@@ -1,0 +1,80 @@
+/**
+ * WrapperUtils.java
+ * Author: Michael Cox
+ * Date: 27-Jan-2009
+ * Time: 18:09:14
+ */
+
+
+package uk.co.mdjcox.utils;
+
+
+import uk.co.mdjcox.configdb.ConfigDbRemote;
+import uk.co.mdjcox.logger.LoggingManager;
+
+import java.io.*;
+import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Collection;
+
+
+public class WrapperUtils {
+
+    private static WrapperUtils instance;
+    private static OsUtils osUtils;
+
+    public static WrapperUtils instance(Logger logger) {
+        if (instance == null) {
+            instance = new WrapperUtils(logger);
+        }
+        return instance;
+    }
+
+
+    private WrapperUtils(Logger logger) {
+        osUtils=OsUtils.instance(logger);
+    }
+
+    private void wrapperOperation(String installDir, String op) throws Exception {
+        osUtils.logger.info("Performing " + op + " of WebFeedEncoder");
+        String command = "";
+        if (File.separatorChar == '\\') {
+            command += "cmd.exe /c \"" + installDir + "wrapper" + File.separator + "WebFeedEncoder.bat\" " + op;
+        } else {
+            command += "sh -c " + installDir + "wrapper" + File.separator + "WebFeedEncoder.sh " + op;
+        }
+        ArrayList<String> errors = new ArrayList<String>();
+        Process process = osUtils.spawnProcess(command, op, true, new ArrayList<String>(), errors);
+
+         int result = process.exitValue();
+         osUtils.logger.info("Result is " + result);
+
+         String resultStr = "";
+         for (String error : errors) {
+             resultStr += error;
+             resultStr += "\n";
+         }
+        if (resultStr.length() > 0) {
+            throw new Exception("Failed to " + op + " service\n" +  result);
+        }
+    }
+
+
+    public void startEncoder(String installDir) throws Exception {
+        wrapperOperation(installDir, "start");
+    }
+
+    public void stopEncoder(String installDir) throws Exception {
+        wrapperOperation(installDir, "stop");
+    }
+
+    public void installEncoder(String installDir) throws Exception {
+        wrapperOperation(installDir, "install");
+    }
+
+    public void uninstallEncoder(String installDir) throws Exception {
+        wrapperOperation(installDir, "uninstall");
+    }
+    
+
+}

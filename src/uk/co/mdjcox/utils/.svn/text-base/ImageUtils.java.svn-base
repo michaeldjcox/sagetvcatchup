@@ -1,0 +1,260 @@
+/**
+ * ImageUtils.java
+ * Author: Michael Cox
+ * Date: 27-Jan-2009
+ * Time: 18:09:14
+ */
+
+
+package uk.co.mdjcox.utils;
+
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+
+
+public class ImageUtils {
+
+    public static void scaleImage(String imageFile, int targetWidth, int targetHeight) throws IOException {
+        BufferedImage image = ImageIO.read(new File(imageFile));
+        if ((targetWidth != image.getWidth()) || (targetHeight != image.getHeight())) {
+            File file = new File(imageFile);
+            File oldFile = new File(imageFile+".old");
+            try {
+                boolean success = false;
+                int count=0;
+                while (!success && (count < 5)) {
+                    success = file.renameTo(oldFile);
+                    count++;
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                    }
+                }
+                if (!success) {
+                    throw new IOException("Failed to rename " + file + " to " + oldFile);
+                }
+
+                BufferedImage src = ImageIO.read(new File(imageFile+".old"));
+                BufferedImage dest = new BufferedImage(targetWidth,targetHeight,
+                                                       BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = dest.createGraphics();
+                AffineTransform at = AffineTransform.getScaleInstance(
+                        (double)targetWidth/src.getWidth(),
+                        (double)targetHeight/src.getHeight());
+                g.drawRenderedImage(src,at);
+
+                ImageIO.write(dest,"jpg",new File(imageFile));
+
+                oldFile.delete();
+            } catch (IOException e) {
+//                Encoder.getLogger().log(Level.WARNING, "Exception scaling image", e);
+                if (oldFile.exists()) {
+                    file.delete();
+                    oldFile.renameTo(file);
+                }
+            }
+        }
+    }
+
+    public static String downloadImage(String url, String imageFile) throws IOException {
+        String fileType = url.substring(url.lastIndexOf(".") + 1);
+        fileType = fileType.toLowerCase();
+        imageFile = imageFile + "." + fileType;
+
+        File downloadFile = new File(imageFile);
+        if (downloadFile.exists()) {
+            downloadFile.delete();
+        }
+        URL u = new URL(url);
+        URLConnection uc = u.openConnection();
+        String contentType = uc.getContentType();
+        int contentLength = uc.getContentLength();
+        InputStream raw = uc.getInputStream();
+        InputStream in = new BufferedInputStream(raw);
+        byte[] data = new byte[contentLength];
+        int bytesRead = 0;
+        int offset = 0;
+        while (offset < contentLength) {
+            bytesRead = in
+                    .read(data, offset, data.length - offset);
+            if (bytesRead == -1) {
+                break;
+            }
+            offset += bytesRead;
+        }
+        in.close();
+
+        if (offset != contentLength) {
+            throw new IOException("Only read " + offset
+                                  + " bytes; Expected "
+                                  + contentLength + " bytes");
+        }
+
+        FileOutputStream out = new FileOutputStream(downloadFile);
+        out.write(data);
+        out.flush();
+        out.close();
+
+        return imageFile;
+    }
+
+//    public static byte[] getImageIcon(String fileName)  {
+//        try {
+//            System.out.println("Opening file " + fileName);
+//            BufferedImage image = ImageIO.read(new File(fileName));
+//            ImageIcon icon = new ImageIcon(image);
+//            while (icon.getImageLoadStatus() == MediaTracker.LOADING) {
+//                try {
+//                    System.out.println("Image loading waiting...");
+//                    Thread.sleep(500);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            if ((icon.getImageLoadStatus() == MediaTracker.ERRORED) ||
+//                (icon.getImageLoadStatus() == MediaTracker.ABORTED)) {
+//                return null;
+//            }
+//            return icon;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+
+   public static byte[] getBytesFromFile(String fileName) throws IOException {
+       File file = new File(fileName);
+        InputStream is = new FileInputStream(file);
+
+        // Get the size of the file
+        long length = file.length();
+
+        // You cannot create an array using a long type.
+        // It needs to be an int type.
+        // Before converting to an int type, check
+        // to ensure that file is not larger than Integer.MAX_VALUE.
+        if (length > Integer.MAX_VALUE) {
+            // File is too large
+        }
+
+        // Create the byte array to hold the data
+        byte[] bytes = new byte[(int)length];
+
+        // Read in the bytes
+        int offset = 0;
+        int numRead = 0;
+        while (offset < bytes.length
+               && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
+            offset += numRead;
+        }
+
+        // Ensure all the bytes have been read in
+        if (offset < bytes.length) {
+            throw new IOException("Could not completely read file "+file.getName());
+        }
+
+        // Close the input stream and return bytes
+        is.close();
+        return bytes;
+    }
+
+    public static String convertToPng(String imageFile) throws IOException {
+        File downloadFile = new File(imageFile);
+        String fileType = imageFile.substring(imageFile.lastIndexOf(".") + 1);
+        fileType = fileType.toLowerCase();
+        if (!fileType.equalsIgnoreCase("jpg")) {
+            //Create file for the source
+//            Encoder.getLogger().info("Converting " + fileType + " to jpg");
+            BufferedImage image = ImageIO.read(downloadFile);
+            imageFile = imageFile.replaceAll(".gif$", ".jpg");
+            imageFile = imageFile.replaceAll(".png$", ".jpg");
+            File output = new File(imageFile);
+            ImageIO.write(image, "jpg", output);
+            downloadFile.delete();
+        }
+        return imageFile;
+    }
+
+
+    public static String createDefaultImage(String channelName, String tmpFile, int destWidth, int destHeight) throws Exception {
+        destWidth = destWidth/2;
+        destHeight = destHeight/2;
+        String[] lines = channelName.split(" ");
+        File outputfile = new File(tmpFile);
+        if (outputfile.exists()) {
+            outputfile.delete();
+        }
+
+        BufferedImage img = new BufferedImage(destWidth,destHeight,
+                                               BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = img.createGraphics();
+
+        int biggest=0;
+
+        for (int i=0; i<lines.length; i++) {
+            if (lines[i].length()>lines[biggest].length()) {
+                biggest = i;
+            }
+        }
+
+        FontMetrics fm = null;
+        Font font = new Font("Dialog", Font.PLAIN, 7);
+        int i=8;
+        while (true) {
+          Font poss =  new Font("Dialog", Font.PLAIN, i);
+          fm = g2.getFontMetrics(poss);
+          Rectangle2D rect = fm.getStringBounds(lines[biggest], g2);
+          if ((lines.length * rect.getHeight()) >= destHeight) {
+            break;
+        }
+            else
+          if ((rect.getWidth()>=destWidth)) {
+              break;
+          } else {
+              font = poss;
+              i++;
+          }
+        }
+
+        fm = g2.getFontMetrics(font);
+        Rectangle2D rect = fm.getStringBounds(lines[biggest], g2);
+
+        g2.setColor(Color.white);
+        g2.setFont(font);
+        int j=1;
+        for (String line : lines) {
+            Rectangle2D rect2 = fm.getStringBounds(line, g2);
+            int x = (int)(destWidth - rect2.getWidth())/2;
+            g2.drawString(line, x,((int)rect.getHeight()*j)-(int)(rect2.getHeight()/4));
+            j++;
+        }
+
+        ImageIO.write(img, "jpg", outputfile);
+        return tmpFile;
+    }
+
+    public static void overlay(String sourceImageFile, String destImageFile, int destWidth, int destHeight) throws IOException {
+        File videoFile = new File(destImageFile);
+        if (videoFile.exists()) {
+            videoFile.delete();
+        }
+
+        BufferedImage src = ImageIO.read(new File(sourceImageFile));
+        BufferedImage dest = new BufferedImage(destWidth,destHeight,
+                                               BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = dest.createGraphics();
+        double xOff = (destWidth - src.getWidth())/2;
+        double yOff = (destHeight - src.getHeight())/2;
+        AffineTransform at = AffineTransform.getTranslateInstance(xOff, yOff);
+        g.drawRenderedImage(src, at);
+        ImageIO.write(dest,"jpg",new File(destImageFile));
+    }
+
+}

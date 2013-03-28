@@ -1,0 +1,30 @@
+/**
+ * UnixUtils.java
+ * Author: Michael Cox
+ * Date: 27-Jan-2009
+ * Time: 18:09:14
+ */
+
+
+package uk.co.mdjcox.utils;
+
+
+import java.util.HashMap;
+import java.util.logging.Logger;
+
+
+class UnixUtils extends OsUtils {
+
+    UnixUtils(Logger logger) {
+        super(logger);
+    }
+
+    public HashMap<String, String> processList() {
+        return getProcesses("ps");
+    }
+
+    public void killOsProcess(String pid, String com) {
+        kill("kill -9", pid);
+    }
+
+}
