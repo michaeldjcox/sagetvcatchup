@@ -164,6 +164,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CatchUp.iml" filepath="$PROJECT_DIR$/CatchUp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SageTvCatchup.iml" filepath="$PROJECT_DIR$/SageTvCatchup.iml" />
     </modules>
   </component>
   <component name="ProjectResources">
@@ -172,8 +173,12 @@
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
+  <component name="SvnBranchConfigurationManager">
+    <option name="mySupportsUserInfoFilter" value="true" />
+  </component>
   <component name="VcsDirectoryMappings">
-    <mapping directory="" vcs="" />
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src" vcs="svn" />
   </component>
   <component name="libraryTable">
     <library name="Sage">

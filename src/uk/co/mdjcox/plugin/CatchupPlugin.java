@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  */
 public class CatchupPlugin implements SageTVPlugin {
 
-    private Logger logger;
+    private LoggerInterface logger;
     private PropertiesFile props;
     private OnlineVideoPublisher sagetvPublisher;
     private PodcastServer server;
@@ -33,7 +33,7 @@ public class CatchupPlugin implements SageTVPlugin {
 
     @Override
     public void start() {
-        LoggerInterface logger = LoggingManager.getLogger(PodcastServer.class, "Catchup", "logs");
+        logger = LoggingManager.getLogger(PodcastServer.class, "Catchup", "logs");
         LoggingManager.addConsole(logger);
 
         try {

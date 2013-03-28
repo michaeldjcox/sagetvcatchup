@@ -18,14 +18,14 @@ public class EpisodesScript extends Script {
         super(logger, script);
     }
 
-    public void getEpisodes(Programme programme) {
+    public void getEpisodes(Programme category) {
         try {
-            getLogger().info("Getting episodes for " + programme);
-            call("url", programme.getServiceUrl(), "programme", programme);
+            getLogger().info("Getting episodes for " + category);
+            call("url", category.getServiceUrl(), "category", category);
         } catch (Throwable e) {
-            getLogger().severe("Unable to get episodes for: " + programme, e);
+            getLogger().severe("Unable to get episodes for: " + category, e);
         } finally {
-            getLogger().info(programme + " has " + programme.getEpisodes().size() + " episodes");
+            getLogger().info(category + " has " + category.getEpisodes().size() + " episodes");
         }
     }
 
