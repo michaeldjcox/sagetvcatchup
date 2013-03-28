@@ -1,5 +1,6 @@
 package uk.co.mdjcox.plugin;
 
+import com.google.inject.Inject;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.*;
 import uk.co.mdjcox.scripts.EpisodeScript;
@@ -21,6 +22,7 @@ public class Harvester {
     private LoggerInterface logger;
     private PropertiesInterface props;
 
+    @Inject
     public Harvester(LoggerInterface logger, PropertiesInterface props) {
         this.logger = logger;
         this.props = props;

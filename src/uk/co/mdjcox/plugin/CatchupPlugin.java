@@ -1,17 +1,12 @@
 package uk.co.mdjcox.plugin;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import sage.SageTVPlugin;
 import uk.co.mdjcox.logger.LoggerInterface;
-import uk.co.mdjcox.logger.LoggingManager;
 import uk.co.mdjcox.model.Catalog;
-import uk.co.mdjcox.utils.HtmlUtils;
-import uk.co.mdjcox.utils.OsUtils;
-import uk.co.mdjcox.utils.PropertiesFile;
 
-import java.io.File;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,35 +17,33 @@ import java.util.logging.Logger;
  */
 public class CatchupPlugin implements SageTVPlugin {
 
-    private LoggerInterface logger;
-    private PropertiesFile props;
     private OnlineVideoPublisher sagetvPublisher;
     private PodcastServer server;
     private Catalog catalog;
+    private Harvester harvester;
 
     public CatchupPlugin(sage.SageTVPluginRegistry registry) {
     }
 
     @Override
     public void start() {
-        logger = LoggingManager.getLogger(PodcastServer.class, "Catchup", "logs");
-        LoggingManager.addConsole(logger);
 
         try {
-            props = new PropertiesFile("config" + File.separator + "catchup.properties", true);
+            CatchupModule module = new CatchupModule();
+            Injector injector = Guice.createInjector(module);
 
-            Harvester harvester = new Harvester(logger, props);
+            harvester =  injector.getInstance(Harvester.class);
+            server = injector.getInstance(PodcastServer.class); //   (logger, props, HtmlUtils.instance(), OsUtils.instance(logger));
+            sagetvPublisher = injector.getInstance(OnlineVideoPublisher.class); // (logger, props, HtmlUtils.instance());
+
             catalog = harvester.refresh();
-
-            server = new PodcastServer(logger, props, HtmlUtils.instance(), OsUtils.instance(logger));
             server.publish(catalog);
             server.start();
-
-            sagetvPublisher = new OnlineVideoPublisher(logger, props, HtmlUtils.instance());
             sagetvPublisher.publish(catalog);
 
         } catch (Exception e) {
-            logger.severe("Failed to start plugin", e);
+            System.err.println("Failed to start plugin");
+            e.printStackTrace();
         }
     }
 
