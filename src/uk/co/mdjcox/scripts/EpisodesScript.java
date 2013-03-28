@@ -1,10 +1,7 @@
 package uk.co.mdjcox.scripts;
 
-import groovy.lang.Binding;
-import groovy.util.GroovyScriptEngine;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.Programme;
-import uk.co.mdjcox.model.Source;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,6 +11,7 @@ import uk.co.mdjcox.model.Source;
  * To change this template use File | Settings | File Templates.
  */
 public class EpisodesScript extends Script {
+
     public EpisodesScript(LoggerInterface logger, String script) {
         super(logger, script);
     }
