@@ -1,11 +1,10 @@
 package uk.co.mdjcox.scripts;
 
-import groovy.lang.Binding;
-import groovy.util.GroovyScriptEngine;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.Episode;
 import uk.co.mdjcox.model.Programme;
-import uk.co.mdjcox.model.Source;
+import uk.co.mdjcox.utils.DownloadUtils;
+import uk.co.mdjcox.utils.HtmlUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,21 +14,21 @@ import uk.co.mdjcox.model.Source;
  * To change this template use File | Settings | File Templates.
  */
 public class EpisodeScript extends Script {
-    public EpisodeScript(LoggerInterface logger, String script) {
-        super(logger, script);
+    public EpisodeScript(LoggerInterface logger, String script, HtmlUtils htmlUtils, DownloadUtils downloadUtils) {
+        super(logger, script, htmlUtils, downloadUtils);
     }
 
     public void getEpisode(Programme programme, Episode episode) {
         try {
             getLogger().info("Getting episode at URL " + episode.getServiceUrl());
-            call("url", episode.getServiceUrl(), "episode", episode,"logger", getLogger() );
+            call("url", episode.getServiceUrl(), "episode", episode, "logger", getLogger());
             String iconUrl = programme.getIconUrl();
             if ((iconUrl == null) || iconUrl.isEmpty()) {
                 programme.setIconUrl(episode.getIconUrl());
             }
             getLogger().info("Found episode " + episode);
         } catch (Throwable e) {
-            programme.removeEpisode(episode); ;
+            programme.removeEpisode(episode);
             getLogger().severe("Unable to get an episode for: " + programme + " " + episode.getServiceUrl(), e);
         }
     }

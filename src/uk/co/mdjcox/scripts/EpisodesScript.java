@@ -2,6 +2,8 @@ package uk.co.mdjcox.scripts;
 
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.Programme;
+import uk.co.mdjcox.utils.DownloadUtils;
+import uk.co.mdjcox.utils.HtmlUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,8 +14,8 @@ import uk.co.mdjcox.model.Programme;
  */
 public class EpisodesScript extends Script {
 
-    public EpisodesScript(LoggerInterface logger, String script) {
-        super(logger, script);
+    public EpisodesScript(LoggerInterface logger, String script, HtmlUtils htmlUtils, DownloadUtils downloadUtils) {
+        super(logger, script, htmlUtils, downloadUtils);
     }
 
     public void getEpisodes(Programme category) {

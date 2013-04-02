@@ -1,11 +1,7 @@
-
-
+import uk.co.mdjcox.model.Programme
 import uk.co.mdjcox.utils.HtmlUtils
 
-import uk.co.mdjcox.model.Programme
-import uk.co.mdjcox.utils.DownloadUtils
-
-String str = DownloadUtils.instance().downloadFileString(url);
+String str = downloadFileString(url);
 
 if (str != null) {
     if (str.contains("The programme you're looking for can't be found")) str = null;
@@ -17,7 +13,7 @@ String start = "<div id=\"results\"";
 str = HtmlUtils.instance().moveTo(start, str)
 str = HtmlUtils.instance().extractTo(end, str)
 
-end="</li>"
+end = "</li>"
 start = "<li>"
 
 while (str != null) {
@@ -42,7 +38,7 @@ while (str != null) {
             ""
     );
 
-    programmes.add( subCat);
+    programmes.add(subCat);
 }
 
 

@@ -6,8 +6,11 @@ import uk.co.mdjcox.model.*;
 import uk.co.mdjcox.scripts.EpisodeScript;
 import uk.co.mdjcox.scripts.EpisodesScript;
 import uk.co.mdjcox.scripts.ProgrammesScript;
+import uk.co.mdjcox.utils.DownloadUtils;
+import uk.co.mdjcox.utils.HtmlUtils;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -21,11 +24,15 @@ public class Harvester {
 
     private LoggerInterface logger;
     private PropertiesInterface props;
+    private HtmlUtils htmlUtils;
+    private DownloadUtils downloadUtils;
 
     @Inject
-    public Harvester(LoggerInterface logger, PropertiesInterface props) {
+    public Harvester(LoggerInterface logger, PropertiesInterface props, HtmlUtils htmlUtils, DownloadUtils downloadUtils) {
         this.logger = logger;
         this.props = props;
+        this.htmlUtils = htmlUtils;
+        this.downloadUtils = downloadUtils;
     }
 
     public Catalog refresh() {
@@ -53,13 +60,18 @@ public class Harvester {
                 String longName = props.getProperty("source." + sourceId + ".longName", "");
                 String serviceUrl = props.getProperty("source." + sourceId + ".serviceUrl", "");
                 String iconUrl = props.getProperty("source." + sourceId + ".iconUrl", "");
-                String programmesScriptName = props.getProperty("source." + sourceId + ".programmesScript", "");
-                String episodesScriptName = props.getProperty("source." + sourceId + ".episodesScript", "");
-                String episodeScriptName = props.getProperty("source." + sourceId + ".episodeScript", "");
 
-                ProgrammesScript programmeScript = new ProgrammesScript(logger, programmesScriptName);
-                EpisodesScript episodesScript = new EpisodesScript(logger, episodesScriptName);
-                EpisodeScript episodeScript = new EpisodeScript(logger, episodeScriptName);
+                String base = System.getProperty("user.dir");
+                base = base + File.separator + "scripts" + File.separator;
+
+                String programmesScriptName = base + props.getProperty("source." + sourceId + ".programmesScript", "");
+                String episodesScriptName = base + props.getProperty("source." + sourceId + ".episodesScript", "");
+                String episodeScriptName = base + props.getProperty("source." + sourceId + ".episodeScript", "");
+
+
+                ProgrammesScript programmeScript = new ProgrammesScript(logger, programmesScriptName, htmlUtils, downloadUtils);
+                EpisodesScript episodesScript = new EpisodesScript(logger, episodesScriptName, htmlUtils, downloadUtils);
+                EpisodeScript episodeScript = new EpisodeScript(logger, episodeScriptName, htmlUtils, downloadUtils);
 
                 Source sourceCat = new Source(sourceId, shortName, longName, serviceUrl, iconUrl);
                 newCategories.put(sourceCat.getId(), sourceCat);
@@ -109,24 +121,24 @@ public class Harvester {
                     System.err.println(programmeCat);
                     // A to Z
                     String programmeTitle = programmeCat.getShortName();
-                    String azName = "";
+                    String azName;
                     if (!programmeTitle.startsWith("The ") && !programmeTitle.startsWith("the ")) {
-                        azName = programmeTitle.substring(0,1).toUpperCase();
+                        azName = programmeTitle.substring(0, 1).toUpperCase();
                     } else {
-                        azName = programmeTitle.substring(4,5).toUpperCase();
+                        azName = programmeTitle.substring(4, 5).toUpperCase();
                     }
 
                     String atozId = sourceCat.getId() + "/AtoZ";
                     SubCategory atozCat = newSubCategories.get(atozId);
                     if (atozCat == null) {
-                        atozCat = new SubCategory(atozId, "A to Z", "A to Z", sourceCat.getServiceUrl() , sourceCat.getIconUrl(), sourceCat.getId());
+                        atozCat = new SubCategory(atozId, "A to Z", "A to Z", sourceCat.getServiceUrl(), sourceCat.getIconUrl(), sourceCat.getId());
                         newSubCategories.put(atozId, atozCat);
                         sourceCat.addSubCategory(atozCat);
                     }
                     String azId = sourceCat.getId() + "/AtoZ/" + azName;
                     SubCategory azCat = newSubCategories.get(azId);
                     if (azCat == null) {
-                        azCat = new SubCategory(azId, azName, azName, sourceCat.getServiceUrl() , sourceCat.getIconUrl(), atozCat.getId());
+                        azCat = new SubCategory(azId, azName, azName, sourceCat.getServiceUrl(), sourceCat.getIconUrl(), atozCat.getId());
                         newSubCategories.put(azId, azCat);
                         atozCat.addSubCategory(azCat);
                     }
@@ -144,14 +156,14 @@ public class Harvester {
                         String genreId = sourceCat.getId() + "/Genre";
                         SubCategory genreCat = newSubCategories.get(genreId);
                         if (genreCat == null) {
-                            genreCat = new SubCategory(genreId, "Genre", "Genre", sourceCat.getServiceUrl() , sourceCat.getIconUrl(), sourceCat.getId());
+                            genreCat = new SubCategory(genreId, "Genre", "Genre", sourceCat.getServiceUrl(), sourceCat.getIconUrl(), sourceCat.getId());
                             newSubCategories.put(genreId, genreCat);
                             sourceCat.addSubCategory(genreCat);
                         }
                         String genreInstanceId = sourceCat.getId() + "/Genre/" + genreName.replace(" ", "");
                         SubCategory genreInstanceCat = newSubCategories.get(genreInstanceId);
                         if (genreInstanceCat == null) {
-                            genreInstanceCat = new SubCategory(genreInstanceId, genreName, genreName, sourceCat.getServiceUrl() , sourceCat.getIconUrl(), genreCat.getId());
+                            genreInstanceCat = new SubCategory(genreInstanceId, genreName, genreName, sourceCat.getServiceUrl(), sourceCat.getIconUrl(), genreCat.getId());
                             newSubCategories.put(genreInstanceId, genreInstanceCat);
                             genreCat.addSubCategory(genreInstanceCat);
                         }
@@ -166,14 +178,14 @@ public class Harvester {
                         String channelId = sourceCat.getId() + "/Channel";
                         SubCategory channelCat = newSubCategories.get(channelId);
                         if (channelCat == null) {
-                            channelCat = new SubCategory(channelId, "Channel", "Channel", sourceCat.getServiceUrl() , sourceCat.getIconUrl(), sourceCat.getId());
+                            channelCat = new SubCategory(channelId, "Channel", "Channel", sourceCat.getServiceUrl(), sourceCat.getIconUrl(), sourceCat.getId());
                             newSubCategories.put(channelId, channelCat);
                             sourceCat.addSubCategory(channelCat);
                         }
                         String channelInstanceId = sourceCat.getId() + "/Channel/" + channelName.replace(" ", "");
                         SubCategory channelInstanceCat = newSubCategories.get(channelInstanceId);
                         if (channelInstanceCat == null) {
-                            channelInstanceCat = new SubCategory(channelInstanceId, channelName, channelName, sourceCat.getServiceUrl() , sourceCat.getIconUrl(), channelCat.getId());
+                            channelInstanceCat = new SubCategory(channelInstanceId, channelName, channelName, sourceCat.getServiceUrl(), sourceCat.getIconUrl(), channelCat.getId());
                             newSubCategories.put(channelInstanceId, channelInstanceCat);
                             channelCat.addSubCategory(channelInstanceCat);
                         }
@@ -190,14 +202,14 @@ public class Harvester {
                         String airdateId = sourceCat.getId() + "/AirDate";
                         SubCategory airdateCat = newSubCategories.get(airdateId);
                         if (airdateCat == null) {
-                            airdateCat = new SubCategory(airdateId, "Air Date", "Air Date", sourceCat.getServiceUrl() , sourceCat.getIconUrl(), sourceCat.getId());
+                            airdateCat = new SubCategory(airdateId, "Air Date", "Air Date", sourceCat.getServiceUrl(), sourceCat.getIconUrl(), sourceCat.getId());
                             newSubCategories.put(airdateId, airdateCat);
                             sourceCat.addSubCategory(airdateCat);
                         }
                         String airDateInstanceId = sourceCat.getId() + "/AirDate/" + airDateName.replace(" ", "").replace(",", "");
-                        Programme airDateInstanceCat = (Programme)newSubCategories.get(airDateInstanceId);
+                        Programme airDateInstanceCat = (Programme) newSubCategories.get(airDateInstanceId);
                         if (airDateInstanceCat == null) {
-                            airDateInstanceCat = new Programme(airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl() , sourceCat.getIconUrl(), airdateCat.getId());
+                            airDateInstanceCat = new Programme(airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(), sourceCat.getIconUrl(), airdateCat.getId());
                             newSubCategories.put(airDateInstanceId, airDateInstanceCat);
                             airdateCat.addSubCategory(airDateInstanceCat);
                         }

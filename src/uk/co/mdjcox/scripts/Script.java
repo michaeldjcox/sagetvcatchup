@@ -1,8 +1,14 @@
 package uk.co.mdjcox.scripts;
 
 import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
+import org.codehaus.groovy.control.CompilerConfiguration;
 import uk.co.mdjcox.logger.LoggerInterface;
+import uk.co.mdjcox.utils.DownloadUtils;
+import uk.co.mdjcox.utils.HtmlUtils;
+
+import java.io.File;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,10 +21,14 @@ public abstract class Script {
 
     private LoggerInterface logger;
     private String script;
+    private HtmlUtils htmlUtils;
+    private DownloadUtils downloadUtils;
 
-    protected Script(LoggerInterface logger, String script) {
+    protected Script(LoggerInterface logger, String script, HtmlUtils htmlUtils, DownloadUtils downloadUtils) {
         this.logger = logger;
         this.script = script;
+        this.htmlUtils = htmlUtils;
+        this.downloadUtils = downloadUtils;
     }
 
     protected LoggerInterface getLogger() {
@@ -28,13 +38,21 @@ public abstract class Script {
     public void call(Object... params) throws Exception {
         String[] roots = new String[]{"./scripts"};
         GroovyScriptEngine gse = new GroovyScriptEngine(roots);
+        CompilerConfiguration comp = gse.getConfig();
+        comp.setScriptBaseClass(GroovyScript.class.getName());
+        gse.setConfig(comp);
+
         Binding binding = new Binding();
-        for (int i=0; i<params.length; i=i+2) {
-            binding.setVariable(params[i].toString(), params[i+1]);
+        for (int i = 0; i < params.length; i = i + 2) {
+            binding.setVariable(params[i].toString(), params[i + 1]);
         }
-        gse.run(script, binding);
+
+        GroovyShell shell = new GroovyShell(binding, comp);
+        GroovyScript script = (GroovyScript) shell.parse(new File(this.script));
+        script.setDownloadUtils(downloadUtils);
+        script.setHtmlUtils(htmlUtils);
+
+        script.run();
 
     }
-
-
 }

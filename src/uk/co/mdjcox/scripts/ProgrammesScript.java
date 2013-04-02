@@ -1,10 +1,10 @@
 package uk.co.mdjcox.scripts;
 
-import groovy.lang.Binding;
-import groovy.util.GroovyScriptEngine;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.Programme;
 import uk.co.mdjcox.model.Source;
+import uk.co.mdjcox.utils.DownloadUtils;
+import uk.co.mdjcox.utils.HtmlUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,8 +17,8 @@ import java.util.Collection;
  * To change this template use File | Settings | File Templates.
  */
 public class ProgrammesScript extends Script {
-    public ProgrammesScript(LoggerInterface logger, String script) {
-        super(logger, script);
+    public ProgrammesScript(LoggerInterface logger, String script, HtmlUtils htmlUtils, DownloadUtils downloadUtils) {
+        super(logger, script, htmlUtils, downloadUtils);
     }
 
     public Collection<Programme> getProgrammes(Source category) {
