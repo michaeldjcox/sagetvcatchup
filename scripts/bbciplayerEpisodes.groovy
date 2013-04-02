@@ -1,8 +1,6 @@
 import uk.co.mdjcox.model.Episode
-import uk.co.mdjcox.utils.HtmlUtils
-import uk.co.mdjcox.utils.DownloadUtils
 
-String str = DownloadUtils.instance().downloadFileString(url);
+String str = downloadFileString(url);
 
 if (str != null) {
     if (str.contains("The programme you're looking for can't be found")) str = null;
@@ -13,13 +11,13 @@ String end = "/>"; // "</a>";
 String start = "<meta property=\"og:url\"";
 
 while (str != null) {
-    str = HtmlUtils.instance().moveTo(start, str)
+    str = moveTo(start, str)
     if (str == null) break;
-    String programmeBlock = HtmlUtils.instance().extractTo(end, str)
-    programmeBlock = HtmlUtils.instance().moveTo("content=\"", programmeBlock);
-    link = HtmlUtils.instance().extractTo("\"", programmeBlock)
+    String programmeBlock = extractTo(end, str)
+    programmeBlock = moveTo("content=\"", programmeBlock);
+    link = extractTo("\"", programmeBlock)
     if (link == null) continue
-    link = HtmlUtils.instance().makeLinkAbsolute("http://www.bbc.co.uk", link);
+    link = makeLinkAbsolute("http://www.bbc.co.uk", link);
     Episode subCat = new Episode(
             "", //programmeTitle
             "", //episodeTitle
@@ -41,21 +39,21 @@ str = orig;
 end = "</ul>"; // "</a>";
 start = "<div class=\"content\" id=\"tabpanel-moreepisodes\">";
 
-str = HtmlUtils.instance().moveTo(start, str);
-str = HtmlUtils.instance().extractTo(end, str)
+str = moveTo(start, str);
+str = extractTo(end, str)
 
 end = "</a"
-start= "<a "
+start = "<a "
 
 
 while (str != null) {
-    str = HtmlUtils.instance().moveTo(start, str)
+    str = moveTo(start, str)
     if (str == null) break;
-    String programmeBlock = HtmlUtils.instance().extractTo(end, str)
-    programmeBlock = HtmlUtils.instance().moveTo("href=\"", programmeBlock);
-    link = HtmlUtils.instance().extractTo("\"", programmeBlock)
+    String programmeBlock = extractTo(end, str)
+    programmeBlock = moveTo("href=\"", programmeBlock);
+    link = extractTo("\"", programmeBlock)
     if (link == null) continue
-    link = HtmlUtils.instance().makeLinkAbsolute("http://www.bbc.co.uk", link);
+    link = makeLinkAbsolute("http://www.bbc.co.uk", link);
     Episode subCat = new Episode(
             "", //programmeTitle
             "", //episodeTitle

@@ -3,8 +3,8 @@ package uk.co.mdjcox.scripts;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.Programme;
 import uk.co.mdjcox.model.Source;
-import uk.co.mdjcox.utils.DownloadUtils;
-import uk.co.mdjcox.utils.HtmlUtils;
+import uk.co.mdjcox.utils.DownloadUtilsInterface;
+import uk.co.mdjcox.utils.HtmlUtilsInterface;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +17,7 @@ import java.util.Collection;
  * To change this template use File | Settings | File Templates.
  */
 public class ProgrammesScript extends Script {
-    public ProgrammesScript(LoggerInterface logger, String script, HtmlUtils htmlUtils, DownloadUtils downloadUtils) {
+    public ProgrammesScript(LoggerInterface logger, String script, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
         super(logger, script, htmlUtils, downloadUtils);
     }
 

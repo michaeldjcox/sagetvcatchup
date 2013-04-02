@@ -6,8 +6,8 @@ import uk.co.mdjcox.model.*;
 import uk.co.mdjcox.scripts.EpisodeScript;
 import uk.co.mdjcox.scripts.EpisodesScript;
 import uk.co.mdjcox.scripts.ProgrammesScript;
-import uk.co.mdjcox.utils.DownloadUtils;
-import uk.co.mdjcox.utils.HtmlUtils;
+import uk.co.mdjcox.utils.DownloadUtilsInterface;
+import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
@@ -24,11 +24,11 @@ public class Harvester {
 
     private LoggerInterface logger;
     private PropertiesInterface props;
-    private HtmlUtils htmlUtils;
-    private DownloadUtils downloadUtils;
+    private HtmlUtilsInterface htmlUtils;
+    private DownloadUtilsInterface downloadUtils;
 
     @Inject
-    public Harvester(LoggerInterface logger, PropertiesInterface props, HtmlUtils htmlUtils, DownloadUtils downloadUtils) {
+    public Harvester(LoggerInterface logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
         this.logger = logger;
         this.props = props;
         this.htmlUtils = htmlUtils;

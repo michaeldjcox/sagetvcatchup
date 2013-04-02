@@ -8,6 +8,7 @@ import org.mockito.MockitoAnnotations;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.logger.LoggingManager;
 import uk.co.mdjcox.utils.HtmlUtils;
+import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.lang.reflect.Method;
@@ -15,13 +16,13 @@ import java.lang.reflect.Method;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
-/** 
-* OnlineVideoPublisher Tester. 
-* 
-* @author <Authors name> 
-* @since <pre>Mar 25, 2013</pre> 
-* @version 1.0 
-*/ 
+/**
+ * OnlineVideoPublisher Tester.
+ *
+ * @author <Authors name>
+ * @version 1.0
+ * @since <pre>Mar 25, 2013</pre>
+ */
 public class OnlineVideoPublisherTest {
 
     private OnlineVideoPublisher publisher;
@@ -29,46 +30,40 @@ public class OnlineVideoPublisherTest {
     private PropertiesInterface properties;
 
 
-@Before
-public void before() throws Exception {
-    MockitoAnnotations.initMocks(this);
-    LoggerInterface logger = LoggingManager.getLogger(this.getClass(), "test", "logs");
-    HtmlUtils htmlUtils = HtmlUtils.instance();
-    publisher = new OnlineVideoPublisher(logger, properties, htmlUtils);
-} 
+    @Before
+    public void before() throws Exception {
+        MockitoAnnotations.initMocks(this);
+        LoggerInterface logger = LoggingManager.getLogger(this.getClass(), "test", "logs");
+        HtmlUtilsInterface htmlUtils = HtmlUtils.instance();
+        publisher = new OnlineVideoPublisher(logger, properties, htmlUtils);
+    }
 
-@After
-public void after() throws Exception { 
-} 
+    @After
+    public void after() throws Exception {
+    }
 
-/** 
-* 
-* Method: unpublish(String file) 
-* 
-*/ 
-@Test
-public void testUnpublish() throws Exception { 
+    /**
+     * Method: unpublish(String file)
+     */
+    @Test
+    public void testUnpublish() throws Exception {
 //TODO: Test goes here... 
-} 
+    }
 
-/** 
-* 
-* Method: publish(Catalog catalog) 
-* 
-*/ 
-@Test
-public void testPublish() throws Exception { 
+    /**
+     * Method: publish(Catalog catalog)
+     */
+    @Test
+    public void testPublish() throws Exception {
 //TODO: Test goes here... 
-} 
+    }
 
 
-/** 
-* 
-* Method: getLinkFile(String file) 
-* 
-*/ 
-@Test
-public void testGetLinkFile() throws Exception { 
+    /**
+     * Method: getLinkFile(String file)
+     */
+    @Test
+    public void testGetLinkFile() throws Exception {
 //TODO: Test goes here... 
 /* 
 try { 
@@ -79,16 +74,14 @@ try {
 } catch(IllegalAccessException e) { 
 } catch(InvocationTargetException e) { 
 } 
-*/ 
-} 
+*/
+    }
 
-/** 
-* 
-* Method: getLabelFile(String file) 
-* 
-*/ 
-@Test
-public void testGetLabelFile() throws Exception { 
+    /**
+     * Method: getLabelFile(String file)
+     */
+    @Test
+    public void testGetLabelFile() throws Exception {
 //TODO: Test goes here... 
 /* 
 try { 
@@ -99,33 +92,29 @@ try {
 } catch(IllegalAccessException e) { 
 } catch(InvocationTargetException e) { 
 } 
-*/ 
-} 
+*/
+    }
 
-/** 
-* 
-* Method: getRoot() 
-* 
-*/ 
-@Test
-public void testGetRoot() throws Exception {
-    when( properties.getProperty("STV", "C:\\Program Files\\SageTV\\SageTV\\STVs\\SageTV7\\SageTV7.xml") ).thenReturn("./test.xml");
-    Method method = publisher.getClass().getDeclaredMethod("getRoot");
-    method.setAccessible(true);
-    Object result = method.invoke(publisher);
-    assertNotNull("getRoot should return a value", result);
-    assertTrue("getRoot should return a String", (result instanceof String));
-    assertEquals("getRoot", "./OnlineVideos", result);
+    /**
+     * Method: getRoot()
+     */
+    @Test
+    public void testGetRoot() throws Exception {
+        when(properties.getProperty("STV", "C:\\Program Files\\SageTV\\SageTV\\STVs\\SageTV7\\SageTV7.xml")).thenReturn("./test.xml");
+        Method method = publisher.getClass().getDeclaredMethod("getRoot");
+        method.setAccessible(true);
+        Object result = method.invoke(publisher);
+        assertNotNull("getRoot should return a value", result);
+        assertTrue("getRoot should return a String", (result instanceof String));
+        assertEquals("getRoot", "./OnlineVideos", result);
 
-} 
+    }
 
-/** 
-* 
-* Method: addPodcast(String category, String subCat, String url, PropertiesFile links, ArrayList<String> otherSubCats) 
-* 
-*/ 
-@Test
-public void testAddPodcast() throws Exception { 
+    /**
+     * Method: addPodcast(String category, String subCat, String url, PropertiesFile links, ArrayList<String> otherSubCats)
+     */
+    @Test
+    public void testAddPodcast() throws Exception {
 //TODO: Test goes here... 
 /* 
 try { 
@@ -136,16 +125,14 @@ try {
 } catch(IllegalAccessException e) { 
 } catch(InvocationTargetException e) { 
 } 
-*/ 
-} 
+*/
+    }
 
-/** 
-* 
-* Method: addCategory(String callSign, String name, String description, String categoryIconUrl, PropertiesFile labels) 
-* 
-*/ 
-@Test
-public void testAddCategory() throws Exception { 
+    /**
+     * Method: addCategory(String callSign, String name, String description, String categoryIconUrl, PropertiesFile labels)
+     */
+    @Test
+    public void testAddCategory() throws Exception {
 //TODO: Test goes here... 
 /* 
 try { 
@@ -156,16 +143,14 @@ try {
 } catch(IllegalAccessException e) { 
 } catch(InvocationTargetException e) { 
 } 
-*/ 
-} 
+*/
+    }
 
-/** 
-* 
-* Method: addSource(String category, String categoryShortName, String categoryLongName, PropertiesFile links, PropertiesFile labels) 
-* 
-*/ 
-@Test
-public void testAddSource() throws Exception { 
+    /**
+     * Method: addSource(String category, String categoryShortName, String categoryLongName, PropertiesFile links, PropertiesFile labels)
+     */
+    @Test
+    public void testAddSource() throws Exception {
 //TODO: Test goes here... 
 /* 
 try { 
@@ -176,16 +161,14 @@ try {
 } catch(IllegalAccessException e) { 
 } catch(InvocationTargetException e) { 
 } 
-*/ 
-} 
+*/
+    }
 
-/** 
-* 
-* Method: addSubCategory(String parentId, String subCatId, String subCatTitle, String subCatDescription, String iconUrl, PropertiesFile links, PropertiesFile labels) 
-* 
-*/ 
-@Test
-public void testAddSubCategory() throws Exception { 
+    /**
+     * Method: addSubCategory(String parentId, String subCatId, String subCatTitle, String subCatDescription, String iconUrl, PropertiesFile links, PropertiesFile labels)
+     */
+    @Test
+    public void testAddSubCategory() throws Exception {
 //TODO: Test goes here... 
 /* 
 try { 
@@ -196,7 +179,7 @@ try {
 } catch(IllegalAccessException e) { 
 } catch(InvocationTargetException e) { 
 } 
-*/ 
-} 
+*/
+    }
 
 } 

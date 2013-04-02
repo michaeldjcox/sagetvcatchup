@@ -1,27 +1,25 @@
 import uk.co.mdjcox.model.Episode
-import uk.co.mdjcox.model.SubCategory
-import uk.co.mdjcox.utils.HtmlUtils
 
-String str = DownloadUtils.instance().downloadFileString(url);
+String str = downloadFileString(url);
 
 if (str != null) {
     if (str.contains("The programme you're looking for can't be found")) str = null;
 }
 
-str = HtmlUtils.instance().moveTo("<ol class=\"all-series\">", str);
-str = HtmlUtils.instance().extractTo("</ol>", str);
+str = moveTo("<ol class=\"all-series\">", str);
+str = extractTo("</ol>", str);
 
 String orig = str;
 String end = "</li>"; // "</a>";
 String start = "<li data";
 
 while (str != null) {
-    str = HtmlUtils.instance().moveTo(start, str)
+    str = moveTo(start, str)
     if (str == null) break;
-    String programmeBlock = HtmlUtils.instance().extractTo(end, str)
-    programmeBlock = HtmlUtils.instance().moveTo("ata-episodeurl=\"", programmeBlock);
-    link = HtmlUtils.instance().extractTo("\"", programmeBlock)
-    link = HtmlUtils.instance().makeLinkAbsolute("http://www.channel4.com", link);
+    String programmeBlock = extractTo(end, str)
+    programmeBlock = moveTo("ata-episodeurl=\"", programmeBlock);
+    link = extractTo("\"", programmeBlock)
+    link = makeLinkAbsolute("http://www.channel4.com", link);
     Episode subCat = new Episode(
             "", //programmeTitle
             "", //episodeTitle
@@ -44,13 +42,13 @@ end = "Watch</a>"; // "</a>";
 start = "<div class=\"node node-episode";
 
 while (str != null) {
-    str = HtmlUtils.instance().moveTo(start, str)
+    str = moveTo(start, str)
     if (str == null) break;
-    String programmeBlock = HtmlUtils.instance().extractTo(end, str)
-    programmeBlock = HtmlUtils.instance().moveTo("href=\"", programmeBlock);
-    link = HtmlUtils.instance().extractTo("\"", programmeBlock)
+    String programmeBlock = extractTo(end, str)
+    programmeBlock = moveTo("href=\"", programmeBlock);
+    link = extractTo("\"", programmeBlock)
     if (link == null) continue
-    link = HtmlUtils.instance().makeLinkAbsolute("http://www.channel4.com", link);
+    link = makeLinkAbsolute("http://www.channel4.com", link);
     Episode subCat = new Episode(
             "", //programmeTitle
             "", //episodeTitle

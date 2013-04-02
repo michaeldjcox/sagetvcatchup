@@ -5,8 +5,8 @@ import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import uk.co.mdjcox.logger.LoggerInterface;
-import uk.co.mdjcox.utils.DownloadUtils;
-import uk.co.mdjcox.utils.HtmlUtils;
+import uk.co.mdjcox.utils.DownloadUtilsInterface;
+import uk.co.mdjcox.utils.HtmlUtilsInterface;
 
 import java.io.File;
 
@@ -21,10 +21,10 @@ public abstract class Script {
 
     private LoggerInterface logger;
     private String script;
-    private HtmlUtils htmlUtils;
-    private DownloadUtils downloadUtils;
+    private HtmlUtilsInterface htmlUtils;
+    private DownloadUtilsInterface downloadUtils;
 
-    protected Script(LoggerInterface logger, String script, HtmlUtils htmlUtils, DownloadUtils downloadUtils) {
+    protected Script(LoggerInterface logger, String script, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
         this.logger = logger;
         this.script = script;
         this.htmlUtils = htmlUtils;

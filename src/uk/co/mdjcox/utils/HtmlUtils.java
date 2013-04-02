@@ -14,12 +14,12 @@ import java.io.*;
 import java.util.ArrayList;
 
 
-public class HtmlUtils {
+public class HtmlUtils implements HtmlUtilsInterface {
     private Parser parser = new Parser();
 
-    private static HtmlUtils instance;
+    private static HtmlUtilsInterface instance;
 
-    public static HtmlUtils instance() {
+    public static HtmlUtilsInterface instance() {
         if (instance == null) {
             instance = new HtmlUtils();
         }
@@ -48,6 +48,7 @@ public class HtmlUtils {
         }
     }
 
+    @Override
     public String removeHtml(String html) {
         if (html == null) return html;
 //        html = html.replace('�', '-');
@@ -70,10 +71,11 @@ public class HtmlUtils {
         return html;
     }
 
+    @Override
     public String makeLinkAbsolute(String base, String relative) {
         if (relative != null) {
             relative = relative.replace("https", "http");
-            if ( !relative.startsWith("http")) {
+            if (!relative.startsWith("http")) {
                 if (relative.startsWith("/") || base.endsWith("/")) {
                     relative = base + relative;
                 } else {
@@ -85,6 +87,7 @@ public class HtmlUtils {
         return relative;
     }
 
+    @Override
     public String makeIdSafe(String id) {
         String newId = "";
         for (char character : id.toCharArray()) {
@@ -95,11 +98,13 @@ public class HtmlUtils {
         return newId;
     }
 
+    @Override
     public String makeContentSafe(String id) {
         id = id.replace(" & ", " and ");
         return id;
     }
 
+    @Override
     public String extractTo(String token, String fileStr) {
         if (fileStr == null) {
             return null;
@@ -118,6 +123,7 @@ public class HtmlUtils {
         }
     }
 
+    @Override
     public boolean hasToken(String token, String fileStr) {
         if (fileStr == null) {
             return false;
@@ -136,6 +142,7 @@ public class HtmlUtils {
         }
     }
 
+    @Override
     public String moveTo(String token, String fileStr) {
         if (fileStr == null) {
             return null;
@@ -154,10 +161,12 @@ public class HtmlUtils {
         }
     }
 
+    @Override
     public String getFileString(String htmlfile) throws IOException {
         return getFileString(htmlfile, null);
     }
 
+    @Override
     public String getFileString(String htmlfile, String filter) throws IOException {
         File file = new File(htmlfile);
         if (!file.exists()) {
@@ -182,6 +191,7 @@ public class HtmlUtils {
         return fileContent;
     }
 
+    @Override
     public String moveToInSteps(ArrayList<String> tokens, String fileStr) {
         try {
             for (String token : tokens) {
@@ -195,23 +205,24 @@ public class HtmlUtils {
         return fileStr;
     }
 
+    @Override
     public ArrayList<String> extractItem(String fileStr, ArrayList<String> start, String stop, boolean removeHtml) {
-            fileStr = moveToInSteps(start, fileStr);
-            if (fileStr == null || fileStr.equals("")) {
-                return null;
-            }
+        fileStr = moveToInSteps(start, fileStr);
+        if (fileStr == null || fileStr.equals("")) {
+            return null;
+        }
 
-            String result = extractTo(stop, fileStr);
-            if (result == null) {
-                return null;
-            }
-            if (removeHtml) {
-                result = removeHtml(result);
-            }
-            fileStr = moveTo( stop, fileStr);
-            if (fileStr == null || fileStr.equals("")) {
-                return null;
-            }
+        String result = extractTo(stop, fileStr);
+        if (result == null) {
+            return null;
+        }
+        if (removeHtml) {
+            result = removeHtml(result);
+        }
+        fileStr = moveTo(stop, fileStr);
+        if (fileStr == null || fileStr.equals("")) {
+            return null;
+        }
 
         ArrayList<String> list = new ArrayList<String>();
         list.add(fileStr);

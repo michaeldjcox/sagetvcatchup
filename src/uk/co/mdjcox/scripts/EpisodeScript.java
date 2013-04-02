@@ -3,8 +3,8 @@ package uk.co.mdjcox.scripts;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.Episode;
 import uk.co.mdjcox.model.Programme;
-import uk.co.mdjcox.utils.DownloadUtils;
-import uk.co.mdjcox.utils.HtmlUtils;
+import uk.co.mdjcox.utils.DownloadUtilsInterface;
+import uk.co.mdjcox.utils.HtmlUtilsInterface;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,7 +14,7 @@ import uk.co.mdjcox.utils.HtmlUtils;
  * To change this template use File | Settings | File Templates.
  */
 public class EpisodeScript extends Script {
-    public EpisodeScript(LoggerInterface logger, String script, HtmlUtils htmlUtils, DownloadUtils downloadUtils) {
+    public EpisodeScript(LoggerInterface logger, String script, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
         super(logger, script, htmlUtils, downloadUtils);
     }
 

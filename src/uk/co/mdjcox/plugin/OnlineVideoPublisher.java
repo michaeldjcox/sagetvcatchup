@@ -16,10 +16,10 @@ public class OnlineVideoPublisher {
 
     private LoggerInterface logger;
     private PropertiesInterface props;
-    private HtmlUtils htmlUtils;
+    private HtmlUtilsInterface htmlUtils;
 
     @Inject
-    public OnlineVideoPublisher(LoggerInterface logger, PropertiesInterface props, HtmlUtils htmlUtils) throws Exception {
+    public OnlineVideoPublisher(LoggerInterface logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils) throws Exception {
         this.logger = logger;
         this.props = props;
         this.htmlUtils = htmlUtils;
@@ -32,12 +32,12 @@ public class OnlineVideoPublisher {
 
         File linkFile = new File(linkFileName);
         if (linkFile.exists()) {
-            success = success &&  linkFile.delete();
+            success = success && linkFile.delete();
         }
 
         File labelFile = new File(labelFileName);
         if (labelFile.exists()) {
-            success = success &&  labelFile.delete();
+            success = success && labelFile.delete();
         }
 
         if (!success) {
@@ -48,14 +48,14 @@ public class OnlineVideoPublisher {
 
     private String getLinkFile(String file) {
         if (!file.isEmpty()) {
-            file="_" + file;
+            file = "_" + file;
         }
         return getRoot() + File.separator + "CustomOnlineVideoLinks" + file + ".properties";
     }
 
     private String getLabelFile(String file) {
         if (!file.isEmpty()) {
-            file="_" + file;
+            file = "_" + file;
         }
         return getRoot() + File.separator + "CustomOnlineVideoUIText" + file + ".properties";
     }
@@ -65,8 +65,8 @@ public class OnlineVideoPublisher {
         STV = STV.replace(File.separatorChar, '/');
 //        STV = STV.replaceAll(".*STVs/", "");
         STV = STV.replaceAll("/[^/]*.xml", "");
-        STV=STV.trim();
-        String root =  STV + File.separator + "OnlineVideos";
+        STV = STV.trim();
+        String root = STV + File.separator + "OnlineVideos";
         return root;
     }
 
@@ -90,21 +90,18 @@ public class OnlineVideoPublisher {
 
         for (Category category : categories) {
             if (category.isRoot()) {
-              continue;
-            } else
-            if (category.isSource()) {
+                continue;
+            } else if (category.isSource()) {
                 logger.info("Online adding source " + category.getId());
                 addSource(category.getId(), category.getShortName(), category.getLongName(), links, labels);
-            } else
-            if (category.isProgrammeCategory()) {
+            } else if (category.isProgrammeCategory()) {
                 logger.info("Online adding final category " + category.getId());
                 addCategory(category.getId(), category.getShortName(), category.getLongName(), category.getIconUrl(), labels);
                 addPodcast(category.getId(), category.getParentId(), category.getPodcastUrl(), links, ((SubCategory) category).getOtherParentIds());
-            } else
-            if (category.isSubCategory()) {
+            } else if (category.isSubCategory()) {
                 logger.info("Online adding non-final category " + category.getId());
                 addSubCategory(category.getParentId(), category.getId(), category.getShortName(), category.getLongName(),
-               category.getIconUrl(), links, labels);
+                        category.getIconUrl(), links, labels);
             } else {
                 logger.severe(category.getId() + " was not handled");
             }
@@ -121,31 +118,31 @@ public class OnlineVideoPublisher {
 
         String result = "";
         if (!subCat.isEmpty()) {
-            result+= "xPodcast" + subCat;
+            result += "xPodcast" + subCat;
         }
 
         for (String other : otherSubCats) {
             if (!result.isEmpty()) result += ",";
             result += "xPodcast" + htmlUtils.makeIdSafe(other);
         }
-        result +=  ";" + url;
+        result += ";" + url;
 
         links.setProperty("xFeedPodcastCustom/" + category, result);
     }
 
-    private void addCategory(String callSign, String name, String description, String categoryIconUrl , PropertiesFile labels) {
+    private void addCategory(String callSign, String name, String description, String categoryIconUrl, PropertiesFile labels) {
         callSign = htmlUtils.makeIdSafe(callSign);
         if ((categoryIconUrl != null) && (!categoryIconUrl.isEmpty())) {
-            labels.setProperty("Category/" + callSign + "/ThumbURL" , categoryIconUrl);
-            labels.setProperty("Source/" +  "xPodcast" + callSign + "/ThumbURL", categoryIconUrl);
+            labels.setProperty("Category/" + callSign + "/ThumbURL", categoryIconUrl);
+            labels.setProperty("Source/" + "xPodcast" + callSign + "/ThumbURL", categoryIconUrl);
         }
         if ((description != null) && (!description.isEmpty())) {
-            labels.setProperty("Category/" + callSign + "/LongName" , description);
-            labels.setProperty("Source/" +  "xPodcast" + callSign + "/LongName", description);
+            labels.setProperty("Category/" + callSign + "/LongName", description);
+            labels.setProperty("Source/" + "xPodcast" + callSign + "/LongName", description);
         }
         if ((name != null) && (!name.isEmpty())) {
-            labels.setProperty("Category/" + callSign + "/ShortName" , name);
-            labels.setProperty("Source/" +  "xPodcast" + callSign + "/ShortName", name);
+            labels.setProperty("Category/" + callSign + "/ShortName", name);
+            labels.setProperty("Source/" + "xPodcast" + callSign + "/ShortName", name);
         }
     }
 
@@ -168,17 +165,17 @@ public class OnlineVideoPublisher {
     }
 
     private void addSubCategory(
-            String parentId ,
-            String subCatId ,
-            String subCatTitle ,
-            String subCatDescription ,
+            String parentId,
+            String subCatId,
+            String subCatTitle,
+            String subCatDescription,
             String iconUrl,
             PropertiesFile links, PropertiesFile labels) {
         parentId = htmlUtils.makeIdSafe(parentId);
         subCatId = htmlUtils.makeIdSafe(subCatId);
 
 
-        logger.info("Online adding subcategory: " + subCatId );
+        logger.info("Online adding subcategory: " + subCatId);
 
         links.setProperty("xFeedPodcastCustom/" + subCatId, "xPodcast" + parentId + ";xURLNone");
         links.setProperty(subCatId + "/IsCategory", "true");
@@ -188,10 +185,10 @@ public class OnlineVideoPublisher {
         labels.setProperty("Category/" + subCatId + "/LongName", subCatDescription);
         if (iconUrl != null && !iconUrl.isEmpty()) {
             labels.setProperty("Category/" + subCatId + "/ThumbURL", iconUrl);
-            labels.setProperty("Source/" +  "xPodcast" + subCatId + "/ThumbURL", iconUrl);
+            labels.setProperty("Source/" + "xPodcast" + subCatId + "/ThumbURL", iconUrl);
         }
-        labels.setProperty("Source/" +  "xPodcast" + subCatId + "/ShortName", subCatTitle);
-        labels.setProperty("Source/" +  "xPodcast" + subCatId + "/LongName", subCatDescription);
+        labels.setProperty("Source/" + "xPodcast" + subCatId + "/ShortName", subCatTitle);
+        labels.setProperty("Source/" + "xPodcast" + subCatId + "/LongName", subCatDescription);
     }
 
 }

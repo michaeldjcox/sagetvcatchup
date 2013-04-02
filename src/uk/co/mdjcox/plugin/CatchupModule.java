@@ -5,10 +5,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.logger.LoggingManager;
-import uk.co.mdjcox.utils.HtmlUtils;
-import uk.co.mdjcox.utils.OsUtils;
-import uk.co.mdjcox.utils.PropertiesFile;
-import uk.co.mdjcox.utils.PropertiesInterface;
+import uk.co.mdjcox.utils.*;
 
 import java.io.File;
 
@@ -41,7 +38,7 @@ public class CatchupModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public HtmlUtils providesHtmlUtls() throws Exception {
+    public HtmlUtilsInterface providesHtmlUtls() throws Exception {
         return HtmlUtils.instance();
     }
 

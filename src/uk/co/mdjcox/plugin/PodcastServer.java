@@ -9,7 +9,7 @@ import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.handler.AbstractHandler;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.*;
-import uk.co.mdjcox.utils.HtmlUtils;
+import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtils;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
@@ -33,10 +33,10 @@ public class PodcastServer {
     private int port;
     private Map<String, String> podcasts = new HashMap<String, String>();
     private Recorder recorder;
-    private HtmlUtils htmlUtils;
+    private HtmlUtilsInterface htmlUtils;
 
     @Inject
-    public PodcastServer(LoggerInterface logger, PropertiesInterface props, HtmlUtils htmlUtils, OsUtils osUtils) throws Exception {
+    public PodcastServer(LoggerInterface logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, OsUtils osUtils) throws Exception {
         this.logger = logger;
         this.htmlUtils = htmlUtils;
         handler = new AbstractHandler() {
