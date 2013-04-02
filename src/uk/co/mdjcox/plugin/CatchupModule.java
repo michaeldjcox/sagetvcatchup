@@ -48,4 +48,10 @@ public class CatchupModule extends AbstractModule {
         return OsUtils.instance(providesLogger());
     }
 
+    @Provides
+    @Singleton
+    public DownloadUtilsInterface providesDownloadUtils() throws Exception {
+        return DownloadUtils.instance();
+    }
+
 }

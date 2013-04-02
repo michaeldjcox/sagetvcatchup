@@ -1,5 +1,6 @@
 package uk.co.mdjcox.scripts;
 
+import com.google.inject.Inject;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
@@ -24,7 +25,8 @@ public abstract class Script {
     private HtmlUtilsInterface htmlUtils;
     private DownloadUtilsInterface downloadUtils;
 
-    protected Script(LoggerInterface logger, String script, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
+    @Inject
+    public Script(LoggerInterface logger, String script, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
         this.logger = logger;
         this.script = script;
         this.htmlUtils = htmlUtils;
