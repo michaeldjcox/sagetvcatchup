@@ -6,8 +6,7 @@ import uk.co.mdjcox.model.*;
 import uk.co.mdjcox.scripts.EpisodeScript;
 import uk.co.mdjcox.scripts.EpisodesScript;
 import uk.co.mdjcox.scripts.ProgrammesScript;
-import uk.co.mdjcox.utils.DownloadUtilsInterface;
-import uk.co.mdjcox.utils.HtmlUtilsInterface;
+import uk.co.mdjcox.scripts.ScriptFactory;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
@@ -24,15 +23,14 @@ public class Harvester {
 
     private LoggerInterface logger;
     private PropertiesInterface props;
-    private HtmlUtilsInterface htmlUtils;
-    private DownloadUtilsInterface downloadUtils;
+    @Inject
+    private ScriptFactory scriptFactory;
+
 
     @Inject
-    public Harvester(LoggerInterface logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
+    public Harvester(LoggerInterface logger, PropertiesInterface props) {
         this.logger = logger;
         this.props = props;
-        this.htmlUtils = htmlUtils;
-        this.downloadUtils = downloadUtils;
     }
 
     public Catalog refresh() {
@@ -68,10 +66,9 @@ public class Harvester {
                 String episodesScriptName = base + props.getProperty("source." + sourceId + ".episodesScript", "");
                 String episodeScriptName = base + props.getProperty("source." + sourceId + ".episodeScript", "");
 
-
-                ProgrammesScript programmeScript = new ProgrammesScript(logger, programmesScriptName, htmlUtils, downloadUtils);
-                EpisodesScript episodesScript = new EpisodesScript(logger, episodesScriptName, htmlUtils, downloadUtils);
-                EpisodeScript episodeScript = new EpisodeScript(logger, episodeScriptName, htmlUtils, downloadUtils);
+                ProgrammesScript programmeScript = scriptFactory.createProgrammesScript(programmesScriptName);
+                EpisodesScript episodesScript = scriptFactory.createEpisodesScript(episodesScriptName);
+                EpisodeScript episodeScript = scriptFactory.createEpisodeScript(episodeScriptName);
 
                 Source sourceCat = new Source(sourceId, shortName, longName, serviceUrl, iconUrl);
                 newCategories.put(sourceCat.getId(), sourceCat);

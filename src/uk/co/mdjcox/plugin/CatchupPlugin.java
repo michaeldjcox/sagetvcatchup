@@ -3,7 +3,6 @@ package uk.co.mdjcox.plugin;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import sage.SageTVPlugin;
-import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.Catalog;
 
 import java.util.Map;
@@ -16,6 +15,8 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class CatchupPlugin implements SageTVPlugin {
+
+    public static Injector injector;
 
     private OnlineVideoPublisher sagetvPublisher;
     private PodcastServer server;
@@ -30,9 +31,9 @@ public class CatchupPlugin implements SageTVPlugin {
 
         try {
             CatchupModule module = new CatchupModule();
-            Injector injector = Guice.createInjector(module);
+            injector = Guice.createInjector(module);
 
-            harvester =  injector.getInstance(Harvester.class);
+            harvester = injector.getInstance(Harvester.class);
             server = injector.getInstance(PodcastServer.class); //   (logger, props, HtmlUtils.instance(), OsUtils.instance(logger));
             sagetvPublisher = injector.getInstance(OnlineVideoPublisher.class); // (logger, props, HtmlUtils.instance());
 

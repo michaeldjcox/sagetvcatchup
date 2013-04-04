@@ -1,5 +1,7 @@
 package uk.co.mdjcox.scripts;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.Programme;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
@@ -14,7 +16,8 @@ import uk.co.mdjcox.utils.HtmlUtilsInterface;
  */
 public class EpisodesScript extends Script {
 
-    public EpisodesScript(LoggerInterface logger, String script, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
+    @AssistedInject
+    public EpisodesScript(LoggerInterface logger, @Assisted String script, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
         super(logger, script, htmlUtils, downloadUtils);
     }
 

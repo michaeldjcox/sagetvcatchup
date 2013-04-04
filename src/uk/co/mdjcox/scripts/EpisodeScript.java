@@ -1,5 +1,7 @@
 package uk.co.mdjcox.scripts;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.Episode;
 import uk.co.mdjcox.model.Programme;
@@ -14,7 +16,9 @@ import uk.co.mdjcox.utils.HtmlUtilsInterface;
  * To change this template use File | Settings | File Templates.
  */
 public class EpisodeScript extends Script {
-    public EpisodeScript(LoggerInterface logger, String script, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
+
+    @AssistedInject
+    public EpisodeScript(LoggerInterface logger, @Assisted String script, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
         super(logger, script, htmlUtils, downloadUtils);
     }
 
