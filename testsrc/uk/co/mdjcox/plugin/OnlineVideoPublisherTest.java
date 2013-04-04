@@ -1,14 +1,11 @@
 package uk.co.mdjcox.plugin;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.co.mdjcox.logger.LoggerInterface;
-import uk.co.mdjcox.logger.LoggingManager;
-import uk.co.mdjcox.utils.HtmlUtils;
-import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.lang.reflect.Method;
@@ -32,10 +29,10 @@ public class OnlineVideoPublisherTest {
 
     @Before
     public void before() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        LoggerInterface logger = LoggingManager.getLogger(this.getClass(), "test", "logs");
-        HtmlUtilsInterface htmlUtils = HtmlUtils.instance();
-        publisher = new OnlineVideoPublisher(logger, properties, htmlUtils);
+        CatchupTestModule module = new CatchupTestModule();
+        Injector injector = Guice.createInjector(module);
+        properties = injector.getInstance(PropertiesInterface.class);
+        publisher = injector.getInstance(OnlineVideoPublisher.class); // (logger, props, HtmlUtils.instance());
     }
 
     @After

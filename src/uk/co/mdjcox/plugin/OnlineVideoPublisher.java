@@ -19,7 +19,7 @@ public class OnlineVideoPublisher {
     private HtmlUtilsInterface htmlUtils;
 
     @Inject
-    public OnlineVideoPublisher(LoggerInterface logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils) throws Exception {
+    private OnlineVideoPublisher(LoggerInterface logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils) throws Exception {
         this.logger = logger;
         this.props = props;
         this.htmlUtils = htmlUtils;

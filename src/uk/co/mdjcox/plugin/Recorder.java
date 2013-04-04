@@ -1,5 +1,6 @@
 package uk.co.mdjcox.plugin;
 
+import com.google.inject.Inject;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.logger.LoggingManager;
 import uk.co.mdjcox.utils.OsUtils;
@@ -25,7 +26,8 @@ public class Recorder {
     private OsUtils osUtils;
     private ConcurrentHashMap<String, File> currentRecordings = new ConcurrentHashMap<String, File>();
 
-    public Recorder(LoggerInterface thelogger, PropertiesInterface props, OsUtils osUtils) {
+    @Inject
+    private Recorder(LoggerInterface thelogger, PropertiesInterface props, OsUtils osUtils) {
         this.logger = thelogger;
         this.props = props;
         this.osUtils = osUtils;
@@ -55,10 +57,11 @@ public class Recorder {
         String command = "get_iplayer " + url + " -o " + outDir;
         ArrayList<String> output = new ArrayList<String>();
         currentRecordings.put(url, new File(""));
-         osUtils.spawnProcess(command, "record", false, output, null);
+        osUtils.spawnProcess(command, "record", false, output, null);
 
         String filename = "";
-        out: while (true) {
+        out:
+        while (true) {
             for (String result : output) {
                 String prefix = "INFO: File name prefix = ";
                 if (result.startsWith(prefix)) {
@@ -110,7 +113,6 @@ public class Recorder {
         recorder.start(url);
         Thread.sleep(30000);
         recorder.stop(url);
-
 
 
     }

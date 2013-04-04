@@ -10,7 +10,6 @@ import org.mortbay.jetty.handler.AbstractHandler;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.*;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
-import uk.co.mdjcox.utils.OsUtils;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import javax.servlet.ServletException;
@@ -36,7 +35,7 @@ public class PodcastServer {
     private HtmlUtilsInterface htmlUtils;
 
     @Inject
-    public PodcastServer(LoggerInterface logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, OsUtils osUtils) throws Exception {
+    private PodcastServer(LoggerInterface logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, Recorder recorder) throws Exception {
         this.logger = logger;
         this.htmlUtils = htmlUtils;
         handler = new AbstractHandler() {
@@ -53,7 +52,7 @@ public class PodcastServer {
         connector.setPort(port);
         server.setConnectors(new Connector[]{connector});
         server.setHandler(handler);
-        recorder = new Recorder(logger, props, osUtils);
+        this.recorder = recorder;
     }
 
     public void start() throws Exception {

@@ -28,7 +28,7 @@ public class Harvester {
 
 
     @Inject
-    public Harvester(LoggerInterface logger, PropertiesInterface props) {
+    private Harvester(LoggerInterface logger, PropertiesInterface props) {
         this.logger = logger;
         this.props = props;
     }
