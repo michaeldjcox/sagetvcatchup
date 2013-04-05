@@ -38,7 +38,7 @@ public class CatchupModule extends AbstractModule {
     @Provides
     @Singleton
     public LoggerInterface providesLogger() throws Exception {
-        LoggerInterface logger = LoggingManager.getLogger(PodcastServer.class, "Catchup", "logs");
+        LoggerInterface logger = LoggingManager.getLogger(CatchupPlugin.class, "Catchup", "logs");
         LoggingManager.addConsole(logger);
         return logger;
     }

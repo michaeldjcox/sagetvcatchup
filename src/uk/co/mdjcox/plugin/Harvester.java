@@ -10,7 +10,10 @@ import uk.co.mdjcox.scripts.ScriptFactory;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
-import java.util.*;
+import java.io.FileFilter;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -38,33 +41,49 @@ public class Harvester {
 
         try {
 
-            props.refresh(true);
+            String base = System.getProperty("user.dir");
+            base = base + File.separator + "sources" + File.separator;
 
-            Set<String> sourceIds = new LinkedHashSet<String>();
-            Set<String> propertyNames = props.getPropertiesLike("^source\\..*\\.shortName");
-            for (String property : propertyNames) {
-                String categoryId = property.replaceAll("^source\\.", "");
-                categoryId = categoryId.replaceAll("\\..*", "");
-                sourceIds.add(categoryId);
+            File dir = new File(base);
+            if (!dir.isDirectory()) {
+                throw new RuntimeException("Plugin directory " + base + " is not a directory");
             }
+
+            if (!dir.exists()) {
+                throw new RuntimeException("Plugin directory " + base + " does not exist");
+            }
+
+            File[] pluginDirs = dir.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    return pathname.isDirectory();
+                }
+            });
+
+            Map<String, File> sourceIds = new LinkedHashMap<String, File>();
+            for (File pluginDir : pluginDirs) {
+                String sourceId = pluginDir.getName();
+                sourceIds.put(sourceId, pluginDir);
+            }
+
 
             Map<String, Category> newCategories = new LinkedHashMap<String, Category>();
 
             Root root = new Root("Catchup", "UK Catchup TV for SageTV", "http://localhost:8081", "http://localhost:8081/logo.png");
             newCategories.put(root.getId(), root);
 
-            for (String sourceId : sourceIds) {
+            for (Map.Entry<String, File> sourceEntry : sourceIds.entrySet()) {
+                String sourceId = sourceEntry.getKey();
+                String plugbase = sourceEntry.getValue().getPath();
+
                 String shortName = props.getProperty("source." + sourceId + ".shortName", "");
                 String longName = props.getProperty("source." + sourceId + ".longName", "");
                 String serviceUrl = props.getProperty("source." + sourceId + ".serviceUrl", "");
                 String iconUrl = props.getProperty("source." + sourceId + ".iconUrl", "");
 
-                String base = System.getProperty("user.dir");
-                base = base + File.separator + "scripts" + File.separator;
-
-                String programmesScriptName = base + props.getProperty("source." + sourceId + ".programmesScript", "");
-                String episodesScriptName = base + props.getProperty("source." + sourceId + ".episodesScript", "");
-                String episodeScriptName = base + props.getProperty("source." + sourceId + ".episodeScript", "");
+                String programmesScriptName = plugbase + props.getProperty("source." + sourceId + ".programmesScript", "");
+                String episodesScriptName = plugbase + props.getProperty("source." + sourceId + ".episodesScript", "");
+                String episodeScriptName = plugbase + props.getProperty("source." + sourceId + ".episodeScript", "");
 
                 ProgrammesScript programmeScript = scriptFactory.createProgrammesScript(programmesScriptName);
                 EpisodesScript episodesScript = scriptFactory.createEpisodesScript(episodesScriptName);
