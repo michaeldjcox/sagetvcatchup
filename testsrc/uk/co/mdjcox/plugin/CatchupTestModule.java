@@ -11,8 +11,6 @@ import uk.co.mdjcox.logger.LoggingManager;
 import uk.co.mdjcox.scripts.ScriptFactory;
 import uk.co.mdjcox.utils.*;
 
-import java.io.File;
-
 /**
  * Created with IntelliJ IDEA.
  * User: michael
@@ -38,7 +36,7 @@ public class CatchupTestModule extends AbstractModule {
     @Provides
     @Singleton
     public PropertiesInterface providesProperties() throws Exception {
-        return new PropertiesFile("config" + File.separator + "catchup.properties", true);
+        return properties;
     }
 
     @Provides
