@@ -23,7 +23,7 @@ public class ProgrammesScript extends Script {
 
     @AssistedInject
     public ProgrammesScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
-        super(logger, base + File.separator + "getEpisodes", htmlUtils, downloadUtils);
+        super(logger, base + File.separator + "getProgrammes.groovy", htmlUtils, downloadUtils);
     }
 
     public Collection<Programme> getProgrammes(Source category) {
@@ -31,9 +31,9 @@ public class ProgrammesScript extends Script {
         try {
             call("url", category.getServiceUrl(), "programmes", programmes);
         } catch (Throwable e) {
-            getLogger().severe("Unable to get subcategories for: " + category, e);
+            getLogger().severe("Unable to get programmes for: " + category, e);
         } finally {
-            getLogger().info(category + " has " + category.getSubCategories().size() + " subcategories");
+            getLogger().info(category + " has " + programmes.size() + " programmes");
         }
         return programmes;
     }

@@ -20,7 +20,7 @@ public class EpisodesScript extends Script {
 
     @AssistedInject
     public EpisodesScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
-        super(logger, base + File.separator + "getEpisodes", htmlUtils, downloadUtils);
+        super(logger, base + File.separator + "getEpisodes.groovy", htmlUtils, downloadUtils);
     }
 
     public void getEpisodes(Programme category) {

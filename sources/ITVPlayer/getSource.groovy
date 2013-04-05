@@ -1,4 +1,4 @@
-import uk.co.mdjcox.model.Source
+package ITVPlayer
 
 source.setId("ITVPlayer");
 source.setShortName("ITV Player");

@@ -21,7 +21,7 @@ public class EpisodeScript extends Script {
 
     @AssistedInject
     public EpisodeScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
-        super(logger, base + File.separator + "getEpisode", htmlUtils, downloadUtils);
+        super(logger, base + File.separator + "getEpisode.groovy", htmlUtils, downloadUtils);
     }
 
     public void getEpisode(Programme programme, Episode episode) {

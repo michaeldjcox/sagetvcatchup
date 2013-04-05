@@ -1,4 +1,4 @@
-import uk.co.mdjcox.model.Source
+package Channel4OD
 
 source.setId("Channel4OD");
 source.setShortName("4OD");

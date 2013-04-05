@@ -1,4 +1,4 @@
-import uk.co.mdjcox.model.Source
+package Iplayer
 
 source.setId("Iplayer");
 source.setShortName("BBC Iplayer");

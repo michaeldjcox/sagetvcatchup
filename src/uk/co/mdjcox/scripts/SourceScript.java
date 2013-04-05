@@ -3,8 +3,6 @@ package uk.co.mdjcox.scripts;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import uk.co.mdjcox.logger.LoggerInterface;
-import uk.co.mdjcox.model.Episode;
-import uk.co.mdjcox.model.Programme;
 import uk.co.mdjcox.model.Source;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
@@ -23,8 +21,8 @@ public class SourceScript extends Script {
     private String sourceId;
 
     @AssistedInject
-    public SourceScript(LoggerInterface logger, @Assisted String id, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
-        super(logger, base + File.separator + "getSource", htmlUtils, downloadUtils);
+    public SourceScript(LoggerInterface logger, @Assisted("id") String id, @Assisted("base") String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
+        super(logger, base + File.separator + "getSource.groovy", htmlUtils, downloadUtils);
         sourceId = id;
     }
 

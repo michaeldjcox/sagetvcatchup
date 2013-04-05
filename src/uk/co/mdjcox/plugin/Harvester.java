@@ -60,6 +60,7 @@ public class Harvester {
             Map<String, String> sourceIds = new LinkedHashMap<String, String>();
             for (File pluginDir : pluginDirs) {
                 String sourceId = pluginDir.getName();
+                if (!sourceId.equals("Iplayer")) continue; // TODO take out
                 sourceIds.put(sourceId, pluginDir.getAbsolutePath());
             }
 

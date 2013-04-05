@@ -1,3 +1,5 @@
+package ITVPlayer
+
 String details = downloadFileString(url);
 
 // PROGRAMME TITLE

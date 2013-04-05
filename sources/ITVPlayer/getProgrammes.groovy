@@ -1,3 +1,5 @@
+package ITVPlayer
+
 import uk.co.mdjcox.model.Programme
 
 String str = downloadFileString(url);

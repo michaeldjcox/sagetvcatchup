@@ -1,5 +1,7 @@
 package uk.co.mdjcox.scripts;
 
+import com.google.inject.assistedinject.Assisted;
+
 /**
  * Created with IntelliJ IDEA.
  * User: michael
@@ -8,8 +10,11 @@ package uk.co.mdjcox.scripts;
  * To change this template use File | Settings | File Templates.
  */
 public interface ScriptFactory {
-    SourceScript createSourceScript(String id, String base);
+    SourceScript createSourceScript(@Assisted("id") String id, @Assisted("base") String base);
+
     ProgrammesScript createProgrammesScript(String base);
+
     EpisodesScript createEpisodesScript(String base);
+
     EpisodeScript createEpisodeScript(String base);
 }
