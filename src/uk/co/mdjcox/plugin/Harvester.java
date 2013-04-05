@@ -149,7 +149,7 @@ public class Harvester {
 
     private void doAirDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode, Map<String, SubCategory> newSubCategories) {
         String airDateName = episode.getAirDate();
-        if (airDateName == null || airDateName.isEmpty()) continue;
+        if (airDateName == null || airDateName.isEmpty()) return;
 
         String airdateId = sourceCat.getId() + "/AirDate";
         SubCategory airdateCat = newSubCategories.get(airdateId);
