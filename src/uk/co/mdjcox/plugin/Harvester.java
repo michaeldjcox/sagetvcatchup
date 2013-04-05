@@ -118,18 +118,19 @@ public class Harvester {
                     logger.info("Categorising " + programmeCat);
                     doAtoZcategorisation(sourceCat, programmeCat, newSubCategories);
 
-                    Episode episode = programmeCat.getEpisodes().values().iterator().next();
+                    boolean doneGenre = false;
+                    for (Episode episode : programmeCat.getEpisodes().values()) {
+                        if (!doneGenre) {
+                            // Genre
+                            doGenreCategorisation(sourceCat, programmeCat, episode, newSubCategories);
 
-                    if (episode == null) continue;
+                            // Channel
+                            doChannelCategorisation(sourceCat, programmeCat, episode, newSubCategories);
+                        }
 
-                    // Genre
-                    doGenreCategorisation(sourceCat, programmeCat, episode, newSubCategories);
-
-                    // Channel
-                    doChannelCategorisation(sourceCat, programmeCat, episode, newSubCategories);
-
-                    // Air Date
-                    doAirDateCategorisation(sourceCat, programmeCat, newSubCategories);
+                        // Air Date
+                        doAirDateCategorisation(sourceCat, programmeCat, episode, newSubCategories);
+                    }
                 }
 
                 newCategories.putAll(newProgCategories);
@@ -146,28 +147,26 @@ public class Harvester {
         return catalog;
     }
 
-    private void doAirDateCategorisation(Source sourceCat, Programme programmeCat, Map<String, SubCategory> newSubCategories) {
-        for (Episode episode : programmeCat.getEpisodes().values()) {
-            String airDateName = episode.getAirDate();
-            if (airDateName == null || airDateName.isEmpty()) continue;
+    private void doAirDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode, Map<String, SubCategory> newSubCategories) {
+        String airDateName = episode.getAirDate();
+        if (airDateName == null || airDateName.isEmpty()) continue;
 
-            String airdateId = sourceCat.getId() + "/AirDate";
-            SubCategory airdateCat = newSubCategories.get(airdateId);
-            if (airdateCat == null) {
-                airdateCat = new SubCategory(airdateId, "Air Date", "Air Date", sourceCat.getServiceUrl(), sourceCat.getIconUrl(), sourceCat.getId());
-                newSubCategories.put(airdateId, airdateCat);
-                sourceCat.addSubCategory(airdateCat);
-            }
-            String airDateInstanceId = sourceCat.getId() + "/AirDate/" + airDateName.replace(" ", "").replace(",", "");
-            Programme airDateInstanceCat = (Programme) newSubCategories.get(airDateInstanceId);
-            if (airDateInstanceCat == null) {
-                airDateInstanceCat = new Programme(airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(), sourceCat.getIconUrl(), airdateCat.getId());
-                newSubCategories.put(airDateInstanceId, airDateInstanceCat);
-                airdateCat.addSubCategory(airDateInstanceCat);
-            }
-
-            airDateInstanceCat.addEpisode(episode);
+        String airdateId = sourceCat.getId() + "/AirDate";
+        SubCategory airdateCat = newSubCategories.get(airdateId);
+        if (airdateCat == null) {
+            airdateCat = new SubCategory(airdateId, "Air Date", "Air Date", sourceCat.getServiceUrl(), sourceCat.getIconUrl(), sourceCat.getId());
+            newSubCategories.put(airdateId, airdateCat);
+            sourceCat.addSubCategory(airdateCat);
         }
+        String airDateInstanceId = sourceCat.getId() + "/AirDate/" + airDateName.replace(" ", "").replace(",", "");
+        Programme airDateInstanceCat = (Programme) newSubCategories.get(airDateInstanceId);
+        if (airDateInstanceCat == null) {
+            airDateInstanceCat = new Programme(airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(), sourceCat.getIconUrl(), airdateCat.getId());
+            newSubCategories.put(airDateInstanceId, airDateInstanceCat);
+            airdateCat.addSubCategory(airDateInstanceCat);
+        }
+
+        airDateInstanceCat.addEpisode(episode);
     }
 
     private void doChannelCategorisation(Source sourceCat, Programme programmeCat, Episode prog, Map<String, SubCategory> newSubCategories) {
