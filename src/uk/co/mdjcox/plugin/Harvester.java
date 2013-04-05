@@ -3,10 +3,7 @@ package uk.co.mdjcox.plugin;
 import com.google.inject.Inject;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.*;
-import uk.co.mdjcox.scripts.EpisodeScript;
-import uk.co.mdjcox.scripts.EpisodesScript;
-import uk.co.mdjcox.scripts.ProgrammesScript;
-import uk.co.mdjcox.scripts.ScriptFactory;
+import uk.co.mdjcox.scripts.*;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
@@ -60,36 +57,27 @@ public class Harvester {
                 }
             });
 
-            Map<String, File> sourceIds = new LinkedHashMap<String, File>();
+            Map<String, String> sourceIds = new LinkedHashMap<String, String>();
             for (File pluginDir : pluginDirs) {
                 String sourceId = pluginDir.getName();
-                sourceIds.put(sourceId, pluginDir);
+                sourceIds.put(sourceId, pluginDir.getAbsolutePath());
             }
-
 
             Map<String, Category> newCategories = new LinkedHashMap<String, Category>();
 
             Root root = new Root("Catchup", "UK Catchup TV for SageTV", "http://localhost:8081", "http://localhost:8081/logo.png");
             newCategories.put(root.getId(), root);
 
-            for (Map.Entry<String, File> sourceEntry : sourceIds.entrySet()) {
+            for (Map.Entry<String, String> sourceEntry : sourceIds.entrySet()) {
                 String sourceId = sourceEntry.getKey();
-                String plugbase = sourceEntry.getValue().getPath();
+                String plugbase = sourceEntry.getValue();
 
-                String shortName = props.getProperty("source." + sourceId + ".shortName", "");
-                String longName = props.getProperty("source." + sourceId + ".longName", "");
-                String serviceUrl = props.getProperty("source." + sourceId + ".serviceUrl", "");
-                String iconUrl = props.getProperty("source." + sourceId + ".iconUrl", "");
+                SourceScript sourceScript = scriptFactory.createSourceScript(sourceId, plugbase);
+                ProgrammesScript programmeScript = scriptFactory.createProgrammesScript(plugbase);
+                EpisodesScript episodesScript = scriptFactory.createEpisodesScript(plugbase);
+                EpisodeScript episodeScript = scriptFactory.createEpisodeScript(plugbase);
 
-                String programmesScriptName = plugbase + props.getProperty("source." + sourceId + ".programmesScript", "");
-                String episodesScriptName = plugbase + props.getProperty("source." + sourceId + ".episodesScript", "");
-                String episodeScriptName = plugbase + props.getProperty("source." + sourceId + ".episodeScript", "");
-
-                ProgrammesScript programmeScript = scriptFactory.createProgrammesScript(programmesScriptName);
-                EpisodesScript episodesScript = scriptFactory.createEpisodesScript(episodesScriptName);
-                EpisodeScript episodeScript = scriptFactory.createEpisodeScript(episodeScriptName);
-
-                Source sourceCat = new Source(sourceId, shortName, longName, serviceUrl, iconUrl);
+                Source sourceCat = sourceScript.getSource();
                 newCategories.put(sourceCat.getId(), sourceCat);
 
                 logger.info("Found source: " + sourceId);

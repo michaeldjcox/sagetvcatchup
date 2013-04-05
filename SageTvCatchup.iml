@@ -3,12 +3,8 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$/config" />
-    <content url="file://$MODULE_DIR$/scripts" />
     <content url="file://$MODULE_DIR$/sources">
-      <sourceFolder url="file://$MODULE_DIR$/sources/4OD" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/sources/Demand5" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/sources/Iplayer" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/sources/ITVPlayer" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/sources" isTestSource="false" />
     </content>
     <content url="file://$MODULE_DIR$/src">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />

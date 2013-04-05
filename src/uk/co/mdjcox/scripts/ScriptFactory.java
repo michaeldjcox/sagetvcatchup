@@ -8,9 +8,8 @@ package uk.co.mdjcox.scripts;
  * To change this template use File | Settings | File Templates.
  */
 public interface ScriptFactory {
-    ProgrammesScript createProgrammesScript(String script);
-
-    EpisodesScript createEpisodesScript(String script);
-
-    EpisodeScript createEpisodeScript(String script);
+    SourceScript createSourceScript(String id, String base);
+    ProgrammesScript createProgrammesScript(String base);
+    EpisodesScript createEpisodesScript(String base);
+    EpisodeScript createEpisodeScript(String base);
 }

@@ -8,6 +8,7 @@ import uk.co.mdjcox.model.Source;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -21,8 +22,8 @@ import java.util.Collection;
 public class ProgrammesScript extends Script {
 
     @AssistedInject
-    public ProgrammesScript(LoggerInterface logger, @Assisted String script, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
-        super(logger, script, htmlUtils, downloadUtils);
+    public ProgrammesScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
+        super(logger, base + File.separator + "getEpisodes", htmlUtils, downloadUtils);
     }
 
     public Collection<Programme> getProgrammes(Source category) {

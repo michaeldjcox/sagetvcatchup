@@ -14,6 +14,8 @@ public class SubCategory extends Category implements Cloneable {
     private ArrayList<String> otherParentIds = new ArrayList<String>();
     private HashMap<String, Category> subCategories = new LinkedHashMap<String, Category>();
 
+
+
     public SubCategory(String id, String categoryShortName, String categoryLongName,
                        String serviceUrl, String iconUrl,
                        String parentId) {

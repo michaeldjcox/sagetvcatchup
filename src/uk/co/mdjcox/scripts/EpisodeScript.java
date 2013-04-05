@@ -8,6 +8,8 @@ import uk.co.mdjcox.model.Programme;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 
+import java.io.File;
+
 /**
  * Created with IntelliJ IDEA.
  * User: michael
@@ -18,8 +20,8 @@ import uk.co.mdjcox.utils.HtmlUtilsInterface;
 public class EpisodeScript extends Script {
 
     @AssistedInject
-    public EpisodeScript(LoggerInterface logger, @Assisted String script, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
-        super(logger, script, htmlUtils, downloadUtils);
+    public EpisodeScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
+        super(logger, base + File.separator + "getEpisode", htmlUtils, downloadUtils);
     }
 
     public void getEpisode(Programme programme, Episode episode) {
