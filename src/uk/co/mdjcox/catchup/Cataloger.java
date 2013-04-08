@@ -19,26 +19,24 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 @Singleton
-public class Harvester {
+public class Cataloger {
 
     private LoggerInterface logger;
     private PropertiesInterface props;
     private PluginManager pluginManager;
 
     @Inject
-    private Harvester(LoggerInterface logger, PropertiesInterface props, PluginManager pluginManager) {
+    private Cataloger(LoggerInterface logger, PropertiesInterface props, PluginManager pluginManager) {
         this.logger = logger;
         this.props = props;
         this.pluginManager = pluginManager;
     }
 
-    public Catalog refresh() {
+    public Catalog catalog() {
         Catalog catalog = new Catalog();
 
         try {
             Map<String, Category> newCategories = new LinkedHashMap<String, Category>();
-
-
 
             Root root = new Root("Catchup", "UK Catchup TV for SageTV", "http://localhost:8081", "http://localhost:8081/logo.png");
             newCategories.put(root.getId(), root);

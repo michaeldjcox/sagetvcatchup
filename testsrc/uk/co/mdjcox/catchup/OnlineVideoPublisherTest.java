@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 /**
- * OnlineVideoPublisher Tester.
+ * Publisher Tester.
  *
  * @author <Authors name>
  * @version 1.0
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
  */
 public class OnlineVideoPublisherTest {
 
-    private OnlineVideoPublisher publisher;
+    private Publisher publisher;
     @Mock
     private PropertiesInterface properties;
 
@@ -32,7 +32,7 @@ public class OnlineVideoPublisherTest {
         CatchupTestModule module = new CatchupTestModule();
         Injector injector = Guice.createInjector(module);
         properties = injector.getInstance(PropertiesInterface.class);
-        publisher = injector.getInstance(OnlineVideoPublisher.class); // (logger, props, HtmlUtils.instance());
+        publisher = injector.getInstance(Publisher.class); // (logger, props, HtmlUtils.instance());
     }
 
     @After
@@ -64,7 +64,7 @@ public class OnlineVideoPublisherTest {
 //TODO: Test goes here... 
 /* 
 try { 
-   Method method = OnlineVideoPublisher.getClass().getMethod("getLinkFile", String.class); 
+   Method method = Publisher.getClass().getMethod("getLinkFile", String.class);
    method.setAccessible(true); 
    method.invoke(<Object>, <Parameters>); 
 } catch(NoSuchMethodException e) { 
@@ -82,7 +82,7 @@ try {
 //TODO: Test goes here... 
 /* 
 try { 
-   Method method = OnlineVideoPublisher.getClass().getMethod("getLabelFile", String.class); 
+   Method method = Publisher.getClass().getMethod("getLabelFile", String.class);
    method.setAccessible(true); 
    method.invoke(<Object>, <Parameters>); 
 } catch(NoSuchMethodException e) { 
@@ -115,7 +115,7 @@ try {
 //TODO: Test goes here... 
 /* 
 try { 
-   Method method = OnlineVideoPublisher.getClass().getMethod("addPodcast", String.class, String.class, String.class, PropertiesFile.class, ArrayList<String>.class); 
+   Method method = Publisher.getClass().getMethod("addPodcast", String.class, String.class, String.class, PropertiesFile.class, ArrayList<String>.class);
    method.setAccessible(true); 
    method.invoke(<Object>, <Parameters>); 
 } catch(NoSuchMethodException e) { 
@@ -133,7 +133,7 @@ try {
 //TODO: Test goes here... 
 /* 
 try { 
-   Method method = OnlineVideoPublisher.getClass().getMethod("addCategory", String.class, String.class, String.class, String.class, PropertiesFile.class); 
+   Method method = Publisher.getClass().getMethod("addCategory", String.class, String.class, String.class, String.class, PropertiesFile.class);
    method.setAccessible(true); 
    method.invoke(<Object>, <Parameters>); 
 } catch(NoSuchMethodException e) { 
@@ -151,7 +151,7 @@ try {
 //TODO: Test goes here... 
 /* 
 try { 
-   Method method = OnlineVideoPublisher.getClass().getMethod("addSource", String.class, String.class, String.class, PropertiesFile.class, PropertiesFile.class); 
+   Method method = Publisher.getClass().getMethod("addSource", String.class, String.class, String.class, PropertiesFile.class, PropertiesFile.class);
    method.setAccessible(true); 
    method.invoke(<Object>, <Parameters>); 
 } catch(NoSuchMethodException e) { 
@@ -169,7 +169,7 @@ try {
 //TODO: Test goes here... 
 /* 
 try { 
-   Method method = OnlineVideoPublisher.getClass().getMethod("addSubCategory", String.class, String.class, String.class, String.class, String.class, PropertiesFile.class, PropertiesFile.class); 
+   Method method = Publisher.getClass().getMethod("addSubCategory", String.class, String.class, String.class, String.class, String.class, PropertiesFile.class, PropertiesFile.class);
    method.setAccessible(true); 
    method.invoke(<Object>, <Parameters>); 
 } catch(NoSuchMethodException e) { 

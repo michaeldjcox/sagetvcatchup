@@ -19,10 +19,10 @@ public class CatchupPlugin implements SageTVPlugin {
 
     public static Injector injector;
 
-//    private OnlineVideoPublisher sagetvPublisher;
+//    private Publisher sagetvPublisher;
 //    private PodcastServer server;
 //    private Catalog catalog;
-//    private Harvester harvester;
+//    private Cataloger harvester;
 //    private PluginManager pluginManager;
 
     public CatchupPlugin(sage.SageTVPluginRegistry registry) {
@@ -36,12 +36,12 @@ public class CatchupPlugin implements SageTVPlugin {
             injector = Guice.createInjector(module);
 
             PluginManager pluginManager = injector.getInstance(PluginManager.class);
-            Harvester harvester = injector.getInstance(Harvester.class);
+            Cataloger harvester = injector.getInstance(Cataloger.class);
             PodcastServer server = injector.getInstance(PodcastServer.class); //   (logger, props, HtmlUtils.instance(), OsUtils.instance(logger));
-            OnlineVideoPublisher sagetvPublisher = injector.getInstance(OnlineVideoPublisher.class); // (logger, props, HtmlUtils.instance());
+            Publisher sagetvPublisher = injector.getInstance(Publisher.class); // (logger, props, HtmlUtils.instance());
 
             pluginManager.load();
-            Catalog catalog = harvester.refresh();
+            Catalog catalog = harvester.catalog();
             server.publish(catalog);
             server.start();
             sagetvPublisher.publish(catalog);

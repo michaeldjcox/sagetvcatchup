@@ -13,14 +13,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Singleton
-public class OnlineVideoPublisher {
+public class Publisher {
 
     private LoggerInterface logger;
     private PropertiesInterface props;
     private HtmlUtilsInterface htmlUtils;
 
     @Inject
-    private OnlineVideoPublisher(LoggerInterface logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils) throws Exception {
+    private Publisher(LoggerInterface logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils) throws Exception {
         this.logger = logger;
         this.props = props;
         this.htmlUtils = htmlUtils;
