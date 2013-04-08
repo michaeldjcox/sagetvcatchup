@@ -6,8 +6,8 @@ import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.logger.LoggingManager;
-import uk.co.mdjcox.scripts.PluginFactory;
-import uk.co.mdjcox.scripts.ScriptFactory;
+import uk.co.mdjcox.plugins.PluginFactory;
+import uk.co.mdjcox.plugins.ScriptFactory;
 import uk.co.mdjcox.utils.*;
 
 import java.io.File;

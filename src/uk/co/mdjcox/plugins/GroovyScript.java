@@ -1,4 +1,4 @@
-package uk.co.mdjcox.scripts;
+package uk.co.mdjcox.plugins;
 
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;

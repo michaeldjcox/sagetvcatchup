@@ -1,4 +1,4 @@
-package uk.co.mdjcox.scripts;
+package uk.co.mdjcox.plugins;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;

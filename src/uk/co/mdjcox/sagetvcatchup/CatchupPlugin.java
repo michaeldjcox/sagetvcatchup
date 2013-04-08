@@ -4,7 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import sage.SageTVPlugin;
 import uk.co.mdjcox.model.Catalog;
-import uk.co.mdjcox.scripts.PluginManager;
+import uk.co.mdjcox.plugins.PluginManager;
 
 import java.util.Map;
 

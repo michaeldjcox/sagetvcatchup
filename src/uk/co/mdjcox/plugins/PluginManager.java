@@ -1,18 +1,14 @@
-package uk.co.mdjcox.scripts;
+package uk.co.mdjcox.plugins;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import uk.co.mdjcox.logger.LoggerInterface;
-import uk.co.mdjcox.model.Category;
-import uk.co.mdjcox.model.Root;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.

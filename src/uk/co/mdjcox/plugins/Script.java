@@ -1,4 +1,4 @@
-package uk.co.mdjcox.scripts;
+package uk.co.mdjcox.plugins;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
@@ -36,7 +36,7 @@ public abstract class Script {
     }
 
     public void call(Object... params) throws Exception {
-        String[] roots = new String[]{"./scripts"};
+        String[] roots = new String[]{"./plugins"};
         GroovyScriptEngine gse = new GroovyScriptEngine(roots);
         CompilerConfiguration comp = gse.getConfig();
         comp.setScriptBaseClass(GroovyScript.class.getName());

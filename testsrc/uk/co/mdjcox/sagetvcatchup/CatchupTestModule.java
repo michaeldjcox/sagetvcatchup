@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.logger.LoggingManager;
-import uk.co.mdjcox.scripts.ScriptFactory;
+import uk.co.mdjcox.plugins.ScriptFactory;
 import uk.co.mdjcox.utils.*;
 
 /**
