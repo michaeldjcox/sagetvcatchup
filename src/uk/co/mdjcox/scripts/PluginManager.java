@@ -46,7 +46,7 @@ public class PluginManager {
 
     public void load() {
         String base = System.getProperty("user.dir");
-        base = base + File.separator + "sources" + File.separator;
+        base = base + File.separator + "plugins" + File.separator;
 
         File dir = new File(base);
         if (!dir.isDirectory()) {

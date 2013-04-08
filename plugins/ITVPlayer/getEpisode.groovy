@@ -26,7 +26,7 @@ episode.setDescription(desc);
 logger.info("Synopsis: " + desc)
 
 // IMAGE URL
-String details2 = moveTo("<meta property=\"og:image\"", details)
+details2 = moveTo("<meta property=\"og:image\"", details)
 details2 = moveTo("content=\"", details2)
 String image = extractTo("\"", details2)
 image = removeHtml(image);

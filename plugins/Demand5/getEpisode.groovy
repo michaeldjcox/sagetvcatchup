@@ -1,25 +1,31 @@
-package Channel4OD
+package Demand5
 
 String details = downloadFileString(url);
 
+//details = moveTo("<meta property=\"fb:app_id", details);
+//details = extractTo("<body class=\"episodes_show_page\">", details);
+
 // PROGRAMME TITLE
-details2 = moveTo("<meta name=\"brandTitle\"", details)
+details2 = moveTo("property=\"og:title\"", details)
 details2 = moveTo("content=\"", details2)
-String seriesTitle = extractTo("\"", details2)
-seriesTitle = removeHtml(seriesTitle);
+String jointTitle = extractTo("\"", details2)
+jointTitle.replace(" | ", "|")
+String[] result = jointTitle.split("\\|")
+
+seriesTitle = removeHtml(result[1]);
 episode.setProgrammeTitle(seriesTitle);
 logger.info("SeriesTitle: " + seriesTitle)
 
 // EPISODE TITLE
-details2 = moveTo("<meta name=\"episodeTitle\"", details)
-details2 = moveTo("content=\"", details2)
-String title = extractTo("\"", details2)
-title = removeHtml(title);
+//details2 = moveTo("<meta name=\"episodeTitle\"", details)
+//details2 = moveTo("content=\"", details2)
+//String title = extractTo("\"", details2)
+title = removeHtml(result[0]);
 episode.setEpisodeTitle(title);
 logger.info("EpisodeTitle: " + title)
 
 // SYNOPSIS
-details2 = moveTo("<meta name=\"synopsis\"", details)
+details2 = moveTo("<meta property=\"og:description\"", details)
 details2 = moveTo("content=\"", details2)
 String desc = extractTo("\"", details2)
 desc = removeHtml(desc);
@@ -27,11 +33,12 @@ episode.setDescription(desc);
 logger.info("Synopsis: " + desc)
 
 // IMAGE URL
-String details2 = moveTo("<meta property=\"og:image\"", details)
+details2 = moveTo("<meta property=\"og:image\"", details)
 details2 = moveTo("content=\"", details2)
 String image = extractTo("\"", details2)
 image = removeHtml(image);
-image = makeLinkAbsolute("http://www.channel4.com", image);
+image = makeLinkAbsolute("http://www.channel5.com", image);
+
 episode.setIconUrl(image);
 logger.info("Icon: " + image)
 
@@ -40,20 +47,19 @@ details2 = moveTo("<meta property=\"og:url\"", details)
 details2 = moveTo("content=\"", details2)
 String tuneurl = extractTo("\"", details2)
 tuneurl = removeHtml(tuneurl);
-tuneurl = makeLinkAbsolute("http://www.channel4.com", tuneurl);
+tuneurl = makeLinkAbsolute("http://www.channel5.com", tuneurl);
 episode.setServiceUrl(tuneurl);
 logger.info("URL: " + tuneurl)
 
 // CATEGORY
-details2 = moveTo("<meta name=\"primaryBrandCategory\"", details)
-details2 = moveTo("content=\"", details2)
+details2 = moveTo("category=", details)
 String genre = extractTo("\"", details2)
 genre = removeHtml(genre);
 episode.setCategory(genre);
 logger.info("Category: " + genre)
 
 // CHANNEL
-details2 = moveTo("<meta property=\"og:site\"", details)
+details2 = moveTo("<meta property=\"og:site_name\"", details)
 details2 = moveTo("content=\"", details2)
 String channel = extractTo("\"", details2)
 channel = removeHtml(channel);
@@ -80,7 +86,6 @@ logger.info("Episode: " + episodeNo)
 details2 = moveTo("<col class=\"onTvDate\"", details)
 details2 = moveTo("<td", details2)
 details2 = moveTo(">", details2)
-
 String date = extractTo("<", details2)
 if (date == null) date = ""
 logger.info("Date: " + date)
@@ -91,6 +96,7 @@ details2 = moveTo(">", details2)
 String time = extractTo("</", details2)
 time = removeHtml(time);
 if (time == null) time = ""
+logger.info("Time: " + time)
 episode.setAirTime(time)
 
 return episode;
