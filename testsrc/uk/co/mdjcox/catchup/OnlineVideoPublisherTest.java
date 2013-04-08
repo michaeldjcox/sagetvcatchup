@@ -1,4 +1,4 @@
-package uk.co.mdjcox.sagetvcatchup;
+package uk.co.mdjcox.catchup;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

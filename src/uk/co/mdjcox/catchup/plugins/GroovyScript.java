@@ -1,4 +1,4 @@
-package uk.co.mdjcox.sagetvcatchup.plugins;
+package uk.co.mdjcox.catchup.plugins;
 
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;

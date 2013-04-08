@@ -1,10 +1,10 @@
-package uk.co.mdjcox.sagetvcatchup;
+package uk.co.mdjcox.catchup;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import sage.SageTVPlugin;
 import uk.co.mdjcox.model.Catalog;
-import uk.co.mdjcox.sagetvcatchup.plugins.PluginManager;
+import uk.co.mdjcox.catchup.plugins.PluginManager;
 
 import java.util.Map;
 

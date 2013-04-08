@@ -1,4 +1,4 @@
-package uk.co.mdjcox.sagetvcatchup.plugins;
+package uk.co.mdjcox.catchup.plugins;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
