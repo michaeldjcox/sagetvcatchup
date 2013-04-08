@@ -29,11 +29,11 @@ public class SourceScript extends Script {
     public Source getSource() {
         Source source = new Source();
         try {
-            getLogger().info("Getting source at URL " + sourceId);
+            getLogger().info("Getting details of source " + sourceId);
             call("source", source, "logger", getLogger());
             getLogger().info("Found source " + source);
         } catch (Throwable e) {
-            getLogger().severe("Unable to get source: " + sourceId, e);
+            getLogger().severe("Unable to get details of source: " + sourceId, e);
         }
         return source;
     }
