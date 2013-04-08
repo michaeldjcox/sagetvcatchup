@@ -98,7 +98,7 @@ public class PodcastServer {
         try {
 
             File file = recorder.start(podcast);
-            logger.info("Streaming " + podcast + " exists=" + file.exists());
+            logger.info("Streaming " + file + " exists=" + file.exists());
 
             FileInputStream in = new FileInputStream(file);
             response.setContentType("video/mp4");

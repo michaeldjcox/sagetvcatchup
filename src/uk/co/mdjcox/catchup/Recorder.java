@@ -26,7 +26,17 @@ public class Recorder {
     private final LoggerInterface logger;
     private PropertiesInterface props;
     private OsUtils osUtils;
-    private ConcurrentHashMap<String, File> currentRecordings = new ConcurrentHashMap<String, File>();
+    private ConcurrentHashMap<String, Recording> currentRecordings = new ConcurrentHashMap<String, Recording>();
+
+    public static class Recording {
+        File file;
+        String fileName="";
+        String url="";
+
+        public Recording(String url) {
+            this.url = url;
+        }
+    }
 
     @Inject
     private Recorder(LoggerInterface thelogger, PropertiesInterface props, OsUtils osUtils) {
@@ -51,14 +61,27 @@ public class Recorder {
     }
 
     public File start(String url) throws Exception {
-        File file = currentRecordings.get(url);
-        if (file != null) {
-            return file;
+        logger.info("Looking for recording of " + url);
+        Recording recording = currentRecordings.get(url);
+        if (recording != null) {
+            logger.info("Recording in progress for " + url);
+            if (recording.file == null) {
+                synchronized (recording) {
+                    recording.wait();
+                }
+            }
+            logger.info("Returning file " + recording.fileName + " for " + url);
+            return recording.file;
         }
-        String outDir = props.getString("recordingDir", "/home/michael/Documents/CatchUp/recordings/");
+
+        logger.info("Starting recording of " + url);
+
+
+        String outDir = props.getString("recordingDir", "/home/michael/Documents/SageTvCatchUp/recordings/");
         String command = "get_iplayer " + url + " -o " + outDir;
         ArrayList<String> output = new ArrayList<String>();
-        currentRecordings.put(url, new File(""));
+        recording = new Recording(url);
+        currentRecordings.put(url, recording);
         osUtils.spawnProcess(command, "record", false, output, null);
 
         String filename = "";
@@ -67,7 +90,7 @@ public class Recorder {
             for (String result : output) {
                 String prefix = "INFO: File name prefix = ";
                 if (result.startsWith(prefix)) {
-                    filename = result.substring(prefix.length()).trim() + ".partial.mp4.flv";
+                    filename = outDir + File.separator + result.substring(prefix.length()).trim() + ".partial.mp4.flv";
                     logger.info("Recording to " + filename);
                     break out;
                 }
@@ -80,15 +103,27 @@ public class Recorder {
             }
         }
 
-        file = new File(filename);
-        while (!file.exists()) {
+        logger.info("Found file name " + filename);
+
+        logger.info("Waiting for existence of " + filename);
+
+        File file = new File(filename);
+        while (!file.exists() || file.length() < (500*1024)) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
 
             }
         }
-        currentRecordings.put(url, file);
+
+        recording.file = file;
+
+        synchronized (recording) {
+            recording.notifyAll();
+        }
+
+        logger.info("Returning file " + file.getAbsolutePath() + " for " + url);
+
         return file;
     }
 
