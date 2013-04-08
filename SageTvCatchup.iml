@@ -3,8 +3,8 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$/config" />
-    <content url="file://$MODULE_DIR$/sources">
-      <sourceFolder url="file://$MODULE_DIR$/sources" isTestSource="false" />
+    <content url="file://$MODULE_DIR$/plugins">
+      <sourceFolder url="file://$MODULE_DIR$/plugins" isTestSource="false" />
     </content>
     <content url="file://$MODULE_DIR$/src">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
