@@ -6,6 +6,8 @@ import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.logger.LoggingManager;
+import uk.co.mdjcox.scripts.PluginFactory;
+import uk.co.mdjcox.scripts.PluginManager;
 import uk.co.mdjcox.scripts.ScriptFactory;
 import uk.co.mdjcox.utils.*;
 
@@ -23,10 +25,9 @@ public class CatchupModule extends AbstractModule {
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder()
-//                .implement(ProgrammesScriptInterface.class, ProgrammesScript.class)
-//                .implement(EpisodesScriptInterface.class, EpisodesScript.class)
-//                .implement(EpisodeScriptInterface.class, EpisodeScript.class)
                 .build(ScriptFactory.class));
+        install(new FactoryModuleBuilder()
+                .build(PluginFactory.class));
     }
 
     @Provides

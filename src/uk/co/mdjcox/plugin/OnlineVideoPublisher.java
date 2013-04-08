@@ -1,6 +1,7 @@
 package uk.co.mdjcox.plugin;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.Catalog;
 import uk.co.mdjcox.model.Category;
@@ -11,7 +12,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
-
+@Singleton
 public class OnlineVideoPublisher {
 
     private LoggerInterface logger;

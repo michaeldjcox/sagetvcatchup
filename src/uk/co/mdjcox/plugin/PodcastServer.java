@@ -1,6 +1,7 @@
 package uk.co.mdjcox.plugin;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
@@ -24,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+@Singleton
 public class PodcastServer {
 
     private LoggerInterface logger;

@@ -4,6 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import sage.SageTVPlugin;
 import uk.co.mdjcox.model.Catalog;
+import uk.co.mdjcox.scripts.PluginManager;
 
 import java.util.Map;
 
@@ -18,10 +19,11 @@ public class CatchupPlugin implements SageTVPlugin {
 
     public static Injector injector;
 
-    private OnlineVideoPublisher sagetvPublisher;
-    private PodcastServer server;
-    private Catalog catalog;
-    private Harvester harvester;
+//    private OnlineVideoPublisher sagetvPublisher;
+//    private PodcastServer server;
+//    private Catalog catalog;
+//    private Harvester harvester;
+//    private PluginManager pluginManager;
 
     public CatchupPlugin(sage.SageTVPluginRegistry registry) {
     }
@@ -33,11 +35,13 @@ public class CatchupPlugin implements SageTVPlugin {
             CatchupModule module = new CatchupModule();
             injector = Guice.createInjector(module);
 
-            harvester = injector.getInstance(Harvester.class);
-            server = injector.getInstance(PodcastServer.class); //   (logger, props, HtmlUtils.instance(), OsUtils.instance(logger));
-            sagetvPublisher = injector.getInstance(OnlineVideoPublisher.class); // (logger, props, HtmlUtils.instance());
+            PluginManager pluginManager = injector.getInstance(PluginManager.class);
+            Harvester harvester = injector.getInstance(Harvester.class);
+            PodcastServer server = injector.getInstance(PodcastServer.class); //   (logger, props, HtmlUtils.instance(), OsUtils.instance(logger));
+            OnlineVideoPublisher sagetvPublisher = injector.getInstance(OnlineVideoPublisher.class); // (logger, props, HtmlUtils.instance());
 
-            catalog = harvester.refresh();
+            pluginManager.load();
+            Catalog catalog = harvester.refresh();
             server.publish(catalog);
             server.start();
             sagetvPublisher.publish(catalog);

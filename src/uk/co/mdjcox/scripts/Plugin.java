@@ -1,6 +1,12 @@
 package uk.co.mdjcox.scripts;
 
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import uk.co.mdjcox.model.Episode;
+import uk.co.mdjcox.model.Programme;
 import uk.co.mdjcox.model.Source;
+
+import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,32 +24,41 @@ public class Plugin {
     private EpisodesScript episodesScript;
     private EpisodeScript episodeScript;
     private Source source;
+    @Inject
+    private ScriptFactory scriptFactory;
 
-    public Plugin(String sourceId, String base) {
-        this.sourceId = sourceId;
+    @Inject
+    public Plugin(@Assisted("id") String id, @Assisted("base") String base) {
+        this.sourceId = id;
         this.base = base;
-        findScripts();
     }
 
-    private void findScripts() {
-
-
-
+    public void init() {
+        sourceScript = scriptFactory.createSourceScript(sourceId, base);
+        programmesScript = scriptFactory.createProgrammesScript(base);
+        episodesScript = scriptFactory.createEpisodesScript(base);
+        episodeScript = scriptFactory.createEpisodeScript(base);
+        source = sourceScript.getSource();
     }
 
     public Source getSource() {
-        return sourceScript.getSource();
+        return source;
     }
 
-    public ProgrammesScript getProgrammesScript() {
-        return programmesScript.getProgrammes();
+    public Collection<Programme> getProgrammes() {
+        return programmesScript.getProgrammes(source);  //To change body of created methods use File | Settings | File Templates.
     }
 
-    public EpisodesScript getEpisodesScript() {
-        return episodesScript;
+    public void getEpisodes(Programme programme) {
+        episodesScript.getEpisodes(programme);
     }
 
-    public EpisodeScript getEpisodeScript() {
-        return episodeScript;
+    public void getEpisode(Programme programme, Episode episode) {
+        episodeScript.getEpisode(programme, episode);
+    }
+
+    @Override
+    public String toString() {
+        return "Plugin:" + source;
     }
 }

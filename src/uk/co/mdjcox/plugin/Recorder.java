@@ -1,6 +1,7 @@
 package uk.co.mdjcox.plugin;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.logger.LoggingManager;
 import uk.co.mdjcox.utils.OsUtils;
@@ -19,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Time: 07:51
  * To change this template use File | Settings | File Templates.
  */
+@Singleton
 public class Recorder {
 
     private final LoggerInterface logger;

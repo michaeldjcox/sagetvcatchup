@@ -1,6 +1,7 @@
 package uk.co.mdjcox.plugin;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.*;
 import uk.co.mdjcox.scripts.*;
@@ -19,69 +20,37 @@ import java.util.Map;
  * Time: 17:34
  * To change this template use File | Settings | File Templates.
  */
+@Singleton
 public class Harvester {
 
     private LoggerInterface logger;
     private PropertiesInterface props;
-    @Inject
-    private ScriptFactory scriptFactory;
-
+    private PluginManager pluginManager;
 
     @Inject
-    private Harvester(LoggerInterface logger, PropertiesInterface props) {
+    private Harvester(LoggerInterface logger, PropertiesInterface props, PluginManager pluginManager) {
         this.logger = logger;
         this.props = props;
+        this.pluginManager = pluginManager;
     }
 
     public Catalog refresh() {
         Catalog catalog = new Catalog();
 
         try {
-
-            String base = System.getProperty("user.dir");
-            base = base + File.separator + "sources" + File.separator;
-
-            File dir = new File(base);
-            if (!dir.isDirectory()) {
-                throw new RuntimeException("Plugin directory " + base + " is not a directory");
-            }
-
-            if (!dir.exists()) {
-                throw new RuntimeException("Plugin directory " + base + " does not exist");
-            }
-
-            File[] pluginDirs = dir.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File pathname) {
-                    return pathname.isDirectory();
-                }
-            });
-
-            Map<String, String> sourceIds = new LinkedHashMap<String, String>();
-            for (File pluginDir : pluginDirs) {
-                String sourceId = pluginDir.getName();
-                if (!sourceId.equals("Iplayer")) continue; // TODO take out
-                sourceIds.put(sourceId, pluginDir.getAbsolutePath());
-            }
-
             Map<String, Category> newCategories = new LinkedHashMap<String, Category>();
+
+
 
             Root root = new Root("Catchup", "UK Catchup TV for SageTV", "http://localhost:8081", "http://localhost:8081/logo.png");
             newCategories.put(root.getId(), root);
 
-            for (Map.Entry<String, String> sourceEntry : sourceIds.entrySet()) {
-                String sourceId = sourceEntry.getKey();
-                String plugbase = sourceEntry.getValue();
+            for (Plugin plugin : pluginManager.getPlugins()) {
 
-                SourceScript sourceScript = scriptFactory.createSourceScript(sourceId, plugbase);
-                ProgrammesScript programmeScript = scriptFactory.createProgrammesScript(plugbase);
-                EpisodesScript episodesScript = scriptFactory.createEpisodesScript(plugbase);
-                EpisodeScript episodeScript = scriptFactory.createEpisodeScript(plugbase);
-
-                Source sourceCat = sourceScript.getSource();
+                Source sourceCat = plugin.getSource();
                 newCategories.put(sourceCat.getId(), sourceCat);
 
-                logger.info("Found source: " + sourceId);
+                logger.info("Found source: " + sourceCat);
 
                 Map<String, Programme> newProgCategories = new LinkedHashMap<String, Programme>();
 
@@ -89,18 +58,17 @@ public class Harvester {
 
                 root.addSubCategory(sourceCat);
 
-                logger.info("Getting programmes found on: " + sourceId);
+                logger.info("Getting programmes found on: " + sourceCat);
 
-                Collection<Programme> programmes = programmeScript.getProgrammes(sourceCat);
+                Collection<Programme> programmes = plugin.getProgrammes();
                 for (Programme programme : programmes) {
 
-                    episodesScript.getEpisodes(programme);
+                    plugin.getEpisodes(programme);
 
                     for (Episode episode : programme.getEpisodes().values()) {
 
-                        episodeScript.getEpisode(programme, episode);
+                        plugin.getEpisode(programme, episode);
                     }
-
 
                     if (programme.getEpisodes().size() == 0) continue;
 
