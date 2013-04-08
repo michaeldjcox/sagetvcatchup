@@ -1,4 +1,4 @@
-package uk.co.mdjcox.plugin;
+package uk.co.mdjcox.sagetvcatchup;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

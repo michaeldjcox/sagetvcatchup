@@ -1,4 +1,4 @@
-package uk.co.mdjcox.plugin;
+package uk.co.mdjcox.sagetvcatchup;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -7,7 +7,6 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.logger.LoggingManager;
 import uk.co.mdjcox.scripts.PluginFactory;
-import uk.co.mdjcox.scripts.PluginManager;
 import uk.co.mdjcox.scripts.ScriptFactory;
 import uk.co.mdjcox.utils.*;
 

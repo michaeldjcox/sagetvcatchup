@@ -1,4 +1,4 @@
-package uk.co.mdjcox.plugin;
+package uk.co.mdjcox.sagetvcatchup;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -7,8 +7,6 @@ import uk.co.mdjcox.model.*;
 import uk.co.mdjcox.scripts.*;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
