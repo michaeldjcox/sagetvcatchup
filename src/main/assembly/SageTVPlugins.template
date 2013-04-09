@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PluginRepository version="1.0.262">
+<SageTVPlugin>
+<Name>_NAME_</Name>
+<Identifier>_ID_</Identifier>
+<Description>
+_DESCRIPTION_
+</Description>
+<Author>_AUTHOR_</Author>
+<CreationDate>_CREATEDATE_</CreationDate>
+<ModificationDate>_MODDATE_</ModificationDate>
+<Version beta="true">_VERSION_</Version>
+<Desktop>false</Desktop>
+<ServerOnly>true</ServerOnly>
+<ResourcePath>_PATH_</ResourcePath>
+<Webpage title="_NAME_">_WEBPAGE_</Webpage>
+<Screenshot title="_SCREENSHOTNAME_">_SCREENSHOTLINK_</Screenshot>
+<PluginType>Standard</PluginType>
+<Package>
+<PackageType>System</PackageType>
+<Location>_LOCATION_</Location>
+<MD5>_MD5_</MD5>
+<Overwrite>true</Overwrite> <!-- Defaults to true -->
+</Package>
+<ImplementationClass>_MAINCLASS_</ImplementationClass>
+<ReleaseNotes>
+_RELEASENOTES_
+</ReleaseNotes>
+</SageTVPlugin>
+</PluginRepository>
+

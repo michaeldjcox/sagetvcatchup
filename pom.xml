@@ -17,6 +17,12 @@
         </repository>
     </repositories>
 
+    <properties>
+        <sagedir>/opt/sagetv/server</sagedir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.build.timestamp.format>yyyy.MM.dd</maven.build.timestamp.format>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -28,6 +34,86 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <version>1.5.2</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <file>${basedir}/src/main/assembly/SageTVPlugins.template</file>
+                    <outputFile>target/SageTvPlugins.xml</outputFile>
+                    <replacements>
+                        <replacement>
+                            <token>_NAME_</token>
+                            <value>SageTV Catchup</value>
+                        </replacement>
+                        <replacement>
+                            <token>_DESCRIPTION_</token>
+                            <value><![CDATA[sagetvcatchup description]]></value>
+                        </replacement>
+                        <replacement>
+                            <token>_ID_</token>
+                            <value>${project.artifactId}</value>
+                        </replacement>
+                        <replacement>
+                            <token>_PATH_</token>
+                            <value>${project.artifactId}</value>
+                        </replacement>
+                        <replacement>
+                            <token>_WEBPAGE_</token>
+                            <value><![CDATA[http://localhost:8081]]></value>
+                        </replacement>
+                        <replacement>
+                            <token>_MAINCLASS_</token>
+                            <value>uk.co.mdjcox.sagetvcatchup.CatchupPlugin</value>
+                        </replacement>
+                        <replacement>
+                            <token>_SCREENSHOTNAME_</token>
+                            <value>Screenshot</value>
+                        </replacement>
+                        <replacement>
+                            <token>_SCREENSHOTLINK_</token>
+                            <value><![CDATA[http://localhost:8081/logo.png]]></value>
+                        </replacement>
+                        <replacement>
+                            <token>_RELEASENOTES_</token>
+                            <value><![CDATA[_VERSION_ - Initial version.]]></value>
+                        </replacement>
+                        <replacement>
+                            <token>_AUTHOR_</token>
+                            <value>michaeldjcox</value>
+                        </replacement>
+                        <replacement>
+                            <token>_MODDATE_</token>
+                            <value>${maven.build.timestamp}</value>
+                        </replacement>
+                        <replacement>
+                            <token>_CREATEDATE_</token>
+                            <value>2013.04.01</value>
+                        </replacement>
+                        <replacement>
+                            <token>_VERSION_</token>
+                            <value>${project.version}</value>
+                        </replacement>
+                        <replacement>
+                            <token>_LOCATION_</token>
+                            <value><![CDATA[http://localhost:8081]]></value>
+                        </replacement>
+                        <replacement>
+                            <token>_MD5_</token>
+                            <value>9999</value>
+                        </replacement>
+                    </replacements>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.4</version>
@@ -50,11 +136,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <sagedir>/opt/sagetv/server</sagedir>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencies>
         <dependency>
