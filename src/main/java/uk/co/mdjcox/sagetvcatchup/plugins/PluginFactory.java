@@ -1,4 +1,4 @@
-package uk.co.mdjcox.catchup.plugins;
+package uk.co.mdjcox.sagetvcatchup.plugins;
 
 import com.google.inject.assistedinject.Assisted;
 

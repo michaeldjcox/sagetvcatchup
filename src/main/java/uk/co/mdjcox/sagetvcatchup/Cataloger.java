@@ -1,10 +1,10 @@
-package uk.co.mdjcox.catchup;
+package uk.co.mdjcox.sagetvcatchup;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.*;
-import uk.co.mdjcox.catchup.plugins.*;
+import uk.co.mdjcox.sagetvcatchup.plugins.*;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.util.Collection;
