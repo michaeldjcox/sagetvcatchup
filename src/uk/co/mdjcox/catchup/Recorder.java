@@ -108,7 +108,7 @@ public class Recorder {
         logger.info("Waiting for existence of " + filename);
 
         File file = new File(filename);
-        while (!file.exists() || file.length() < (500*1024)) {
+        while (!file.exists() || file.length() < (1000*1024)) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

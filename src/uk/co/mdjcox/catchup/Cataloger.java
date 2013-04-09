@@ -71,8 +71,8 @@ public class Cataloger {
                     newProgCategories.put(programme.getId(), programme);
                     newEpisodes.putAll(programme.getEpisodes());
 
-                    // TODO take this out
-                    if (newProgCategories.size() > 0) {
+//                    // TODO take this out
+                    if (newProgCategories.size() > 5) {
                         break;
                     }
                 }

@@ -15,15 +15,16 @@ import java.util.Map;
  * Time: 18:05
  * To change this template use File | Settings | File Templates.
  */
+
+// TODO - some issues parsing content meta-data
+// TODO - check video from other providers
+// TODO - how to stop playback and resume - how to tidy away broken fragments
+// TODO - why does sagetv giveup
+// TODO - parameter for how much download before playback
+
 public class CatchupPlugin implements SageTVPlugin {
 
     public static Injector injector;
-
-//    private Publisher sagetvPublisher;
-//    private PodcastServer server;
-//    private Catalog catalog;
-//    private Cataloger harvester;
-//    private PluginManager pluginManager;
 
     public CatchupPlugin(sage.SageTVPluginRegistry registry) {
     }
