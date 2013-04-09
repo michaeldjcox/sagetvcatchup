@@ -1,4 +1,5 @@
-SageTvCatchup.iws
+sagetvcatchup.iws
 logs/
 out/
 recordings/
+target/

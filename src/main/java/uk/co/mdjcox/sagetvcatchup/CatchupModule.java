@@ -32,7 +32,7 @@ public class CatchupModule extends AbstractModule {
     @Provides
     @Singleton
     public PropertiesInterface providesProperties() throws Exception {
-        return new PropertiesFile("config" + File.separator + "catchup.properties", true);
+        return new PropertiesFile("src" + File.separator + "main" + File.separator + "config" + File.separator + "catchup.properties", true);
     }
 
     @Provides
