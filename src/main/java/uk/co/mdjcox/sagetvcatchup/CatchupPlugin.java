@@ -3,10 +3,16 @@ package uk.co.mdjcox.sagetvcatchup;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import sage.SageTVPlugin;
+import sage.SageTVPluginRegistry;
+import uk.co.mdjcox.logger.Logger;
+import uk.co.mdjcox.logger.LoggerInterface;
+import uk.co.mdjcox.logger.LoggingManager;
 import uk.co.mdjcox.model.Catalog;
 import uk.co.mdjcox.sagetvcatchup.plugins.PluginManager;
 
+import java.io.File;
 import java.util.Map;
+import java.util.concurrent.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,43 +30,93 @@ import java.util.Map;
 
 public class CatchupPlugin implements SageTVPlugin {
 
+    public static LoggerInterface logger;
     public static Injector injector;
 
+    private SageTVPluginRegistry registry;
+    private PodcastServer server;
+
+    private ScheduledExecutorService service;
+
     public CatchupPlugin(sage.SageTVPluginRegistry registry) {
+        this.registry = registry;
+    }
+
+    private static void getLogger() {
+        logger = LoggingManager.getLogger(CatchupPlugin.class, "sagetvcatchup", System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator + "logs" + File.separator);
     }
 
     @Override
     public void start() {
 
         try {
+            service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+                @Override
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, "sagetvcatchup-scheduler");
+                }
+            });
+
             CatchupModule module = new CatchupModule();
+            logger = module.providesLogger();
+
+            logger.info("Starting SageTVCatchup plugin");
+
+            registry.eventSubscribe(this, "PlaybackStopped");
+            registry.eventSubscribe(this, "PlaybackStarted");
+            registry.eventSubscribe(this, "PlaybackFinished");
+
             injector = Guice.createInjector(module);
 
             PluginManager pluginManager = injector.getInstance(PluginManager.class);
-            Cataloger harvester = injector.getInstance(Cataloger.class);
-            PodcastServer server = injector.getInstance(PodcastServer.class); //   (logger, props, HtmlUtils.instance(), OsUtils.instance(logger));
-            Publisher sagetvPublisher = injector.getInstance(Publisher.class); // (logger, props, HtmlUtils.instance());
+            final Cataloger harvester = injector.getInstance(Cataloger.class);
+            server = injector.getInstance(PodcastServer.class);
+            final Publisher sagetvPublisher = injector.getInstance(Publisher.class);
 
             pluginManager.load();
-            Catalog catalog = harvester.catalog();
-            server.publish(catalog);
             server.start();
-            sagetvPublisher.publish(catalog);
+
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        logger.info("Refreshing catalog");
+                        Catalog catalog = harvester.catalog();
+                        server.publish(catalog);
+                        sagetvPublisher.publish(catalog);
+                    } catch (Exception e) {
+                        logger.severe("Failed to refresh catalog", e);
+                    }
+                }
+            } ;
+
+            service.scheduleAtFixedRate(runnable, 1, 1200, TimeUnit.SECONDS);
 
         } catch (Exception e) {
-            System.err.println("Failed to start plugin");
-            e.printStackTrace();
+            logger.severe("Failed to start plugin", e);
         }
     }
 
     @Override
     public void stop() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        logger.info("Stopping SageTVCatchup plugin");
+
+        try {
+            registry.eventSubscribe(this, "PlaybackStopped");
+            registry.eventSubscribe(this, "PlaybackStarted");
+            registry.eventSubscribe(this, "PlaybackFinished");
+        } catch (Exception e) {
+            logger.severe("Failed to unsubscribe from events", e);
+        }
+
+        if (server != null) {
+            server.stop();
+        }
     }
 
     @Override
     public void destroy() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        logger.info("Destroying SageTVCatchup plugin");
     }
 
     @Override
@@ -115,7 +171,7 @@ public class CatchupPlugin implements SageTVPlugin {
 
     @Override
     public void sageEvent(String s, Map map) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        logger.info("Received event " + s);
     }
 
     public static void main(String[] args) {

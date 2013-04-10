@@ -124,7 +124,7 @@ public class LoggingManager {
             dir = System.getProperty("user.dir");
             dir = dir.replace('\\', File.separatorChar);
             dir = dir.replace('/', File.separatorChar);
-            dir = dir + File.separator + "webfeedencoder" + File.separator;
+            dir = dir + File.separator + "sagetvcatchup" + File.separator;
             inSageTv = true;
         } else
         if (dir.endsWith(".jar")) {

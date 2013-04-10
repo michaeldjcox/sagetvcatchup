@@ -3,6 +3,7 @@ package uk.co.mdjcox.sagetvcatchup.plugins;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import uk.co.mdjcox.logger.LoggerInterface;
+import uk.co.mdjcox.logger.LoggingManager;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
@@ -41,8 +42,11 @@ public class PluginManager {
     }
 
     public void load() {
-        String base = System.getProperty("user.dir");
-        base = base + File.separator + "src" + File.separator + "main" + File.separator + "plugins" + File.separator;
+
+        String base = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "plugins" + File.separator;
+        if (LoggingManager.inSageTv()) {
+            base =  System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator + "plugins" + File.separator;
+        }
 
         File dir = new File(base);
         if (!dir.isDirectory()) {

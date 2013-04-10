@@ -32,13 +32,18 @@ public class CatchupModule extends AbstractModule {
     @Provides
     @Singleton
     public PropertiesInterface providesProperties() throws Exception {
-        return new PropertiesFile("src" + File.separator + "main" + File.separator + "config" + File.separator + "catchup.properties", true);
+        String base = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "config" + File.separator + "catchup.properties";
+        if (LoggingManager.inSageTv()) {
+            base =  System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator + "config" + File.separator + "catchup.properties";
+        }
+
+        return new PropertiesFile(base, true);
     }
 
     @Provides
     @Singleton
     public LoggerInterface providesLogger() throws Exception {
-        LoggerInterface logger = LoggingManager.getLogger(CatchupPlugin.class, "Catchup", "logs");
+        LoggerInterface logger = LoggingManager.getLogger(CatchupPlugin.class, "sagetvcatchup");
         LoggingManager.addConsole(logger);
         return logger;
     }
