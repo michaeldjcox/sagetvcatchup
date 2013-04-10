@@ -37,13 +37,10 @@ public class CatchupPlugin implements SageTVPlugin {
     private PodcastServer server;
 
     private ScheduledExecutorService service;
+    private Publisher sagetvPublisher;
 
     public CatchupPlugin(sage.SageTVPluginRegistry registry) {
         this.registry = registry;
-    }
-
-    private static void getLogger() {
-        logger = LoggingManager.getLogger(CatchupPlugin.class, "sagetvcatchup", System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator + "logs" + File.separator);
     }
 
     @Override
@@ -60,7 +57,7 @@ public class CatchupPlugin implements SageTVPlugin {
             CatchupModule module = new CatchupModule();
             logger = module.providesLogger();
 
-            logger.info("Starting SageTVCatchup plugin");
+            logger.info("Starting sagetvcatchup plugin");
 
             registry.eventSubscribe(this, "PlaybackStopped");
             registry.eventSubscribe(this, "PlaybackStarted");
@@ -71,7 +68,7 @@ public class CatchupPlugin implements SageTVPlugin {
             PluginManager pluginManager = injector.getInstance(PluginManager.class);
             final Cataloger harvester = injector.getInstance(Cataloger.class);
             server = injector.getInstance(PodcastServer.class);
-            final Publisher sagetvPublisher = injector.getInstance(Publisher.class);
+            sagetvPublisher = injector.getInstance(Publisher.class);
 
             pluginManager.load();
             server.start();
@@ -93,13 +90,23 @@ public class CatchupPlugin implements SageTVPlugin {
             service.scheduleAtFixedRate(runnable, 1, 1200, TimeUnit.SECONDS);
 
         } catch (Exception e) {
-            logger.severe("Failed to start plugin", e);
+            logger.severe("Failed to start sagetvcatchup plugin", e);
         }
     }
 
     @Override
     public void stop() {
-        logger.info("Stopping SageTVCatchup plugin");
+        logger.info("Stopping sagetvcatchup plugin");
+
+        service.shutdownNow();
+
+        try {
+            if (sagetvPublisher != null) {
+                sagetvPublisher.unpublish();
+            }
+        } catch (Exception e) {
+            logger.severe("Failed to remove online video properties", e);
+        }
 
         try {
             registry.eventSubscribe(this, "PlaybackStopped");
@@ -109,44 +116,48 @@ public class CatchupPlugin implements SageTVPlugin {
             logger.severe("Failed to unsubscribe from events", e);
         }
 
-        if (server != null) {
-            server.stop();
+        try {
+            if (server != null) {
+                server.stop();
+            }
+        } catch (Exception e) {
+            logger.severe("Failed to stop podcast", e);
         }
     }
 
     @Override
     public void destroy() {
-        logger.info("Destroying SageTVCatchup plugin");
+        logger.info("Destroying sagetvcatchup plugin");
     }
 
     @Override
     public String[] getConfigSettings() {
-        return new String[0];  //To change body of implemented methods use File | Settings | File Templates.
+        return new String[0];
     }
 
     @Override
     public String getConfigValue(String s) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public String[] getConfigValues(String s) {
-        return new String[0];  //To change body of implemented methods use File | Settings | File Templates.
+        return new String[0];
     }
 
     @Override
     public int getConfigType(String s) {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        return 0;
     }
 
     @Override
     public void setConfigValue(String s, String s1) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     @Override
     public void setConfigValues(String s, String[] strings) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     @Override
@@ -156,22 +167,22 @@ public class CatchupPlugin implements SageTVPlugin {
 
     @Override
     public String getConfigHelpText(String s) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public String getConfigLabel(String s) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     public void resetConfig() {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     @Override
     public void sageEvent(String s, Map map) {
-        logger.info("Received event " + s);
+        logger.info("Received event " + s + " with " + map);
     }
 
     public static void main(String[] args) {

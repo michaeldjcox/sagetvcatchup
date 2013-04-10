@@ -26,7 +26,9 @@ public class Publisher {
         this.htmlUtils = htmlUtils;
     }
 
-    public void unpublish(String file) throws Exception {
+    public void unpublish() throws Exception {
+        String file = props.getProperty("fileName", "Catchup");
+
         boolean success = true;
         String linkFileName = getLinkFile(file);
         String labelFileName = getLabelFile(file);

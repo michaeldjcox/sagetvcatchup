@@ -21,6 +21,8 @@ import java.io.File;
  */
 public class CatchupModule extends AbstractModule {
 
+    private LoggerInterface logger;
+
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder()
@@ -43,8 +45,12 @@ public class CatchupModule extends AbstractModule {
     @Provides
     @Singleton
     public LoggerInterface providesLogger() throws Exception {
-        LoggerInterface logger = LoggingManager.getLogger(CatchupPlugin.class, "sagetvcatchup");
-        LoggingManager.addConsole(logger);
+        if (logger == null) {
+            logger = LoggingManager.getLogger(CatchupPlugin.class, "sagetvcatchup");
+            if (!LoggingManager.inSageTv()) {
+                LoggingManager.addConsole(logger);
+            }
+        }
         return logger;
     }
 
