@@ -40,7 +40,7 @@
                 <version>1.5.2</version>
                 <executions>
                     <execution>
-                        <phase>prepare-package</phase>
+                        <phase>install</phase>
                         <goals>
                             <goal>replace</goal>
                         </goals>
@@ -48,7 +48,7 @@
                 </executions>
                 <configuration>
                     <file>${basedir}/src/main/assembly/SageTVPlugins.template</file>
-                    <outputFile>target/SageTvPlugins.xml</outputFile>
+                    <outputFile>${sagedir}/SageTVPluginsDev.xml</outputFile>
                     <replacements>
                         <replacement>
                             <token>_NAME_</token>
@@ -68,7 +68,7 @@
                         </replacement>
                         <replacement>
                             <token>_WEBPAGE_</token>
-                            <value><![CDATA[http://localhost:8081]]></value>
+                            <value><![CDATA[http://localhost]]></value>
                         </replacement>
                         <replacement>
                             <token>_MAINCLASS_</token>
@@ -80,7 +80,7 @@
                         </replacement>
                         <replacement>
                             <token>_SCREENSHOTLINK_</token>
-                            <value><![CDATA[http://localhost:8081/logo.png]]></value>
+                            <value><![CDATA[http://localhost/logo.png]]></value>
                         </replacement>
                         <replacement>
                             <token>_RELEASENOTES_</token>
@@ -104,13 +104,21 @@
                         </replacement>
                         <replacement>
                             <token>_LOCATION_</token>
-                            <value><![CDATA[http://localhost:8081]]></value>
+                            <value><![CDATA[http://localhost/sagetvcatchup/${project.version}/${project.artifactId}-${project.version}-plugin.zip]]></value>
                         </replacement>
                         <replacement>
                             <token>_MD5_</token>
-                            <value>9999</value>
+                            <valueFile>${settings.localRepository}/uk/co/mdjcox/${project.artifactId}/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}-plugin.zip.md5</valueFile>
                         </replacement>
                     </replacements>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <createChecksum>true</createChecksum>
                 </configuration>
             </plugin>
 
