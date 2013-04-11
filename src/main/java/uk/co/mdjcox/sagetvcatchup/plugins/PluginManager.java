@@ -43,10 +43,7 @@ public class PluginManager {
 
     public void load() {
 
-        String base = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "plugins" + File.separator;
-        if (LoggingManager.inSageTv()) {
-            base =  System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator + "plugins" + File.separator;
-        }
+        String base = props.getProperty("pluginDir", "/opt/sagetv/server/sagetvcatchup/plugins");
 
         File dir = new File(base);
         if (!dir.isDirectory()) {

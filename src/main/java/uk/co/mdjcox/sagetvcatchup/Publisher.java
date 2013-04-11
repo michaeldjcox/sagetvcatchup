@@ -91,6 +91,8 @@ public class Publisher {
         links.clear();
         labels.clear();
 
+        int port = props.getInt("podcasterPort", 8081);
+
         for (Category category : categories) {
             if (category.isRoot()) {
                 continue;
@@ -100,7 +102,7 @@ public class Publisher {
             } else if (category.isProgrammeCategory()) {
                 logger.info("Online adding final category " + category.getId());
                 addCategory(category.getId(), category.getShortName(), category.getLongName(), category.getIconUrl(), labels);
-                addPodcast(category.getId(), category.getParentId(), category.getPodcastUrl(), links, ((SubCategory) category).getOtherParentIds());
+                addPodcast(category.getId(), category.getParentId(), "http://localhost:"+port+"/" + category.getId(), links, ((SubCategory) category).getOtherParentIds());
             } else if (category.isSubCategory()) {
                 logger.info("Online adding non-final category " + category.getId());
                 addSubCategory(category.getParentId(), category.getId(), category.getShortName(), category.getLongName(),

@@ -112,7 +112,7 @@ class WindowsUtils extends OsUtils {
                                      String wmiCommaSeparatedFieldName)
             throws Exception {
         String vbScript = getVBScript(wmiQueryStr, wmiCommaSeparatedFieldName);
-        String tmpFileName = LoggingManager.getInstallDirectory() + "tmp" + File.separator + "jwmi.vbs";
+        String tmpFileName = System.getProperty("java.io.tmpdir") + File.separator + "jwmi.vbs";
         writeStrToFile(tmpFileName, vbScript);
         String output = execute(
                 new String[] {"cmd.exe", "/C", "cscript.exe", tmpFileName});
@@ -184,7 +184,7 @@ class WindowsUtils extends OsUtils {
     }
 
     public static void main(String[] args) throws Exception {
-        LoggerInterface logger = LoggingManager.getLogger(WindowsUtils.class, "test");
+        LoggerInterface logger = LoggingManager.getLogger(WindowsUtils.class, "test", "/home/michael/Documents/sagetvcatchup");
         LoggingManager.addConsole(logger);
         OsUtils utils = OsUtils.instance(logger);
         String command = "\"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe\"";

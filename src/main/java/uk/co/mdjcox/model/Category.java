@@ -72,11 +72,6 @@ public abstract class Category {
         this.parentId = parentId;
     }
 
-    public String getPodcastUrl() {
-        return "http://localhost:8081/" + getId();
-
-    }
-
     public boolean isSource() {
         return (this instanceof Source);
     }

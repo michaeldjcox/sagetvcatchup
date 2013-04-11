@@ -15,11 +15,11 @@ import java.io.File;
 /**
  * Created with IntelliJ IDEA.
  * User: michael
- * Date: 28/03/13
- * Time: 21:40
+ * Date: 11/04/13
+ * Time: 08:09
  * To change this template use File | Settings | File Templates.
  */
-public class CatchupModule extends AbstractModule {
+public class CatchupDevModule extends AbstractModule {
 
     @Override
     protected void configure() {
@@ -31,18 +31,23 @@ public class CatchupModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public PropertiesInterface providesProperties() throws Exception {
-        String base =  System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator + "config" + File.separator + "catchup.properties";
-        PropertiesInterface properties = new PropertiesFile(base, true);
-        return properties;
+    public LoggerInterface providesLogger() throws Exception {
+        PropertiesInterface props = providesProperties();
+        LoggerInterface logger = LoggingManager.getLogger(CatchupPlugin.class, "sagetvcatchup", props.getProperty("logDir", "/tmp/logs"));
+        LoggingManager.addConsole(logger);
+        return logger;
     }
 
     @Provides
     @Singleton
-    public LoggerInterface providesLogger() throws Exception {
-        PropertiesInterface props = providesProperties();
-        LoggerInterface logger = LoggingManager.getLogger(CatchupPlugin.class, "sagetvcatchup", props.getProperty("logDir", "/tmp/logs"));
-        return logger;
+    public PropertiesInterface providesProperties() throws Exception {
+        String base = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "config" + File.separator + "catchup.properties";
+        PropertiesInterface props =  new PropertiesFile(base, true);
+        props.setProperty("recordingDir", "/home/michael/Documents/sagetvcatchup/recordings");
+        props.setProperty("pluginDir", "/home/michael/Documents/sagetvcatchup/src/main/plugins");
+        props.setProperty("logDir", "/home/michael/Documents/sagetvcatchup/logs");
+        props.setProperty("podcasterPort", "8082");
+        return props;
     }
 
     @Provides

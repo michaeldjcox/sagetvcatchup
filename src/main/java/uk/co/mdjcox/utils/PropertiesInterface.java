@@ -13,6 +13,8 @@ import java.util.Set;
 public interface PropertiesInterface {
     void clearProperty(String token);
 
+    Object setProperty(String key, String value);
+
     void setPropertySequence(String token, ArrayList<String> values);
 
     String getString(String token);

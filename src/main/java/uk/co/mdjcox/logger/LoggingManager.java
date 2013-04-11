@@ -23,8 +23,6 @@ import java.util.logging.Logger;
  */
 public class LoggingManager {
 
-    private static boolean inSageTv = false;
-
     public synchronized static void addConsole(LoggerInterface loggerInterface) {
         ConsoleHandler handler2 = new ConsoleHandler();
         // UTF-16 for System.err doesn't seem to work
@@ -44,10 +42,6 @@ public class LoggingManager {
         loggerInterface.addHandler(handler2);
     }
 
-    public synchronized static LoggerInterface getLogger(Class clazz, String name) {
-        String logDir = getInstallDirectory() + File.separator + "logs" + File.separator;
-        return getLogger(clazz, name, logDir);
-    }
     /**
      * Gets a logger instance for the application.
      *
@@ -107,46 +101,4 @@ public class LoggingManager {
             // We did our best
         }
     }
-
-    public static boolean inSageTv() {
-        return inSageTv ;
-    }
-
-    public static String getInstallDirectory()  {
-        final ProtectionDomain domain = LoggingManager.class
-                .getProtectionDomain();
-        final CodeSource source = domain.getCodeSource();
-        final URL location = source.getLocation();
-        String dir = location.getPath().substring(1);
-        dir = dir.replace('/', File.separatorChar);
-        dir = dir.replace('\\', File.separatorChar);
-        if (dir.toLowerCase().contains("jars") && dir.toLowerCase().contains("sagetv")) {
-            dir = System.getProperty("user.dir");
-            dir = dir.replace('\\', File.separatorChar);
-            dir = dir.replace('/', File.separatorChar);
-            dir = dir + File.separator + "sagetvcatchup" + File.separator;
-            inSageTv = true;
-        } else
-        if (dir.endsWith(".jar")) {
-            final int fileStart = dir.lastIndexOf(File.separator) + 1;
-            dir = dir.substring(0, fileStart);
-            if (dir.endsWith("libs" + File.separator)) {
-                dir = dir.substring(0, dir.length()-5);
-            }
-            dir = dir.replaceAll("%20", " ");
-        } else {
-            dir = System.getProperty("user.dir");
-            dir = dir.replace('\\', File.separatorChar);
-            dir = dir.replace('/', File.separatorChar);
-            dir = dir + File.separator;
-        }
-
-        if (File.separator.equals("/")) {
-            dir = File.separator + dir;
-        }
-
-        return dir;
-    }
-
-
 }

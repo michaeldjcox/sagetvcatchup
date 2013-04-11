@@ -50,7 +50,7 @@ public class PodcastServer {
         };
         server = new Server();
         Connector connector = new SocketConnector();
-        port = props.getInt("port", 8081);
+        port = props.getInt("port", props.getInt("podcasterPort"));
         connector.setPort(port);
         server.setConnectors(new Connector[]{connector});
         server.setHandler(handler);
@@ -205,7 +205,7 @@ public class PodcastServer {
                 resultStr += "<media:thumbnail url=\"" + episode.getIconUrl() + "\"/>" + CRLF;
                 int length = 999999;
                 String type = "video/mp4";
-                resultStr += "<enclosure url=\"" + episode.getPodcastUrl() + "\" length=\"" + length + "\" type=\"" + type + "\"/>" + CRLF;
+                resultStr += "<enclosure url=\"" + "http://localhost:"+port+"/play?link=" + episode.getServiceUrl() + "\" length=\"" + length + "\" type=\"" + type + "\"/>" + CRLF;
                 resultStr += "</item>" + CRLF;
             }
         } else if (service.isSubCategory()) {
@@ -213,8 +213,8 @@ public class PodcastServer {
             for (Category subCat : subCats.values()) {
                 resultStr += "<item>" + CRLF;
                 resultStr += "<title>" + subCat.getShortName() + "</title>" + CRLF;
-                resultStr += "<link>" + subCat.getPodcastUrl() + "</link>" + CRLF;
-                resultStr += "<guid>" + subCat.getPodcastUrl() + "</guid>" + CRLF;
+                resultStr += "<link>" + "http://localhost:"+port+"/" + subCat.getId() + "</link>" + CRLF;
+                resultStr += "<guid>" + "http://localhost"+port+"/" + subCat.getId() + "</guid>" + CRLF;
                 resultStr += "<description>" + subCat.getLongName() + "</description>" + CRLF;
                 resultStr += "<itunes:image href=\"" + subCat.getIconUrl() + "\"/>" + CRLF;
                 resultStr += "<media:thumbnail url=\"" + subCat.getIconUrl() + "\"/>" + CRLF;

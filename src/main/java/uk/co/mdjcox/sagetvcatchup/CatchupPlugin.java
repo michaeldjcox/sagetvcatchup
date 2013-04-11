@@ -1,5 +1,6 @@
 package uk.co.mdjcox.sagetvcatchup;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import sage.SageTVPlugin;
@@ -9,8 +10,12 @@ import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.logger.LoggingManager;
 import uk.co.mdjcox.model.Catalog;
 import uk.co.mdjcox.sagetvcatchup.plugins.PluginManager;
+import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
+import java.net.URL;
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -47,6 +52,25 @@ public class CatchupPlugin implements SageTVPlugin {
     public void start() {
 
         try {
+            AbstractModule module;
+            String home = System.getProperty("user.dir");
+            if (home.startsWith("/home/michael")) {
+                System.err.println("Running in DEV");
+                module = new CatchupDevModule();
+            } else {
+                System.err.println("Running in SageTV");
+                module = new CatchupModule();
+            }
+
+            injector = Guice.createInjector(module);
+
+            logger = injector.getInstance(LoggerInterface.class);
+
+            logger.info("Starting sagetvcatchup plugin");
+
+            PropertiesInterface props = injector.getInstance(PropertiesInterface.class);
+            logger.info(props.toString());
+
             service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
                 @Override
                 public Thread newThread(Runnable r) {
@@ -54,16 +78,12 @@ public class CatchupPlugin implements SageTVPlugin {
                 }
             });
 
-            CatchupModule module = new CatchupModule();
-            logger = module.providesLogger();
 
-            logger.info("Starting sagetvcatchup plugin");
-
-            registry.eventSubscribe(this, "PlaybackStopped");
-            registry.eventSubscribe(this, "PlaybackStarted");
-            registry.eventSubscribe(this, "PlaybackFinished");
-
-            injector = Guice.createInjector(module);
+            if (registry != null) {
+                registry.eventSubscribe(this, "PlaybackStopped");
+                registry.eventSubscribe(this, "PlaybackStarted");
+                registry.eventSubscribe(this, "PlaybackFinished");
+            }
 
             PluginManager pluginManager = injector.getInstance(PluginManager.class);
             final Cataloger harvester = injector.getInstance(Cataloger.class);
@@ -90,7 +110,12 @@ public class CatchupPlugin implements SageTVPlugin {
             service.scheduleAtFixedRate(runnable, 1, 1200, TimeUnit.SECONDS);
 
         } catch (Exception e) {
-            logger.severe("Failed to start sagetvcatchup plugin", e);
+            if (logger == null) {
+               System.err.println("Failed to start sagetvcatchup plugin");
+                e.printStackTrace();
+            } else {
+                logger.severe("Failed to start sagetvcatchup plugin", e);
+            }
         }
     }
 

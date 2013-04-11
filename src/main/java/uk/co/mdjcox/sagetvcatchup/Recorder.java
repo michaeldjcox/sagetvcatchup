@@ -77,11 +77,7 @@ public class Recorder {
         logger.info("Starting recording of " + url);
 
 
-        String outDir = "/home/michael/Documents/SageTvCatchUp/recordings";
-        if (LoggingManager.inSageTv()) {
-            outDir = props.getString("recordingDir", "/opt/sagetv/server/sagetvcatchup/recordings");
-        }
-
+        String outDir = props.getString("recordingDir", "/opt/sagetv/server/sagetvcatchup/recordings");
         String command = "get_iplayer " + url + " -o " + outDir + File.separator;
         ArrayList<String> output = new ArrayList<String>();
         recording = new Recording(url);

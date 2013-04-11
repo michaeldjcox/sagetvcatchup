@@ -122,10 +122,6 @@ public class Episode {
         this.episode = episode;
     }
 
-    public String getPodcastUrl() {
-        return "http://localhost:8081/play?link=" + getServiceUrl();
-    }
-
     public String getPodcastTitle() {
         String episodeTitle = getEpisodeTitle();
         String programmeTitle = getProgrammeTitle();

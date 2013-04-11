@@ -44,7 +44,6 @@ public class SubCategoryTest {
         assertArrayEquals("otherParentIds", new String[] {}, subcat.getOtherParentIds().toArray());
         assertArrayEquals("subCategories keys", new String[] {}, subcat.getSubCategories().keySet().toArray());
         assertArrayEquals("subCategories values", new String[] {}, subcat.getSubCategories().values().toArray());
-        assertEquals("podcastUrl", "http://localhost:8081/id", subcat.getPodcastUrl());
     }
 
     /**

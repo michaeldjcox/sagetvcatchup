@@ -38,7 +38,7 @@ public class Cataloger {
         try {
             Map<String, Category> newCategories = new LinkedHashMap<String, Category>();
 
-            Root root = new Root("Catchup", "UK Catchup TV for SageTV", "http://localhost:8081", "http://localhost:8081/logo.png");
+            Root root = new Root("Catchup", "UK Catchup TV for SageTV", "http://localhost:8081", "http://localhost:" + props.getInt("podcasterPort", 8081)+ "/logo.png");
             newCategories.put(root.getId(), root);
 
             for (Plugin plugin : pluginManager.getPlugins()) {
