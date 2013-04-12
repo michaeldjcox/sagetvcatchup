@@ -82,6 +82,9 @@ public class PodcastServer {
         } else if (target.startsWith("/play")) {
             String url = request.getParameter("link");
             getVideoResponse(response, url);
+        } else if (target.startsWith("/stop")) {
+            String url = request.getParameter("link");
+            stopVideoResponse(response, url);
         } else {
             String serviceName = target.substring(1);
             String podcast = podcasts.get(serviceName);
@@ -94,7 +97,15 @@ public class PodcastServer {
         ((Request) request).setHandled(true);
     }
 
-    private void getVideoResponse(HttpServletResponse response, String podcast) throws ServletException {
+    private void stopVideoResponse(HttpServletResponse response, String podcast) throws ServletException, IOException {
+        logger.info("Stop Streaming " + podcast);
+
+        recorder.stop(podcast);
+
+        getMessageResponse(response, "Podcast terminated");
+    }
+
+        private void getVideoResponse(HttpServletResponse response, String podcast) throws ServletException {
         try {
 
             File file = recorder.start(podcast);

@@ -207,7 +207,22 @@ public class CatchupPlugin implements SageTVPlugin {
 
     @Override
     public void sageEvent(String s, Map map) {
-        logger.info("Received event " + s + " with " + map);
+
+        if (s.equals("PlaybackStarted")) {
+            Object object = map.get("MediaFile");
+           logger.info("Playback started of " + object);
+        } else
+        if (s.equals("PlaybackStopped")) {
+            Object object = map.get("MediaFile");
+            logger.info("Playback stopped of " + object);
+        } else
+        if (s.equals("PlaybackFinished")) {
+            Object object = map.get("MediaFile");
+            logger.info("Playback stopped of " + object);
+        } else {
+            logger.info("Received event " + s);
+        }
+
     }
 
     public static void main(String[] args) {

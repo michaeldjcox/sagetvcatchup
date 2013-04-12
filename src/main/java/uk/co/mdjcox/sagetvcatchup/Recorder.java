@@ -78,7 +78,7 @@ public class Recorder {
 
 
         String outDir = props.getString("recordingDir", "/opt/sagetv/server/sagetvcatchup/recordings");
-        String command = "get_iplayer " + url + " -o " + outDir + File.separator;
+        String command = "get_iplayer " + url + " --force -o " + outDir + File.separator;
         ArrayList<String> output = new ArrayList<String>();
         recording = new Recording(url);
         currentRecordings.put(url, recording);

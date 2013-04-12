@@ -21,6 +21,9 @@ import java.io.File;
  */
 public class CatchupDevModule extends AbstractModule {
 
+    private PropertiesFile properties;
+    private LoggerInterface logger;
+
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder()
@@ -33,8 +36,10 @@ public class CatchupDevModule extends AbstractModule {
     @Singleton
     public LoggerInterface providesLogger() throws Exception {
         PropertiesInterface props = providesProperties();
-        LoggerInterface logger = LoggingManager.getLogger(CatchupPlugin.class, "sagetvcatchup", props.getProperty("logDir", "/tmp/logs"));
-        LoggingManager.addConsole(logger);
+        if (logger == null) {
+            logger = LoggingManager.getLogger(CatchupPlugin.class, "sagetvcatchup", props.getProperty("logDir", "/tmp/logs"));
+            LoggingManager.addConsole(logger);
+        }
         return logger;
     }
 
@@ -42,12 +47,14 @@ public class CatchupDevModule extends AbstractModule {
     @Singleton
     public PropertiesInterface providesProperties() throws Exception {
         String base = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "config" + File.separator + "catchup.properties";
-        PropertiesInterface props =  new PropertiesFile(base, true);
-        props.setProperty("recordingDir", "/home/michael/Documents/sagetvcatchup/recordings");
-        props.setProperty("pluginDir", "/home/michael/Documents/sagetvcatchup/src/main/plugins");
-        props.setProperty("logDir", "/home/michael/Documents/sagetvcatchup/logs");
-        props.setProperty("podcasterPort", "8082");
-        return props;
+        if (properties == null) {
+            properties =  new PropertiesFile(base, true);
+            properties.setProperty("recordingDir", "/home/michael/Documents/sagetvcatchup/recordings");
+            properties.setProperty("pluginDir", "/home/michael/Documents/sagetvcatchup/src/main/plugins");
+            properties.setProperty("logDir", "/home/michael/Documents/sagetvcatchup/logs");
+            properties.setProperty("podcasterPort", "8082");
+        }
+        return properties;
     }
 
     @Provides

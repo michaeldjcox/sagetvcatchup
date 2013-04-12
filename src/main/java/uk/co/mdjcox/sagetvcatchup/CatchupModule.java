@@ -21,6 +21,9 @@ import java.io.File;
  */
 public class CatchupModule extends AbstractModule {
 
+    private PropertiesFile properties;
+    private LoggerInterface logger;
+
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder()
@@ -32,8 +35,10 @@ public class CatchupModule extends AbstractModule {
     @Provides
     @Singleton
     public PropertiesInterface providesProperties() throws Exception {
-        String base =  System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator + "config" + File.separator + "catchup.properties";
-        PropertiesInterface properties = new PropertiesFile(base, true);
+        if (properties == null) {
+            String base =  System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator + "config" + File.separator + "catchup.properties";
+            properties = new PropertiesFile(base, true);
+        }
         return properties;
     }
 
@@ -41,7 +46,9 @@ public class CatchupModule extends AbstractModule {
     @Singleton
     public LoggerInterface providesLogger() throws Exception {
         PropertiesInterface props = providesProperties();
-        LoggerInterface logger = LoggingManager.getLogger(CatchupPlugin.class, "sagetvcatchup", props.getProperty("logDir", "/tmp/logs"));
+        if (logger == null) {
+            logger = LoggingManager.getLogger(CatchupPlugin.class, "sagetvcatchup", props.getProperty("logDir", "/tmp/logs"));
+        }
         return logger;
     }
 
