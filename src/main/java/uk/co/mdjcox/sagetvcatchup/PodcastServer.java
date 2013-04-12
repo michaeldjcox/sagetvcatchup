@@ -80,11 +80,13 @@ public class PodcastServer {
         if (target.equals("/logo.png")) {
             getLogoResponse(response);
         } else if (target.startsWith("/play")) {
-            String url = request.getParameter("link");
-            getVideoResponse(response, url);
+            String url = request.getParameter("url");
+            String name = request.getParameter("name");
+            getVideoResponse(response, url, name);
         } else if (target.startsWith("/stop")) {
-            String url = request.getParameter("link");
-            stopVideoResponse(response, url);
+            String url = request.getParameter("url");
+            String name = request.getParameter("name");
+            stopVideoResponse(response, url, name);
         } else {
             String serviceName = target.substring(1);
             String podcast = podcasts.get(serviceName);
@@ -97,18 +99,18 @@ public class PodcastServer {
         ((Request) request).setHandled(true);
     }
 
-    private void stopVideoResponse(HttpServletResponse response, String podcast) throws ServletException, IOException {
-        logger.info("Stop Streaming " + podcast);
+    private void stopVideoResponse(HttpServletResponse response, String url, String name) throws ServletException, IOException {
+        logger.info("Stop Streaming " + name);
 
-        recorder.stop(podcast);
+        recorder.stop(name, url);
 
         getMessageResponse(response, "Podcast terminated");
     }
 
-        private void getVideoResponse(HttpServletResponse response, String podcast) throws ServletException {
+        private void getVideoResponse(HttpServletResponse response, String url, String name) throws ServletException {
         try {
 
-            File file = recorder.start(podcast);
+            File file = recorder.start(url, name);
             logger.info("Streaming " + file + " exists=" + file.exists());
 
             FileInputStream in = new FileInputStream(file);
@@ -135,7 +137,7 @@ public class PodcastServer {
             }
             in.close();
             out.close();
-            logger.info("Streamed " + served + " bytes of " + podcast + " of expected " + file.length());
+            logger.info("Streamed " + served + " bytes of " + name + " of expected " + file.length());
         } catch (Exception e) {
             throw new ServletException("Failed to stream video", e);
         }
@@ -216,7 +218,7 @@ public class PodcastServer {
                 resultStr += "<media:thumbnail url=\"" + episode.getIconUrl() + "\"/>" + CRLF;
                 int length = 999999;
                 String type = "video/mp4";
-                resultStr += "<enclosure url=\"" + "http://localhost:"+port+"/play?link=" + episode.getServiceUrl() + "\" length=\"" + length + "\" type=\"" + type + "\"/>" + CRLF;
+                resultStr += "<enclosure url=\"" + "http://localhost:"+port+"/play?url=" + episode.getServiceUrl() + "?name=" + htmlUtils.makeContentSafe(episode.getEpisodeTitle()) + "\" length=\"" + length + "\" type=\"" + type + "\"/>" + CRLF;
                 resultStr += "</item>" + CRLF;
             }
         } else if (service.isSubCategory()) {

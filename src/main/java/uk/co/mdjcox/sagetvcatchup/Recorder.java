@@ -2,8 +2,11 @@ package uk.co.mdjcox.sagetvcatchup;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import sage.Sage;
+import sage.b3;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.logger.LoggingManager;
+import uk.co.mdjcox.utils.HtmlUtils;
 import uk.co.mdjcox.utils.OsUtils;
 import uk.co.mdjcox.utils.PropertiesFile;
 import uk.co.mdjcox.utils.PropertiesInterface;
@@ -11,6 +14,7 @@ import uk.co.mdjcox.utils.PropertiesInterface;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -27,49 +31,48 @@ public class Recorder {
     private PropertiesInterface props;
     private OsUtils osUtils;
     private ConcurrentHashMap<String, Recording> currentRecordings = new ConcurrentHashMap<String, Recording>();
-
-    public void registerStartName(Object object) {
-        logger.info("Media file class name is " + object.getClass().getName());
-        //To change body of created methods use File | Settings | File Templates.
-    }
+    private final HtmlUtils htmlUtils;
 
     public static class Recording {
         File file;
         String fileName="";
         String url="";
+        String name="";
 
-        public Recording(String url) {
+        public Recording(String url, String name) {
             this.url = url;
+            this.name = name;
         }
     }
 
     @Inject
-    private Recorder(LoggerInterface thelogger, PropertiesInterface props, OsUtils osUtils) {
+    private Recorder(LoggerInterface thelogger, PropertiesInterface props, OsUtils osUtils, HtmlUtils htmlUtils) {
         this.logger = thelogger;
         this.props = props;
         this.osUtils = osUtils;
+        this.htmlUtils = htmlUtils;
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                for (String url : currentRecordings.keySet()) {
+                for (Recording recording : currentRecordings.values()) {
                     try {
-                        logger.info("Shutting down - stopping " + url);
+                        logger.info("Shutting down - stopping " + recording.name);
 
-                        stop(url);
+                        stop(recording.url, recording.name );
                     } catch (Exception e) {
-                        logger.info("Failed to stop " + url);
+                        logger.info("Failed to stop " + recording.name);
                     }
                 }
             }
         }));
     }
 
-    public File start(String url) throws Exception {
-        logger.info("Looking for recording of " + url);
-        Recording recording = currentRecordings.get(url);
+    public File start(String url, String episodeName) throws Exception {
+        logger.info("Looking for recording of " + episodeName);
+        Recording recording = currentRecordings.get(episodeName);
         if (recording != null) {
-            logger.info("Recording in progress for " + url);
+            logger.info("Recording in progress for " + episodeName);
             if (recording.file == null) {
                 synchronized (recording) {
                     recording.wait();
@@ -85,8 +88,8 @@ public class Recorder {
         String outDir = props.getString("recordingDir", "/opt/sagetv/server/sagetvcatchup/recordings");
         String command = "get_iplayer " + url + " --force -o " + outDir + File.separator;
         ArrayList<String> output = new ArrayList<String>();
-        recording = new Recording(url);
-        currentRecordings.put(url, recording);
+        recording = new Recording(url, episodeName);
+        currentRecordings.put(episodeName, recording);
         osUtils.spawnProcess(command, "record", false, output, null);
 
         // TODO need to deal with completely downloaded files
@@ -134,31 +137,36 @@ public class Recorder {
         return file;
     }
 
-    public void stop(String url) {
-        HashMap<String, String> processes = osUtils.processList();
-        for (String process : processes.keySet()) {
-            String pid = processes.get(process);
-            logger.info("Checking " + pid + " " + process);
-            if (process.contains(url)) {
-                osUtils.killOsProcess(pid, process);
-            }
+    public void stop(Map map) {
+        // TODO make this more robust
+        String value = map.toString();
+        value = htmlUtils.moveTo("MediaFile[", value);
+        value = htmlUtils.moveTo("\"", value);
+        String name = htmlUtils.extractTo("\"", value);
+        name = htmlUtils.makeContentSafe(name);
+
+        Recording recording = currentRecordings.get(name);
+
+        if (recording != null) {
+            logger.info("Going to stop plaback of " + name);
+        } else {
+            logger.info("Cannot find recording of " + name);
+
         }
-        currentRecordings.remove(url);
-
     }
 
-    public static void main(String[] args) throws Exception {
-        LoggerInterface logger = LoggingManager.getLogger(Recorder.class, "Recorder", "logs");
-        LoggingManager.addConsole(logger);
-
-        PropertiesInterface props = new PropertiesFile();
-        Recorder recorder = new Recorder(logger, props, OsUtils.instance(logger));
-        String url = "http://www.bbc.co.uk/iplayer/episode/b01rgpj6/The_A_to_Z_of_TV_Gardening_Letter_K/";
-        recorder.start(url);
-        Thread.sleep(30000);
-        recorder.stop(url);
-
-
+    public void stop(String url, String episodeName) {
+        Recording recording = currentRecordings.get(episodeName);
+        if (recording != null) {
+            HashMap<String, String> processes = osUtils.processList();
+            for (String process : processes.keySet()) {
+                String pid = processes.get(process);
+                logger.info("Checking " + pid + " " + process);
+                if (process.contains(recording.url)) {
+                    osUtils.killOsProcess(pid, process);
+                }
+            }
+            currentRecordings.remove(episodeName);
+        }
     }
-
 }
