@@ -28,6 +28,11 @@ public class Recorder {
     private OsUtils osUtils;
     private ConcurrentHashMap<String, Recording> currentRecordings = new ConcurrentHashMap<String, Recording>();
 
+    public void registerStartName(Object object) {
+        logger.info("Media file class name is " + object.getClass().getName());
+        //To change body of created methods use File | Settings | File Templates.
+    }
+
     public static class Recording {
         File file;
         String fileName="";
@@ -83,6 +88,8 @@ public class Recorder {
         recording = new Recording(url);
         currentRecordings.put(url, recording);
         osUtils.spawnProcess(command, "record", false, output, null);
+
+        // TODO need to deal with completely downloaded files
 
         String filename = "";
         out:

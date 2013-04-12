@@ -3,6 +3,7 @@ package uk.co.mdjcox.sagetvcatchup;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import sage.MediaFileMetadataParser;
 import sage.SageTVPlugin;
 import sage.SageTVPluginRegistry;
 import uk.co.mdjcox.logger.Logger;
@@ -43,6 +44,7 @@ public class CatchupPlugin implements SageTVPlugin {
 
     private ScheduledExecutorService service;
     private Publisher sagetvPublisher;
+    private Recorder recorder;
 
     public CatchupPlugin(sage.SageTVPluginRegistry registry) {
         this.registry = registry;
@@ -89,6 +91,7 @@ public class CatchupPlugin implements SageTVPlugin {
             final Cataloger harvester = injector.getInstance(Cataloger.class);
             server = injector.getInstance(PodcastServer.class);
             sagetvPublisher = injector.getInstance(Publisher.class);
+            recorder = injector.getInstance(Recorder.class);
 
             pluginManager.load();
             server.start();
@@ -211,6 +214,10 @@ public class CatchupPlugin implements SageTVPlugin {
         if (s.equals("PlaybackStarted")) {
             Object object = map.get("MediaFile");
            logger.info("Playback started of " + object);
+
+            recorder.registerStartName(object);
+
+
         } else
         if (s.equals("PlaybackStopped")) {
             Object object = map.get("MediaFile");
