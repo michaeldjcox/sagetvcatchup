@@ -23,6 +23,7 @@ while (str != null) {
     link = extractTo("\"", programmeBlock)
     link = makeLinkAbsolute("http://www.channel4.com", link);
     Episode subCat = new Episode(
+            "", // id
             "", //programmeTitle
             "", //episodeTitle
             "", // series
@@ -52,6 +53,7 @@ while (str != null) {
     if (link == null) continue
     link = makeLinkAbsolute("http://www.channel4.com", link);
     Episode subCat = new Episode(
+            "", // id
             "", //programmeTitle
             "", //episodeTitle
             "", // series

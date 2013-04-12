@@ -59,7 +59,7 @@ public class Recorder {
                     try {
                         logger.info("Shutting down - stopping " + recording.name);
 
-                        stop(recording.url, recording.name );
+                        stop(recording);
                     } catch (Exception e) {
                         logger.info("Failed to stop " + recording.name);
                     }
@@ -143,20 +143,25 @@ public class Recorder {
         value = htmlUtils.moveTo("MediaFile[", value);
         value = htmlUtils.moveTo("\"", value);
         String name = htmlUtils.extractTo("\"", value);
-        name = htmlUtils.makeContentSafe(name);
+        name = htmlUtils.makeIdSafe(name);
 
+        stop(name);
+    }
+
+    public void stop(String name) {
         Recording recording = currentRecordings.get(name);
 
         if (recording != null) {
             logger.info("Going to stop plaback of " + name);
+
+            stop(recording);
         } else {
             logger.info("Cannot find recording of " + name);
 
         }
     }
 
-    public void stop(String url, String episodeName) {
-        Recording recording = currentRecordings.get(episodeName);
+    public void stop(Recording recording) {
         if (recording != null) {
             HashMap<String, String> processes = osUtils.processList();
             for (String process : processes.keySet()) {
@@ -166,7 +171,7 @@ public class Recorder {
                     osUtils.killOsProcess(pid, process);
                 }
             }
-            currentRecordings.remove(episodeName);
+            currentRecordings.remove(recording.name);
         }
     }
 }

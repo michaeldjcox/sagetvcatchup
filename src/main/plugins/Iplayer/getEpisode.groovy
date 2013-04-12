@@ -22,6 +22,9 @@ title = removeHtml(title);
 episode.setEpisodeTitle(title);
 logger.info("EpisodeTitle: " + title)
 
+// ID
+episode.setId(makeIdSafe(title))
+
 // SYNOPSIS
 details2 = moveTo("<summary>", metadetails)
 String desc = extractTo("<", details2)

@@ -18,6 +18,9 @@ title = removeHtml(title);
 episode.setEpisodeTitle(title);
 logger.info("EpisodeTitle: " + title)
 
+// ID
+episode.setId(makeIdSafe(title))
+
 // SYNOPSIS
 details2 = moveTo("<meta name=\"synopsis\"", details)
 details2 = moveTo("content=\"", details2)

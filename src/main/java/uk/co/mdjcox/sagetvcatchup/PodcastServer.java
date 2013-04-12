@@ -35,6 +35,7 @@ public class PodcastServer {
     private Map<String, String> podcasts = new HashMap<String, String>();
     private Recorder recorder;
     private HtmlUtilsInterface htmlUtils;
+    private Map<String, Episode> episodes = new HashMap<String, Episode>();
 
     @Inject
     private PodcastServer(LoggerInterface logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, Recorder recorder) throws Exception {
@@ -80,13 +81,11 @@ public class PodcastServer {
         if (target.equals("/logo.png")) {
             getLogoResponse(response);
         } else if (target.startsWith("/play")) {
-            String url = request.getParameter("url");
             String name = request.getParameter("name");
-            getVideoResponse(response, url, name);
+            getVideoResponse(response, name);
         } else if (target.startsWith("/stop")) {
-            String url = request.getParameter("url");
             String name = request.getParameter("name");
-            stopVideoResponse(response, url, name);
+            stopVideoResponse(response, name);
         } else {
             String serviceName = target.substring(1);
             String podcast = podcasts.get(serviceName);
@@ -99,18 +98,22 @@ public class PodcastServer {
         ((Request) request).setHandled(true);
     }
 
-    private void stopVideoResponse(HttpServletResponse response, String url, String name) throws ServletException, IOException {
+    private void stopVideoResponse(HttpServletResponse response,String name) throws ServletException, IOException {
         logger.info("Stop Streaming " + name);
 
-        recorder.stop(name, url);
+        Episode cat = episodes.get(name);
+
+        recorder.stop(name);
 
         getMessageResponse(response, "Podcast terminated");
     }
 
-        private void getVideoResponse(HttpServletResponse response, String url, String name) throws ServletException {
+        private void getVideoResponse(HttpServletResponse response, String name) throws ServletException {
         try {
 
-            File file = recorder.start(url, name);
+            Episode cat = episodes.get(name);
+
+            File file = recorder.start(cat.getServiceUrl(), name);
             logger.info("Streaming " + file + " exists=" + file.exists());
 
             FileInputStream in = new FileInputStream(file);
@@ -218,7 +221,7 @@ public class PodcastServer {
                 resultStr += "<media:thumbnail url=\"" + episode.getIconUrl() + "\"/>" + CRLF;
                 int length = 999999;
                 String type = "video/mp4";
-                resultStr += "<enclosure url=\"" + "http://localhost:"+port+"/play?url=" + episode.getServiceUrl() + "?name=" + htmlUtils.makeContentSafe(episode.getEpisodeTitle()) + "\" length=\"" + length + "\" type=\"" + type + "\"/>" + CRLF;
+                resultStr += "<enclosure url=\"" + "http://localhost:"+port+"/play?name=" + episode.getId() + "\" length=\"" + length + "\" type=\"" + type + "\"/>" + CRLF;
                 resultStr += "</item>" + CRLF;
             }
         } else if (service.isSubCategory()) {
@@ -243,16 +246,24 @@ public class PodcastServer {
 
     public void publish(Catalog catalog) {
         Map<String, String> newPodcasts = new HashMap<String, String>();
+        Map<String, Episode> newEpisodes = new HashMap<String, Episode>();
         for (Category cat : catalog.getCategories()) {
             try {
                 logger.info("Building podcast for " + cat);
                 String podcast = buildPodcastFor(cat);
                 newPodcasts.put(cat.getId(), podcast);
+
+                if (cat instanceof Programme) {
+                    for (Episode ep : ((Programme)cat).getEpisodes().values()) {
+                        newEpisodes.put(ep.getId(), ep);
+                    }
+                }
             } catch (Exception e) {
                 logger.severe("Failed to build podcast for " + cat, e);
             }
         }
         podcasts = newPodcasts;
+        episodes = newEpisodes;
     }
 
 }

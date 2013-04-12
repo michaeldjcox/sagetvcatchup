@@ -21,6 +21,7 @@ while (str != null) {
     if (link == null) continue
     link = makeLinkAbsolute("http://www.itv.com", link);
     Episode subCat = new Episode(
+            "", // id
             "", //programmeTitle
             "", //episodeTitle
             "", // series
@@ -52,6 +53,7 @@ while (str != null) {
     if (link == null) continue
     link = makeLinkAbsolute("http://www.itv.com", link);
     Episode subCat = new Episode(
+            "", // id
             "", //programmeTitle
             "", //episodeTitle
             "", // series
