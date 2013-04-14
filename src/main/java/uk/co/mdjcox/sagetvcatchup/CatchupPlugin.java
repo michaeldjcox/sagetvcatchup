@@ -220,6 +220,7 @@ public class CatchupPlugin implements SageTVPlugin {
         } else
         if (s.equals("PlaybackFinished")) {
             logger.info("Playback finished of " + map);
+            recorder.stop(map);
         } else {
             logger.info("Received event " + s);
         }
