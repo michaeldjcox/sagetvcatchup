@@ -8,6 +8,7 @@ package uk.co.mdjcox.model;
  * To change this template use File | Settings | File Templates.
  */
 public class Episode {
+    private String sourceId;
     private String id;
     private String programmeTitle;
     private String episodeTitle;
@@ -21,7 +22,8 @@ public class Episode {
     private String channel;
     private String category;
 
-    public Episode(String id, String programmeTitle, String episodeTitle, String series, String episode, String description, String iconUrl, String serviceUrl, String airDate, String airTime, String channel, String category) {
+    public Episode(String sourceId, String id, String programmeTitle, String episodeTitle, String series, String episode, String description, String iconUrl, String serviceUrl, String airDate, String airTime, String channel, String category) {
+        this.sourceId = sourceId;
         this.id = id;
         this.programmeTitle = programmeTitle;
         this.episodeTitle = episodeTitle;
@@ -34,6 +36,14 @@ public class Episode {
         this.airTime = airTime;
         this.channel = channel;
         this.category = category;
+    }
+
+    public String getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId;
     }
 
     public String getId() {

@@ -8,6 +8,7 @@ import uk.co.mdjcox.model.Programme;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
+import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 
@@ -21,14 +22,16 @@ import java.io.File;
 public class EpisodeScript extends Script {
 
     @AssistedInject
-    public EpisodeScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils) {
-        super(logger, base + File.separator + "getEpisode.groovy", htmlUtils, downloadUtils, osUtils);
+    public EpisodeScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils,
+                         DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils,
+                         PropertiesInterface properties) {
+        super(logger, base + File.separator + "getEpisode.groovy", htmlUtils, downloadUtils, osUtils, properties);
     }
 
     public void getEpisode(Programme programme, Episode episode) {
         try {
             getLogger().info("Getting episode at URL " + episode.getServiceUrl());
-            call("url", episode.getServiceUrl(), "episode", episode, "logger", getLogger());
+            call("url", episode.getServiceUrl(), "episode", episode);
             String iconUrl = programme.getIconUrl();
             if ((iconUrl == null) || iconUrl.isEmpty()) {
                 programme.setIconUrl(episode.getIconUrl());

@@ -21,6 +21,7 @@ while (str != null) {
     if (link == null) continue
     link = makeLinkAbsolute("http://www.bbc.co.uk", link);
     Episode subCat = new Episode(
+            "Iplayer",
             "", // id
             "", //programmeTitle
             "", //episodeTitle
@@ -58,6 +59,7 @@ while (str != null) {
     if (link == null) continue
     link = makeLinkAbsolute("http://www.bbc.co.uk", link);
     Episode subCat = new Episode(
+            "Iplayer",
             "", // id
             "", //programmeTitle
             "", //episodeTitle

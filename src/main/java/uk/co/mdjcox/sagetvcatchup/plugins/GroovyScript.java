@@ -1,12 +1,16 @@
 package uk.co.mdjcox.sagetvcatchup.plugins;
 
+import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
+import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,11 +19,18 @@ import java.util.ArrayList;
  * Time: 00:11
  * To change this template use File | Settings | File Templates.
  */
-public abstract class GroovyScript extends groovy.lang.Script implements HtmlUtilsInterface, DownloadUtilsInterface {
+public abstract class GroovyScript extends groovy.lang.Script implements HtmlUtilsInterface,
+        DownloadUtilsInterface, OsUtilsInterface {
 
+    private LoggerInterface logger;
     private HtmlUtilsInterface htmlUtils;
     private DownloadUtilsInterface downloadUtils;
     private OsUtilsInterface osUtils;
+    private PropertiesInterface properties;
+
+    public void setLogger(LoggerInterface logger) {
+        this.logger = logger;
+    }
 
     public void setHtmlUtils(HtmlUtilsInterface htmlUtils) {
         this.htmlUtils = htmlUtils;
@@ -31,6 +42,10 @@ public abstract class GroovyScript extends groovy.lang.Script implements HtmlUti
 
     public void setOsUtils(OsUtilsInterface osUtils) {
         this.osUtils = osUtils;
+    }
+
+    public void setProperties(PropertiesInterface properties) {
+        this.properties = properties;
     }
 
     public String downloadFileString(String url) throws Exception {
@@ -109,5 +124,82 @@ public abstract class GroovyScript extends groovy.lang.Script implements HtmlUti
     @Override
     public ArrayList<String> extractItem(String fileStr, ArrayList<String> start, String stop, boolean removeHtml) {
         return htmlUtils.extractItem(fileStr, start, stop, removeHtml);
+    }
+
+    @Override
+    public Process spawnProcess(String radioCommand, String action, boolean wait) throws Exception {
+        return osUtils.spawnProcess(radioCommand, action, wait);
+    }
+
+    @Override
+    public Process spawnProcess(String radioCommand, String action, boolean wait, ArrayList<String> output, ArrayList<String> errors) throws Exception {
+        return osUtils.spawnProcess(radioCommand, action, wait, output, errors);
+    }
+
+    @Override
+    public void killOsProcess(String pid, String cmd) {
+        osUtils.killOsProcess(pid, cmd);
+    }
+
+    @Override
+    public HashMap<String, String> processList() {
+        return osUtils.processList();
+    }
+
+    public String getString(String token) {
+        return properties.getString(token);
+    }
+
+    public String getString(String token, String defaultString) {
+        return properties.getString(token, defaultString);
+    }
+
+    public int getInt(String token) {
+        return properties.getInt(token);
+    }
+
+    public int getInt(String token, int defaultValue) {
+        return properties.getInt(token, defaultValue);
+    }
+
+    public boolean getBoolean(String token) {
+        return properties.getBoolean(token);
+    }
+
+    public boolean getBoolean(String token, boolean defaultValue) {
+        return properties.getBoolean(token, defaultValue);
+    }
+
+    public ArrayList<String> getPropertySequence(String token) {
+        return properties.getPropertySequence(token);
+    }
+
+    public ArrayList<String> getPropertySequenceAllowBlanks(String token) {
+        return properties.getPropertySequenceAllowBlanks(token);
+
+    }
+
+    public Set<String> getPropertiesLike(String regex) {
+        return properties.getPropertiesLike(regex);
+    }
+
+    public void severe(String msg) {
+        logger.severe(msg);
+    }
+
+    public void severe(String msg, Throwable thrown) {
+        logger.severe(msg, thrown);
+    }
+
+    public void warning(String msg) {
+        logger.warning(msg);
+    }
+
+    public void warning(String msg, Throwable thrown) {
+        logger.warning(msg, thrown);
+    }
+
+    public void info(String msg) {
+        logger.info(msg);
     }
 }

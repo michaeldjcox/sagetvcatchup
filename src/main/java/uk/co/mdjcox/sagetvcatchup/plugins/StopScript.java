@@ -7,6 +7,7 @@ import uk.co.mdjcox.model.Recording;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
+import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 
@@ -20,14 +21,16 @@ import java.io.File;
 public class StopScript extends Script {
 
     @AssistedInject
-    public StopScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils) {
-        super(logger, base + File.separator + "stopEpisode.groovy", htmlUtils, downloadUtils, osUtils);
+    public StopScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils,
+                      DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils,
+                      PropertiesInterface properties) {
+        super(logger, base + File.separator + "stopEpisode.groovy", htmlUtils, downloadUtils, osUtils, properties);
     }
 
     public void stop(Recording recording) {
         try {
             getLogger().info("Stopping playback of " + recording);
-            call("recording", recording, "", "logger", getLogger());
+            call("recording", recording, "");
             getLogger().info("Stopped episode " + recording);
         } catch (Throwable e) {
             getLogger().severe("Unable to stop: " + recording, e);

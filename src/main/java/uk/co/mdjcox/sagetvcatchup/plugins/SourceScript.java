@@ -7,6 +7,7 @@ import uk.co.mdjcox.model.Source;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
+import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 
@@ -22,8 +23,10 @@ public class SourceScript extends Script {
     private String sourceId;
 
     @AssistedInject
-    public SourceScript(LoggerInterface logger, @Assisted("id") String id, @Assisted("base") String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils) {
-        super(logger, base + File.separator + "getSource.groovy", htmlUtils, downloadUtils, osUtils);
+    public SourceScript(LoggerInterface logger, @Assisted("id") String id, @Assisted("base") String base,
+                        HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils,
+                        OsUtilsInterface osUtils, PropertiesInterface properties) {
+        super(logger, base + File.separator + "getSource.groovy", htmlUtils, downloadUtils, osUtils, properties);
         sourceId = id;
     }
 
@@ -31,7 +34,7 @@ public class SourceScript extends Script {
         Source source = new Source();
         try {
             getLogger().info("Getting details of source " + sourceId);
-            call("source", source, "logger", getLogger());
+            call("source", source);
             getLogger().info("Found source " + source);
         } catch (Throwable e) {
             getLogger().severe("Unable to get details of source: " + sourceId, e);

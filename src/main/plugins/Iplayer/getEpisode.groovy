@@ -13,14 +13,14 @@ details2 = moveTo(">", details2)
 String seriesTitle = extractTo("<", details2)
 seriesTitle = removeHtml(seriesTitle);
 episode.setProgrammeTitle(seriesTitle);
-logger.info("SeriesTitle: " + seriesTitle)
+info("SeriesTitle: " + seriesTitle)
 
 // EPISODE TITLE
 details2 = moveTo("<title>", metadetails)
 String title = extractTo("<", details2)
 title = removeHtml(title);
 episode.setEpisodeTitle(title);
-logger.info("EpisodeTitle: " + title)
+info("EpisodeTitle: " + title)
 
 // ID
 episode.setId(makeIdSafe(title))
@@ -30,7 +30,7 @@ details2 = moveTo("<summary>", metadetails)
 String desc = extractTo("<", details2)
 desc = removeHtml(desc);
 episode.setDescription(desc);
-logger.info("Synopsis: " + desc)
+info("Synopsis: " + desc)
 
 // IMAGE URL
 details2 = moveTo("<link rel=\"holding\"", metadetails)
@@ -39,7 +39,7 @@ String image = extractTo("\"", details2)
 image = removeHtml(image);
 image = makeLinkAbsolute("http://www.bbc.co.uk", image);
 episode.setIconUrl(image);
-logger.info("Icon: " + image)
+info("Icon: " + image)
 
 // TUNE URL
 details2 = moveTo("<link rel=\"alternate\"", metadetails)
@@ -48,7 +48,7 @@ String tuneurl = extractTo("\"", details2)
 tuneurl = removeHtml(tuneurl);
 tuneurl = makeLinkAbsolute("http://www.bbc.co.uk", tuneurl);
 episode.setServiceUrl(tuneurl);
-logger.info("URL: " + tuneurl)
+info("URL: " + tuneurl)
 
 // CATEGORY
 details2 = moveTo("<ul class=\"categories\"", details)
@@ -60,7 +60,7 @@ if (genre == null) genre = "Other"
 genre = genre.replace("&", " and ")
 genre = genre.replace("_", " ")
 episode.setCategory(genre);
-logger.info("Category: " + genre)
+info("Category: " + genre)
 
 // CHANNEL
 details2 = moveTo("<service id=", metadetails)
@@ -68,7 +68,7 @@ details2 = moveTo(">", details2)
 String channel = extractTo("<", details2)
 channel = removeHtml(channel);
 episode.setChannel(channel);
-logger.info("Channel: " + channel)
+info("Channel: " + channel)
 
 // SERIES
 details2 = moveTo("<programmeSeries id=", details)
@@ -76,7 +76,7 @@ details2 = moveTo(">", details2)
 String seriesNumber = extractTo("<", details2)
 seriesNumber = removeHtml(seriesNumber);
 episode.setSeries(seriesNumber);
-logger.info("Series: " + seriesNumber)
+info("Series: " + seriesNumber)
 
 // EPISODE
 details2 = moveTo("<div class=\"field-episode-number\"", details)
@@ -84,7 +84,7 @@ details2 = moveTo("<div class=\"field-item even\">", details2)
 String episodeNo = extractTo("<", details2)
 episodeNo = removeHtml(episodeNo);
 episode.setEpisode(episodeNo);
-logger.info("Episode: " + episodeNo)
+info("Episode: " + episodeNo)
 
 //AIRING DATE
 details2 = moveTo("<li class=\"last_broadcast_date\">", details)
@@ -96,13 +96,13 @@ details3 = moveTo(", ", details2);
 String date = moveTo(" ", details3);
 date = removeHtml(date);
 if (date == null) date = ""
-logger.info("Date: " + date)
+info("Date: " + date)
 episode.setAirDate(date)
 
 time = extractTo(" ", details3);
 time = removeHtml(time);
 if (time == null) time = ""
-logger.info("Time: " + time)
+info("Time: " + time)
 episode.setAirTime(time)
 
 return episode;

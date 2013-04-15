@@ -174,7 +174,7 @@ public class PodcastServer {
         response.setCharacterEncoding("ISO-8859-1");
 
         final ClassLoader cl = PodcastServer.class.getClassLoader();
-        final URL resource = cl.getResource("resources/logo.png");
+        final URL resource = cl.getResource("logo.png");
 
         // Set content size
 

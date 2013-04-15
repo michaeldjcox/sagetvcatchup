@@ -8,6 +8,7 @@ import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
+import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 
@@ -25,14 +26,16 @@ public abstract class Script {
     private HtmlUtilsInterface htmlUtils;
     private DownloadUtilsInterface downloadUtils;
     private OsUtilsInterface osUtils;
+    private PropertiesInterface properties;
 
     protected Script(LoggerInterface logger, String script, HtmlUtilsInterface htmlUtils,
-                     DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils) {
+                     DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils, PropertiesInterface properties) {
         this.logger = logger;
         this.script = script;
         this.htmlUtils = htmlUtils;
         this.downloadUtils = downloadUtils;
         this.osUtils = osUtils;
+        this.properties = properties;
     }
 
     protected LoggerInterface getLogger() {
@@ -56,6 +59,8 @@ public abstract class Script {
         script.setDownloadUtils(downloadUtils);
         script.setHtmlUtils(htmlUtils);
         script.setOsUtils(osUtils);
+        script.setProperties(properties);
+        script.setLogger(logger);
 
         script.run();
 

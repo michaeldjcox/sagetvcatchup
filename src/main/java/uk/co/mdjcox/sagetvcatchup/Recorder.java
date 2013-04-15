@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.model.Episode;
 import uk.co.mdjcox.model.Recording;
+import uk.co.mdjcox.sagetvcatchup.plugins.Plugin;
+import uk.co.mdjcox.sagetvcatchup.plugins.PluginManager;
 import uk.co.mdjcox.utils.*;
 
 import java.io.File;
@@ -25,13 +27,15 @@ public class Recorder {
     private final LoggerInterface logger;
     private PropertiesInterface props;
     private OsUtilsInterface osUtils;
+    private PluginManager pluginManager;
     private ConcurrentHashMap<String, Recording> currentRecordings = new ConcurrentHashMap<String, Recording>();
 
     @Inject
-    private Recorder(LoggerInterface thelogger, PropertiesInterface props, OsUtilsInterface osUtils) {
+    private Recorder(LoggerInterface thelogger, PropertiesInterface props, OsUtilsInterface osUtils, PluginManager pluginManager) {
         this.logger = thelogger;
         this.props = props;
         this.osUtils = osUtils;
+        this.pluginManager = pluginManager;
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
@@ -70,56 +74,19 @@ public class Recorder {
         logger.info("Starting recording of " + url);
 
 
-        String outDir = props.getString("recordingDir", "/opt/sagetv/server/sagetvcatchup/recordings");
-        String command = "get_iplayer " + url + " --force -o " + outDir + File.separator;
-        ArrayList<String> output = new ArrayList<String>();
         recording = new Recording(episode);
         currentRecordings.put(episodeName, recording);
-        osUtils.spawnProcess(command, "record", false, output, null);
 
-        // TODO need to deal with completely downloaded files
-
-        String filename = "";
-        out:
-        while (true) {
-            for (String result : output) {
-                String prefix = "INFO: File name prefix = ";
-                if (result.startsWith(prefix)) {
-                    filename = outDir + File.separator + result.substring(prefix.length()).trim() + ".partial.mp4.flv";
-                    logger.info("Recording to " + filename);
-                    break out;
-                }
-            }
-            logger.info("Waiting for file name...");
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-
-            }
-        }
-
-        logger.info("Found file name " + filename);
-
-        logger.info("Waiting for existence of " + filename);
-
-        File file = new File(filename);
-        while (!file.exists() || file.length() < (1000*1024)) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-
-            }
-        }
-
-        recording.setFile(file);
+        Plugin plugin = pluginManager.getPlugin(episode.getSourceId());
+        plugin.playEpisode(recording);
 
         synchronized (recording) {
             recording.notifyAll();
         }
 
-        logger.info("Returning file " + file.getAbsolutePath() + " for " + url);
+        logger.info("Returning file " + recording.getFile().getAbsolutePath() + " for " + url);
 
-        return file;
+        return recording.getFile();
     }
 
     public void stop(Episode episode) {
@@ -128,7 +95,7 @@ public class Recorder {
         Recording recording = currentRecordings.get(name);
 
         if (recording != null) {
-            logger.info("Going to stop plaback of " + name);
+            logger.info("Going to stop playback of " + name);
 
             stop(recording);
         } else {
@@ -138,15 +105,10 @@ public class Recorder {
     }
 
     private void stop(Recording recording) {
+
         if (recording != null) {
-            HashMap<String, String> processes = osUtils.processList();
-            for (String process : processes.keySet()) {
-                String pid = processes.get(process);
-                logger.info("Checking " + pid + " " + process);
-                if (process.contains(recording.getUrl())) {
-                    osUtils.killOsProcess(pid, process);
-                }
-            }
+            Plugin plugin = pluginManager.getPlugin(recording.getSourceId());
+            plugin.stopEpisode(recording);
             currentRecordings.remove(recording.getName());
         }
     }

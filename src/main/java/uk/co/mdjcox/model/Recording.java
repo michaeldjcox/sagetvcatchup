@@ -25,12 +25,23 @@ public class Recording {
         this.file = file;
     }
 
+    public String getSourceId() {
+        return episode.getSourceId();
+    }
+
     public String getUrl() {
         return episode.getServiceUrl();
     }
 
     public String getName() {
         return episode.getEpisodeTitle();
+    }
+
+    public String getFilename() {
+        if (file != null) {
+            return file.getAbsolutePath();
+        }
+        return "";
     }
 
     @Override

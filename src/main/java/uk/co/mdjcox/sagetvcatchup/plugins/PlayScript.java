@@ -10,6 +10,7 @@ import uk.co.mdjcox.sagetvcatchup.Recorder;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
+import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 
@@ -23,14 +24,14 @@ import java.io.File;
 public class PlayScript extends Script {
 
     @AssistedInject
-    public PlayScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils) {
-        super(logger, base + File.separator + "playEpisode.groovy", htmlUtils, downloadUtils, osUtils);
+    public PlayScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils, PropertiesInterface properties) {
+        super(logger, base + File.separator + "playEpisode.groovy", htmlUtils, downloadUtils, osUtils, properties);
     }
 
     public void play(Recording recording) {
         try {
             getLogger().info("Starting playback of " + recording);
-            call("recording", recording, "", "logger", getLogger());
+            call("recording", recording);
             getLogger().info("Playing episode " + recording);
         } catch (Throwable e) {
             getLogger().severe("Unable to playback: " + recording, e);
