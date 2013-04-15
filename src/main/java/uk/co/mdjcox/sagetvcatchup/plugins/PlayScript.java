@@ -23,7 +23,7 @@ import java.io.File;
 public class PlayScript extends Script {
 
     @AssistedInject
-    public PlayScript(LoggerInterface logger, @Assisted("base") String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils) {
+    public PlayScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils) {
         super(logger, base + File.separator + "playEpisode.groovy", htmlUtils, downloadUtils, osUtils);
     }
 

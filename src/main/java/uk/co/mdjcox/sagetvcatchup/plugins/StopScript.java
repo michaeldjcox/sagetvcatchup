@@ -20,7 +20,7 @@ import java.io.File;
 public class StopScript extends Script {
 
     @AssistedInject
-    public StopScript(LoggerInterface logger, @Assisted("base") String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils) {
+    public StopScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils) {
         super(logger, base + File.separator + "stopEpisode.groovy", htmlUtils, downloadUtils, osUtils);
     }
 
