@@ -19,8 +19,8 @@ import java.util.Set;
  * Time: 00:11
  * To change this template use File | Settings | File Templates.
  */
-public abstract class GroovyScript extends groovy.lang.Script implements HtmlUtilsInterface,
-        DownloadUtilsInterface, OsUtilsInterface {
+public abstract class GroovyScript extends groovy.lang.Script implements
+         OsUtilsInterface {
 
     private LoggerInterface logger;
     private HtmlUtilsInterface htmlUtils;
@@ -48,36 +48,25 @@ public abstract class GroovyScript extends groovy.lang.Script implements HtmlUti
         this.properties = properties;
     }
 
-    public String downloadFileString(String url) throws Exception {
+    /* From here on down are methods available to the plugin user */
+
+    public String GET(String url) throws Exception {
         return downloadUtils.downloadFileString(url);
     }
 
-    @Override
-    public String sampleFileString(String source) throws Exception {
-        return downloadUtils.sampleFileString(source);
+    public String SAMPLE(String url) throws Exception {
+        return downloadUtils.sampleFileString(url);
     }
 
-    @Override
-    public String sampleFileString(String source, String encoding) throws Exception {
-        return downloadUtils.sampleFileString(source, encoding);
-    }
-
-    @Override
-    public String downloadFileString(String source, String encoding) throws Exception {
-        return downloadUtils.downloadFileString(source, encoding);
-    }
-
-    @Override
-    public void downloadFile(URL url, String file) throws IOException {
+    public void DOWNLOAD(URL url, String file) throws IOException {
         downloadUtils.downloadFile(url, file);
     }
 
-    public String moveTo(String token, String fileStr) {
+    public String MOVE_TO(String token, String fileStr) {
         return htmlUtils.moveTo(token, fileStr);
     }
 
-    @Override
-    public String removeHtml(String html) {
+    public String REMOVE_HTML(String html) {
         return htmlUtils.removeHtml(html);
     }
 
