@@ -9,9 +9,9 @@ package Iplayer
  */
 
 ArrayList<String> output = new ArrayList<String>();
-String outDir = props.getString("recordingDir", "/opt/sagetv/server/sagetvcatchup/recordings");
-String command = "get_iplayer " + url + " --force -o " + outDir + File.separator;
-osUtils.spawnProcess(command, "record", false, output, null);
+String outDir = getString("recordingDir", "/opt/sagetv/server/sagetvcatchup/recordings");
+String command = "get_iplayer " + recording.getUrl() + " --force -o " + outDir + File.separator;
+spawnProcess(command, "record", false, output, null);
 
 // TODO need to deal with completely downloaded files
 

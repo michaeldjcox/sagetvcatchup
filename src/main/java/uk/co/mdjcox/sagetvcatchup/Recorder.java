@@ -25,16 +25,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Recorder {
 
     private final LoggerInterface logger;
-    private PropertiesInterface props;
-    private OsUtilsInterface osUtils;
     private PluginManager pluginManager;
     private ConcurrentHashMap<String, Recording> currentRecordings = new ConcurrentHashMap<String, Recording>();
 
     @Inject
-    private Recorder(LoggerInterface thelogger, PropertiesInterface props, OsUtilsInterface osUtils, PluginManager pluginManager) {
+    private Recorder(LoggerInterface thelogger, PluginManager pluginManager) {
         this.logger = thelogger;
-        this.props = props;
-        this.osUtils = osUtils;
         this.pluginManager = pluginManager;
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {

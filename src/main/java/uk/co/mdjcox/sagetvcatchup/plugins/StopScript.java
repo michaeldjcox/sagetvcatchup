@@ -30,7 +30,7 @@ public class StopScript extends Script {
     public void stop(Recording recording) {
         try {
             getLogger().info("Stopping playback of " + recording);
-            call("recording", recording, "");
+            call("recording", recording);
             getLogger().info("Stopped episode " + recording);
         } catch (Throwable e) {
             getLogger().severe("Unable to stop: " + recording, e);
