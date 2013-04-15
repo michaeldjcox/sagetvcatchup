@@ -2,19 +2,14 @@ package uk.co.mdjcox.sagetvcatchup;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import sage.Sage;
-import sage.b3;
 import uk.co.mdjcox.logger.LoggerInterface;
-import uk.co.mdjcox.logger.LoggingManager;
-import uk.co.mdjcox.utils.HtmlUtils;
-import uk.co.mdjcox.utils.OsUtils;
-import uk.co.mdjcox.utils.PropertiesFile;
-import uk.co.mdjcox.utils.PropertiesInterface;
+import uk.co.mdjcox.model.Episode;
+import uk.co.mdjcox.model.Recording;
+import uk.co.mdjcox.utils.*;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -29,57 +24,47 @@ public class Recorder {
 
     private final LoggerInterface logger;
     private PropertiesInterface props;
-    private OsUtils osUtils;
+    private OsUtilsInterface osUtils;
     private ConcurrentHashMap<String, Recording> currentRecordings = new ConcurrentHashMap<String, Recording>();
-    private final HtmlUtils htmlUtils;
-
-    public static class Recording {
-        File file;
-        String fileName="";
-        String url="";
-        String name="";
-
-        public Recording(String url, String name) {
-            this.url = url;
-            this.name = name;
-        }
-    }
 
     @Inject
-    private Recorder(LoggerInterface thelogger, PropertiesInterface props, OsUtils osUtils, HtmlUtils htmlUtils) {
+    private Recorder(LoggerInterface thelogger, PropertiesInterface props, OsUtilsInterface osUtils) {
         this.logger = thelogger;
         this.props = props;
         this.osUtils = osUtils;
-        this.htmlUtils = htmlUtils;
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
                 for (Recording recording : currentRecordings.values()) {
                     try {
-                        logger.info("Shutting down - stopping " + recording.name);
+                        logger.info("Shutting down - stopping " + recording);
 
                         stop(recording);
                     } catch (Exception e) {
-                        logger.info("Failed to stop " + recording.name);
+                        logger.info("Failed to stop " + recording);
                     }
                 }
             }
         }));
     }
 
-    public File start(String url, String episodeName) throws Exception {
-        logger.info("Looking for recording of " + episodeName);
+    public File start(Episode episode) throws Exception {
+
+        String url = episode.getServiceUrl();
+        String episodeName = episode.getEpisodeTitle();
+
+        logger.info("Looking for recording of " + episode);
         Recording recording = currentRecordings.get(episodeName);
         if (recording != null) {
-            logger.info("Recording in progress for " + episodeName);
-            if (recording.file == null) {
+            logger.info("Recording in progress for " + episode);
+            if (recording.getFile() == null) {
                 synchronized (recording) {
                     recording.wait();
                 }
             }
-            logger.info("Returning file " + recording.fileName + " for " + url);
-            return recording.file;
+            logger.info("Returning file " + recording.getFile() + " for " + episodeName);
+            return recording.getFile();
         }
 
         logger.info("Starting recording of " + url);
@@ -88,7 +73,7 @@ public class Recorder {
         String outDir = props.getString("recordingDir", "/opt/sagetv/server/sagetvcatchup/recordings");
         String command = "get_iplayer " + url + " --force -o " + outDir + File.separator;
         ArrayList<String> output = new ArrayList<String>();
-        recording = new Recording(url, episodeName);
+        recording = new Recording(episode);
         currentRecordings.put(episodeName, recording);
         osUtils.spawnProcess(command, "record", false, output, null);
 
@@ -126,7 +111,7 @@ public class Recorder {
             }
         }
 
-        recording.file = file;
+        recording.setFile(file);
 
         synchronized (recording) {
             recording.notifyAll();
@@ -137,18 +122,9 @@ public class Recorder {
         return file;
     }
 
-    public void stop(Map map) {
-        // TODO make this more robust
-        String value = map.toString();
-        value = htmlUtils.moveTo("MediaFile[", value);
-        value = htmlUtils.moveTo("\"", value);
-        String name = htmlUtils.extractTo("\"", value);
-        name = htmlUtils.makeIdSafe(name);
+    public void stop(Episode episode) {
+        String name = episode.getEpisodeTitle();
 
-        stop(name);
-    }
-
-    public void stop(String name) {
         Recording recording = currentRecordings.get(name);
 
         if (recording != null) {
@@ -161,17 +137,17 @@ public class Recorder {
         }
     }
 
-    public void stop(Recording recording) {
+    private void stop(Recording recording) {
         if (recording != null) {
             HashMap<String, String> processes = osUtils.processList();
             for (String process : processes.keySet()) {
                 String pid = processes.get(process);
                 logger.info("Checking " + pid + " " + process);
-                if (process.contains(recording.url)) {
+                if (process.contains(recording.getUrl())) {
                     osUtils.killOsProcess(pid, process);
                 }
             }
-            currentRecordings.remove(recording.name);
+            currentRecordings.remove(recording.getName());
         }
     }
 }

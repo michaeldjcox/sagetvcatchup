@@ -2,6 +2,7 @@ package uk.co.mdjcox.sagetvcatchup.plugins;
 
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
+import uk.co.mdjcox.utils.OsUtilsInterface;
 
 import java.io.IOException;
 import java.net.URL;
@@ -18,6 +19,7 @@ public abstract class GroovyScript extends groovy.lang.Script implements HtmlUti
 
     private HtmlUtilsInterface htmlUtils;
     private DownloadUtilsInterface downloadUtils;
+    private OsUtilsInterface osUtils;
 
     public void setHtmlUtils(HtmlUtilsInterface htmlUtils) {
         this.htmlUtils = htmlUtils;
@@ -25,6 +27,10 @@ public abstract class GroovyScript extends groovy.lang.Script implements HtmlUti
 
     public void setDownloadUtils(DownloadUtilsInterface downloadUtils) {
         this.downloadUtils = downloadUtils;
+    }
+
+    public void setOsUtils(OsUtilsInterface osUtils) {
+        this.osUtils = osUtils;
     }
 
     public String downloadFileString(String url) throws Exception {

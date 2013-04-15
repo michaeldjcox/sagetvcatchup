@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import uk.co.mdjcox.model.Episode;
 import uk.co.mdjcox.model.Programme;
+import uk.co.mdjcox.model.Recording;
 import uk.co.mdjcox.model.Source;
 
 import java.util.Collection;
@@ -23,6 +24,8 @@ public class Plugin {
     private ProgrammesScript programmesScript;
     private EpisodesScript episodesScript;
     private EpisodeScript episodeScript;
+    private PlayScript playScript;
+    private StopScript stopScript;
     private Source source;
     @Inject
     private ScriptFactory scriptFactory;
@@ -38,6 +41,8 @@ public class Plugin {
         programmesScript = scriptFactory.createProgrammesScript(base);
         episodesScript = scriptFactory.createEpisodesScript(base);
         episodeScript = scriptFactory.createEpisodeScript(base);
+        playScript = scriptFactory.createPlayScript(base);
+        stopScript = scriptFactory.createStopScript(base);
         source = sourceScript.getSource();
     }
 
@@ -46,7 +51,7 @@ public class Plugin {
     }
 
     public Collection<Programme> getProgrammes() {
-        return programmesScript.getProgrammes(source);  //To change body of created methods use File | Settings | File Templates.
+        return programmesScript.getProgrammes(source);
     }
 
     public void getEpisodes(Programme programme) {
@@ -55,6 +60,14 @@ public class Plugin {
 
     public void getEpisode(Programme programme, Episode episode) {
         episodeScript.getEpisode(programme, episode);
+    }
+
+    public void playEpisode(Recording recording) {
+        playScript.play(recording);
+    }
+
+    public void stopEpisode(Recording recording) {
+        stopScript.stop(recording);
     }
 
     @Override

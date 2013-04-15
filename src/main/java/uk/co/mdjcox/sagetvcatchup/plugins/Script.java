@@ -7,6 +7,7 @@ import org.codehaus.groovy.control.CompilerConfiguration;
 import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
+import uk.co.mdjcox.utils.OsUtilsInterface;
 
 import java.io.File;
 
@@ -23,12 +24,15 @@ public abstract class Script {
     private String script;
     private HtmlUtilsInterface htmlUtils;
     private DownloadUtilsInterface downloadUtils;
+    private OsUtilsInterface osUtils;
 
-    protected Script(LoggerInterface logger, String script, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
+    protected Script(LoggerInterface logger, String script, HtmlUtilsInterface htmlUtils,
+                     DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils) {
         this.logger = logger;
         this.script = script;
         this.htmlUtils = htmlUtils;
         this.downloadUtils = downloadUtils;
+        this.osUtils = osUtils;
     }
 
     protected LoggerInterface getLogger() {
@@ -51,6 +55,7 @@ public abstract class Script {
         GroovyScript script = (GroovyScript) shell.parse(new File(this.script));
         script.setDownloadUtils(downloadUtils);
         script.setHtmlUtils(htmlUtils);
+        script.setOsUtils(osUtils);
 
         script.run();
 

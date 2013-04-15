@@ -11,6 +11,7 @@ import uk.co.mdjcox.logger.LoggerInterface;
 import uk.co.mdjcox.logger.LoggingManager;
 import uk.co.mdjcox.model.Catalog;
 import uk.co.mdjcox.sagetvcatchup.plugins.PluginManager;
+import uk.co.mdjcox.utils.HtmlUtils;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
@@ -44,7 +45,6 @@ public class CatchupPlugin implements SageTVPlugin {
 
     private ScheduledExecutorService service;
     private Publisher sagetvPublisher;
-    private Recorder recorder;
 
     public CatchupPlugin(sage.SageTVPluginRegistry registry) {
         this.registry = registry;
@@ -91,7 +91,7 @@ public class CatchupPlugin implements SageTVPlugin {
             final Cataloger harvester = injector.getInstance(Cataloger.class);
             server = injector.getInstance(PodcastServer.class);
             sagetvPublisher = injector.getInstance(Publisher.class);
-            recorder = injector.getInstance(Recorder.class);
+            Recorder recorder = injector.getInstance(Recorder.class);
 
             pluginManager.load();
             server.start();
@@ -216,16 +216,30 @@ public class CatchupPlugin implements SageTVPlugin {
         } else
         if (s.equals("PlaybackStopped")) {
             logger.info("Playback stopped of " + map);
-            recorder.stop(map);
+            stopRecording(map);
         } else
         if (s.equals("PlaybackFinished")) {
             logger.info("Playback finished of " + map);
-            recorder.stop(map);
+            stopRecording(map);
         } else {
             logger.info("Received event " + s);
         }
 
     }
+
+    private void stopRecording(Map map) {
+    // TODO make this more robust
+    HtmlUtils htmlUtils = injector.getInstance(HtmlUtils.class);
+    String episodeTitle = map.toString();
+    episodeTitle = htmlUtils.moveTo("MediaFile[", episodeTitle);
+    episodeTitle = htmlUtils.moveTo("\"", episodeTitle);
+    episodeTitle = htmlUtils.extractTo("\"", episodeTitle);
+    episodeTitle = htmlUtils.makeIdSafe(episodeTitle);
+
+    server.stopRecording(episodeTitle);
+
+}
+
 
     public static void main(String[] args) {
         CatchupPlugin plugin = new CatchupPlugin(null);

@@ -101,19 +101,23 @@ public class PodcastServer {
     private void stopVideoResponse(HttpServletResponse response,String name) throws ServletException, IOException {
         logger.info("Stop Streaming " + name);
 
-        Episode cat = episodes.get(name);
-
-        recorder.stop(name);
+        stopRecording(name);
 
         getMessageResponse(response, "Podcast terminated");
     }
 
-        private void getVideoResponse(HttpServletResponse response, String name) throws ServletException {
+    public void stopRecording(String name) {
+        Episode episode = episodes.get(name);
+
+        recorder.stop(episode);
+    }
+
+    private void getVideoResponse(HttpServletResponse response, String name) throws ServletException {
         try {
 
-            Episode cat = episodes.get(name);
+            Episode episode = episodes.get(name);
 
-            File file = recorder.start(cat.getServiceUrl(), name);
+            File file = recorder.start(episode);
             logger.info("Streaming " + file + " exists=" + file.exists());
 
             FileInputStream in = new FileInputStream(file);

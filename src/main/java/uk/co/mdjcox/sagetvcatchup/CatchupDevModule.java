@@ -65,7 +65,7 @@ public class CatchupDevModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public OsUtils providesOsUtlis() throws Exception {
+    public OsUtilsInterface providesOsUtlis() throws Exception {
         return OsUtils.instance(providesLogger());
     }
 

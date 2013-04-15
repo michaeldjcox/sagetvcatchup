@@ -186,7 +186,7 @@ class WindowsUtils extends OsUtils {
     public static void main(String[] args) throws Exception {
         LoggerInterface logger = LoggingManager.getLogger(WindowsUtils.class, "test", "/home/michael/Documents/sagetvcatchup");
         LoggingManager.addConsole(logger);
-        OsUtils utils = OsUtils.instance(logger);
+        OsUtilsInterface utils = OsUtils.instance(logger);
         String command = "\"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe\"";
 //        utils.spawnProcess(command, "VLC", false);
         Thread.sleep(3000);

@@ -7,6 +7,7 @@ import uk.co.mdjcox.model.Episode;
 import uk.co.mdjcox.model.Programme;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
+import uk.co.mdjcox.utils.OsUtilsInterface;
 
 import java.io.File;
 
@@ -20,8 +21,8 @@ import java.io.File;
 public class EpisodeScript extends Script {
 
     @AssistedInject
-    public EpisodeScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils) {
-        super(logger, base + File.separator + "getEpisode.groovy", htmlUtils, downloadUtils);
+    public EpisodeScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils) {
+        super(logger, base + File.separator + "getEpisode.groovy", htmlUtils, downloadUtils, osUtils);
     }
 
     public void getEpisode(Programme programme, Episode episode) {

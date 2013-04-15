@@ -17,4 +17,9 @@ public interface ScriptFactory {
     EpisodesScript createEpisodesScript(String base);
 
     EpisodeScript createEpisodeScript(String base);
+
+    PlayScript createPlayScript(String base);
+
+    StopScript createStopScript(String base);
+
 }

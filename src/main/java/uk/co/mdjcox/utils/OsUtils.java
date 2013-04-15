@@ -15,12 +15,12 @@ import java.io.*;
 import java.util.*;
 
 
-public abstract class OsUtils {
-    private static OsUtils instance;
+public abstract class OsUtils implements OsUtilsInterface {
+    private static OsUtilsInterface instance;
     protected LoggerInterface logger;
     private String os;
 
-    public static OsUtils instance(LoggerInterface logger) {
+    public static OsUtilsInterface instance(LoggerInterface logger) {
         if (instance == null) {
             if (File.separatorChar=='\\') {
                 instance = new WindowsUtils(logger);
@@ -38,10 +38,12 @@ public abstract class OsUtils {
         os = os.replace('.','_');
     }
 
+    @Override
     public Process spawnProcess(String radioCommand, String action, boolean wait) throws Exception {
         return spawnProcess(radioCommand, action, wait, null, null);
     }
 
+    @Override
     public Process spawnProcess(String radioCommand, String action, boolean wait, ArrayList<String> output, ArrayList<String> errors) throws Exception {
         logger.info("Spawn " + radioCommand);
 
@@ -177,10 +179,6 @@ public abstract class OsUtils {
         env[i]=envVar;
         return env;
     }
-
-    public abstract void killOsProcess(String pid, String cmd);
-
-    public abstract HashMap<String, String> processList();
 
     private class StreamConsumer extends Thread {
         private InputStream is;
