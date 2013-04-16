@@ -91,12 +91,20 @@ public abstract class GroovyScript extends groovy.lang.Script {
         return htmlUtils.hasToken(token, fileStr);
     }
 
-    public Process EXECUTE(String osCommand, String loggerName, boolean wait) throws Exception {
-        return osUtils.spawnProcess(osCommand, loggerName, wait);
+
+    public Process EXECUTE(String osCommand, String loggerName) throws Exception {
+        return osUtils.spawnProcess(osCommand, loggerName, false);
+    }
+    public Process EXECUTE_AND_WAIT(String osCommand, String loggerName) throws Exception {
+        return osUtils.spawnProcess(osCommand, loggerName, true);
     }
 
-    public Process EXECUTE(String radioCommand, String loggerName, boolean wait, ArrayList<String> output, ArrayList<String> errors) throws Exception {
-        return osUtils.spawnProcess(radioCommand, loggerName, wait, output, errors);
+    public Process EXECUTE(String radioCommand, String loggerName, ArrayList<String> output, ArrayList<String> errors) throws Exception {
+        return osUtils.spawnProcess(radioCommand, loggerName, false, output, errors);
+    }
+
+    public Process EXECUTE_AND_WAIT(String radioCommand, String loggerName, ArrayList<String> output, ArrayList<String> errors) throws Exception {
+        return osUtils.spawnProcess(radioCommand, loggerName, true, output, errors);
     }
 
     public void KILL(String pid, String cmd) {

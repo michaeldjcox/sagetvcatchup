@@ -2,7 +2,7 @@ package ITVPlayer
 
 String command = "get_flash_videos -f " + outDir + File.separator + recording.getId() + " " + recording.getUrl() ;
 ArrayList<String> output = new ArrayList<String>();
-EXECUTE(command, "record", false, output, null);
+EXECUTE(command, "record", output, null);
 
 // TODO need to deal with completely downloaded files
 

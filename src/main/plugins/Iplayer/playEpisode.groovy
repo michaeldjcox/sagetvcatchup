@@ -2,7 +2,7 @@ package Iplayer
 
 String command = "get_iplayer " + recording.getUrl() + " --force -o " + outDir + File.separator;
 ArrayList<String> output = new ArrayList<String>();
-EXECUTE(command, "record", false, output, null);
+EXECUTE(command, "record", output, null);
 
 // TODO need to deal with completely downloaded files
 
