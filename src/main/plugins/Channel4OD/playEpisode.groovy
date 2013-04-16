@@ -1,14 +1,13 @@
-package Iplayer
+package Channel4OD
 
-String outDir = GET_STRING_PROPERTY("recordingDir", "/opt/sagetv/server/sagetvcatchup/recordings");
-String command = "get_iplayer " + recording.getUrl() + " --force -o " + outDir + File.separator;
+String command = "get_flash_videos -f " + outDir + File.separator + recording.getId() + " " + recording.getUrl() ;
 ArrayList<String> output = new ArrayList<String>();
 EXECUTE(command, "record", output, null);
 
 // TODO need to deal with completely downloaded files
 
-String prefix = "INFO: File name prefix = "
-String filename = WAIT_FOR_OUTPUT(prefix, output, 30000)
+String outDir = GET_STRING_PROPERTY("recordingDir", "/opt/sagetv/server/sagetvcatchup/recordings");
+String filename = WAIT_FOR_OUTPUT("INFO: File name prefix = ", output, 30000)
 filename = outDir + File.separator + filename.substring(prefix.length()).trim() + ".partial.mp4.flv";
 
 LOG_INFO("Recording to " + filename);
