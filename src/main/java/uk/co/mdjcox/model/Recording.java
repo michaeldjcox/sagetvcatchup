@@ -33,6 +33,10 @@ public class Recording {
         return episode.getServiceUrl();
     }
 
+    public String getId() {
+        return episode.getId();
+    }
+
     public String getName() {
         return episode.getEpisodeTitle();
     }

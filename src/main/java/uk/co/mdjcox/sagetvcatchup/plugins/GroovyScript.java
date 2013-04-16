@@ -156,6 +156,7 @@ public abstract class GroovyScript extends groovy.lang.Script {
     }
 
     public void WAIT_FOR(long millis) {
+        logger.info("Waiting for " + millis + "ms");
         long stopTime = System.currentTimeMillis() + millis;
         while (System.currentTimeMillis() < stopTime) {
             try {
@@ -169,17 +170,18 @@ public abstract class GroovyScript extends groovy.lang.Script {
         }
     }
 
-    public File WAIT_FOR_FILE(String filename) {
+    public File WAIT_FOR_FILE(String filename, long timeoutMillis) {
         logger.info("Waiting for existence of " + filename);
+        long stopTime = System.currentTimeMillis() + timeoutMillis;
         File file = new File(filename);
-        while (!file.exists()) {
+        while (!file.exists() || (System.currentTimeMillis() > stopTime)) {
             WAIT_FOR(1000);
         }
         return file;
     }
 
     public File WAIT_FOR_FILE_OF_SIZE(String filename, long atLeastSize, long timeoutMillis) {
-        logger.info("Waiting for existence of " + filename);
+        logger.info("Waiting for " + filename + " to attain size of " + atLeastSize);
         long stopTime = System.currentTimeMillis() + timeoutMillis;
         File file = new File(filename);
         while (!file.exists() || (file.length() < atLeastSize)) {
@@ -188,4 +190,21 @@ public abstract class GroovyScript extends groovy.lang.Script {
         }
         return file;
     }
+
+    public String WAIT_FOR_OUTPUT(String prefix, ArrayList<String> output, long timeoutMillis) {
+        long stopTime = System.currentTimeMillis() + timeoutMillis;
+        out:
+        while (System.currentTimeMillis() < stopTime) {
+            for (String result : output) {
+                if (result.startsWith(prefix)) {
+                    return result;
+                }
+            }
+            LOG_INFO("Waiting for '" + prefix + "' in job output");
+
+            WAIT_FOR(1000);
+        }
+        return "";
+    }
+
 }
