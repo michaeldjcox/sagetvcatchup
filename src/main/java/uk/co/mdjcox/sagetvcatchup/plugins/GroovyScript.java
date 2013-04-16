@@ -19,8 +19,7 @@ import java.util.Set;
  * Time: 00:11
  * To change this template use File | Settings | File Templates.
  */
-public abstract class GroovyScript extends groovy.lang.Script implements
-         OsUtilsInterface {
+public abstract class GroovyScript extends groovy.lang.Script {
 
     private LoggerInterface logger;
     private HtmlUtilsInterface htmlUtils;
@@ -50,15 +49,15 @@ public abstract class GroovyScript extends groovy.lang.Script implements
 
     /* From here on down are methods available to the plugin user */
 
-    public String GET(String url) throws Exception {
+    public String GET_WEB_PAGE(String url) throws Exception {
         return downloadUtils.downloadFileString(url);
     }
 
-    public String SAMPLE(String url) throws Exception {
+    public String SAMPLE_WEB_PAGE(String url) throws Exception {
         return downloadUtils.sampleFileString(url);
     }
 
-    public void DOWNLOAD(URL url, String file) throws IOException {
+    public void DOWNLOAD_WEB_PAGE(URL url, String file) throws IOException {
         downloadUtils.downloadFile(url, file);
     }
 
@@ -66,129 +65,87 @@ public abstract class GroovyScript extends groovy.lang.Script implements
         return htmlUtils.moveTo(token, fileStr);
     }
 
-    public String REMOVE_HTML(String html) {
+    public String REMOVE_HTML_TAGS(String html) {
         return htmlUtils.removeHtml(html);
     }
 
-    @Override
-    public String makeLinkAbsolute(String base, String relative) {
+    public String MAKE_LINK_ABSOLUTE(String base, String relative) {
         return htmlUtils.makeLinkAbsolute(base, relative);
     }
 
-    @Override
-    public String makeIdSafe(String id) {
+    public String MAKE_ID(String id) {
         return htmlUtils.makeIdSafe(id);
     }
 
-    @Override
-    public String makeContentSafe(String id) {
+    public String MAKE_HTML_SAFE(String id) {
         return htmlUtils.makeContentSafe(id);
     }
 
-    @Override
-    public String extractTo(String token, String fileStr) {
+    public String EXTRACT_TO(String token, String fileStr) {
         return htmlUtils.extractTo(token, fileStr);
     }
 
-    @Override
-    public boolean hasToken(String token, String fileStr) {
+    public boolean CONTAINS_TOKEN(String token, String fileStr) {
         return htmlUtils.hasToken(token, fileStr);
     }
 
-    @Override
-    public String getFileString(String htmlfile) throws IOException {
-        return htmlUtils.getFileString(htmlfile);
+    public Process RUN(String osCommand, String loggerName, boolean wait) throws Exception {
+        return osUtils.spawnProcess(osCommand, loggerName, wait);
     }
 
-    @Override
-    public String getFileString(String htmlfile, String filter) throws IOException {
-        return htmlUtils.getFileString(htmlfile, filter);
+    public Process RUN(String radioCommand, String loggerName, boolean wait, ArrayList<String> output, ArrayList<String> errors) throws Exception {
+        return osUtils.spawnProcess(radioCommand, loggerName, wait, output, errors);
     }
 
-    @Override
-    public String moveToInSteps(ArrayList<String> tokens, String fileStr) {
-        return htmlUtils.moveToInSteps(tokens, fileStr);
+    public void KILL(String pid, String cmd) {
+        osUtils.killProcess(pid, cmd);
     }
 
-    @Override
-    public ArrayList<String> extractItem(String fileStr, ArrayList<String> start, String stop, boolean removeHtml) {
-        return htmlUtils.extractItem(fileStr, start, stop, removeHtml);
+    public HashMap<String, String> GET_PROCESSES() {
+        return osUtils.getProcesses();
     }
 
-    @Override
-    public Process spawnProcess(String radioCommand, String action, boolean wait) throws Exception {
-        return osUtils.spawnProcess(radioCommand, action, wait);
-    }
-
-    @Override
-    public Process spawnProcess(String radioCommand, String action, boolean wait, ArrayList<String> output, ArrayList<String> errors) throws Exception {
-        return osUtils.spawnProcess(radioCommand, action, wait, output, errors);
-    }
-
-    @Override
-    public void killOsProcess(String pid, String cmd) {
-        osUtils.killOsProcess(pid, cmd);
-    }
-
-    @Override
-    public HashMap<String, String> processList() {
-        return osUtils.processList();
-    }
-
-    public String getString(String token) {
+    public String GET_STRING_PROPERTY(String token) {
         return properties.getString(token);
     }
 
-    public String getString(String token, String defaultString) {
+    public String GET_STRING_PROPERTY(String token, String defaultString) {
         return properties.getString(token, defaultString);
     }
 
-    public int getInt(String token) {
+    public int GET_INT_PROPERTY(String token) {
         return properties.getInt(token);
     }
 
-    public int getInt(String token, int defaultValue) {
+    public int GET_INT_PROPERTY(String token, int defaultValue) {
         return properties.getInt(token, defaultValue);
     }
 
-    public boolean getBoolean(String token) {
+    public boolean GET_BOOLEAN_PROPERTY(String token) {
         return properties.getBoolean(token);
     }
 
-    public boolean getBoolean(String token, boolean defaultValue) {
+    public boolean GET_BOOLEAN_PROPERTY(String token, boolean defaultValue) {
         return properties.getBoolean(token, defaultValue);
     }
 
-    public ArrayList<String> getPropertySequence(String token) {
-        return properties.getPropertySequence(token);
-    }
-
-    public ArrayList<String> getPropertySequenceAllowBlanks(String token) {
-        return properties.getPropertySequenceAllowBlanks(token);
-
-    }
-
-    public Set<String> getPropertiesLike(String regex) {
-        return properties.getPropertiesLike(regex);
-    }
-
-    public void severe(String msg) {
+    public void LOG_ERROR(String msg) {
         logger.severe(msg);
     }
 
-    public void severe(String msg, Throwable thrown) {
+    public void LOG_ERROR(String msg, Throwable thrown) {
         logger.severe(msg, thrown);
     }
 
-    public void warning(String msg) {
+    public void LOG_WARNING(String msg) {
         logger.warning(msg);
     }
 
-    public void warning(String msg, Throwable thrown) {
+    public void LOG_WARNING(String msg, Throwable thrown) {
         logger.warning(msg, thrown);
     }
 
-    public void info(String msg) {
+    public void LOG_INFO(String msg) {
         logger.info(msg);
     }
 }

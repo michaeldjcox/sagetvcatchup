@@ -21,11 +21,11 @@ class UnixUtils extends OsUtils {
         super(logger);
     }
 
-    public HashMap<String, String> processList() {
+    public HashMap<String, String> getProcesses() {
         return getProcesses("ps -eo pid,command");
     }
 
-    public void killOsProcess(String pid, String com) {
+    public void killProcess(String pid, String com) {
         kill("kill -9", pid);
     }
 

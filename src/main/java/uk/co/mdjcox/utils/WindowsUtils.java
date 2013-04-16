@@ -147,7 +147,7 @@ class WindowsUtils extends OsUtils {
         return output.trim();
     }
 
-    public HashMap<String, String> processList() {
+    public HashMap<String, String> getProcesses() {
         HashMap<String,String> results = new HashMap<String,String>();
         try {
             logger.info("Getting OS processes");
@@ -177,7 +177,7 @@ class WindowsUtils extends OsUtils {
         return results;
     }
 
-    public void killOsProcess(String pid, String com) {
+    public void killProcess(String pid, String com) {
         logger.info("Killing process " + pid + " for " + com);
         kill("taskkill /F /PID", pid);
         logger.info("Killed process " + pid + " for " + com);
@@ -188,13 +188,13 @@ class WindowsUtils extends OsUtils {
         LoggingManager.addConsole(logger);
         OsUtilsInterface utils = OsUtils.instance(logger);
         String command = "\"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe\"";
-//        utils.spawnProcess(command, "VLC", false);
+//        utils.RUN(command, "VLC", false);
         Thread.sleep(3000);
-        HashMap<String, String> processes = utils.processList();
+        HashMap<String, String> processes = utils.getProcesses();
         for (String process : processes.keySet()) {
             String pid = processes.get(process);
             if (process.equals(command)) {
-                utils.killOsProcess(pid, command);
+                utils.killProcess(pid, command);
             }
         }
        logger.info("Finished test");

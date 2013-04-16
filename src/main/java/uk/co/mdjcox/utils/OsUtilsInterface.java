@@ -11,11 +11,11 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public interface OsUtilsInterface {
-    Process spawnProcess(String radioCommand, String action, boolean wait) throws Exception;
+    Process spawnProcess(String osCommand, String loggerName, boolean waitForCompletion) throws Exception;
 
-    Process spawnProcess(String radioCommand, String action, boolean wait, ArrayList<String> output, ArrayList<String> errors) throws Exception;
+    Process spawnProcess(String osCommand, String loggerName, boolean waitForCompletion, ArrayList<String> output, ArrayList<String> errors) throws Exception;
 
-    void killOsProcess(String pid, String cmd);
+    void killProcess(String pid, String cmd);
 
-    HashMap<String, String> processList();
+    HashMap<String, String> getProcesses();
 }

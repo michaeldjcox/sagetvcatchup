@@ -39,19 +39,19 @@ public abstract class OsUtils implements OsUtilsInterface {
     }
 
     @Override
-    public Process spawnProcess(String radioCommand, String action, boolean wait) throws Exception {
-        return spawnProcess(radioCommand, action, wait, null, null);
+    public Process spawnProcess(String osCommand, String loggerName, boolean waitForCompletion) throws Exception {
+        return spawnProcess(osCommand, loggerName, waitForCompletion, null, null);
     }
 
     @Override
-    public Process spawnProcess(String radioCommand, String action, boolean wait, ArrayList<String> output, ArrayList<String> errors) throws Exception {
-        logger.info("Spawn " + radioCommand);
+    public Process spawnProcess(String osCommand, String loggerName, boolean waitForCompletion, ArrayList<String> output, ArrayList<String> errors) throws Exception {
+        logger.info("Spawn " + osCommand);
 
         String command = "";
         String envVar = "";
 
-        if (radioCommand.startsWith("cmd /c start ")) {
-            envVar = radioCommand.replace("cmd /c start ", "");
+        if (osCommand.startsWith("cmd /c start ")) {
+            envVar = osCommand.replace("cmd /c start ", "");
             String[] split = split(envVar);
             String name = split[0];
             if (name.startsWith("\"") && name.endsWith("\"") && !name.contains(".exe") && !name.contains(".EXE")) {
@@ -63,7 +63,7 @@ public abstract class OsUtils implements OsUtilsInterface {
             }
             command = command + " %MYCMD%";
         } else {
-            command = radioCommand;
+            command = osCommand;
             envVar = "";
         }
 
@@ -74,17 +74,17 @@ public abstract class OsUtils implements OsUtilsInterface {
 
         Process process = Runtime.getRuntime().exec(split(command), env);
 
-        captureStreams(process, action, output, errors, wait);
-        if (wait) {
-            logger.info("Entering proc waitfor " + radioCommand);
+        captureStreams(process, loggerName, output, errors, waitForCompletion);
+        if (waitForCompletion) {
+            logger.info("Entering proc waitfor " + osCommand);
             try {
                 process.waitFor();
             } catch (InterruptedException e) {
                 logger.info("Interrupted waiting for process");
             }
-            logger.info("Exiting proc waitfor " + radioCommand);
+            logger.info("Exiting proc waitfor " + osCommand);
             int result = process.exitValue();
-            logger.info("Result is " + result + " for " + radioCommand);
+            logger.info("Result is " + result + " for " + osCommand);
             return process;
         } else {
             return process;

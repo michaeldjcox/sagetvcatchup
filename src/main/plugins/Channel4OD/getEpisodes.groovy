@@ -2,14 +2,14 @@ package Channel4OD
 
 import uk.co.mdjcox.model.Episode
 
-String str = GET(url);
+String str = GET_WEB_PAGE(url);
 
 if (str != null) {
     if (str.contains("The programme you're looking for can't be found")) str = null;
 }
 
 str = MOVE_TO("<ol class=\"all-series\">", str);
-str = extractTo("</ol>", str);
+str = EXTRACT_TO("</ol>", str);
 
 String orig = str;
 String end = "</li>"; // "</a>";
@@ -18,10 +18,10 @@ String start = "<li data";
 while (str != null) {
     str = MOVE_TO(start, str)
     if (str == null) break;
-    String programmeBlock = extractTo(end, str)
+    String programmeBlock = EXTRACT_TO(end, str)
     programmeBlock = MOVE_TO("ata-episodeurl=\"", programmeBlock);
-    link = extractTo("\"", programmeBlock)
-    link = makeLinkAbsolute("http://www.channel4.com", link);
+    link = EXTRACT_TO("\"", programmeBlock)
+    link = MAKE_LINK_ABSOLUTE("http://www.channel4.com", link);
     Episode subCat = new Episode(
             "Channel4OD",
             "", // id
@@ -48,11 +48,11 @@ start = "<div class=\"node node-episode";
 while (str != null) {
     str = MOVE_TO(start, str)
     if (str == null) break;
-    String programmeBlock = extractTo(end, str)
+    String programmeBlock = EXTRACT_TO(end, str)
     programmeBlock = MOVE_TO("href=\"", programmeBlock);
-    link = extractTo("\"", programmeBlock)
+    link = EXTRACT_TO("\"", programmeBlock)
     if (link == null) continue
-    link = makeLinkAbsolute("http://www.channel4.com", link);
+    link = MAKE_LINK_ABSOLUTE("http://www.channel4.com", link);
     Episode subCat = new Episode(
             "Channel4OD",
             "", // id

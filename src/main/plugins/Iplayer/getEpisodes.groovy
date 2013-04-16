@@ -2,7 +2,7 @@ package Iplayer
 
 import uk.co.mdjcox.model.Episode
 
-String str = GET(url);
+String str = GET_WEB_PAGE(url);
 
 if (str != null) {
     if (str.contains("The programme you're looking for can't be found")) str = null;
@@ -15,11 +15,11 @@ String start = "<meta property=\"og:url\"";
 while (str != null) {
     str = MOVE_TO(start, str)
     if (str == null) break;
-    String programmeBlock = extractTo(end, str)
+    String programmeBlock = EXTRACT_TO(end, str)
     programmeBlock = MOVE_TO("content=\"", programmeBlock);
-    link = extractTo("\"", programmeBlock)
+    link = EXTRACT_TO("\"", programmeBlock)
     if (link == null) continue
-    link = makeLinkAbsolute("http://www.bbc.co.uk", link);
+    link = MAKE_LINK_ABSOLUTE("http://www.bbc.co.uk", link);
     Episode subCat = new Episode(
             "Iplayer",
             "", // id
@@ -44,7 +44,7 @@ end = "</ul>"; // "</a>";
 start = "<div class=\"content\" id=\"tabpanel-moreepisodes\">";
 
 str = MOVE_TO(start, str);
-str = extractTo(end, str)
+str = EXTRACT_TO(end, str)
 
 end = "</a"
 start = "<a "
@@ -53,11 +53,11 @@ start = "<a "
 while (str != null) {
     str = MOVE_TO(start, str)
     if (str == null) break;
-    String programmeBlock = extractTo(end, str)
+    String programmeBlock = EXTRACT_TO(end, str)
     programmeBlock = MOVE_TO("href=\"", programmeBlock);
-    link = extractTo("\"", programmeBlock)
+    link = EXTRACT_TO("\"", programmeBlock)
     if (link == null) continue
-    link = makeLinkAbsolute("http://www.bbc.co.uk", link);
+    link = MAKE_LINK_ABSOLUTE("http://www.bbc.co.uk", link);
     Episode subCat = new Episode(
             "Iplayer",
             "", // id
