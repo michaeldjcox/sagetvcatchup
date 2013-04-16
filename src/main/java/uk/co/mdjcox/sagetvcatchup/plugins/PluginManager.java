@@ -63,7 +63,7 @@ public class PluginManager {
 
         for (File pluginDir : pluginDirs) {
             String sourceId = pluginDir.getName();
-            if (!sourceId.equals("Iplayer")) continue; // TODO take out
+            if (!sourceId.equals("Demand5")) continue; // TODO take out
             Plugin plugin = pluginFactory.createPlugin(sourceId, pluginDir.getAbsolutePath());
             plugin.init();
             plugins.put(sourceId, plugin);
