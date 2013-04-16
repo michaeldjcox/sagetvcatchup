@@ -18,4 +18,6 @@ public interface OsUtilsInterface {
     void killProcess(String pid, String cmd);
 
     HashMap<String, String> getProcesses();
+
+    void killProcessesContaining(String expression);
 }

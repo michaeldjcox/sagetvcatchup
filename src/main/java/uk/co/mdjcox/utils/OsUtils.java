@@ -245,6 +245,18 @@ public abstract class OsUtils implements OsUtilsInterface {
         return results;
     }
 
+    public void killProcessesContaining(String token) {
+        HashMap<String, String> processes = getProcesses();
+        for (String process : processes.keySet()) {
+            String pid = processes.get(process);
+            logger.info("Checking if " + pid + " " + process + " contains " + token);
+            if (process.contains(token)) {
+                killProcess(pid, process);
+            }
+        }
+    }
+
+
     protected void kill(String command, String pid) {
         if ((pid == null) || pid.trim().isEmpty()) return;
         try {
@@ -255,4 +267,7 @@ public abstract class OsUtils implements OsUtilsInterface {
             logger.warning("Failed to kill OS process "+ pid, e);
         }
     }
+
+
+
 }

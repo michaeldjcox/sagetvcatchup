@@ -8,10 +8,11 @@ package Iplayer
  * To change this template use File | Settings | File Templates.
  */
 
-ArrayList<String> output = new ArrayList<String>();
 String outDir = GET_STRING_PROPERTY("recordingDir", "/opt/sagetv/server/sagetvcatchup/recordings");
 String command = "get_iplayer " + recording.getUrl() + " --force -o " + outDir + File.separator;
-RUN(command, "record", false, output, null);
+
+ArrayList<String> output = new ArrayList<String>();
+EXECUTE(command, "record", false, output, null);
 
 // TODO need to deal with completely downloaded files
 
@@ -36,16 +37,7 @@ while (true) {
 
 LOG_INFO("Found file name " + filename);
 
-LOG_INFO("Waiting for existence of " + filename);
-
-File file = new File(filename);
-while (!file.exists() || file.length() < (1000*1024)) {
-    try {
-        Thread.sleep(1000);
-    } catch (InterruptedException e) {
-
-    }
-}
+File file = WAIT_FOR_FILE_OF_SIZE(filename, 1024000, 10000)
 
 recording.setFile(file);
 

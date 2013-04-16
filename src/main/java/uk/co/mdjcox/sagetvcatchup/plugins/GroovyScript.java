@@ -6,11 +6,13 @@ import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created with IntelliJ IDEA.
@@ -89,16 +91,20 @@ public abstract class GroovyScript extends groovy.lang.Script {
         return htmlUtils.hasToken(token, fileStr);
     }
 
-    public Process RUN(String osCommand, String loggerName, boolean wait) throws Exception {
+    public Process EXECUTE(String osCommand, String loggerName, boolean wait) throws Exception {
         return osUtils.spawnProcess(osCommand, loggerName, wait);
     }
 
-    public Process RUN(String radioCommand, String loggerName, boolean wait, ArrayList<String> output, ArrayList<String> errors) throws Exception {
+    public Process EXECUTE(String radioCommand, String loggerName, boolean wait, ArrayList<String> output, ArrayList<String> errors) throws Exception {
         return osUtils.spawnProcess(radioCommand, loggerName, wait, output, errors);
     }
 
     public void KILL(String pid, String cmd) {
         osUtils.killProcess(pid, cmd);
+    }
+
+    public void KILL_CONTAINING(String expression) {
+        osUtils.killProcessesContaining(expression);
     }
 
     public HashMap<String, String> GET_PROCESSES() {
@@ -147,5 +153,39 @@ public abstract class GroovyScript extends groovy.lang.Script {
 
     public void LOG_INFO(String msg) {
         logger.info(msg);
+    }
+
+    public void WAIT_FOR(long millis) {
+        long stopTime = System.currentTimeMillis() + millis;
+        while (System.currentTimeMillis() < stopTime) {
+            try {
+                long left = stopTime -System.currentTimeMillis();
+                if (left > 0) {
+                    Thread.sleep(left);
+                }
+            } catch (InterruptedException e) {
+
+            }
+        }
+    }
+
+    public File WAIT_FOR_FILE(String filename) {
+        logger.info("Waiting for existence of " + filename);
+        File file = new File(filename);
+        while (!file.exists()) {
+            WAIT_FOR(1000);
+        }
+        return file;
+    }
+
+    public File WAIT_FOR_FILE_OF_SIZE(String filename, long atLeastSize, long timeoutMillis) {
+        logger.info("Waiting for existence of " + filename);
+        long stopTime = System.currentTimeMillis() + timeoutMillis;
+        File file = new File(filename);
+        while (!file.exists() || (file.length() < atLeastSize)) {
+            WAIT_FOR(1000);
+            if (System.currentTimeMillis() > stopTime) break;
+        }
+        return file;
     }
 }

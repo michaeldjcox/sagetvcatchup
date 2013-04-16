@@ -188,7 +188,7 @@ class WindowsUtils extends OsUtils {
         LoggingManager.addConsole(logger);
         OsUtilsInterface utils = OsUtils.instance(logger);
         String command = "\"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe\"";
-//        utils.RUN(command, "VLC", false);
+//        utils.EXECUTE(command, "VLC", false);
         Thread.sleep(3000);
         HashMap<String, String> processes = utils.getProcesses();
         for (String process : processes.keySet()) {
