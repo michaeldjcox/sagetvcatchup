@@ -1,12 +1,10 @@
 package uk.co.mdjcox.model;
 
-import groovy.lang.Binding;
-import groovy.util.GroovyScriptEngine;
-import uk.co.mdjcox.utils.PropertiesFile;
-
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,11 +20,11 @@ public class Catalog {
     public Catalog()  {
     }
 
-    public Collection<Category> getCategories() {
-      return categories.values();
+    public final List<Category> getCategories() {
+      return Collections.unmodifiableList(new ArrayList<Category>(categories.values()));
     }
 
-    public void setCategories(Map<String, Category> categories) {
-        this.categories = categories;
+    public final void setCategories(Map<String, Category> categoryMap) {
+       this.categories = new LinkedHashMap<String, Category>(categoryMap);
     }
 }
