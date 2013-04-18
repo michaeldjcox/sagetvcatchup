@@ -86,15 +86,6 @@ public class SubCategoryTest {
     assertArrayEquals("Other parents #2", new String[]{"parentId2", "parentId3"}, result.toArray());
   }
 
-
-  /**
-   * Method: clone()
-   */
-  @Test
-  public void testClone() throws Exception {
-//TODO: Test goes here... 
-  }
-
   /**
    *
    * Method: isSource()
@@ -142,6 +133,6 @@ public class SubCategoryTest {
    */
   @Test
   public void testToString() throws Exception {
-    TestCase.assertEquals("Category toString should be the id", subcat.getId(), subcat.toString());
+    assertEquals("Category toString should be the id", subcat.getId(), subcat.toString());
   }
 } 

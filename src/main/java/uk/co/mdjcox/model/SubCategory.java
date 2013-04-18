@@ -9,7 +9,7 @@ import java.util.*;
  * Time: 07:37
  * To change this template use File | Settings | File Templates.
  */
-public class SubCategory extends Category implements Cloneable {
+public class SubCategory extends Category {
 
     private ArrayList<String> otherParentIds = new ArrayList<String>();
     private HashMap<String, Category> subCategories = new LinkedHashMap<String, Category>();
@@ -36,14 +36,6 @@ public class SubCategory extends Category implements Cloneable {
 
     public ArrayList<String> getOtherParentIds() {
         return otherParentIds;
-    }
-
-    public Object clone() {
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            return null;
-        }
     }
 
 }

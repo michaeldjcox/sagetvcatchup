@@ -9,7 +9,7 @@ import java.util.HashMap;
  * Time: 07:25
  * To change this template use File | Settings | File Templates.
  */
-public class Programme extends SubCategory implements Cloneable {
+public class Programme extends SubCategory {
 
     private HashMap<String, Episode> episodes = new HashMap<String, Episode>();
 
@@ -26,6 +26,6 @@ public class Programme extends SubCategory implements Cloneable {
     }
 
     public HashMap<String, Episode> getEpisodes() {
-        return episodes;
+        return new HashMap(episodes);
     }
 }
