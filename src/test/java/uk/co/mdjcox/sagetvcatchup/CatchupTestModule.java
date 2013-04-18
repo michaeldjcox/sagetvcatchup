@@ -39,15 +39,15 @@ public class CatchupTestModule extends AbstractModule {
     @Provides
     @Singleton
     public PropertiesInterface providesProperties() throws Exception {
-        return properties;
+      return properties;
     }
 
     @Provides
     @Singleton
     public Logger providesLogger() throws Exception {
       if (logger == null) {
+        System.setProperty("logback.configurationFile", "/home/michael/Documents/sagetvcatchup/src/main/config/logback-test.xml");
         logger = LoggerFactory.getLogger(this.getClass());
-        // TODO add console
       }
         return logger;
     }

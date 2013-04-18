@@ -38,8 +38,8 @@ public class CatchupDevModule extends AbstractModule {
     @Singleton
     public Logger providesLogger() throws Exception {
         if (logger == null) {
+          System.setProperty("logback.configurationFile", "/home/michael/Documents/sagetvcatchup/src/main/config/logback-test.xml");
             logger = LoggerFactory.getLogger(CatchupPlugin.class);
-          // TODO add console
         }
         return logger;
     }
@@ -52,7 +52,6 @@ public class CatchupDevModule extends AbstractModule {
             properties =  new PropertiesFile(base, true);
             properties.setProperty("recordingDir", "/home/michael/Documents/sagetvcatchup/recordings");
             properties.setProperty("pluginDir", "/home/michael/Documents/sagetvcatchup/src/main/plugins");
-            properties.setProperty("logDir", "/home/michael/Documents/sagetvcatchup/logs");
             properties.setProperty("podcasterPort", "8082");
         }
         return properties;

@@ -24,6 +24,9 @@
         <fileSet>
             <directory>${basedir}/src/main/config</directory>
             <outputDirectory>sagetvcatchup/config</outputDirectory>
+            <excludes>
+                <exclude>logback-test.xml</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <directory>${basedir}/src/main/logs</directory>
