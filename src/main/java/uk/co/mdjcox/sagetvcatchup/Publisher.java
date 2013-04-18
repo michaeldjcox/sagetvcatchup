@@ -2,7 +2,9 @@ package uk.co.mdjcox.sagetvcatchup;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import uk.co.mdjcox.logger.LoggerInterface;
+
+import org.slf4j.Logger;
+
 import uk.co.mdjcox.model.Catalog;
 import uk.co.mdjcox.model.Category;
 import uk.co.mdjcox.model.SubCategory;
@@ -15,12 +17,12 @@ import java.util.Collection;
 @Singleton
 public class Publisher {
 
-    private LoggerInterface logger;
+    private Logger logger;
     private PropertiesInterface props;
     private HtmlUtilsInterface htmlUtils;
 
     @Inject
-    private Publisher(LoggerInterface logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils) throws Exception {
+    private Publisher(Logger logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils) throws Exception {
         this.logger = logger;
         this.props = props;
         this.htmlUtils = htmlUtils;
@@ -108,7 +110,7 @@ public class Publisher {
                 addSubCategory(category.getParentId(), category.getId(), category.getShortName(), category.getLongName(),
                         category.getIconUrl(), links, labels);
             } else {
-                logger.severe(category.getId() + " was not handled");
+                logger.error(category.getId() + " was not handled");
             }
         }
 

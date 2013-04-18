@@ -2,7 +2,9 @@ package uk.co.mdjcox.sagetvcatchup.plugins;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import uk.co.mdjcox.logger.LoggerInterface;
+
+import org.slf4j.Logger;
+
 import uk.co.mdjcox.model.Episode;
 import uk.co.mdjcox.model.Recording;
 import uk.co.mdjcox.model.Source;
@@ -24,7 +26,7 @@ import java.io.File;
 public class PlayScript extends Script {
 
     @AssistedInject
-    public PlayScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils, PropertiesInterface properties) {
+    public PlayScript(Logger logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils, PropertiesInterface properties) {
         super(logger, base + File.separator + "playEpisode.groovy", htmlUtils, downloadUtils, osUtils, properties);
     }
 
@@ -34,7 +36,7 @@ public class PlayScript extends Script {
             call("recording", recording);
             getLogger().info("Playing episode " + recording);
         } catch (Throwable e) {
-            getLogger().severe("Unable to playback: " + recording, e);
+            getLogger().error("Unable to playback: " + recording, e);
         }
     }
 

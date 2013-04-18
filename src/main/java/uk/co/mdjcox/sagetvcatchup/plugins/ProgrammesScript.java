@@ -2,7 +2,9 @@ package uk.co.mdjcox.sagetvcatchup.plugins;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import uk.co.mdjcox.logger.LoggerInterface;
+
+import org.slf4j.Logger;
+
 import uk.co.mdjcox.model.Programme;
 import uk.co.mdjcox.model.Source;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
@@ -24,7 +26,7 @@ import java.util.Collection;
 public class ProgrammesScript extends Script {
 
     @AssistedInject
-    public ProgrammesScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils,
+    public ProgrammesScript(Logger logger, @Assisted String base, HtmlUtilsInterface htmlUtils,
                             DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils,
                             PropertiesInterface properties) {
         super(logger, base + File.separator + "getProgrammes.groovy", htmlUtils, downloadUtils, osUtils, properties);
@@ -35,7 +37,7 @@ public class ProgrammesScript extends Script {
         try {
             call("url", category.getServiceUrl(), "programmes", programmes);
         } catch (Throwable e) {
-            getLogger().severe("Unable to get programmes for: " + category, e);
+            getLogger().error("Unable to get programmes for: " + category, e);
         } finally {
             getLogger().info(category + " has " + programmes.size() + " programmes");
         }

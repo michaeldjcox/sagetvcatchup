@@ -9,8 +9,7 @@
 package uk.co.mdjcox.utils;
 
 
-import uk.co.mdjcox.logger.LoggerInterface;
-import uk.co.mdjcox.logger.LoggingManager;
+import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,7 +23,7 @@ class WindowsUtils extends OsUtils {
     private static final String CRLF = "\r\n";
     private static final String SEPARATOR = "AAAA";
 
-    public WindowsUtils(LoggerInterface logger) {
+    public WindowsUtils(Logger logger) {
         super(logger);
     }
 
@@ -169,7 +168,7 @@ class WindowsUtils extends OsUtils {
                 results.put(cmd, pid);
             }
         } catch (Exception e) {
-            logger.warning("Cannot check OS processes", e);
+            logger.warn("Cannot check OS processes", e);
         } finally{
             logger.info("Got OS processes");
         }
@@ -181,24 +180,6 @@ class WindowsUtils extends OsUtils {
         logger.info("Killing process " + pid + " for " + com);
         kill("taskkill /F /PID", pid);
         logger.info("Killed process " + pid + " for " + com);
-    }
-
-    public static void main(String[] args) throws Exception {
-        LoggerInterface logger = LoggingManager.getLogger(WindowsUtils.class, "test", "/home/michael/Documents/sagetvcatchup");
-        LoggingManager.addConsole(logger);
-        OsUtilsInterface utils = OsUtils.instance(logger);
-        String command = "\"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe\"";
-//        utils.EXECUTE(command, "VLC", false);
-        Thread.sleep(3000);
-        HashMap<String, String> processes = utils.getProcesses();
-        for (String process : processes.keySet()) {
-            String pid = processes.get(process);
-            if (process.equals(command)) {
-                utils.killProcess(pid, command);
-            }
-        }
-       logger.info("Finished test");
-
     }
 }
 

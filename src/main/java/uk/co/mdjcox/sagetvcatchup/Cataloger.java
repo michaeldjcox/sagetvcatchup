@@ -2,7 +2,9 @@ package uk.co.mdjcox.sagetvcatchup;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import uk.co.mdjcox.logger.LoggerInterface;
+
+import org.slf4j.Logger;
+
 import uk.co.mdjcox.model.*;
 import uk.co.mdjcox.sagetvcatchup.plugins.*;
 import uk.co.mdjcox.utils.PropertiesInterface;
@@ -21,12 +23,12 @@ import java.util.Map;
 @Singleton
 public class Cataloger {
 
-    private LoggerInterface logger;
+    private Logger logger;
     private PropertiesInterface props;
     private PluginManager pluginManager;
 
     @Inject
-    private Cataloger(LoggerInterface logger, PropertiesInterface props, PluginManager pluginManager) {
+    private Cataloger(Logger logger, PropertiesInterface props, PluginManager pluginManager) {
         this.logger = logger;
         this.props = props;
         this.pluginManager = pluginManager;
@@ -113,7 +115,7 @@ public class Cataloger {
             catalog.setCategories(newCategories);
 
         } catch (Exception e) {
-            logger.severe("Failed to refresh properties file", e);
+            logger.error("Failed to refresh properties file", e);
         }
 
         return catalog;

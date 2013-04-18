@@ -6,8 +6,9 @@ import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.co.mdjcox.logger.LoggerInterface;
-import uk.co.mdjcox.logger.LoggingManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.co.mdjcox.sagetvcatchup.plugins.ScriptFactory;
 import uk.co.mdjcox.utils.*;
 
@@ -19,6 +20,8 @@ import uk.co.mdjcox.utils.*;
  * To change this template use File | Settings | File Templates.
  */
 public class CatchupTestModule extends AbstractModule {
+
+  private Logger logger;
 
     @Mock
     private PropertiesInterface properties;
@@ -41,9 +44,11 @@ public class CatchupTestModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public LoggerInterface providesLogger() throws Exception {
-        LoggerInterface logger = LoggingManager.getLogger(this.getClass(), "test", "logs");
-        LoggingManager.addConsole(logger);
+    public Logger providesLogger() throws Exception {
+      if (logger == null) {
+        logger = LoggerFactory.getLogger(this.getClass());
+        // TODO add console
+      }
         return logger;
     }
 

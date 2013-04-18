@@ -9,7 +9,7 @@
 package uk.co.mdjcox.utils;
 
 
-import uk.co.mdjcox.logger.LoggerInterface;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class TmpFileManager {
         return fileOrDir.delete();
     }
 
-    public static void housekeep(final LoggerInterface logger, final boolean later) {
+    public static void housekeep(final Logger logger, final boolean later) {
         final ArrayList<String> hkpFiles = new ArrayList<String>();
         hkpFiles.addAll(tmpFiles);
         tmpFiles.clear();

@@ -4,8 +4,10 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import uk.co.mdjcox.logger.LoggerInterface;
-import uk.co.mdjcox.logger.LoggingManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.co.mdjcox.sagetvcatchup.plugins.PluginFactory;
 import uk.co.mdjcox.sagetvcatchup.plugins.ScriptFactory;
 import uk.co.mdjcox.utils.*;
@@ -22,7 +24,7 @@ import java.io.File;
 public class CatchupDevModule extends AbstractModule {
 
     private PropertiesFile properties;
-    private LoggerInterface logger;
+    private Logger logger;
 
     @Override
     protected void configure() {
@@ -34,11 +36,10 @@ public class CatchupDevModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public LoggerInterface providesLogger() throws Exception {
-        PropertiesInterface props = providesProperties();
+    public Logger providesLogger() throws Exception {
         if (logger == null) {
-            logger = LoggingManager.getLogger(CatchupPlugin.class, "sagetvcatchup", props.getProperty("logDir", "/tmp/logs"));
-            LoggingManager.addConsole(logger);
+            logger = LoggerFactory.getLogger(CatchupPlugin.class);
+          // TODO add console
         }
         return logger;
     }

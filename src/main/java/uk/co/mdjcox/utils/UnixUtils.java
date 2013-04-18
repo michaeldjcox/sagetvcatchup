@@ -9,7 +9,7 @@
 package uk.co.mdjcox.utils;
 
 
-import uk.co.mdjcox.logger.LoggerInterface;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 
 class UnixUtils extends OsUtils {
 
-    UnixUtils(LoggerInterface logger) {
+    UnixUtils(Logger logger) {
         super(logger);
     }
 
@@ -47,7 +47,7 @@ class UnixUtils extends OsUtils {
                 }
             }
         } catch (Exception e) {
-            logger.warning("Cannot check OS processes", e);
+            logger.warn("Cannot check OS processes", e);
         }
         return results;
     }

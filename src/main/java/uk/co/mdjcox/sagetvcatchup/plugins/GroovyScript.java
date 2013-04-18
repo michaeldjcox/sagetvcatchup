@@ -1,6 +1,7 @@
 package uk.co.mdjcox.sagetvcatchup.plugins;
 
-import uk.co.mdjcox.logger.LoggerInterface;
+import org.slf4j.Logger;
+
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
@@ -23,13 +24,13 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class GroovyScript extends groovy.lang.Script {
 
-    private LoggerInterface logger;
+    private Logger logger;
     private HtmlUtilsInterface htmlUtils;
     private DownloadUtilsInterface downloadUtils;
     private OsUtilsInterface osUtils;
     private PropertiesInterface properties;
 
-    public void setLogger(LoggerInterface logger) {
+    public void setLogger(Logger logger) {
         this.logger = logger;
     }
 
@@ -144,19 +145,19 @@ public abstract class GroovyScript extends groovy.lang.Script {
     }
 
     public void LOG_ERROR(String msg) {
-        logger.severe(msg);
+        logger.error(msg);
     }
 
     public void LOG_ERROR(String msg, Throwable thrown) {
-        logger.severe(msg, thrown);
+        logger.error(msg, thrown);
     }
 
     public void LOG_WARNING(String msg) {
-        logger.warning(msg);
+        logger.warn(msg);
     }
 
     public void LOG_WARNING(String msg, Throwable thrown) {
-        logger.warning(msg, thrown);
+        logger.warn(msg, thrown);
     }
 
     public void LOG_INFO(String msg) {

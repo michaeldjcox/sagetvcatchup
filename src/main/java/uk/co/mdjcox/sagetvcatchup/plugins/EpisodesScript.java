@@ -2,7 +2,9 @@ package uk.co.mdjcox.sagetvcatchup.plugins;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import uk.co.mdjcox.logger.LoggerInterface;
+
+import org.slf4j.Logger;
+
 import uk.co.mdjcox.model.Programme;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
@@ -21,7 +23,7 @@ import java.io.File;
 public class EpisodesScript extends Script {
 
     @AssistedInject
-    public EpisodesScript(LoggerInterface logger, @Assisted String base, HtmlUtilsInterface htmlUtils,
+    public EpisodesScript(Logger logger, @Assisted String base, HtmlUtilsInterface htmlUtils,
                           DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils,
                           PropertiesInterface properties) {
         super(logger, base + File.separator + "getEpisodes.groovy", htmlUtils, downloadUtils, osUtils, properties);
@@ -32,7 +34,7 @@ public class EpisodesScript extends Script {
             getLogger().info("Getting episodes for " + category);
             call("url", category.getServiceUrl(), "category", category);
         } catch (Throwable e) {
-            getLogger().severe("Unable to get episodes for: " + category, e);
+            getLogger().error("Unable to get episodes for: " + category, e);
         } finally {
             getLogger().info(category + " has " + category.getEpisodes().size() + " episodes");
         }

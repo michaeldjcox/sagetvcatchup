@@ -1,8 +1,17 @@
 package uk.co.mdjcox.model; 
 
-import org.junit.Test; 
+import junit.framework.Assert;
+
+import org.junit.Test;
 import org.junit.Before; 
-import org.junit.After; 
+import org.junit.After;
+
+import uk.co.mdjcox.model.Category;
+
+import java.lang.String;
+
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.TestCase.assertEquals;
 
 /** 
 * Category Tester. 
@@ -13,9 +22,24 @@ import org.junit.After;
 */ 
 public class CategoryTest { 
 
-@Before
-public void before() throws Exception { 
-} 
+  private class MyCategory extends Category {
+
+    protected MyCategory(String id, String shortName, String longName, String serviceUrl,
+                         String iconUrl,
+                         String parentId) {
+      super(id, shortName, longName, serviceUrl, iconUrl,
+            parentId);    //To change body of overridden methods use File | Settings | File Templates.
+    }
+  } ;
+
+  private MyCategory category;
+
+  @Before
+  public void before() throws Exception {
+    category = new MyCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId") {
+    } ;
+
+  }
 
 @After
 public void after() throws Exception { 
@@ -27,9 +51,9 @@ public void after() throws Exception {
 * 
 */ 
 @Test
-public void testGetId() throws Exception { 
-//TODO: Test goes here... 
-} 
+public void testGetId() throws Exception {
+   assertEquals("getId", "id", category.getId());
+}
 
 /** 
 * 
@@ -37,8 +61,9 @@ public void testGetId() throws Exception {
 * 
 */ 
 @Test
-public void testSetId() throws Exception { 
-//TODO: Test goes here... 
+public void testSetId() throws Exception {
+  category.setId("id2");
+  assertEquals("setId", "id2", category.getId());
 } 
 
 /** 
@@ -47,8 +72,8 @@ public void testSetId() throws Exception {
 * 
 */ 
 @Test
-public void testGetShortName() throws Exception { 
-//TODO: Test goes here... 
+public void testGetShortName() throws Exception {
+  assertEquals("getShortName", "shortName", category.getShortName());
 } 
 
 /** 
@@ -57,9 +82,10 @@ public void testGetShortName() throws Exception {
 * 
 */ 
 @Test
-public void testSetShortName() throws Exception { 
-//TODO: Test goes here... 
-} 
+public void testSetShortName() throws Exception {
+  category.setShortName("shortName2");
+  assertEquals("getShortName", "shortName2", category.getShortName());
+}
 
 /** 
 * 
@@ -67,8 +93,8 @@ public void testSetShortName() throws Exception {
 * 
 */ 
 @Test
-public void testGetLongName() throws Exception { 
-//TODO: Test goes here... 
+public void testGetLongName() throws Exception {
+  assertEquals("getLongName", "longName", category.getLongName());
 } 
 
 /** 
@@ -77,8 +103,9 @@ public void testGetLongName() throws Exception {
 * 
 */ 
 @Test
-public void testSetLongName() throws Exception { 
-//TODO: Test goes here... 
+public void testSetLongName() throws Exception {
+  category.setLongName("longName2");
+  assertEquals("setLongName", "longName2", category.getLongName());
 } 
 
 /** 
@@ -87,8 +114,8 @@ public void testSetLongName() throws Exception {
 * 
 */ 
 @Test
-public void testGetServiceUrl() throws Exception { 
-//TODO: Test goes here... 
+public void testGetServiceUrl() throws Exception {
+  assertEquals("getServiceUrl", "serviceUrl", category.getServiceUrl());
 } 
 
 /** 
@@ -97,8 +124,9 @@ public void testGetServiceUrl() throws Exception {
 * 
 */ 
 @Test
-public void testSetServiceUrl() throws Exception { 
-//TODO: Test goes here... 
+public void testSetServiceUrl() throws Exception {
+  category.setServiceUrl("serviceUrl2");
+  assertEquals("setServiceUrl", "serviceUrl2", category.getServiceUrl());
 } 
 
 /** 
@@ -107,8 +135,8 @@ public void testSetServiceUrl() throws Exception {
 * 
 */ 
 @Test
-public void testGetIconUrl() throws Exception { 
-//TODO: Test goes here... 
+public void testGetIconUrl() throws Exception {
+  assertEquals("getIconUrl", "iconUrl", category.getIconUrl());
 } 
 
 /** 
@@ -117,8 +145,9 @@ public void testGetIconUrl() throws Exception {
 * 
 */ 
 @Test
-public void testSetIconUrl() throws Exception { 
-//TODO: Test goes here... 
+public void testSetIconUrl() throws Exception {
+  category.setIconUrl("iconUrl2");
+  assertEquals("setIconUrl", "iconUrl2", category.getIconUrl());
 } 
 
 /** 
@@ -127,8 +156,8 @@ public void testSetIconUrl() throws Exception {
 * 
 */ 
 @Test
-public void testGetParentId() throws Exception { 
-//TODO: Test goes here... 
+public void testGetParentId() throws Exception {
+  assertEquals("getParentId", "parentId", category.getParentId());
 } 
 
 /** 
@@ -137,8 +166,9 @@ public void testGetParentId() throws Exception {
 * 
 */ 
 @Test
-public void testSetParentId() throws Exception { 
-//TODO: Test goes here... 
+public void testSetParentId() throws Exception {
+  category.setParentId("parentId2");
+  assertEquals("setParentId", "parentId2", category.getParentId());
 } 
 
 /** 
@@ -148,8 +178,8 @@ public void testSetParentId() throws Exception {
 */ 
 @Test
 public void testIsSource() throws Exception { 
-//TODO: Test goes here... 
-} 
+  assertFalse("This category is not a Source", category.isSource());
+}
 
 /** 
 * 
@@ -157,8 +187,8 @@ public void testIsSource() throws Exception {
 * 
 */ 
 @Test
-public void testIsSubCategory() throws Exception { 
-//TODO: Test goes here... 
+public void testIsSubCategory() throws Exception {
+  assertFalse("This category is not a SubCategory", category.isSubCategory());
 } 
 
 /** 
@@ -167,8 +197,8 @@ public void testIsSubCategory() throws Exception {
 * 
 */ 
 @Test
-public void testIsProgrammeCategory() throws Exception { 
-//TODO: Test goes here... 
+public void testIsProgrammeCategory() throws Exception {
+  assertFalse("This category is not a Programme", category.isProgrammeCategory());
 } 
 
 /** 
@@ -177,8 +207,8 @@ public void testIsProgrammeCategory() throws Exception {
 * 
 */ 
 @Test
-public void testIsRoot() throws Exception { 
-//TODO: Test goes here... 
+public void testIsRoot() throws Exception {
+  assertFalse("This category is not the Root", category.isRoot());
 } 
 
 /** 
@@ -187,9 +217,7 @@ public void testIsRoot() throws Exception {
 * 
 */ 
 @Test
-public void testToString() throws Exception { 
-//TODO: Test goes here... 
-} 
-
-
+public void testToString() throws Exception {
+  assertEquals("Category toString should be the id", category.getId(), category.toString());
+}
 } 

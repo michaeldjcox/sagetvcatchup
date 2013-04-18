@@ -9,18 +9,27 @@
 package uk.co.mdjcox.utils;
 
 
-import uk.co.mdjcox.logger.LoggerInterface;
+import org.slf4j.Logger;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 
 public abstract class OsUtils implements OsUtilsInterface {
     private static OsUtilsInterface instance;
-    protected LoggerInterface logger;
+    protected Logger logger;
     private String os;
 
-    public static OsUtilsInterface instance(LoggerInterface logger) {
+    public static OsUtilsInterface instance(Logger logger) {
         if (instance == null) {
             if (File.separatorChar=='\\') {
                 instance = new WindowsUtils(logger);
@@ -31,7 +40,7 @@ public abstract class OsUtils implements OsUtilsInterface {
         return instance;
     }
 
-    protected OsUtils(LoggerInterface logger) {
+    protected OsUtils(Logger logger) {
         this.logger = logger;
         os =  System.getProperty("os.name");
         os = os.replace(' ', '_');
@@ -182,7 +191,7 @@ public abstract class OsUtils implements OsUtilsInterface {
 
     private class StreamConsumer extends Thread {
         private InputStream is;
-        private LoggerInterface logger;
+        private Logger logger;
         private String type;
         private ArrayList<String> output;
 
@@ -190,7 +199,7 @@ public abstract class OsUtils implements OsUtilsInterface {
         private StreamConsumer() {
         }
 
-        public StreamConsumer(InputStream is, String type, LoggerInterface logger, ArrayList<String> output) {
+        public StreamConsumer(InputStream is, String type, Logger logger, ArrayList<String> output) {
             this.is = is;
             this.logger = logger;
             this.type = type;
@@ -211,7 +220,7 @@ public abstract class OsUtils implements OsUtilsInterface {
                     }
                 }
             } catch (IOException ioe) {
-                logger.severe("Stream consumer terminatated with exception", ioe);
+                logger.error("Stream consumer terminatated with exception", ioe);
             } finally {
                 logger.info("Stream consumer " + type + " terminating ");
             }
@@ -240,7 +249,7 @@ public abstract class OsUtils implements OsUtilsInterface {
                 }
             }
         } catch (Exception e) {
-            logger.warning("Cannot check OS processes", e);
+            logger.warn("Cannot check OS processes", e);
         }
         return results;
     }
@@ -264,7 +273,7 @@ public abstract class OsUtils implements OsUtilsInterface {
             captureStreams(process, "kill", null, null, true);
             process.waitFor();
         } catch (Exception e) {
-            logger.warning("Failed to kill OS process "+ pid, e);
+            logger.warn("Failed to kill OS process " + pid, e);
         }
     }
 

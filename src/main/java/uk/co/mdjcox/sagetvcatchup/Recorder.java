@@ -2,7 +2,9 @@ package uk.co.mdjcox.sagetvcatchup;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import uk.co.mdjcox.logger.LoggerInterface;
+
+import org.slf4j.Logger;
+
 import uk.co.mdjcox.model.Episode;
 import uk.co.mdjcox.model.Recording;
 import uk.co.mdjcox.sagetvcatchup.plugins.Plugin;
@@ -24,12 +26,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Singleton
 public class Recorder {
 
-    private final LoggerInterface logger;
+    private final Logger logger;
     private PluginManager pluginManager;
     private ConcurrentHashMap<String, Recording> currentRecordings = new ConcurrentHashMap<String, Recording>();
 
     @Inject
-    private Recorder(LoggerInterface thelogger, PluginManager pluginManager) {
+    private Recorder(Logger thelogger, PluginManager pluginManager) {
         this.logger = thelogger;
         this.pluginManager = pluginManager;
 

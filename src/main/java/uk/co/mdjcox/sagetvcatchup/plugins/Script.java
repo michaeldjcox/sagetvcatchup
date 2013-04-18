@@ -4,7 +4,8 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
 import org.codehaus.groovy.control.CompilerConfiguration;
-import uk.co.mdjcox.logger.LoggerInterface;
+import org.slf4j.Logger;
+
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
@@ -21,14 +22,14 @@ import java.io.File;
  */
 public abstract class Script {
 
-    private LoggerInterface logger;
+    private Logger logger;
     private String script;
     private HtmlUtilsInterface htmlUtils;
     private DownloadUtilsInterface downloadUtils;
     private OsUtilsInterface osUtils;
     private PropertiesInterface properties;
 
-    protected Script(LoggerInterface logger, String script, HtmlUtilsInterface htmlUtils,
+    protected Script(Logger logger, String script, HtmlUtilsInterface htmlUtils,
                      DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils, PropertiesInterface properties) {
         this.logger = logger;
         this.script = script;
@@ -38,7 +39,7 @@ public abstract class Script {
         this.properties = properties;
     }
 
-    protected LoggerInterface getLogger() {
+    protected Logger getLogger() {
         return logger;
     }
 

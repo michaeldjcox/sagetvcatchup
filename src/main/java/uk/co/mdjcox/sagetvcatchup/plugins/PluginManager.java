@@ -2,8 +2,9 @@ package uk.co.mdjcox.sagetvcatchup.plugins;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import uk.co.mdjcox.logger.LoggerInterface;
-import uk.co.mdjcox.logger.LoggingManager;
+
+import org.slf4j.Logger;
+
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
@@ -21,14 +22,14 @@ import java.util.LinkedHashMap;
 @Singleton
 public class PluginManager {
 
-    private LoggerInterface logger;
+    private Logger logger;
     private PropertiesInterface props;
     private LinkedHashMap<String, Plugin> plugins = new  LinkedHashMap<String, Plugin>();
     @Inject
     private PluginFactory pluginFactory;
 
     @Inject
-    private PluginManager(LoggerInterface logger, PropertiesInterface props) {
+    private PluginManager(Logger logger, PropertiesInterface props) {
         this.logger = logger;
         this.props = props;
     }

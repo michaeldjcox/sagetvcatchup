@@ -3,23 +3,23 @@ package uk.co.mdjcox.sagetvcatchup;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import sage.MediaFileMetadataParser;
-import sage.SageTVPlugin;
-import sage.SageTVPluginRegistry;
-import uk.co.mdjcox.logger.Logger;
-import uk.co.mdjcox.logger.LoggerInterface;
-import uk.co.mdjcox.logger.LoggingManager;
+
+import org.slf4j.Logger;
+
 import uk.co.mdjcox.model.Catalog;
 import uk.co.mdjcox.sagetvcatchup.plugins.PluginManager;
 import uk.co.mdjcox.utils.HtmlUtils;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
-import java.io.File;
-import java.net.URL;
-import java.security.CodeSource;
-import java.security.ProtectionDomain;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+
+import sage.SageTVPlugin;
+import sage.SageTVPluginRegistry;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,7 +37,7 @@ import java.util.concurrent.*;
 
 public class CatchupPlugin implements SageTVPlugin {
 
-    public static LoggerInterface logger;
+    public static Logger logger;
     public static Injector injector;
 
     private SageTVPluginRegistry registry;
@@ -66,7 +66,7 @@ public class CatchupPlugin implements SageTVPlugin {
 
             injector = Guice.createInjector(module);
 
-            logger = injector.getInstance(LoggerInterface.class);
+            logger = injector.getInstance(Logger.class);
 
             logger.info("Starting sagetvcatchup plugin");
 
@@ -105,7 +105,7 @@ public class CatchupPlugin implements SageTVPlugin {
                         server.publish(catalog);
                         sagetvPublisher.publish(catalog);
                     } catch (Exception e) {
-                        logger.severe("Failed to refresh catalog", e);
+                        logger.error("Failed to refresh catalog", e);
                     }
                 }
             } ;
@@ -117,7 +117,7 @@ public class CatchupPlugin implements SageTVPlugin {
                System.err.println("Failed to start sagetvcatchup plugin");
                 e.printStackTrace();
             } else {
-                logger.severe("Failed to start sagetvcatchup plugin", e);
+                logger.error("Failed to start sagetvcatchup plugin", e);
             }
         }
     }
@@ -133,7 +133,7 @@ public class CatchupPlugin implements SageTVPlugin {
                 sagetvPublisher.unpublish();
             }
         } catch (Exception e) {
-            logger.severe("Failed to remove online video properties", e);
+            logger.error("Failed to remove online video properties", e);
         }
 
         try {
@@ -141,7 +141,7 @@ public class CatchupPlugin implements SageTVPlugin {
             registry.eventSubscribe(this, "PlaybackStarted");
             registry.eventSubscribe(this, "PlaybackFinished");
         } catch (Exception e) {
-            logger.severe("Failed to unsubscribe from events", e);
+            logger.error("Failed to unsubscribe from events", e);
         }
 
         try {
@@ -149,7 +149,7 @@ public class CatchupPlugin implements SageTVPlugin {
                 server.stop();
             }
         } catch (Exception e) {
-            logger.severe("Failed to stop podcast", e);
+            logger.error("Failed to stop podcast", e);
         }
     }
 

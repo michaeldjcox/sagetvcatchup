@@ -8,8 +8,13 @@ import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.handler.AbstractHandler;
-import uk.co.mdjcox.logger.LoggerInterface;
-import uk.co.mdjcox.model.*;
+import org.slf4j.Logger;
+
+import uk.co.mdjcox.model.Catalog;
+import uk.co.mdjcox.model.Category;
+import uk.co.mdjcox.model.Episode;
+import uk.co.mdjcox.model.Programme;
+import uk.co.mdjcox.model.SubCategory;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
@@ -28,7 +33,7 @@ import java.util.Map;
 @Singleton
 public class PodcastServer {
 
-    private LoggerInterface logger;
+    private Logger logger;
     private Server server;
     private Handler handler;
     private int port;
@@ -38,7 +43,7 @@ public class PodcastServer {
     private Map<String, Episode> episodes = new HashMap<String, Episode>();
 
     @Inject
-    private PodcastServer(LoggerInterface logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, Recorder recorder) throws Exception {
+    private PodcastServer(Logger logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, Recorder recorder) throws Exception {
         this.logger = logger;
         this.htmlUtils = htmlUtils;
         handler = new AbstractHandler() {
@@ -68,7 +73,7 @@ public class PodcastServer {
         try {
             server.stop();
         } catch (Exception e) {
-            logger.warning("Failed to stop the podcast server", e);
+            logger.warn("Failed to stop the podcast server", e);
         }
     }
 
@@ -263,7 +268,7 @@ public class PodcastServer {
                     }
                 }
             } catch (Exception e) {
-                logger.severe("Failed to build podcast for " + cat, e);
+                logger.error("Failed to build podcast for " + cat, e);
             }
         }
         podcasts = newPodcasts;

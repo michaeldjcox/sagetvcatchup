@@ -1,5 +1,7 @@
 package uk.co.mdjcox.model;
 
+import junit.framework.TestCase;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -7,6 +9,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Map;
 
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -19,9 +23,11 @@ import static org.junit.Assert.assertEquals;
  */
 public class SubCategoryTest {
 
+  private SubCategory subcat;
 
   @Before
   public void before() throws Exception {
+    subcat = new SubCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
   }
 
   @After
@@ -34,9 +40,6 @@ public class SubCategoryTest {
    */
   @Test
   public void testCreate() throws Exception {
-    SubCategory
-        subcat =
-        new SubCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
     assertEquals("id", "id", subcat.getId());
     assertEquals("shortName", "shortName", subcat.getShortName());
     assertEquals("longName", "longName", subcat.getLongName());
@@ -56,17 +59,14 @@ public class SubCategoryTest {
   @Test
   public void testAddGetSubCategory() throws Exception {
     SubCategory
-        cat =
-        new SubCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
-    SubCategory
-        subcat =
+        subsubcat =
         new SubCategory("subCatId", "subShortName", "subLongName", "subServiceUrl", "subIconUrl",
                         "id");
-    cat.addSubCategory(subcat);
-    Map<String, Category> result = cat.getSubCategories();
+    subcat.addSubCategory(subsubcat);
+    Map<String, Category> result = subcat.getSubCategories();
     assertEquals("Number of subcategories", 1, result.size());
     assertArrayEquals("Subcategory key set", new String[]{"subCatId"}, result.keySet().toArray());
-    assertArrayEquals("Subcategory values", new Category[]{subcat}, result.values().toArray());
+    assertArrayEquals("Subcategory values", new Category[]{subsubcat}, result.values().toArray());
 
   }
 
@@ -76,15 +76,12 @@ public class SubCategoryTest {
    */
   @Test
   public void testAddGetOtherParentId() throws Exception {
-    SubCategory
-        cat =
-        new SubCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
-    cat.addOtherParentId("parentId2");
-    ArrayList<String> result = cat.getOtherParentIds();
+    subcat.addOtherParentId("parentId2");
+    ArrayList<String> result = subcat.getOtherParentIds();
     assertEquals("Number of other parentIds #1", 1, result.size());
     assertArrayEquals("Other parents #1", new String[]{"parentId2"}, result.toArray());
-    cat.addOtherParentId("parentId3");
-    result = cat.getOtherParentIds();
+    subcat.addOtherParentId("parentId3");
+    result = subcat.getOtherParentIds();
     assertEquals("Number of other parentIds #2", 2, result.size());
     assertArrayEquals("Other parents #2", new String[]{"parentId2", "parentId3"}, result.toArray());
   }
@@ -98,5 +95,53 @@ public class SubCategoryTest {
 //TODO: Test goes here... 
   }
 
+  /**
+   *
+   * Method: isSource()
+   *
+   */
+  @Test
+  public void testIsSource() throws Exception {
+    assertFalse("This category is not a Source", subcat.isSource());
+  }
 
+  /**
+   *
+   * Method: isSubCategory()
+   *
+   */
+  @Test
+  public void testIsSubCategory() throws Exception {
+    assertTrue("This category is not a SubCategory", subcat.isSubCategory());
+  }
+
+  /**
+   *
+   * Method: isProgrammeCategory()
+   *
+   */
+  @Test
+  public void testIsProgrammeCategory() throws Exception {
+    assertFalse("This category is not a Programme", subcat.isProgrammeCategory());
+  }
+
+  /**
+   *
+   * Method: isRoot()
+   *
+   */
+  @Test
+  public void testIsRoot() throws Exception {
+    assertFalse("This category is not the Root", subcat.isRoot());
+  }
+
+  /**
+   *
+   * Method: toString()
+   *
+   */
+  @Test
+  public void testToString() throws Exception {
+    TestCase.assertEquals("Category toString should be the id", subcat.getId(), subcat.toString());
+  }
 } 
