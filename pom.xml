@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -38,6 +39,22 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.6.2.201302030002</version>
+                <executions>
+                    <execution>
+                        <id>jacoco-initialize</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-site</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
             </plugin>
             <plugin>
                 <groupId>com.google.code.maven-replacer-plugin</groupId>
@@ -109,11 +126,14 @@
                         </replacement>
                         <replacement>
                             <token>_LOCATION_</token>
-                            <value><![CDATA[http://localhost/sagetvcatchup/${project.version}/${project.artifactId}-${project.version}-plugin.zip]]></value>
+                            <value>
+                                <![CDATA[http://localhost/sagetvcatchup/${project.version}/${project.artifactId}-${project.version}-plugin.zip]]></value>
                         </replacement>
                         <replacement>
                             <token>_MD5_</token>
-                            <valueFile>${settings.localRepository}/uk/co/mdjcox/${project.artifactId}/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}-plugin.zip.md5</valueFile>
+                            <valueFile>
+                                ${settings.localRepository}/uk/co/mdjcox/${project.artifactId}/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}-plugin.zip.md5
+                            </valueFile>
                         </replacement>
                     </replacements>
                 </configuration>
