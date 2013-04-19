@@ -695,6 +695,13 @@ public void testGetPodcastTitle() throws Exception {
                                 "airTime", "channel", "category");
   assertEquals("getPodcastTitle", "episodeTitle - series - episode", episode.getPodcastTitle());
 
+  episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle", "1",
+                        "2", "descripton", "iconUrl", "serviceUrl", "airDate",
+                        "airTime", "channel", "category");
+  assertEquals("getPodcastTitle", "episodeTitle - Series 1 - Episode 2", episode.getPodcastTitle());
+
+
+
   episode = new Episode("sourceId", "id", "programmeTitle", "", "series",
                         "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
                         "airTime", "channel", "category");
@@ -709,6 +716,16 @@ public void testGetPodcastTitle() throws Exception {
                         "", "descripton", "iconUrl", "serviceUrl", "airDate",
                         "airTime", "channel", "category");
   assertEquals("getPodcastTitle", "episodeTitle - series", episode.getPodcastTitle());
+
+  episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle", "",
+                        "", "descripton", "iconUrl", "serviceUrl", "airDate",
+                        "airTime", "channel", "category");
+  assertEquals("getPodcastTitle", "episodeTitle", episode.getPodcastTitle());
+
+  episode = new Episode("sourceId", "id", "programmeTitle", "", "",
+                        "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
+                        "airTime", "channel", "category");
+  assertEquals("getPodcastTitle", "programmeTitle - episode", episode.getPodcastTitle());
 }
 
 /** 
