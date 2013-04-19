@@ -1,10 +1,12 @@
 package uk.co.mdjcox.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import com.google.common.collect.ImmutableList;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,10 +23,10 @@ public class Catalog {
     }
 
     public final List<Category> getCategories() {
-      return Collections.unmodifiableList(new ArrayList<Category>(categories.values()));
+      return ImmutableList.copyOf(categories.values());
     }
 
     public final void setCategories(Map<String, Category> categoryMap) {
-       this.categories = new LinkedHashMap<String, Category>(categoryMap);
+       this.categories = new LinkedHashMap<String, Category>(checkNotNull(categoryMap));
     }
 }

@@ -1,6 +1,11 @@
 package uk.co.mdjcox.model;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import java.util.*;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,8 +19,6 @@ public class SubCategory extends Category {
     private ArrayList<String> otherParentIds = new ArrayList<String>();
     private HashMap<String, Category> subCategories = new LinkedHashMap<String, Category>();
 
-
-
     public SubCategory(String id, String categoryShortName, String categoryLongName,
                        String serviceUrl, String iconUrl,
                        String parentId) {
@@ -23,19 +26,19 @@ public class SubCategory extends Category {
     }
 
     public void addSubCategory(Category subCategory) {
-        subCategories.put(subCategory.getId(), subCategory);
+        subCategories.put(subCategory.getId(), checkNotNull(subCategory));
     }
 
     public Map<String, Category> getSubCategories() {
-        return subCategories;
+        return ImmutableMap.copyOf(subCategories);
     }
 
     public void addOtherParentId(String parentId) {
-        otherParentIds.add(parentId);
+        otherParentIds.add(checkNotNull(parentId));
     }
 
-    public ArrayList<String> getOtherParentIds() {
-        return otherParentIds;
+    public List<String> getOtherParentIds() {
+        return ImmutableList.copyOf(otherParentIds);
     }
 
 }

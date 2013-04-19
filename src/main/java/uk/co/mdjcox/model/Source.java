@@ -9,10 +9,6 @@ package uk.co.mdjcox.model;
  */
 public class Source extends SubCategory {
 
-    public Source() {
-        super("", "", "", "", "", "");
-    }
-
     public Source(String id, String shortName, String longName,
                   String serviceUrl, String iconUrl) {
         super(id, shortName, longName, serviceUrl, iconUrl, "");

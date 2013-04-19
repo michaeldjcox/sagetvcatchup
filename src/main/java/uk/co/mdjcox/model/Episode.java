@@ -1,5 +1,7 @@
 package uk.co.mdjcox.model;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Created with IntelliJ IDEA.
  * User: michael
@@ -8,34 +10,34 @@ package uk.co.mdjcox.model;
  * To change this template use File | Settings | File Templates.
  */
 public class Episode {
-    private String sourceId;
-    private String id;
-    private String programmeTitle;
-    private String episodeTitle;
-    private String series;
-    private String episode;
-    private String description;
-    private String iconUrl;
-    private String serviceUrl;
-    private String airDate;
-    private String airTime;
-    private String channel;
-    private String category;
+    private String sourceId="";
+    private String id="";
+    private String programmeTitle="";
+    private String episodeTitle="";
+    private String series="";
+    private String episode="";
+    private String description="";
+    private String iconUrl="";
+    private String serviceUrl="";
+    private String airDate="";
+    private String airTime="";
+    private String channel="";
+    private String category="";
 
     public Episode(String sourceId, String id, String programmeTitle, String episodeTitle, String series, String episode, String description, String iconUrl, String serviceUrl, String airDate, String airTime, String channel, String category) {
-        this.sourceId = sourceId;
-        this.id = id;
-        this.programmeTitle = programmeTitle;
-        this.episodeTitle = episodeTitle;
-        this.series = series;
-        this.episode = episode;
-        this.description = description;
-        this.iconUrl = iconUrl;
-        this.serviceUrl = serviceUrl;
-        this.airDate = airDate;
-        this.airTime = airTime;
-        this.channel = channel;
-        this.category = category;
+        this.sourceId = checkNotNull(sourceId);
+        this.id = checkNotNull(id);
+        this.programmeTitle = checkNotNull(programmeTitle);
+        this.episodeTitle = checkNotNull(episodeTitle);
+        this.series = checkNotNull(series);
+        this.episode = checkNotNull(episode);
+        this.description = checkNotNull(description);
+        this.iconUrl = checkNotNull(iconUrl);
+        this.serviceUrl = checkNotNull(serviceUrl);
+        this.airDate = checkNotNull(airDate);
+        this.airTime = checkNotNull(airTime);
+        this.channel = checkNotNull(channel);
+        this.category = checkNotNull(category);
     }
 
     public String getSourceId() {
@@ -43,7 +45,7 @@ public class Episode {
     }
 
     public void setSourceId(String sourceId) {
-        this.sourceId = sourceId;
+        this.sourceId = checkNotNull(sourceId);
     }
 
     public String getId() {
@@ -51,7 +53,7 @@ public class Episode {
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.id = checkNotNull(id);
     }
 
     public String getAirDate() {
@@ -59,7 +61,7 @@ public class Episode {
     }
 
     public void setAirDate(String airDate) {
-        this.airDate = airDate;
+        this.airDate = checkNotNull(airDate);
     }
 
     public String getAirTime() {
@@ -67,7 +69,7 @@ public class Episode {
     }
 
     public void setAirTime(String airTime) {
-        this.airTime = airTime;
+        this.airTime = checkNotNull(airTime);
     }
 
     public String getProgrammeTitle() {
@@ -75,23 +77,23 @@ public class Episode {
     }
 
     public void setProgrammeTitle(String programmeTitle) {
-        this.programmeTitle = programmeTitle;
+        this.programmeTitle = checkNotNull(programmeTitle);
     }
 
     public void setEpisodeTitle(String episodeTitle) {
-        this.episodeTitle = episodeTitle;
+        this.episodeTitle = checkNotNull(episodeTitle);
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = checkNotNull(description);
     }
 
     public void setIconUrl(String iconUrl) {
-        this.iconUrl = iconUrl;
+        this.iconUrl = checkNotNull(iconUrl);
     }
 
     public void setServiceUrl(String serviceUrl) {
-        this.serviceUrl = serviceUrl;
+        this.serviceUrl = checkNotNull(serviceUrl);
     }
 
     public String getIconUrl() {
@@ -115,7 +117,7 @@ public class Episode {
     }
 
     public void setChannel(String channel) {
-        this.channel = channel;
+        this.channel = checkNotNull(channel);
     }
 
     public String getCategory() {
@@ -123,7 +125,7 @@ public class Episode {
     }
 
     public void setCategory(String category) {
-        this.category = category;
+        this.category = checkNotNull(category);
     }
 
     public String getSeries() {
@@ -131,7 +133,7 @@ public class Episode {
     }
 
     public void setSeries(String series) {
-        this.series = series;
+        this.series = checkNotNull(series);
     }
 
     public String getEpisode() {
@@ -139,7 +141,7 @@ public class Episode {
     }
 
     public void setEpisode(String episode) {
-        this.episode = episode;
+        this.episode = checkNotNull(episode);
     }
 
     public String getPodcastTitle() {

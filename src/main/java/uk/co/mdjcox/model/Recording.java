@@ -2,6 +2,8 @@ package uk.co.mdjcox.model;
 
 import java.io.File;
 
+import static com.google.inject.internal.util.$Preconditions.checkNotNull;
+
 /**
  * Created with IntelliJ IDEA.
  * User: michael
@@ -14,7 +16,7 @@ public class Recording {
     private Episode episode;
 
     public Recording(Episode episode) {
-        this.episode = episode;
+      this.episode = checkNotNull(episode);
     }
 
     public File getFile() {
@@ -22,7 +24,7 @@ public class Recording {
     }
 
     public void setFile(File file) {
-        this.file = file;
+        this.file = checkNotNull(file);
     }
 
     public String getSourceId() {

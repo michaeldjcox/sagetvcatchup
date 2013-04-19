@@ -7,6 +7,7 @@ import org.junit.After;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
 
 /** 
 * Source Tester. 
@@ -17,14 +18,9 @@ import static junit.framework.TestCase.assertTrue;
 */ 
 public class SourceTest { 
 
-  private Source category;
-  private Source category2;
 
   @Before
 public void before() throws Exception {
-  category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
-  category2 = new Source();
-
   }
 
 @After
@@ -38,8 +34,8 @@ public void after() throws Exception {
    */
   @Test
   public void testGetId() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     assertEquals("getId", "id", category.getId());
-    assertEquals("getId", "", category2.getId());
 
   }
 
@@ -50,8 +46,17 @@ public void after() throws Exception {
    */
   @Test
   public void testSetId() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     category.setId("id2");
     assertEquals("setId", "id2", category.getId());
+
+    try {
+      category.setId(null);
+    } catch (NullPointerException e) {
+      return;
+    }
+
+    fail("Should have thrown NullPointerException");
   }
 
   /**
@@ -61,8 +66,8 @@ public void after() throws Exception {
    */
   @Test
   public void testGetShortName() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     assertEquals("getShortName", "shortName", category.getShortName());
-    assertEquals("getShortName", "", category2.getShortName());
   }
 
   /**
@@ -72,8 +77,16 @@ public void after() throws Exception {
    */
   @Test
   public void testSetShortName() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     category.setShortName("shortName2");
     assertEquals("getShortName", "shortName2", category.getShortName());
+    try {
+      category.setShortName(null);
+    } catch (NullPointerException e) {
+      return;
+    }
+
+    fail("Should have thrown NullPointerException");
   }
 
   /**
@@ -83,8 +96,8 @@ public void after() throws Exception {
    */
   @Test
   public void testGetLongName() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     assertEquals("getLongName", "longName", category.getLongName());
-    assertEquals("getLongName", "", category2.getLongName());
   }
 
   /**
@@ -94,8 +107,16 @@ public void after() throws Exception {
    */
   @Test
   public void testSetLongName() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     category.setLongName("longName2");
     assertEquals("setLongName", "longName2", category.getLongName());
+    try {
+      category.setLongName(null);
+    } catch (NullPointerException e) {
+      return;
+    }
+
+    fail("Should have thrown NullPointerException");
   }
 
   /**
@@ -105,8 +126,8 @@ public void after() throws Exception {
    */
   @Test
   public void testGetServiceUrl() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     assertEquals("getServiceUrl", "serviceUrl", category.getServiceUrl());
-    assertEquals("getServiceUrl", "", category2.getServiceUrl());
   }
 
   /**
@@ -116,9 +137,16 @@ public void after() throws Exception {
    */
   @Test
   public void testSetServiceUrl() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     category.setServiceUrl("serviceUrl2");
     assertEquals("setServiceUrl", "serviceUrl2", category.getServiceUrl());
-  }
+    try {
+      category.setServiceUrl(null);
+    } catch (NullPointerException e) {
+      return;
+    }
+
+    fail("Should have thrown NullPointerException");  }
 
   /**
    *
@@ -127,8 +155,8 @@ public void after() throws Exception {
    */
   @Test
   public void testGetIconUrl() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     assertEquals("getIconUrl", "iconUrl", category.getIconUrl());
-    assertEquals("getIconUrl", "", category2.getIconUrl());
   }
 
   /**
@@ -138,8 +166,16 @@ public void after() throws Exception {
    */
   @Test
   public void testSetIconUrl() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     category.setIconUrl("iconUrl2");
     assertEquals("setIconUrl", "iconUrl2", category.getIconUrl());
+    try {
+      category.setIconUrl(null);
+    } catch (NullPointerException e) {
+      return;
+    }
+
+    fail("Should have thrown NullPointerException");
   }
 
   /**
@@ -149,8 +185,8 @@ public void after() throws Exception {
    */
   @Test
   public void testGetParentId() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     assertEquals("getParentId", "", category.getParentId());
-    assertEquals("getParentId", "", category2.getParentId());
   }
 
   /**
@@ -160,9 +196,16 @@ public void after() throws Exception {
    */
   @Test
   public void testSetParentId() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     category.setParentId("parentId2");
     assertEquals("setParentId", "parentId2", category.getParentId());
-  }
+    try {
+      category.setParentId(null);
+    } catch (NullPointerException e) {
+      return;
+    }
+
+    fail("Should have thrown NullPointerException");  }
 
   /**
    *
@@ -171,6 +214,7 @@ public void after() throws Exception {
    */
   @Test
   public void testIsSource() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     assertTrue("This category is not a Source", category.isSource());
   }
 
@@ -181,6 +225,7 @@ public void after() throws Exception {
    */
   @Test
   public void testIsSubCategory() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     assertTrue("This category is not a SubCategory", category.isSubCategory());
   }
 
@@ -191,6 +236,7 @@ public void after() throws Exception {
    */
   @Test
   public void testIsProgrammeCategory() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     assertFalse("This category is not a Programme", category.isProgrammeCategory());
   }
 
@@ -201,6 +247,7 @@ public void after() throws Exception {
    */
   @Test
   public void testIsRoot() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     assertFalse("This category is the Root", category.isRoot());
   }
 
@@ -211,6 +258,7 @@ public void after() throws Exception {
    */
   @Test
   public void testToString() throws Exception {
+    Source category = new Source("id", "shortName", "longName", "serviceUrl", "iconUrl");
     assertEquals("Category toString should be the id", category.getId(), category.toString());
   }
 

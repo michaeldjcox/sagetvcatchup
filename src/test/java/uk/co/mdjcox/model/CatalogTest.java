@@ -1,15 +1,14 @@
 package uk.co.mdjcox.model;
 
-import org.junit.Test;
-import org.junit.Before;
 import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 import static junit.framework.TestCase.assertEquals;
 
 /**
@@ -86,6 +85,25 @@ public class CatalogTest {
 
     List<Category> results = catalog.getCategories();
     assertEquals("Results contain one entry", 1, results.size());
+  }
+
+  @Test
+  public void testSetCategoriesNull() throws Exception {
+
+    // Test the simple came of inserting one entry
+    Catalog catalog = new Catalog();
+    SubCategory
+        cat =
+        new SubCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+
+    try {
+      catalog.setCategories(null);
+    } catch (NullPointerException e) {
+      return;
+    }
+
+    fail("Should have thrown NullPointerException");
+
   }
 
   @Test

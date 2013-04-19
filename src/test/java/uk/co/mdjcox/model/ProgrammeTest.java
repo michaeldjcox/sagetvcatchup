@@ -1,15 +1,12 @@
-package uk.co.mdjcox.model; 
+package uk.co.mdjcox.model;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
-import org.junit.Before; 
 import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import static junit.framework.Assert.fail;
 import static junit.framework.TestCase.assertEquals;
 
 /** 
@@ -63,7 +60,7 @@ public void testAddEpisode() throws Exception {
   public void testGetEpisodesImmutabilityTest() throws Exception {
     Programme subcat = new Programme("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
-    HashMap<String, Episode> episodes = subcat.getEpisodes();
+    Map<String, Episode> episodes = subcat.getEpisodes();
 
     assertEquals("Episodes should number 0", 0, episodes.size());
 
@@ -71,11 +68,14 @@ public void testAddEpisode() throws Exception {
                                   "episode2", "descripton2", "iconUrl2", "serviceUrl2", "airDate2",
                                   "airTime2", "channel2", "category2");
 
-    episodes.put("id2", episode2);
+    try {
+      episodes.put("id2", episode2);
+    } catch (UnsupportedOperationException e) {
+      return;
+    }
 
-    episodes = subcat.getEpisodes();
+    fail("Should have thrown UnsupportedOperationException");
 
-    assertEquals("Episodes should number 0", 0, episodes.size());
   }
 
   /**
@@ -117,7 +117,7 @@ public void testGetEpisodes() throws Exception {
 
   assertEquals("Episodes should number 1", 1, subcat.getEpisodes().size());
 
-  HashMap<String, Episode> episodes = subcat.getEpisodes();
+  Map<String, Episode> episodes = subcat.getEpisodes();
 
   assertEquals("Episode found should match that entered", episode,
                episodes.entrySet().iterator().next().getValue());

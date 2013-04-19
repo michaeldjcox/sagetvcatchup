@@ -219,7 +219,7 @@ public class PodcastServer {
 
         if (service.isProgrammeCategory()) {
             Programme programme = (Programme) service;
-            HashMap<String, Episode> episodes = programme.getEpisodes();
+            Map<String, Episode> episodes = programme.getEpisodes();
             for (Episode episode : episodes.values()) {
                 resultStr += "<item>" + CRLF;
                 resultStr += "<title>" + htmlUtils.makeContentSafe(episode.getPodcastTitle()) + "</title>" + CRLF;

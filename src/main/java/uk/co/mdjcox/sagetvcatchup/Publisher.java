@@ -8,11 +8,15 @@ import org.slf4j.Logger;
 import uk.co.mdjcox.model.Catalog;
 import uk.co.mdjcox.model.Category;
 import uk.co.mdjcox.model.SubCategory;
-import uk.co.mdjcox.utils.*;
+import uk.co.mdjcox.utils.CustomOnlineLabelsPropertyLayout;
+import uk.co.mdjcox.utils.CustomOnlineLinksPropertyLayout;
+import uk.co.mdjcox.utils.HtmlUtilsInterface;
+import uk.co.mdjcox.utils.PropertiesFile;
+import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Singleton
 public class Publisher {
@@ -119,7 +123,7 @@ public class Publisher {
 
     }
 
-    private void addPodcast(String category, String subCat, String url, PropertiesFile links, ArrayList<String> otherSubCats) {
+    private void addPodcast(String category, String subCat, String url, PropertiesFile links, List<String> otherSubCats) {
         category = htmlUtils.makeIdSafe(category);
         subCat = htmlUtils.makeIdSafe(subCat);
 

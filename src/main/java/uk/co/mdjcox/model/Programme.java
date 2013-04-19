@@ -1,6 +1,9 @@
 package uk.co.mdjcox.model;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,7 +28,7 @@ public class Programme extends SubCategory {
         episodes.remove(episode.getServiceUrl());
     }
 
-    public HashMap<String, Episode> getEpisodes() {
-        return new HashMap(episodes);
+    public Map<String, Episode> getEpisodes() {
+      return ImmutableMap.copyOf(episodes);
     }
 }
