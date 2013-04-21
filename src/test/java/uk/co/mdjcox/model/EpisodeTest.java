@@ -695,12 +695,31 @@ public void testGetPodcastTitle() throws Exception {
                                 "airTime", "channel", "category");
   assertEquals("getPodcastTitle", "episodeTitle - series - episode", episode.getPodcastTitle());
 
+  episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle", "Series",
+                        "Episode", "descripton", "iconUrl", "serviceUrl", "airDate",
+                        "airTime", "channel", "category");
+  assertEquals("getPodcastTitle", "episodeTitle - Series - Episode", episode.getPodcastTitle());
+
+  episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle", "A",
+                        "A", "descripton", "iconUrl", "serviceUrl", "airDate",
+                        "airTime", "channel", "category");
+  assertEquals("getPodcastTitle", "episodeTitle - A - A", episode.getPodcastTitle());
+
   episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle", "1",
                         "2", "descripton", "iconUrl", "serviceUrl", "airDate",
                         "airTime", "channel", "category");
   assertEquals("getPodcastTitle", "episodeTitle - Series 1 - Episode 2", episode.getPodcastTitle());
 
+  episode = new Episode("sourceId", "id", "programmeTitle", "", "",
+                        "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
+                        "airTime", "channel", "category");
+  assertEquals("getPodcastTitle", "programmeTitle - episode", episode.getPodcastTitle());
 
+
+  episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle", "",
+                        "", "descripton", "iconUrl", "serviceUrl", "airDate",
+                        "airTime", "channel", "category");
+  assertEquals("getPodcastTitle", "episodeTitle", episode.getPodcastTitle());
 
   episode = new Episode("sourceId", "id", "programmeTitle", "", "series",
                         "episode", "descripton", "iconUrl", "serviceUrl", "airDate",

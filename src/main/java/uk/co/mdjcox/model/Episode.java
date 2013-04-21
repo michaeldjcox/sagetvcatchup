@@ -150,17 +150,17 @@ public class Episode {
         String series = getSeries();
         String episodeNr = getEpisode();
         String title = episodeTitle;
-        if (title == null || title.isEmpty()) {
+        if (title.isEmpty()) {
             title = programmeTitle;
         }
-        if (series != null && !series.isEmpty()) {
+        if (!series.isEmpty()) {
             if (series.startsWith("Series") || series.startsWith("series") || !Character.isDigit(series.charAt(0))) {
                 title += " - " + series;
             } else {
                 title += " - Series " + series;
             }
         }
-        if (episodeNr != null && !episodeNr.isEmpty()) {
+        if (!episodeNr.isEmpty()) {
 
             if (episodeNr.startsWith("Episode") || episodeNr.startsWith("episode") || !Character.isDigit(episodeNr.charAt(0))) {
                 title += " - " + episodeNr;
