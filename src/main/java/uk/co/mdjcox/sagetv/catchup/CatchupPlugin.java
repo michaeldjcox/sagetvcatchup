@@ -2,6 +2,7 @@ package uk.co.mdjcox.sagetv.catchup;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 
 import org.slf4j.Logger;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.onlinevideo.Publisher;
+import uk.co.mdjcox.sagetv.onlinevideo.PublisherFactory;
 import uk.co.mdjcox.utils.HtmlUtils;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
@@ -47,7 +49,8 @@ public class CatchupPlugin implements SageTVPlugin {
     private ScheduledExecutorService service;
     private Publisher sagetvPublisher;
 
-    public CatchupPlugin(sage.SageTVPluginRegistry registry) {
+  @Inject
+  public CatchupPlugin(sage.SageTVPluginRegistry registry) {
         this.registry = registry;
     }
 
@@ -91,7 +94,13 @@ public class CatchupPlugin implements SageTVPlugin {
             PluginManager pluginManager = injector.getInstance(PluginManager.class);
             final Cataloger harvester = injector.getInstance(Cataloger.class);
             server = injector.getInstance(PodcastServer.class);
-            sagetvPublisher = injector.getInstance(Publisher.class);
+
+            String fileName = props.getString("fileName");
+            String STV = props.getString("STV");
+
+            PublisherFactory publisherFactory =  injector.getInstance(PublisherFactory.class);
+            sagetvPublisher = publisherFactory.createPublisher(fileName, STV);
+
             Recorder recorder = injector.getInstance(Recorder.class);
 
             pluginManager.load();

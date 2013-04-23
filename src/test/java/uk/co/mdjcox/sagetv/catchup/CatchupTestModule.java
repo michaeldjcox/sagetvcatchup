@@ -46,7 +46,7 @@ public class CatchupTestModule extends AbstractModule {
     @Singleton
     public Logger providesLogger() throws Exception {
       if (logger == null) {
-        System.setProperty("logback.configurationFile", "/home/michael/Documents/catchup/src/main/config/logback-test.xml");
+        System.setProperty("logback.configurationFile", "/home/michael/Documents/sagetvcatchup/src/main/config/logback-test.xml");
         logger = LoggerFactory.getLogger(this.getClass());
       }
         return logger;

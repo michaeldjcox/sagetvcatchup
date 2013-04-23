@@ -1,5 +1,5 @@
 /**
- * CustomOnlineLabelsPropertyLayout.java
+ * LabelsPropertyLayout.java
  * Author: Michael Cox
  * Date: 27-Jan-2009
  * Time: 18:09:14
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Properties;
 
 
-public class CustomOnlineLabelsPropertyLayout extends PropertiesFileLayout {
+public class LabelsPropertyLayout extends PropertiesFileLayout {
 
     private static final String HEADER =
             "# =============================================================================="

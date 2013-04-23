@@ -1,5 +1,7 @@
 package uk.co.mdjcox.sagetv.model;
 
+import junit.framework.TestCase;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -142,5 +144,37 @@ public void testGetEpisodes() throws Exception {
 
 }
 
+  /**
+   *
+   * Method: getPodcastUrl()
+   *
+   */
+  @Test
+  public void testGetPodcastUrl() throws Exception {
+    Programme subcat = new Programme("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+    subcat.setPodcastUrl("podcastUrl");
+    assertEquals("getPodcastUrl", "podcastUrl", subcat.getPodcastUrl());
+  }
+
+  /**
+   *
+   * Method: setPodcastUrl(String podcastUrl)
+   *
+   */
+  @Test
+  public void testSetPodcastUrl() throws Exception {
+    Programme subcat = new Programme("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+    subcat.setPodcastUrl("podcastUrl");
+
+    assertEquals("setPodcastUrl", "podcastUrl", subcat.getPodcastUrl());
+
+    try {
+      subcat.setPodcastUrl(null);
+    } catch (NullPointerException e) {
+      return;
+    }
+
+    TestCase.fail("Should have thrown NullPointerException");
+  }
 
 } 

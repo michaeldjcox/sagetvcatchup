@@ -1,5 +1,5 @@
 /**
- * CustomOnlineLinksPropertyLayout.java
+ * LinksPropertyLayout.java
  * Author: Michael Cox
  * Date: 27-Jan-2009
  * Time: 18:09:14
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Properties;
 
 
-public class CustomOnlineLinksPropertyLayout extends PropertiesFileLayout {
+public class LinksPropertyLayout extends PropertiesFileLayout {
 
     private final static String HEADER =
             "# =============================================================================="

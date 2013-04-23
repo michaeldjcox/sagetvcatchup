@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.ScriptFactory;
+import uk.co.mdjcox.sagetv.onlinevideo.PublisherFactory;
 import uk.co.mdjcox.utils.DownloadUtils;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtils;
@@ -39,6 +40,8 @@ public class CatchupModule extends AbstractModule {
                 .build(ScriptFactory.class));
         install(new FactoryModuleBuilder()
                 .build(PluginFactory.class));
+      install(new FactoryModuleBuilder()
+                  .build(PublisherFactory.class));
     }
 
     @Provides

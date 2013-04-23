@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.ScriptFactory;
+import uk.co.mdjcox.sagetv.onlinevideo.PublisherFactory;
 import uk.co.mdjcox.utils.*;
 
 import java.io.File;
@@ -32,13 +33,15 @@ public class CatchupDevModule extends AbstractModule {
                 .build(ScriptFactory.class));
         install(new FactoryModuleBuilder()
                 .build(PluginFactory.class));
+      install(new FactoryModuleBuilder()
+                  .build(PublisherFactory.class));
     }
 
     @Provides
     @Singleton
     public Logger providesLogger() throws Exception {
         if (logger == null) {
-          System.setProperty("logback.configurationFile", "/home/michael/Documents/catchup/src/main/config/logback-test.xml");
+          System.setProperty("logback.configurationFile", "/home/michael/Documents/sagetvcatchup/src/main/config/logback-test.xml");
             logger = LoggerFactory.getLogger(CatchupPlugin.class);
         }
         return logger;
@@ -50,8 +53,8 @@ public class CatchupDevModule extends AbstractModule {
         String base = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "config" + File.separator + "catchup.properties";
         if (properties == null) {
             properties =  new PropertiesFile(base, true);
-            properties.setProperty("recordingDir", "/home/michael/Documents/catchup/recordings");
-            properties.setProperty("pluginDir", "/home/michael/Documents/catchup/src/main/plugins");
+            properties.setProperty("recordingDir", "/home/michael/Documents/sagetvcatchup/recordings");
+            properties.setProperty("pluginDir", "/home/michael/Documents/sagetvcatchup/src/main/plugins");
             properties.setProperty("podcasterPort", "8082");
         }
         return properties;

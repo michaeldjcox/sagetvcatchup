@@ -74,6 +74,7 @@ details2 = MOVE_TO("<meta name=\"seriesNumber\"", details)
 details2 = MOVE_TO("content=\"", details2)
 String seriesNumber = EXTRACT_TO("\"", details2)
 seriesNumber = REMOVE_HTML_TAGS(seriesNumber);
+if (seriesNumber == null) seriesNumber = "";
 episode.setSeries(seriesNumber);
 LOG_INFO("Series: " + seriesNumber)
 
@@ -82,6 +83,7 @@ details2 = MOVE_TO("<meta name=\"episodeSequenceNumber\"", details)
 details2 = MOVE_TO("content=\"", details2)
 String episodeNo = EXTRACT_TO("\"", details2)
 episodeNo = REMOVE_HTML_TAGS(episodeNo);
+if (episodeNo == null) episodeNo = "";
 episode.setEpisode(episodeNo);
 LOG_INFO("Episode: " + episodeNo)
 
