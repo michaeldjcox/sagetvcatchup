@@ -1,6 +1,6 @@
 package ITVPlayer
 
-String outDir = GET_STRING_PROPERTY("recordingDir", "/opt/sagetv/server/sagetvcatchup/recordings");
+String outDir = GET_STRING_PROPERTY("recordingDir", "/opt/sagetv/server/catchup/recordings");
 String filename = outDir + File.separator + recording.getId() + ".flv"
 
 String command = "get_flash_videos -y -f " + filename + " " + recording.getUrl() ;

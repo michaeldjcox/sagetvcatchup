@@ -1,6 +1,6 @@
 package Iplayer
 
-String outDir = GET_STRING_PROPERTY("recordingDir", "/opt/sagetv/server/sagetvcatchup/recordings");
+String outDir = GET_STRING_PROPERTY("recordingDir", "/opt/sagetv/server/catchup/recordings");
 String command = "get_iplayer " + recording.getUrl() + " --force -o " + outDir + File.separator;
 ArrayList<String> output = new ArrayList<String>();
 EXECUTE(command, "record", output, null);

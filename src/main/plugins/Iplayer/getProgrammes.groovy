@@ -1,6 +1,6 @@
 package Iplayer
 
-import uk.co.mdjcox.model.Programme
+import uk.co.mdjcox.sagetv.model.Programme
 
 String str = GET_WEB_PAGE(url);
 
