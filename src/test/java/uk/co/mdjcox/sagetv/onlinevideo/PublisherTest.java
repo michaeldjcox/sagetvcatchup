@@ -7,6 +7,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import sun.nio.ch.FileChannelImpl;
+
 import uk.co.mdjcox.sagetv.catchup.CatchupTestModule;
 import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.model.Episode;
@@ -17,7 +19,12 @@ import uk.co.mdjcox.sagetv.model.SubCategory;
 import uk.co.mdjcox.utils.PropertiesFile;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Method;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -121,6 +128,31 @@ public class PublisherTest {
 
     assertFalse("Link file not should exist after test", linkFile.exists());
     assertFalse("Label file not should exist after test", labelFile.exists());
+
+    // Should also work if there is nothing to do
+
+    publisher.unpublish();
+
+    assertFalse("Link file not should exist after test", linkFile.exists());
+    assertFalse("Label file not should exist after test", labelFile.exists());
+
+    linkFile = new File(linkFileName);
+    labelFile = new File(labelFileName);
+
+    if (!linkFile.exists()) linkFile.createNewFile();
+    if (!labelFile.exists()) labelFile.createNewFile();
+
+
+      try {
+        System.setProperty("inTest", "true");
+        publisher.unpublish();
+      } catch (Throwable ex) {
+        return;
+      } finally {
+        System.setProperty("inTest", "false");
+      }
+
+    fail("Should have thrown an exception");
   }
 
   /**
@@ -270,8 +302,8 @@ public class PublisherTest {
     Object result = method.invoke(publisher, "test");
     assertEquals("getLinkFile()", "/tmp/OnlineVideos/CustomOnlineVideoLinks_test.properties", result);
 
-    method.invoke(publisher, "");
-    assertEquals("getLinkFile()", "/tmp/OnlineVideos/CustomOnlineVideoLinks_test.properties", result);
+    result =method.invoke(publisher, "");
+    assertEquals("getLinkFile()", "/tmp/OnlineVideos/CustomOnlineVideoLinks.properties", result);
 
   }
 
@@ -283,7 +315,11 @@ public class PublisherTest {
     Method method = Publisher.class.getDeclaredMethod("getLabelFile", String.class);
     method.setAccessible(true);
     Object result = method.invoke(publisher, "test");
-    assertEquals("getLinkFile()", "/tmp/OnlineVideos/CustomOnlineVideoUIText_test.properties", result);
+    assertEquals("getLabelFile()", "/tmp/OnlineVideos/CustomOnlineVideoUIText_test.properties", result);
+
+    result = method.invoke(publisher, "");
+    assertEquals("getLabelFile()", "/tmp/OnlineVideos/CustomOnlineVideoUIText.properties", result);
+
   }
 
   /**

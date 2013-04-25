@@ -69,7 +69,8 @@ public class Publisher {
    * @throws Exception if there was a problem deleting the files
    */
   public void unpublish() throws Exception {
-    boolean success = true;
+    boolean success = !Boolean.getBoolean("inTest");
+
     String linkFileName = getLinkFile(qualifier);
     String labelFileName = getLabelFile(qualifier);
 
