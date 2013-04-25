@@ -6,6 +6,6 @@ import com.google.inject.assistedinject.Assisted;
  * Created with IntelliJ IDEA.
  */
 public interface PublisherFactory {
-  Publisher createPublisher(@Assisted("file") String file, @Assisted("STV") String stvDirectory);
+  Publisher createPublisher(@Assisted("qualifier") String qualifier, @Assisted("STV") String stvDirectory);
 
 }

@@ -28,6 +28,7 @@ import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Publisher Tester.
@@ -59,6 +60,39 @@ public class PublisherTest {
 
   @After
   public void after() throws Exception {
+  }
+
+  @Test
+  public void testCreate() throws Exception {
+    boolean thrown=false;
+    try {
+      String tmpDir = System.getProperty("java.io.tmpdir", ".");
+      CatchupTestModule module = new CatchupTestModule();
+      Injector injector = Guice.createInjector(module);
+      PublisherFactory publisherFactory = injector.getInstance(PublisherFactory.class);
+      publisherFactory.createPublisher(null, tmpDir);
+    } catch (com.google.inject.ProvisionException e) {
+      thrown = true;
+    }
+
+    if (!thrown) {
+      fail("Should have thrown com.google.inject.ProvisionException");
+    }
+
+    thrown=false;
+    try {
+      CatchupTestModule module = new CatchupTestModule();
+      Injector injector = Guice.createInjector(module);
+      PublisherFactory publisherFactory = injector.getInstance(PublisherFactory.class);
+      publisherFactory.createPublisher("test", null);
+    } catch (com.google.inject.ProvisionException e) {
+      thrown = true;
+    }
+
+    if (!thrown) {
+      fail("Should have thrown com.google.inject.ProvisionException");
+    }
+
   }
 
   /**
@@ -235,6 +269,10 @@ public class PublisherTest {
     method.setAccessible(true);
     Object result = method.invoke(publisher, "test");
     assertEquals("getLinkFile()", "/tmp/OnlineVideos/CustomOnlineVideoLinks_test.properties", result);
+
+    method.invoke(publisher, "");
+    assertEquals("getLinkFile()", "/tmp/OnlineVideos/CustomOnlineVideoLinks_test.properties", result);
+
   }
 
   /**
@@ -263,41 +301,30 @@ public class PublisherTest {
   }
 
   /**
-   * Method: addPodcast(String category, String subCat, String url, PropertiesFile links,
-   * ArrayList<String> otherSubCats)
+   * Method: addProgramme(Programme programme, PropertiesFile links, PropertiesFile labels)
    */
   @Test
-  public void testAddPodcast() throws Exception {
-    Method method = Publisher.class.getDeclaredMethod("addPodcast", String.class, String.class,
-                                                      String.class, PropertiesFile.class,
-                                                      List.class);
+  public void testAddProgramme() throws Exception {
+    Method method = Publisher.class.getDeclaredMethod("addProgramme", Programme.class,
+                                                      PropertiesFile.class,
+                                                      PropertiesFile.class);
     method.setAccessible(true);
-    PropertiesFile file = new PropertiesFile();
-    ArrayList<String> subcats = new ArrayList<String>();
-    subcats.add("subcat2");
-    method.invoke(publisher, "cat", "subcat", "url", file, subcats);
-    assertEquals("Property count", 1, file.entrySet().size());
-    assertEquals("Property name", "xFeedPodcastCustom/cat",
-                 file.entrySet().iterator().next().getKey());
-    assertEquals("Property value", "xPodcastsubcat,xPodcastsubcat2;url",
-                 file.entrySet().iterator().next().getValue());
-  }
+    PropertiesFile linksFile = new PropertiesFile();
+    PropertiesFile labelsFile = new PropertiesFile();
 
-  /**
-   * Method: addCategory(String callSign, String name, String description, String categoryIconUrl,
-   * PropertiesFile labels)
-   */
-  @Test
-  public void testAddCategory() throws Exception {
-    Method
-        method =
-        Publisher.class.getDeclaredMethod("addCategory", String.class, String.class, String.class,
-                                          String.class, PropertiesFile.class);
-    method.setAccessible(true);
-    PropertiesFile file = new PropertiesFile();
-    method.invoke(publisher, "callSign", "name", "description", "categoryIconUrl", file);
-    assertEquals("Property count", 6, file.entrySet().size());
-    Iterator<Map.Entry<Object, Object>> itr = file.entrySet().iterator();
+    Programme programme = new Programme("callSign", "name", "description", "serviceUrl", "categoryIconUrl", "subcat");
+    programme.addOtherParentId("subcat2");
+    programme.setPodcastUrl("podcastUrl");
+    method.invoke(publisher, programme, linksFile, labelsFile);
+
+    assertEquals("Property count", 1, linksFile.entrySet().size());
+    assertEquals("Property name", "xFeedPodcastCustom/callSign",
+                 linksFile.entrySet().iterator().next().getKey());
+    assertEquals("Property value", "xPodcastsubcat,xPodcastsubcat2;podcastUrl",
+                 linksFile.entrySet().iterator().next().getValue());
+
+    assertEquals("Property count", 6, labelsFile.entrySet().size());
+    Iterator<Map.Entry<Object, Object>> itr = labelsFile.entrySet().iterator();
     Map.Entry<Object, Object> entry = itr.next();
     assertEquals("Property name", "Category/callSign/ShortName", entry.getKey());
     assertEquals("Property value", "name", entry.getValue());
@@ -328,12 +355,15 @@ public class PublisherTest {
 
     Method
         method =
-        Publisher.class.getDeclaredMethod("addSource", String.class, String.class, String.class,
+        Publisher.class.getDeclaredMethod("addSource", Source.class,
                                           PropertiesFile.class, PropertiesFile.class);
     method.setAccessible(true);
     PropertiesFile links = new PropertiesFile();
     PropertiesFile labels = new PropertiesFile();
-    method.invoke(publisher, "category", "name", "description", links, labels);
+
+    Source source = new Source("category", "name", "description", "serviceUrl", "iconUrl");
+
+    method.invoke(publisher, source, links, labels);
     assertEquals("Links Property count", 1, links.entrySet().size());
     assertEquals("Labels count", 2, labels.entrySet().size());
 
@@ -360,14 +390,14 @@ public class PublisherTest {
     Method
         method =
         Publisher.class
-            .getDeclaredMethod("addSubCategory", String.class, String.class, String.class,
-                               String.class, String.class, PropertiesFile.class,
+            .getDeclaredMethod("addSubCategory", SubCategory.class, PropertiesFile.class,
                                PropertiesFile.class);
     method.setAccessible(true);
     PropertiesFile links = new PropertiesFile();
     PropertiesFile labels = new PropertiesFile();
-    method.invoke(publisher, "parentId", "subcatId", "subcatTitle", "subCatDescription", "iconUrl",
-                  links, labels);
+    SubCategory subCategory = new SubCategory("subcatId", "subcatTitle", "subCatDescription", "serviceUrl", "iconUrl", "parentId");
+
+    method.invoke(publisher, subCategory, links, labels);
     assertEquals("Links Property count", 3, links.entrySet().size());
     assertEquals("Labels count", 6, labels.entrySet().size());
 
