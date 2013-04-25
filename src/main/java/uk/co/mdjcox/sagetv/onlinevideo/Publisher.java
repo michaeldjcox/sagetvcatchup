@@ -1,3 +1,10 @@
+/*
+ * Project: sagetvcatchup
+ * Class:   Catalog
+ * Author:  michael
+ * Date:    22/04/13
+ * Time:    07:34
+ */
 package uk.co.mdjcox.sagetv.onlinevideo;
 
 import com.google.inject.Inject;
@@ -10,35 +17,59 @@ import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.model.Category;
 import uk.co.mdjcox.sagetv.model.Programme;
 import uk.co.mdjcox.sagetv.model.SubCategory;
+import uk.co.mdjcox.sagetv.model.Source;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesFile;
-import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * This class can take a {@link Catalog} of media {@link Source}, categories {@link SubCategory},
+ * programmes {@link Programme} metadata and publish as a SageTV online video source.
+ *
+ * A SageTV custom online video source is two properties files contains in the
+ * <code>OnlineVideos</code> subdirectory of the <code>STV</code> directory.
+ */
 @Singleton
 public class Publisher {
 
+  /** The logger to be used for debug output */
   private Logger logger;
+  /** The utilities used to perform some string manipulation */
   private HtmlUtilsInterface htmlUtils;
-  private String file;
+  /** The qualifier added to the custom SageTV online video link and UIText files */
+  private String qualifier;
+  /** The SageTV STV directory */
   private String STV;
 
+  /**
+   * Creates a new instance which can be used to create new online video property files.
+   *
+   * @param logger The logger to be used for debug output
+   * @param htmlUtils The utilities used to perform some string manipulation
+   * @param qualifier The qualifier added to the custom SageTV online video link and UIText files
+   * @param stvDirectory The SageTV STV directory
+   */
   @Inject
-  private Publisher(Logger logger, HtmlUtilsInterface htmlUtils, @Assisted("file") String file, @Assisted("STV") String stvDirectory)
-      throws Exception {
+  private Publisher(Logger logger, HtmlUtilsInterface htmlUtils, @Assisted("qualifier") String qualifier, @Assisted("STV") String stvDirectory)
+  {
     this.logger = logger;
-    this.file = file;
+    this.qualifier = qualifier;
     this.STV = stvDirectory;
     this.htmlUtils = htmlUtils;
   }
 
+  /**
+   * This method removes the any created online video property files.
+   *
+   * @throws Exception if there was a problem deleting the files
+   */
   public void unpublish() throws Exception {
     boolean success = true;
-    String linkFileName = getLinkFile(file);
-    String labelFileName = getLabelFile(file);
+    String linkFileName = getLinkFile(qualifier);
+    String labelFileName = getLabelFile(qualifier);
 
     File linkFile = new File(linkFileName);
     if (linkFile.exists()) {
@@ -56,35 +87,60 @@ public class Publisher {
 
   }
 
-  private String getLinkFile(String file) {
-    if (!file.isEmpty()) {
-      file = "_" + file;
+  /**
+   * Returns a full path name for the <code>CustomOnlineVideoLinks</code> properties file.
+   *
+   * @param qualifier the qualifier used to distinguish different <code>CustomOnlineVideoLinks</code> files
+   *
+   * @return the full file path
+   */
+  private String getLinkFile(String qualifier) {
+    if (!qualifier.isEmpty()) {
+      qualifier = "_" + qualifier;
     }
-    return getRoot() + File.separator + "CustomOnlineVideoLinks" + file + ".properties";
+    return getRoot() + File.separator + "CustomOnlineVideoLinks" + qualifier + ".properties";
   }
 
-  private String getLabelFile(String file) {
-    if (!file.isEmpty()) {
-      file = "_" + file;
+  /**
+   * Returns a full path name for the <code>CustomOnlineVideoUIText</code> properties file.
+   *
+   * @param qualifier the qualifier used to distinguish different <code>CustomOnlineVideoUIText</code> files
+   *
+   * @return the full file path
+   */
+  private String getLabelFile(String qualifier) {
+    if (!qualifier.isEmpty()) {
+      qualifier = "_" + qualifier;
     }
-    return getRoot() + File.separator + "CustomOnlineVideoUIText" + file + ".properties";
+    return getRoot() + File.separator + "CustomOnlineVideoUIText" + qualifier + ".properties";
   }
 
+  /**
+   * Returns the full path for the STV online videos directory
+   *
+   * @return full path of the online videos directory
+   */
   private String getRoot() {
     STV = STV.replace(File.separatorChar, '/');
-//        STV = STV.replaceAll(".*STVs/", "");
     STV = STV.replaceAll("/[^/]*.xml", "");
     STV = STV.trim();
     String root = STV + File.separator + "OnlineVideos";
     return root;
   }
 
-
+  /**
+   * Takes a catalog of online video meta data and exports its as SageTV custom online video
+   * property files.
+   *
+   * @param catalog the catalog of online video meta data
+   *
+   * @throws Exception if the property files cannot be created.
+   */
   public void publish(Catalog catalog) throws Exception {
     Collection<Category> categories = catalog.getCategories();
 
-    String linkFile = getLinkFile(file);
-    String labelFile = getLabelFile(file);
+    String linkFile = getLinkFile(qualifier);
+    String labelFile = getLabelFile(qualifier);
 
     logger.info("Publishing to " + linkFile);
     logger.info("Publishing to " + labelFile);
@@ -122,6 +178,15 @@ public class Publisher {
 
   }
 
+  /**
+   * Adds a podcast to the custom online video property files.
+   *
+   * @param category a unique id for the podcast
+   * @param subCat the primary category this podcast belongs to
+   * @param url the podcast URL
+   * @param links the <code>CustomOnlineVideoLinks</code> file to add the podcast to
+   * @param otherSubCats other categories this podcast belongs to
+   */
   private void addPodcast(String category, String subCat, String url, PropertiesFile links,
                           List<String> otherSubCats) {
     category = htmlUtils.makeIdSafe(category);
@@ -143,6 +208,14 @@ public class Publisher {
     links.setProperty("xFeedPodcastCustom/" + category, result);
   }
 
+  /**
+   *
+   * @param callSign
+   * @param name
+   * @param description
+   * @param categoryIconUrl
+   * @param labels
+   */
   private void addCategory(String callSign, String name, String description, String categoryIconUrl,
                            PropertiesFile labels) {
     callSign = htmlUtils.makeIdSafe(callSign);

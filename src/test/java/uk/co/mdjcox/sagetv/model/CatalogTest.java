@@ -1,5 +1,7 @@
 package uk.co.mdjcox.sagetv.model;
 
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -130,5 +132,26 @@ public class CatalogTest {
 
     results = catalog.getCategories();
     assertEquals("Results should still contain one entry", 1, results.size());
+  }
+
+  /**
+   *
+   * Method: addCategory(Category cat)
+   *
+   */
+  @Test
+  public void testAddCategory() throws Exception {
+    Catalog catalog = new Catalog();
+    SubCategory
+        cat =
+        new SubCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+
+      catalog.addCategory(cat);
+
+    List<Category> cats = catalog.getCategories();
+
+    assertEquals("testAddCategory - size", 1, cats.size());
+
+    assertEquals("testAddCategory - added element", cat, cats.get(0));
   }
 }

@@ -48,4 +48,17 @@ public class Catalog {
   public final void setCategories(Map<String, Category> categoryMap) {
     this.categories = new LinkedHashMap<String, Category>(checkNotNull(categoryMap));
   }
+
+  /**
+   * Adds a new media file category to the catalog.
+   *
+   * @param cat the category to be added
+   *
+   * @throws NullPointerException if a null category is provided
+   */
+  public final void addCategory(Category cat) {
+    checkNotNull(cat);
+    this.categories.put(cat.getId(), cat);
+  }
+
 }
