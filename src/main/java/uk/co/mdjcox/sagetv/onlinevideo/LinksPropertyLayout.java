@@ -30,6 +30,28 @@ public class LinksPropertyLayout extends PropertiesFileLayout {
             + "# properties file (OnlineVideoLinks.properties), the default values will be"
             + CR + "# overwritten!" + CR + "#" + CR
             + "# =============================================================================="
+            + CR + ""
+
+            + CR + "# =============================================================================="
+            + CR + "#"
+            + CR + "# Using multiple custom online video properties files"
+            + CR + "#"
+            + CR + "# Multiple custom properties files can be used. Simply add your own descriptive"
+            + CR + "# text between the end of the base custom filenames & their .properties"
+            + CR + "# extensions, as shown below:"
+            + CR + "#"
+            + CR + "# Base filenames:"
+            + CR + "#      CustomOnlineVideoLinks.properties"
+            + CR + "#      CustomOnlineVideoUIText.properties"
+            + CR + "#"
+            + CR + "# Sample secondary filenames:"
+            + CR + "#      CustomOnlineVideoLinks_Set2.properties"
+            + CR + "#      CustomOnlineVideoUIText_Set2.properties"
+            + CR + "#"
+            + CR + "# The \"CustomSources\" properties in all the CustomOnlineVideoLinks files will be"
+            + CR + "# combined; any other duplicate property name values will be overwritten. "
+            + CR + "#"
+            + CR + "# =============================================================================="
             + CR + "" + CR
             + "# =============================================================================="
             + CR + "# To add custom podcast links:" + CR + "#" + CR

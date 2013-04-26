@@ -69,25 +69,37 @@ public class Publisher {
    * @throws Exception if there was a problem deleting the files
    */
   public void unpublish() throws Exception {
-    boolean success = !Boolean.getBoolean("inTest");
+    boolean deleteLink = true;
+    boolean deleteLabel = true;
+
 
     String linkFileName = getLinkFile(qualifier);
     String labelFileName = getLabelFile(qualifier);
 
     File linkFile = new File(linkFileName);
     if (linkFile.exists()) {
-      success = success && linkFile.delete();
+      deleteLink = delete(linkFile);
     }
 
     File labelFile = new File(labelFileName);
     if (labelFile.exists()) {
-      success = success && labelFile.delete();
+      deleteLabel = delete(labelFile);
     }
 
-    if (!success) {
+    if (!deleteLink || !deleteLabel) {
       throw new Exception("Unable to delete online services files");
     }
 
+  }
+
+  /**
+   * Method to engineer a delete failure for unit test
+   *
+   * @param file file to delete
+   * @return true if deleted
+   */
+  private boolean delete(File file) {
+    return file.delete() && !Boolean.getBoolean("inTest");
   }
 
   /**

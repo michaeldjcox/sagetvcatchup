@@ -1,0 +1,21 @@
+# ==============================================================================
+#
+# 1
+#
+# To add additional items on the Online Services menu, define the custom source
+# categories here. These items will be listed after the default items on the
+# Online Services menu in the order they are listed here.
+#
+# NOTE: Every custom links file can have its own "CustomSources" property and
+# all their values will be combined.
+#
+# NOTE: Do not use the property named "Sources", unless you wish to override the
+# default list of online source categories.
+#
+# NOTE: Podcast sources must start with "xPodcast".
+#
+# Format:
+# Separate each item with a comma (,)
+# CustomSources=xPodcastCategeoryName1,xPodcastCategeoryName2,xPodcastCategeoryName3, ...
+#
+# ==============================================================================

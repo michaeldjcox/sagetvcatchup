@@ -1,0 +1,52 @@
+# ==============================================================================
+# This properties file contains custom user definitions for the list of
+# available online videos and the links to get those videos.
+#
+# NOTE: If the same property names are used in this file as are in the default
+# properties file (OnlineVideoLinks.properties), the default values will be
+# overwritten!
+#
+# ==============================================================================
+
+# ==============================================================================
+#
+# Using multiple custom online video properties files
+#
+# Multiple custom properties files can be used. Simply add your own descriptive
+# text between the end of the base custom filenames & their .properties
+# extensions, as shown below:
+#
+# Base filenames:
+#      CustomOnlineVideoLinks.properties
+#      CustomOnlineVideoUIText.properties
+#
+# Sample secondary filenames:
+#      CustomOnlineVideoLinks_Set2.properties
+#      CustomOnlineVideoUIText_Set2.properties
+#
+# The "CustomSources" properties in all the CustomOnlineVideoLinks files will be
+# combined; any other duplicate property name values will be overwritten. 
+#
+# ==============================================================================
+
+# ==============================================================================
+# To add custom podcast links:
+#
+#  Section 1) Add a new xPodcast<CategoryName> to the CustomSources
+#             line. (Optional) 
+#
+#  Section 2) Define the FeedName's URL on its feed definition line:
+#             xFeedPodcastCustom/<FeedName>=Source1,Source2,...,SourceN;FeedURL    
+#
+# After adding a new feed, reload the Online Services menu in SageTV, navigate
+# to the category containing the new link, then select that item to download
+# its list of content and automatically set its initial icon and title.
+# Aterwards, the icon and/or title can be edited near the end of the
+# "CustomOnlineVideoUIText.properties" file.
+#
+# Note: Any source or category item that has no title defined in the 
+# 		"CustomOnlineVideoUIText.properties" file will show its property name in
+#		SageTV.  
+#
+# ==============================================================================
+

@@ -7,8 +7,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import sun.nio.ch.FileChannelImpl;
-
 import uk.co.mdjcox.sagetv.catchup.CatchupTestModule;
 import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.model.Episode;
@@ -19,17 +17,9 @@ import uk.co.mdjcox.sagetv.model.SubCategory;
 import uk.co.mdjcox.utils.PropertiesFile;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.RandomAccessFile;
 import java.lang.reflect.Method;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;

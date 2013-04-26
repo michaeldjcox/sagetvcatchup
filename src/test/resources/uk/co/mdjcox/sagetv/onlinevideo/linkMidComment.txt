@@ -1,0 +1,91 @@
+#
+# ==============================================================================
+#
+# 2
+#
+# Custom Podcast feeds added by users
+#
+# Property line format:
+#
+# xFeedPodcastCustom/FeedName=Source1,Source2,...,SourceN;FeedURL 
+#
+#	xFeedPodcastCustom - The required property prefix.
+#
+#	FeedName - The unique code name for this feed. To use a Google or YouTube
+#			   Video link as a podcast feed, end the FeedName with one of these
+# 			   suffixes, including the underscore '_':
+#					_GOO - Google Video style link 
+#					_YTV - YouTube Video style link 
+#					_YTC - YouTube Channel style link 
+#
+#			   The feed list is sorted alphanumerically, based on this FeedName.
+#
+#	Source1,Source2,...,SourceN - 
+#					Comma-separated list of source categoriess to list this feed
+#					under, and other Flags. The source categories must come
+#                   from the 'Sources' property at the top of this file. The
+#					valid Flags are listed below.
+#                   	** Notes: All of the source categories listed here must
+#                   	** start with "xPodcast"; see list below.
+#                   	** All of the flags listed here must start with
+#						** "xFlag"; see list below.
+#
+#	; - Separate the Source list from the feed's URL using a semicolon 
+#
+#	FeedURL - The URL of the feed. See below for using externally generated
+#			  feeds.
+#
+# ============================================================
+#
+# Valid predefined Source category names:
+#
+#    xPodcastNews           xPodcastComedy  xPodcastSports    xPodcastScienceTech
+#    xPodcastEntertainment  xPodcastHD      xPodcastFamily    xPodcastHomeGarden
+#
+#    ... plus any defined at the top of this file or defined as subcategories.
+#
+# ============================================================
+#
+# Valid predefined Flag names:
+#
+#    xFlagTitleNone - Display the feed's icon w/o a title overlay.
+#	 xFlagTitleShow - Display the feed's icon with a title overlay. (default) 
+#
+# ============================================================
+#
+# Subcategory definitions
+#
+#	To create a subcategory, use the following three lines as examples:
+#
+#       xFeedPodcastCustom/NameOfSubCat=xPodcastCustom;xURLNone
+#       NameOfSubCat/IsCategory=true
+#       NameOfSubCat/CategoryName=xPodcastNameOfSubCat
+#
+#   In this example, "NameOfSubCat" is the FeedName of the subcategory, which
+#   is used to sort the subcategory into its parent category - "xPodcastCustom"
+#   in this example.
+#
+#	"xPodcastNameOfSubCat" is now the text used to assign feeds to this
+#	subcategory.
+#
+#	Be sure to define the subcategory names as shown in the examples in 
+#	"CustomOnlineVideoUIText.properties", both the "Category" and "Source"
+#   names, as follows:
+#
+#       Category/NameOfSubCat/LongName=<Full Name to display in feed list>
+#       Category/NameOfSubCat/ShortName=<Short Name of subcategory>
+#       Source/xPodcastNameOfSubCat/LongName=<Full Name to display as menu title>
+#       Source/xPodcastNameOfSubCat/ShortName=<Short Name to display in menu title>
+#
+# ============================================================
+#
+# Externally generated feeds
+#
+# An external application can be used to generate an XML file for a feed rather
+# than downloading the feed. To use a custom external application, format the
+# FeedURL portion of the feed property as follows:
+#
+# 	external,filename.exe,param1||param2||param3||...paramN
+#
+# ==============================================================================
+#
