@@ -11,7 +11,9 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -46,7 +48,7 @@ public void testGetHeadComment() throws Exception {
 
   String header = layout.getHeadComment();
 
-  checkResult(comment, header);
+//  checkResult(comment, header);
 
   assertEquals("Header comment", comment, header);
 
@@ -107,7 +109,7 @@ public void testGetTailComment() throws Exception {
 
   String tail = layout.getTailComment();
 
-  checkResult(comment, tail);
+//  checkResult(comment, tail);
 
   assertEquals("Tail comment", comment, tail);
 }
@@ -147,13 +149,20 @@ public void testGetPostPropComments() throws Exception {
 
   assertEquals("Pre props", 2, comments.size());
 
-  Map.Entry<String, String> entry = comments.entrySet().iterator().next();
+  Iterator itr = comments.entrySet().iterator();
+
+  Map.Entry<String, String> entry = (Map.Entry<String, String>)itr.next();
 
   String comment = getExpectedComment("linkPost1Comment");
 
   assertEquals("Pre prop #1 key", "CustomSources", entry.getKey());
   assertEquals("Pre prop #1 value", comment, entry.getValue());
-} 
+
+  entry = (Map.Entry<String, String>)itr.next();
+
+  assertEquals("Pre prop #2 key", ".*\\/CategoryName", entry.getKey());
+  assertEquals("Pre prop #2 value", "", entry.getValue());
+}
 
 /** 
 * 
@@ -161,8 +170,11 @@ public void testGetPostPropComments() throws Exception {
 * 
 */ 
 @Test
-public void testGetComparator() throws Exception { 
-fail("Undefined test");
+public void testGetComparator() throws Exception {
+  LinksPropertyLayout layout = new LinksPropertyLayout();
+   layout.getComparator(new Properties());
+
+  fail("Undefined test");
 //TODO: Test goes here... 
 } 
 
