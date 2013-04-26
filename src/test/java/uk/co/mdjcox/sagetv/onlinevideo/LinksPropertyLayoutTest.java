@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -44,20 +46,30 @@ public void testGetHeadComment() throws Exception {
 
   String header = layout.getHeadComment();
 
-  int max = Math.max(comment.length(), header.length());
-
-  System.err.println("MAX=" + max + " expected=" + comment.length() + " found=" + header.length());
-
-  for (int i =0; i< max ; i++) {
-    System.err.println(comment.charAt(i) + ":" + header.charAt(i));
-  }
-
+  checkResult(comment, header);
 
   assertEquals("Header comment", comment, header);
 
-
-
 }
+
+  private void checkResult(String comment, String header) {
+    int max = Math.max(comment.length(), header.length());
+
+    System.err.println("MAX=" + max + " expected=" + comment.length() + " found=" + header.length());
+
+    for (int i =0; i< max ; i++) {
+      if (comment.charAt(i) != header.charAt(i)) {
+        String expected = String.valueOf(comment.charAt(i));
+        String actual = String.valueOf(header.charAt(i));
+
+        if (expected.equals("\n")) expected = "LF";
+        if (expected.equals("\r")) expected = "CR";
+        if (actual.equals("\n")) actual = "LF";
+        if (actual.equals("\r")) actual = "CR";
+        System.err.println(i + " " + expected + ":" + actual);
+      }
+    }
+  }
 
   private String getExpectedComment(String commentTag) throws IOException {
     java.net.URL url = getClass().getResource(commentTag + ".txt");
@@ -69,7 +81,7 @@ public void testGetHeadComment() throws Exception {
       out: while (true) {
         String newbit = breader.readLine();
         if (!comment.isEmpty()) {
-          comment += "\r\n";
+          comment += System.getProperty("line.separator");
         }
         if (newbit==null) break out;
         comment = comment + newbit;
@@ -88,10 +100,17 @@ public void testGetHeadComment() throws Exception {
 * 
 */ 
 @Test
-public void testGetTailComment() throws Exception { 
-fail("Undefined test");
-//TODO: Test goes here... 
-} 
+public void testGetTailComment() throws Exception {
+  LinksPropertyLayout layout = new LinksPropertyLayout();
+
+  String comment = "";
+
+  String tail = layout.getTailComment();
+
+  checkResult(comment, tail);
+
+  assertEquals("Tail comment", comment, tail);
+}
 
 /** 
 * 
@@ -99,9 +118,20 @@ fail("Undefined test");
 * 
 */ 
 @Test
-public void testGetPrePropComments() throws Exception { 
-fail("Undefined test");
-//TODO: Test goes here... 
+public void testGetPrePropComments() throws Exception {
+
+  LinksPropertyLayout layout = new LinksPropertyLayout();
+
+  HashMap<String, String> comments = layout.getPrePropComments();
+
+  assertEquals("Pre props", 1, comments.size());
+
+  Map.Entry<String, String> entry = comments.entrySet().iterator().next();
+
+  String comment = getExpectedComment("linkPre1Comment");
+
+  assertEquals("Pre prop #1 key", "CustomSources", entry.getKey());
+  assertEquals("Pre prop #1 value", comment, entry.getValue());
 } 
 
 /** 
@@ -110,9 +140,19 @@ fail("Undefined test");
 * 
 */ 
 @Test
-public void testGetPostPropComments() throws Exception { 
-fail("Undefined test");
-//TODO: Test goes here... 
+public void testGetPostPropComments() throws Exception {
+  LinksPropertyLayout layout = new LinksPropertyLayout();
+
+  HashMap<String, String> comments = layout.getPostPropComments();
+
+  assertEquals("Pre props", 2, comments.size());
+
+  Map.Entry<String, String> entry = comments.entrySet().iterator().next();
+
+  String comment = getExpectedComment("linkPost1Comment");
+
+  assertEquals("Pre prop #1 key", "CustomSources", entry.getKey());
+  assertEquals("Pre prop #1 value", comment, entry.getValue());
 } 
 
 /** 

@@ -86,9 +86,12 @@ public class LinksPropertyLayout extends PropertiesFileLayout {
             + CR
             + "# categories here. These items will be listed after the default items on the"
             + CR + "# Online Services menu in the order they are listed here."
-            + CR + "#" + CR
-            + "# NOTE: Do not use the property named \"Sources\", unless you wish to override the"
-            + CR + "# default list of online source categories. " + CR + "#"
+            + CR + "#"
+            + CR + "# NOTE: Every custom links file can have its own \"CustomSources\" property and"
+            + CR + "# all their values will be combined."
+            + CR + "#"
+            + CR + "# NOTE: Do not use the property named \"Sources\", unless you wish to override the"
+            + CR + "# default list of online source categories." + CR + "#"
             + CR + "# NOTE: Podcast sources must start with \"xPodcast\"." + CR
             + "#" + CR + "# Format:" + CR
             + "# Separate each item with a comma (,)" + CR
@@ -97,7 +100,7 @@ public class LinksPropertyLayout extends PropertiesFileLayout {
             + "# =============================================================================="
             + CR;
 
-    final static String PRE2 = "" + CR + "#" + CR
+    final static String PRE2 = "#" + CR
                                + "# =============================================================================="
                                + CR + "#" + CR + "# 2" + CR + "#" + CR
                                + "# Custom Podcast feeds added by users" + CR
@@ -139,7 +142,8 @@ public class LinksPropertyLayout extends PropertiesFileLayout {
                                + CR + "#" + CR
                                + "#\t; - Separate the Source list from the feed's URL using a semicolon "
                                + CR + "#" + CR
-                               + "#\tFeedURL - The URL of the feed." + CR + "#"
+                               + "#\tFeedURL - The URL of the feed. See below for using externally generated"
+                               + CR + "#\t\t\t  feeds." + CR + "#"
                                + CR
                                + "# ============================================================"
                                + CR + "#" + CR
@@ -188,6 +192,16 @@ public class LinksPropertyLayout extends PropertiesFileLayout {
                                + "#       Source/xPodcastNameOfSubCat/ShortName=<Short Name to display in menu title>"
                                + CR + "#" + CR
                                + "# ============================================================"
+                               + CR + "#"
+                               + CR + "# Externally generated feeds"
+                               + CR + "#"
+                               + CR + "# An external application can be used to generate an XML file for a feed rather"
+                               + CR + "# than downloading the feed. To use a custom external application, format the"
+                               + CR + "# FeedURL portion of the feed property as follows:"
+                               + CR + "#"
+                               + CR + "# 	external,filename.exe,param1||param2||param3||...paramN"
+                               + CR + "#"
+                               + CR + "# =============================================================================="
                                + CR + "#" + CR;
 
     public String getHeadComment() {
