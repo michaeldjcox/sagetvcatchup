@@ -10,12 +10,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.TestCase.fail;
 
 /** 
@@ -147,7 +151,7 @@ public void testGetPostPropComments() throws Exception {
 
   HashMap<String, String> comments = layout.getPostPropComments();
 
-  assertEquals("Pre props", 2, comments.size());
+  assertEquals("Post props", 2, comments.size());
 
   Iterator itr = comments.entrySet().iterator();
 
@@ -172,11 +176,66 @@ public void testGetPostPropComments() throws Exception {
 @Test
 public void testGetComparator() throws Exception {
   LinksPropertyLayout layout = new LinksPropertyLayout();
-   layout.getComparator(new Properties());
+  Properties test = new Properties();
 
-  fail("Undefined test");
-//TODO: Test goes here... 
-} 
+  test.put("CustomSources","xPodcastPhotoshop,xPodcastCustom");
+  test.put("xFeedPodcastCustom/AACustomSubCat","xPodcastCustom;xURLNone");
+  test.put("AACustomSubCat/IsCategory","true");
+  test.put("AACustomSubCat/CategoryName","xPodcastAACustomSubCat");
+  test.put("xFeedPodcastCustom/AACustomSubCat2","xPodcastAACustomSubCat;xURLNone");
+  test.put("AACustomSubCat2/IsCategory","true");
+  test.put("AACustomSubCat2/CategoryName","xPodcastAACustomSubCat2");
+  test.put("xFeedPodcastCustom/ZZCustomSubCat","xPodcastCustom;xURLNone");
+  test.put("ZZCustomSubCat/IsCategory","true");
+  test.put("ZZCustomSubCat/CategoryName","xPodcastZZCustomSubCat");
+  test.put("xFeedPodcastCustom/RusselBrownShow","xPodcastPhotoshop,xPodcastAACustomSubCat;http://rss.adobe.com/www/special/rbrown_show.rss");
+  test.put("xFeedPodcastCustom/PhotoshopQuickTips","xPodcastPhotoshop,xPodcastAACustomSubCat;http://photoshopquicktips.libsyn.com/rss");
+  test.put("xFeedPodcastCustom/PhotoshopPixelPerfect","xPodcastPhotoshop,xPodcastAACustomSubCat2;http://revision3.com/pixelperfect/feed/quicktime-high-definition");
+  test.put("xFeedPodcastCustom/PhotoshopUserTV","xPodcastPhotoshop,xPodcastAACustomSubCat2;http://www.photoshopusertv.com/feed");
+  test.put("xFeedPodcastCustom/PhotoshopOnline","xPodcastPhotoshop,xPodcastZZCustomSubCat;http://feeds.feedburner.com/photoshoponline");
+  test.put("xFeedPodcastCustom/DrPhotoshop","xPodcastPhotoshop,xPodcastZZCustomSubCat;http://dr-photoshop.com/rss");
+  test.put("xFeedPodcastCustom/Lost","xPodcastCustom;http://abc.go.com/primetime/lost/podcastRSS?feedPublishKey");
+  test.put("xFeedPodcastCustom/ShowtimeTudors","xPodcastCustom;http://www.sho.com/site/tudors/xml/podcasts.xml");
+  test.put("xFeedPodcastCustom/ShowtimeDexter","xPodcastCustom;http://www.sho.com/site/dexter/xml/podcasts.xml");
+  test.put("xFeedPodcastCustom/ShowtimeLWword","xPodcastCustom;http://www.sho.com/site/lword/xml/podcasts.xml");
+  test.put("xFeedPodcastCustom/ShowtimeWeeds","xPodcastCustom;http://www.sho.com/site/weeds/xml/podcasts.xml");
+
+  Comparator comp = layout.getComparator(test);
+  assertNotNull("getComparator() should return something", comp);
+
+  TreeMap<Object, Object> test2 = new TreeMap<Object,Object>(comp);
+  test2.putAll(test);
+
+
+  Iterator<Map.Entry<Object,Object>> itr = test2.entrySet().iterator();
+  Map.Entry<Object,Object> entry = null;
+  entry=itr.next(); assertEquals("Item out of order", "CustomSources=xPodcastPhotoshop,xPodcastCustom", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "xFeedPodcastCustom/AACustomSubCat=xPodcastCustom;xURLNone", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "AACustomSubCat/IsCategory=true", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "AACustomSubCat/CategoryName=xPodcastAACustomSubCat", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "xFeedPodcastCustom/AACustomSubCat2=xPodcastAACustomSubCat;xURLNone", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "AACustomSubCat2/IsCategory=true", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "AACustomSubCat2/CategoryName=xPodcastAACustomSubCat2", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "xFeedPodcastCustom/ZZCustomSubCat=xPodcastCustom;xURLNone", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "ZZCustomSubCat/IsCategory=true", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "ZZCustomSubCat/CategoryName=xPodcastZZCustomSubCat", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "xFeedPodcastCustom/DrPhotoshop=xPodcastPhotoshop,xPodcastZZCustomSubCat;http://dr-photoshop.com/rss", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "xFeedPodcastCustom/Lost=xPodcastCustom;http://abc.go.com/primetime/lost/podcastRSS?feedPublishKey", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "xFeedPodcastCustom/PhotoshopOnline=xPodcastPhotoshop,xPodcastZZCustomSubCat;http://feeds.feedburner.com/photoshoponline", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "xFeedPodcastCustom/PhotoshopPixelPerfect=xPodcastPhotoshop,xPodcastAACustomSubCat2;http://revision3.com/pixelperfect/feed/quicktime-high-definition", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "xFeedPodcastCustom/PhotoshopQuickTips=xPodcastPhotoshop,xPodcastAACustomSubCat;http://photoshopquicktips.libsyn.com/rss", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "xFeedPodcastCustom/PhotoshopUserTV=xPodcastPhotoshop,xPodcastAACustomSubCat2;http://www.photoshopusertv.com/feed", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "xFeedPodcastCustom/RusselBrownShow=xPodcastPhotoshop,xPodcastAACustomSubCat;http://rss.adobe.com/www/special/rbrown_show.rss", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "xFeedPodcastCustom/ShowtimeDexter=xPodcastCustom;http://www.sho.com/site/dexter/xml/podcasts.xml", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "xFeedPodcastCustom/ShowtimeLWword=xPodcastCustom;http://www.sho.com/site/lword/xml/podcasts.xml", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "xFeedPodcastCustom/ShowtimeTudors=xPodcastCustom;http://www.sho.com/site/tudors/xml/podcasts.xml", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "xFeedPodcastCustom/ShowtimeWeeds=xPodcastCustom;http://www.sho.com/site/weeds/xml/podcasts.xml", entry.getKey() + "=" + entry.getValue());
+
+
+
+
+
+}
 
 
 } 

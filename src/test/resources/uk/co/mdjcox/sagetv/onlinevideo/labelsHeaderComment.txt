@@ -1,0 +1,27 @@
+# ==============================================================================
+# This properties file contains custom user definitions for the text displayed
+# in the SageTV UI for custom user-added online video menu items.
+#
+# To add custom online video links, see the comments near the top of the
+# "CustomOnlineVideoLinks.properties" file.
+#
+# After adding a new feed in "CustomOnlineVideoLinks.properties", select that
+# (blank) item in SageTV to download its list of content and automatically set
+# its initial icon and title. Aterwards, the icon and/or title can be edited
+# near the end of this file.
+#
+# NOTE: If the same property names are used in this file as are in the default
+# properties file (OnlineVideoUIText.properties), the default values will be
+# overwritten inside SageTV!
+#
+#
+# To create a language translation file, use the 2-letter language code added to
+# the base filename after an underscore. Example: For a German language version
+# of this file, copy the default filename:
+#       CustomOnlineVideoUIText.properties
+# to the _de version: 
+#       CustomOnlineVideoUIText_de.properties
+# 
+# Then, change the property values.
+# 
+# ==============================================================================

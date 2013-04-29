@@ -46,7 +46,7 @@ public class LabelsPropertyLayout extends PropertiesFileLayout {
             + "# to the _de version: " + CR
             + "#       CustomOnlineVideoUIText_de.properties" + CR + "# " + CR
             + "# Then, change the property values." + CR + "# " + CR
-            + "# ==============================================================================";
+            + "# ==============================================================================" + CR;
     private static final String TAIL = "";
     private static final String PRE1 =
             "# =============================================================================="
