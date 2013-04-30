@@ -84,13 +84,15 @@ public void testGetHeadComment() throws Exception {
     FileReader reader = new FileReader(filename);
     BufferedReader breader = new BufferedReader(reader);
     try {
+      boolean doneNothing = true;
       out: while (true) {
         String newbit = breader.readLine();
-        if (!comment.isEmpty()) {
+        if (!doneNothing) {
           comment += System.getProperty("line.separator");
         }
         if (newbit==null) break out;
         comment = comment + newbit;
+        doneNothing = false;
       }
     } catch (Exception e) {
     } finally {

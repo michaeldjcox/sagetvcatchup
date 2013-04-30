@@ -22,8 +22,11 @@ import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesFile;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -66,9 +69,9 @@ public class Publisher {
   /**
    * This method removes the any created online video property files.
    *
-   * @throws Exception if there was a problem deleting the files
+   * @return true if the property files were deleted
    */
-  public void unpublish() throws Exception {
+  public boolean unpublish() throws Exception {
     boolean deleteLink = true;
     boolean deleteLabel = true;
 
@@ -78,28 +81,15 @@ public class Publisher {
 
     File linkFile = new File(linkFileName);
     if (linkFile.exists()) {
-      deleteLink = delete(linkFile);
+      deleteLink = linkFile.delete();
     }
 
     File labelFile = new File(labelFileName);
     if (labelFile.exists()) {
-      deleteLabel = delete(labelFile);
+      deleteLabel = labelFile.delete();
     }
 
-    if (!deleteLink || !deleteLabel) {
-      throw new Exception("Unable to delete online services files");
-    }
-
-  }
-
-  /**
-   * Method to engineer a delete failure for unit test
-   *
-   * @param file file to delete
-   * @return true if deleted
-   */
-  private boolean delete(File file) {
-    return file.delete() && !Boolean.getBoolean("inTest");
+    return deleteLink && deleteLabel;
   }
 
   /**
@@ -203,7 +193,7 @@ public class Publisher {
     String description = programme.getLongName();
     String iconUrl = programme.getIconUrl();
     String url = programme.getPodcastUrl();
-    List<String> otherParentIds = programme.getOtherParentIds();
+    Set<String> otherParentIds = programme.getOtherParentIds();
 
     id = htmlUtils.makeIdSafe(id);
     parentId = htmlUtils.makeIdSafe(parentId);

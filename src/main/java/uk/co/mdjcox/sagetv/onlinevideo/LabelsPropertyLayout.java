@@ -86,9 +86,23 @@ public class LabelsPropertyLayout extends PropertiesFileLayout {
     public Comparator getComparator(Properties props) {
         return new Comparator() {
             public int compare(Object o1, Object o2) {
-                String s1 = (String) o1;
-                String s2 = (String) o2;
-                return s2.compareTo(s1);
+              String s1 = (String) o1;
+              String s2 = (String) o2;
+
+              String s1part1 = s1.substring(0, s1.indexOf("/"));
+              String s1part2 = s1.substring(s1.indexOf("/")+1);
+
+              String s2part1 = s2.substring(0, s2.indexOf("/"));
+              String s2part2 = s2.substring(s2.indexOf("/")+1);
+
+              int result =  s2part1.compareTo(s1part1);
+
+              if (result == 0) {
+                 return s1part2.compareTo(s2part2);
+              } else {
+                return result;
+              }
+
             }
         };
     }

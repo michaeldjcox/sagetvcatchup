@@ -100,7 +100,7 @@ public class LinksPropertyLayout extends PropertiesFileLayout {
             + "# =============================================================================="
             + CR;
 
-    final static String PRE2 = "#" + CR
+    final static String PRE2 = CR + "#" + CR
                                + "# =============================================================================="
                                + CR + "#" + CR + "# 2" + CR + "#" + CR
                                + "# Custom Podcast feeds added by users" + CR

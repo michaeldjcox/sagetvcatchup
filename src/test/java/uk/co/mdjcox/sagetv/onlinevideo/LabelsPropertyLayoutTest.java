@@ -236,59 +236,73 @@ public void testGetComparator() throws Exception {
   Iterator<Map.Entry<Object,Object>> itr = test2.entrySet().iterator();
   Map.Entry<Object,Object> entry = null;
 
-  entry=itr.next(); assertEquals("Item out of order", "Source/xPodcastCustom/LongName=Custom Test Links", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Source/xPodcastCustom/ShortName=Custom Test Links", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Source/xPodcastPhotoshop/LongName=Photoshop", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Source/xPodcastPhotoshop/ShortName=Photoshop", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Source/xPodcastAACustomSubCat/LongName=Subcategory 1 menu title", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Source/xPodcastAACustomSubCat/ShortName=Subcat 1 title", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Source/xPodcastAACustomSubCat2/LongName=Subcategory 2 menu title", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Source/xPodcastAACustomSubCat2/ShortName=Subcat 2 title", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Source/xPodcastCustom/LongName=Custom Test Links", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Source/xPodcastCustom/ShortName=Custom Test Links", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Source/xPodcastPhotoshop/LongName=Photoshop", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Source/xPodcastPhotoshop/ShortName=Photoshop", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Source/xPodcastZZCustomSubCat/LongName=ZZ Subcategory menu title", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Source/xPodcastZZCustomSubCat/ShortName=ZZ Subcat title", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Category/AACustomSubCat/LongName=Subcategory 1 list name", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Category/AACustomSubCat/ShortName=Subcat 1 name", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Category/AACustomSubCat2/LongName=Subcategory 2 list name", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Category/AACustomSubCat2/ShortName=Subcat 2 name", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/ZZCustomSubCat/LongName=ZZ Subcategory at end of list", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/ZZCustomSubCat/ShortName=ZZ Subcat at list end", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/RusselBrownShow/ThumbURL=http://rss.adobe.com/www/special/rbrown/BannerArtjpg.jpg", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/RusselBrownShow/LongName=The Russell Brown Show", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/RusselBrownShow/ShortName=The Russell Brown Show", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopQuickTips/ThumbURL=http://libsyn.com/podcasts/photoshopquicktips/images/quicktipslarge.jpg", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopQuickTips/LongName=Photoshop Quicktips", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopQuickTips/ShortName=Photoshop Quicktips", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopPixelPerfect/ThumbURL=http://revision3.com/static/images/shows/pixelperfect/pixelperfect.jpg", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopPixelPerfect/LongName=PixelPerfect (HD Quicktime)", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopPixelPerfect/ShortName=PixelPerfect (HD Quicktime)", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopUserTV/ThumbURL=http://photoshopusertv.com/wp-images/photoshopusertv/psutv-144.jpg", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopUserTV/LongName=Photoshop User TV", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopUserTV/ShortName=Photoshop User TV", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopOnline/ThumbURL=http://www.feedburner.com/fb/images/pub/fb_pwrd.gif", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopOnline/LongName=Photoshop Online", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopOnline/ShortName=Photoshop Online", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Category/DrPhotoshop/LongName=Dr. Photoshop News", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Category/DrPhotoshop/ShortName=Dr. Photoshop News", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/Lost/ThumbURL=http://a.abc.com/primetime/lost/images/podcast/300x300_lost_20051109.jpg", entry.getKey() + "=" + entry.getValue());
+
   entry=itr.next(); assertEquals("Item out of order", "Category/Lost/LongName=The Official LOST Podcast", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Category/Lost/ShortName=The Official LOST Podcast", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/ShowtimeTudors/LongName=Showtime: The Tudors", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/ShowtimeTudors/ShortName=Showtime: The Tudors", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/Lost/ThumbURL=http://a.abc.com/primetime/lost/images/podcast/300x300_lost_20051109.jpg", entry.getKey() + "=" + entry.getValue());
+
+  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopOnline/LongName=Photoshop Online", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopOnline/ShortName=Photoshop Online", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopOnline/ThumbURL=http://www.feedburner.com/fb/images/pub/fb_pwrd.gif", entry.getKey() + "=" + entry.getValue());
+
+  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopPixelPerfect/LongName=PixelPerfect (HD Quicktime)", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopPixelPerfect/ShortName=PixelPerfect (HD Quicktime)", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopPixelPerfect/ThumbURL=http://revision3.com/static/images/shows/pixelperfect/pixelperfect.jpg", entry.getKey() + "=" + entry.getValue());
+
+  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopQuickTips/LongName=Photoshop Quicktips", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopQuickTips/ShortName=Photoshop Quicktips", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopQuickTips/ThumbURL=http://libsyn.com/podcasts/photoshopquicktips/images/quicktipslarge.jpg", entry.getKey() + "=" + entry.getValue());
+
+  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopUserTV/LongName=Photoshop User TV", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopUserTV/ShortName=Photoshop User TV", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/PhotoshopUserTV/ThumbURL=http://photoshopusertv.com/wp-images/photoshopusertv/psutv-144.jpg", entry.getKey() + "=" + entry.getValue());
+
+  entry=itr.next(); assertEquals("Item out of order", "Category/RusselBrownShow/LongName=The Russell Brown Show", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/RusselBrownShow/ShortName=The Russell Brown Show", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/RusselBrownShow/ThumbURL=http://rss.adobe.com/www/special/rbrown/BannerArtjpg.jpg", entry.getKey() + "=" + entry.getValue());
+
   entry=itr.next(); assertEquals("Item out of order", "Category/ShowtimeDexter/LongName=Showtime: Dexter", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Category/ShowtimeDexter/ShortName=Showtime: Dexter", entry.getKey() + "=" + entry.getValue());
+
   entry=itr.next(); assertEquals("Item out of order", "Category/ShowtimeLWword/LongName=Showtime: The L Word", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Category/ShowtimeLWword/ShortName=Showtime: The L Word", entry.getKey() + "=" + entry.getValue());
+
+  entry=itr.next(); assertEquals("Item out of order", "Category/ShowtimeTudors/LongName=Showtime: The Tudors", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/ShowtimeTudors/ShortName=Showtime: The Tudors", entry.getKey() + "=" + entry.getValue());
+
   entry=itr.next(); assertEquals("Item out of order", "Category/ShowtimeWeeds/LongName=Showtime: Weeds", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Category/ShowtimeWeeds/ShortName=Showtime: Weeds", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/YouTubeCBSTest_YTV/ThumbURL=http://www.youtube.com/img/pic_youtubelogo_123x63.gif", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/YouTubeCBSTest_YTV/LongName=Playlists of cbs", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/YouTubeCBSTest_YTV/ShortName=Playlists of cbs", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/YouTubeCBSSTPlaylist6_YTV/ThumbURL=http://www.youtube.com/img/pic_youtubelogo_123x63.gif", entry.getKey() + "=" + entry.getValue());
+
   entry=itr.next(); assertEquals("Item out of order", "Category/YouTubeCBSSTPlaylist6_YTV/LongName=Star Trek", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Category/YouTubeCBSSTPlaylist6_YTV/ShortName=Star Trek", entry.getKey() + "=" + entry.getValue());
-  entry=itr.next(); assertEquals("Item out of order", "Category/YouTubeCBSSTPlaylist8_YTV/ThumbURL=http://www.youtube.com/img/pic_youtubelogo_123x63.gif", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/YouTubeCBSSTPlaylist6_YTV/ThumbURL=http://www.youtube.com/img/pic_youtubelogo_123x63.gif", entry.getKey() + "=" + entry.getValue());
+
   entry=itr.next(); assertEquals("Item out of order", "Category/YouTubeCBSSTPlaylist8_YTV/LongName=Star Trek", entry.getKey() + "=" + entry.getValue());
   entry=itr.next(); assertEquals("Item out of order", "Category/YouTubeCBSSTPlaylist8_YTV/ShortName=Star Trek", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/YouTubeCBSSTPlaylist8_YTV/ThumbURL=http://www.youtube.com/img/pic_youtubelogo_123x63.gif", entry.getKey() + "=" + entry.getValue());
+
+  entry=itr.next(); assertEquals("Item out of order", "Category/YouTubeCBSTest_YTV/LongName=Playlists of cbs", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/YouTubeCBSTest_YTV/ShortName=Playlists of cbs", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/YouTubeCBSTest_YTV/ThumbURL=http://www.youtube.com/img/pic_youtubelogo_123x63.gif", entry.getKey() + "=" + entry.getValue());
+
+  entry=itr.next(); assertEquals("Item out of order", "Category/ZZCustomSubCat/LongName=ZZ Subcategory at end of list", entry.getKey() + "=" + entry.getValue());
+  entry=itr.next(); assertEquals("Item out of order", "Category/ZZCustomSubCat/ShortName=ZZ Subcat at list end", entry.getKey() + "=" + entry.getValue());
 
 
 } 

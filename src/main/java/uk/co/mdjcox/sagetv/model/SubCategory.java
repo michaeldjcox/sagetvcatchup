@@ -9,6 +9,7 @@ package uk.co.mdjcox.sagetv.model;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import java.util.*;
 
@@ -23,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SubCategory extends Category {
 
   /** List of {@link Category} ids that are parents of this category. */
-  private List<String> otherParentIds = new ArrayList<String>();
+  private Set<String> otherParentIds = new LinkedHashSet<String>();
   /** Map of child {@link Category} indexed by their ids. */
   private Map<String, Category> subCategories = new LinkedHashMap<String, Category>();
 
@@ -75,8 +76,8 @@ public class SubCategory extends Category {
    *
    * @return the list of other parent ids
    */
-  public final List<String> getOtherParentIds() {
-    return ImmutableList.copyOf(otherParentIds);
+  public final Set<String> getOtherParentIds() {
+    return ImmutableSet.copyOf(otherParentIds);
   }
 
 }

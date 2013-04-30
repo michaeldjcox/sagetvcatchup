@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.fail;
@@ -181,7 +182,7 @@ public class SubCategoryTest {
   public void testAddGetOtherParentId() throws Exception {
     SubCategory subcat = new SubCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
     subcat.addOtherParentId("parentId2");
-    List<String> result = subcat.getOtherParentIds();
+    Set<String> result = subcat.getOtherParentIds();
     assertEquals("Number of other parentIds #1", 1, result.size());
     assertArrayEquals("Other parents #1", new String[]{"parentId2"}, result.toArray());
     subcat.addOtherParentId("parentId3");
@@ -201,7 +202,7 @@ public class SubCategoryTest {
   public void testGetOtherParentIdImmutable() throws Exception {
     SubCategory subcat = new SubCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
     subcat.addOtherParentId("parentId2");
-    List<String> result = subcat.getOtherParentIds();
+    Set<String> result = subcat.getOtherParentIds();
     assertEquals("Number of other parentIds #1", 1, result.size());
     assertArrayEquals("Other parents #1", new String[]{"parentId2"}, result.toArray());
 
