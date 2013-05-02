@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/DECORATION/1.3.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.3.0 http://maven.apache.org/xsd/decoration-1.3.0.xsd">
+    <bannerLeft>
+        <name>SageTV Catchup</name>
+        <src>images/logo.png</src>
+        <href>http://localhost/sagetvcatchup</href>
+    </bannerLeft>
+    <body>
+        <menu name="Overview">
+            <item name="Introduction" href="index.html"/>
+            <item name="About" href="about.html"/>
+            <item name="Goals" href="plugin-info.html"/>
+            <item name="Usage" href="usage.html"/>
+            <item name="FAQ" href="faq.html"/>
+        </menu>
+        <menu name="Details">
+            <item name="API Documentation" href="/apidocs/index.html"/>
+            <item name="Source code" href="source-repository.html"/>
+            <item name="Dependencies" href="dependencies.html"/>
+            <item name="Dependency info" href="dependency-info.html"/>
+            <item name="Distribution management" href="distribution-management.html"/>
+            <item name="Continuous integration" href="integration.html"/>
+            <item name="Issue Tracking" href="issue-tracking.html"/>
+            <item name="License" href="license.html"/>
+            <item name="Mailing list" href="mail-lists.html"/>
+            <item name="Plugin Management" href="plugin-management.html"/>
+            <item name="Plugins" href="plugins.html"/>
+            <item name="Project Info" href="project-info.html"/>
+            <item name="Project Reports" href="project-reports.html"/>
+            <item name="Project Summary" href="project-summary.html"/>
+            <item name="Tag list" href="taglist.html"/>
+            <item name="Team" href="team-list.html"/>
+        </menu>
+        <menu name="Reports">
+            <item name="Unit Test Coverage" href="/jacoco/index.html"/>
+            <item name="Unit Test Results" href="surefire-report.html"/>
+            <item name="Checkstyle" href="/checkstyle.html"/>
+        </menu>
+    </body>
+</project>
+
