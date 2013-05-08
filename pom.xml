@@ -7,8 +7,57 @@
     <artifactId>sagetvcatchup</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>sagetvcatchup</name>
-    <url>https://github.com/michaeldjcox/sagetvcatchup.git</url>
+
+    <name>SageTV Catchup TV</name>
+    <url>http://localhost</url>
+    <description>Attempt to make UK catchup TV available via SageTV plugin</description>
+
+    <scm>
+        <url>https://github.com/michaeldjcox/sagetvcatchup</url>
+        <connection>scm:git:git://github.com/michaeldjcox/sagetvcatchup.git</connection>
+        <developerConnection>scm:git:git@github.com:michaeldjcox/sagetvcatchup.git</developerConnection>
+    </scm>
+
+    <issueManagement>
+        <url>https://github.com/michaeldjcox/sagetvcatchup/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <!--ciManagement>
+        <system>Continuum</system>
+        <url>http://integrationserver.wakaleo.com/continuum</url>
+        <notifiers>
+            <notifier>
+                <type>mail</type>
+                <address>duke@wakaleo.com</address>
+            </notifier>
+        </notifiers>
+    </ciManagement-->
+
+    <developers>
+        <developer>
+            <id>michaeldjcox</id>
+            <name>Michael Cox</name>
+            <email>michaeldjcox@gmail.com</email>
+            <roles>
+                <role>Project Manager</role>
+                <role>Architect</role>
+                <role>Developer</role>
+            </roles>
+            <organization>none</organization>
+            <timezone>0</timezone>
+        </developer>
+    </developers>
+
+    <mailingLists>
+        <mailingList>
+            <name>HotelDatabase project mailing list</name>
+            <subscribe>dev-subscribe@wakaleo.com</subscribe>
+            <unsubscribe>dev-unsubscribe@wakaleo.com</unsubscribe>
+            <post>dev@wakaleo.com</post>
+            <archive>http://mail-archives.wakaleo.com/modmbox/dev/</archive>
+        </mailingList>
+    </mailingLists>
 
     <repositories>
         <!--repository>
@@ -39,26 +88,6 @@
                     <source>1.7</source>
                     <target>1.7</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.6.2.201302030002</version>
-                <executions>
-                    <execution>
-                        <id>jacoco-initialize</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>jacoco-site</id>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>com.google.code.maven-replacer-plugin</groupId>
@@ -189,11 +218,45 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.9</version>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.6.2.201302030002</version>
+                <executions>
+                    <execution>
+                        <id>jacoco-initialize</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-site</id>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
     <reporting>
     <plugins>
+        <!--plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.6.2.201302030002</version>
+            <reportSets>
+                <reportSet>
+                    <id>html</id>
+                    <reports>
+                        <report>report</report>
+                    </reports>
+                </reportSet>
+            </reportSets>
+        </plugin-->
         <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>taglist-maven-plugin</artifactId>
