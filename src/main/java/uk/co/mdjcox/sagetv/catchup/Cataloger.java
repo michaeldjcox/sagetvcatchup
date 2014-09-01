@@ -9,9 +9,7 @@ import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.sagetv.catchup.plugins.*;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA. User: michael Date: 28/03/13 Time: 17:34 To change this template use
@@ -20,232 +18,245 @@ import java.util.Map;
 @Singleton
 public class Cataloger {
 
-  private Logger logger;
-  private PropertiesInterface props;
-  private PluginManager pluginManager;
-  private String podcastUrlBase;
+    private Logger logger;
+    private PropertiesInterface props;
+    private PluginManager pluginManager;
+    private String podcastUrlBase;
 
-  @Inject
-  private Cataloger(Logger logger, PropertiesInterface props, PluginManager pluginManager) {
-    this.logger = logger;
-    this.props = props;
-    this.pluginManager = pluginManager;
-    this.podcastUrlBase = "http://localhost:" + props.getString("podcasterPort", "8081") + "/";
+    @Inject
+    private Cataloger(Logger logger, PropertiesInterface props, PluginManager pluginManager) {
+        this.logger = logger;
+        this.props = props;
+        this.pluginManager = pluginManager;
+        this.podcastUrlBase = "http://localhost:" + props.getString("podcasterPort", "8081") + "/";
 
-  }
+    }
 
-  public Catalog catalog() {
-    Catalog catalog = new Catalog();
+    public Catalog catalog() {
+        Catalog catalog = new Catalog();
 
-    try {
-      Map<String, Category> newCategories = new LinkedHashMap<String, Category>();
+        try {
+            Map<String, Category> newCategories = new LinkedHashMap<String, Category>();
 
-      Root
-          root =
-          new Root("Catchup", "UK Catchup TV for SageTV", "http://localhost:8081",
-                   "http://localhost:" + props.getInt("podcasterPort", 8081) + "/logo.png");
-      newCategories.put(root.getId(), root);
+            Root root = new Root("Catchup", "UK Catchup TV for SageTV", "http://localhost:8081",
+                            "http://localhost:" + props.getInt("podcasterPort", 8081) + "/logo.png");
+            newCategories.put(root.getId(), root);
 
-      for (Plugin plugin : pluginManager.getPlugins()) {
+            for (Plugin plugin : pluginManager.getPlugins()) {
 
-        Source sourceCat = plugin.getSource();
-        newCategories.put(sourceCat.getId(), sourceCat);
+                Source sourceCat = plugin.getSource();
+                String pluginName = sourceCat.getId();
 
-        logger.info("Found source: " + sourceCat);
+                ArrayList<String> testProgrammes = new ArrayList<String>();
+                if (props.getBoolean(pluginName + ".skip")) {
+                    logger.info("Skipping plugin " + pluginName);
+                    continue;
+                } else {
+                    testProgrammes = props.getPropertySequence(pluginName + ".programmes");
+                }
 
-        Map<String, Programme> newProgCategories = new LinkedHashMap<String, Programme>();
+                newCategories.put(sourceCat.getId(), sourceCat);
 
-        Map<String, Episode> newEpisodes = new LinkedHashMap<String, Episode>();
+                logger.info("Found source: " + sourceCat);
 
-        root.addSubCategory(sourceCat);
+                Map<String, Programme> newProgCategories = new LinkedHashMap<String, Programme>();
 
-        logger.info("Getting programmes found on: " + sourceCat);
+                Map<String, Episode> newEpisodes = new LinkedHashMap<String, Episode>();
 
-        Collection<Programme> programmes = plugin.getProgrammes();
-        for (Programme programme : programmes) {
+                root.addSubCategory(sourceCat);
 
-          programme.setPodcastUrl(podcastUrlBase + programme.getId());
+                logger.info("Getting programmes found on: " + sourceCat);
 
-          plugin.getEpisodes(programme);
+                Collection<Programme> programmes = plugin.getProgrammes();
+                for (Programme programme : programmes) {
 
-          for (Episode episode : programme.getEpisodes().values()) {
+                    String programmeId = programme.getId();
+                    if (testProgrammes != null && !testProgrammes.isEmpty()) {
+                        if (!testProgrammes.contains(programmeId)) {
+                            logger.info("Skipping programme " + programmeId);
+                            continue;
+                        }
+                    }
 
-            plugin.getEpisode(programme, episode);
-          }
+                    programme.setPodcastUrl(podcastUrlBase + programmeId);
 
-          if (programme.getEpisodes().size() == 0) {
-            continue;
-          }
+                    plugin.getEpisodes(programme);
 
-          newProgCategories.put(programme.getId(), programme);
-          newEpisodes.putAll(programme.getEpisodes());
+                    for (Episode episode : programme.getEpisodes().values()) {
 
-//                    // TODO take this out
-          if (newProgCategories.size() > 0) {
-            break;
-          }
-        }
+                        plugin.getEpisode(programme, episode);
+                    }
 
-        sourceCat.getSubCategories().clear();
+                    if (programme.getEpisodes().size() == 0) {
+                        continue;
+                    }
 
-        logger.info("Found " + newProgCategories.size() + " Programmes");
-        logger.info("Found " + newEpisodes.size() + " Episodes");
+                    newProgCategories.put(programmeId, programme);
+                    newEpisodes.putAll(programme.getEpisodes());
+                }
 
-        Map<String, SubCategory> newSubCategories = new LinkedHashMap<String, SubCategory>();
+                sourceCat.clearSubCategories();
 
-        for (Programme programmeCat : newProgCategories.values()) {
-          logger.info("Categorising " + programmeCat);
-          doAtoZcategorisation(sourceCat, programmeCat, newSubCategories);
+                logger.info("Found " + newProgCategories.size() + " Programmes");
+                logger.info("Found " + newEpisodes.size() + " Episodes");
 
-          boolean doneGenre = false;
-          for (Episode episode : programmeCat.getEpisodes().values()) {
-            if (!doneGenre) {
-              // Genre
-              doGenreCategorisation(sourceCat, programmeCat, episode, newSubCategories);
+                Map<String, SubCategory> newSubCategories = new LinkedHashMap<String, SubCategory>();
 
-              // Channel
-              doChannelCategorisation(sourceCat, programmeCat, episode, newSubCategories);
+                for (Programme programmeCat : newProgCategories.values()) {
+                    logger.info("Categorising " + programmeCat);
+                    doAtoZcategorisation(sourceCat, programmeCat, newSubCategories);
+
+                    boolean doneGenre = false;
+                    for (Episode episode : programmeCat.getEpisodes().values()) {
+                        if (!doneGenre) {
+                            // Genre
+                            doGenreCategorisation(sourceCat, programmeCat, episode, newSubCategories);
+
+                            // Channel
+                            doChannelCategorisation(sourceCat, programmeCat, episode, newSubCategories);
+                        }
+
+                        // Air Date
+                        doAirDateCategorisation(sourceCat, programmeCat, episode, newSubCategories);
+                    }
+                }
+
+                newCategories.putAll(newProgCategories);
+                newCategories.putAll(newSubCategories);
+
             }
 
-            // Air Date
-            doAirDateCategorisation(sourceCat, programmeCat, episode, newSubCategories);
-          }
+            catalog.setCategories(newCategories);
+
+        } catch (Exception e) {
+            logger.error("Failed to refresh properties file", e);
         }
 
-        newCategories.putAll(newProgCategories);
-        newCategories.putAll(newSubCategories);
-
-      }
-
-      catalog.setCategories(newCategories);
-
-    } catch (Exception e) {
-      logger.error("Failed to refresh properties file", e);
+        return catalog;
     }
 
-    return catalog;
-  }
+    private void doAirDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode,
+                                         Map<String, SubCategory> newSubCategories) {
+        String airDateName = episode.getAirDate();
+        if (airDateName == null || airDateName.isEmpty()) {
+            return;
+        }
 
-  private void doAirDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode,
-                                       Map<String, SubCategory> newSubCategories) {
-    String airDateName = episode.getAirDate();
-    if (airDateName == null || airDateName.isEmpty()) {
-      return;
-    }
-
-    String airdateId = sourceCat.getId() + "/AirDate";
-    SubCategory airdateCat = newSubCategories.get(airdateId);
-    if (airdateCat == null) {
-      airdateCat =
-          new SubCategory(airdateId, "Air Date", "Air Date", sourceCat.getServiceUrl(),
-                          sourceCat.getIconUrl(), sourceCat.getId());
-      newSubCategories.put(airdateId, airdateCat);
-      sourceCat.addSubCategory(airdateCat);
-    }
-    String
-        airDateInstanceId =
-        sourceCat.getId() + "/AirDate/" + airDateName.replace(" ", "").replace(",", "");
-    Programme airDateInstanceCat = (Programme) newSubCategories.get(airDateInstanceId);
-    if (airDateInstanceCat == null) {
-      airDateInstanceCat =
-          new Programme(airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(),
-                        sourceCat.getIconUrl(), airdateCat.getId());
-      airDateInstanceCat.setPodcastUrl(podcastUrlBase + airDateInstanceId);
-      newSubCategories.put(airDateInstanceId, airDateInstanceCat);
-      airdateCat.addSubCategory(airDateInstanceCat);
-    }
-
-    airDateInstanceCat.addEpisode(episode);
-  }
-
-  private void doChannelCategorisation(Source sourceCat, Programme programmeCat, Episode prog,
-                                       Map<String, SubCategory> newSubCategories) {
-    String channelName = prog.getChannel();
-    if (channelName != null && !channelName.isEmpty()) {
-
-      String channelId = sourceCat.getId() + "/Channel";
-      SubCategory channelCat = newSubCategories.get(channelId);
-      if (channelCat == null) {
-        channelCat =
-            new SubCategory(channelId, "Channel", "Channel", sourceCat.getServiceUrl(),
+        String airdateId = sourceCat.getId() + "/AirDate";
+        SubCategory airdateCat = newSubCategories.get(airdateId);
+        if (airdateCat == null) {
+            airdateCat =
+                    new SubCategory(airdateId, "Air Date", "Air Date", sourceCat.getServiceUrl(),
                             sourceCat.getIconUrl(), sourceCat.getId());
-        newSubCategories.put(channelId, channelCat);
-        sourceCat.addSubCategory(channelCat);
-      }
-      String channelInstanceId = sourceCat.getId() + "/Channel/" + channelName.replace(" ", "");
-      SubCategory channelInstanceCat = newSubCategories.get(channelInstanceId);
-      if (channelInstanceCat == null) {
-        channelInstanceCat =
-            new SubCategory(channelInstanceId, channelName, channelName, sourceCat.getServiceUrl(),
-                            sourceCat.getIconUrl(), channelCat.getId());
-        newSubCategories.put(channelInstanceId, channelInstanceCat);
-        channelCat.addSubCategory(channelInstanceCat);
-      }
+            newSubCategories.put(airdateId, airdateCat);
+            sourceCat.addSubCategory(airdateCat);
+        }
+        String
+                airDateInstanceId =
+                sourceCat.getId() + "/AirDate/" + airDateName.replace(" ", "").replace(",", "");
+        Programme airDateInstanceCat = (Programme) newSubCategories.get(airDateInstanceId);
+        if (airDateInstanceCat == null) {
+            airDateInstanceCat =
+                    new Programme(airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(),
+                            sourceCat.getIconUrl(), airdateCat.getId());
+            airDateInstanceCat.setPodcastUrl(podcastUrlBase + airDateInstanceId);
+            newSubCategories.put(airDateInstanceId, airDateInstanceCat);
+            airdateCat.addSubCategory(airDateInstanceCat);
+        }
 
-      programmeCat.addOtherParentId(channelInstanceId);
-      channelInstanceCat.addSubCategory(programmeCat);
+        airDateInstanceCat.addEpisode(episode);
     }
-  }
 
-  private void doGenreCategorisation(Source sourceCat, Programme programmeCat, Episode prog,
-                                     Map<String, SubCategory> newSubCategories) {
-    String genreName = prog.getCategory();
-    if (genreName != null && !genreName.isEmpty()) {
-      String genreId = sourceCat.getId() + "/Genre";
-      SubCategory genreCat = newSubCategories.get(genreId);
-      if (genreCat == null) {
-        genreCat =
-            new SubCategory(genreId, "Genre", "Genre", sourceCat.getServiceUrl(),
+    private void doChannelCategorisation(Source sourceCat, Programme programmeCat, Episode prog,
+                                         Map<String, SubCategory> newSubCategories) {
+        String channelName = prog.getChannel();
+        if (channelName != null && !channelName.isEmpty()) {
+
+            String channelId = sourceCat.getId() + "/Channel";
+            SubCategory channelCat = newSubCategories.get(channelId);
+            if (channelCat == null) {
+                channelCat =
+                        new SubCategory(channelId, "Channel", "Channel", sourceCat.getServiceUrl(),
+                                sourceCat.getIconUrl(), sourceCat.getId());
+                newSubCategories.put(channelId, channelCat);
+                sourceCat.addSubCategory(channelCat);
+            }
+            String channelInstanceId = sourceCat.getId() + "/Channel/" + channelName.replace(" ", "");
+            SubCategory channelInstanceCat = newSubCategories.get(channelInstanceId);
+            if (channelInstanceCat == null) {
+                channelInstanceCat =
+                        new SubCategory(channelInstanceId, channelName, channelName, sourceCat.getServiceUrl(),
+                                sourceCat.getIconUrl(), channelCat.getId());
+                newSubCategories.put(channelInstanceId, channelInstanceCat);
+                channelCat.addSubCategory(channelInstanceCat);
+            }
+
+            programmeCat.addOtherParentId(channelInstanceId);
+            channelInstanceCat.addSubCategory(programmeCat);
+        }
+    }
+
+    private void doGenreCategorisation(Source sourceCat, Programme programmeCat, Episode prog,
+                                       Map<String, SubCategory> newSubCategories) {
+        Set<String> genres = prog.getGenres();
+        if (genres != null && !genres.isEmpty()) {
+            for (String genreName : genres) {
+                String genreId = sourceCat.getId() + "/Genre";
+                SubCategory genreCat = newSubCategories.get(genreId);
+                if (genreCat == null) {
+                    genreCat =
+                            new SubCategory(genreId, "Genre", "Genre", sourceCat.getServiceUrl(),
+                                    sourceCat.getIconUrl(), sourceCat.getId());
+                    newSubCategories.put(genreId, genreCat);
+                    sourceCat.addSubCategory(genreCat);
+                }
+                String genreInstanceId = sourceCat.getId() + "/Genre/" + genreName.replace(" ", "");
+                SubCategory genreInstanceCat = newSubCategories.get(genreInstanceId);
+                if (genreInstanceCat == null) {
+                    genreInstanceCat =
+                            new SubCategory(genreInstanceId, genreName, genreName, sourceCat.getServiceUrl(),
+                                    sourceCat.getIconUrl(), genreCat.getId());
+                    newSubCategories.put(genreInstanceId, genreInstanceCat);
+                    genreCat.addSubCategory(genreInstanceCat);
+                }
+                programmeCat.addOtherParentId(genreInstanceId);
+                genreInstanceCat.addSubCategory(programmeCat);
+            }
+        }
+    }
+
+    private void doAtoZcategorisation(Source sourceCat, Programme programmeCat,
+                                      Map<String, SubCategory> newSubCategories) {
+        // A to Z
+        String programmeTitle = programmeCat.getShortName();
+        String azName;
+        if (!programmeTitle.startsWith("The ") && !programmeTitle.startsWith("the ")) {
+            azName = programmeTitle.substring(0, 1).toUpperCase();
+        } else {
+            azName = programmeTitle.substring(4, 5).toUpperCase();
+        }
+
+        String atozId = sourceCat.getId() + "/AtoZ";
+        SubCategory atozCat = newSubCategories.get(atozId);
+        if (atozCat == null) {
+            atozCat =
+                    new SubCategory(atozId, "A to Z", "A to Z", sourceCat.getServiceUrl(),
                             sourceCat.getIconUrl(), sourceCat.getId());
-        newSubCategories.put(genreId, genreCat);
-        sourceCat.addSubCategory(genreCat);
-      }
-      String genreInstanceId = sourceCat.getId() + "/Genre/" + genreName.replace(" ", "");
-      SubCategory genreInstanceCat = newSubCategories.get(genreInstanceId);
-      if (genreInstanceCat == null) {
-        genreInstanceCat =
-            new SubCategory(genreInstanceId, genreName, genreName, sourceCat.getServiceUrl(),
-                            sourceCat.getIconUrl(), genreCat.getId());
-        newSubCategories.put(genreInstanceId, genreInstanceCat);
-        genreCat.addSubCategory(genreInstanceCat);
-      }
-      programmeCat.addOtherParentId(genreInstanceId);
-      genreInstanceCat.addSubCategory(programmeCat);
-    }
-  }
+            newSubCategories.put(atozId, atozCat);
+            sourceCat.addSubCategory(atozCat);
+        }
+        String azId = sourceCat.getId() + "/AtoZ/" + azName;
+        SubCategory azCat = newSubCategories.get(azId);
+        if (azCat == null) {
+            azCat =
+                    new SubCategory(azId, azName, azName, sourceCat.getServiceUrl(), sourceCat.getIconUrl(),
+                            atozCat.getId());
+            newSubCategories.put(azId, azCat);
+            atozCat.addSubCategory(azCat);
+        }
 
-  private void doAtoZcategorisation(Source sourceCat, Programme programmeCat,
-                                    Map<String, SubCategory> newSubCategories) {
-    // A to Z
-    String programmeTitle = programmeCat.getShortName();
-    String azName;
-    if (!programmeTitle.startsWith("The ") && !programmeTitle.startsWith("the ")) {
-      azName = programmeTitle.substring(0, 1).toUpperCase();
-    } else {
-      azName = programmeTitle.substring(4, 5).toUpperCase();
+        programmeCat.addOtherParentId(azId);
+        azCat.addSubCategory(programmeCat);
     }
-
-    String atozId = sourceCat.getId() + "/AtoZ";
-    SubCategory atozCat = newSubCategories.get(atozId);
-    if (atozCat == null) {
-      atozCat =
-          new SubCategory(atozId, "A to Z", "A to Z", sourceCat.getServiceUrl(),
-                          sourceCat.getIconUrl(), sourceCat.getId());
-      newSubCategories.put(atozId, atozCat);
-      sourceCat.addSubCategory(atozCat);
-    }
-    String azId = sourceCat.getId() + "/AtoZ/" + azName;
-    SubCategory azCat = newSubCategories.get(azId);
-    if (azCat == null) {
-      azCat =
-          new SubCategory(azId, azName, azName, sourceCat.getServiceUrl(), sourceCat.getIconUrl(),
-                          atozCat.getId());
-      newSubCategories.put(azId, azCat);
-      atozCat.addSubCategory(azCat);
-    }
-
-    programmeCat.addOtherParentId(azId);
-    azCat.addSubCategory(programmeCat);
-  }
 
 }

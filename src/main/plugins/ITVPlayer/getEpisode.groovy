@@ -52,7 +52,7 @@ String genre = EXTRACT_TO("<", details2)
 genre = REMOVE_HTML_TAGS(genre)
 if (genre == null) genre = "Other"
 genre = genre.replace("&", " and ")
-episode.setCategory(genre);
+episode.addGenre(genre);
 LOG_INFO("Category: " + genre)
 
 // CHANNEL

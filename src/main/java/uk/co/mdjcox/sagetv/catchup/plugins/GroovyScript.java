@@ -54,6 +54,20 @@ public abstract class GroovyScript extends groovy.lang.Script {
         return downloadUtils.downloadFileString(url);
     }
 
+    public String REPLACE_LINK_PREFIX(String existingUrl, String newPrefix) {
+        existingUrl = existingUrl.substring(existingUrl.lastIndexOf('/'));
+
+        if (newPrefix.endsWith("/")) {
+            newPrefix = newPrefix.substring(0, newPrefix.length()-1);
+        }
+        return newPrefix + existingUrl;
+    }
+
+    public String REPLACE_LINK_PREFIX(String existingUrl, String oldPrefix, String newPrefix) {
+        return existingUrl.replace(oldPrefix, newPrefix);
+    }
+
+
     public String SAMPLE_WEB_PAGE(String url) throws Exception {
         return downloadUtils.sampleFileString(url);
     }

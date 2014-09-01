@@ -1,5 +1,6 @@
 package uk.co.mdjcox.sagetv.model;
 
+import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.junit.Before; 
 import org.junit.After;
@@ -43,7 +44,7 @@ public void testCreate() {
     try {
       Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
                                     "series", "episode", "description", "iconUrl", "serviceUrl",
-                                    "airDate","airTime", "channel", "category");
+                                    "airDate","airTime", "channel", Sets.newHashSet("category"));
       Recording recording = new Recording(episode);
 
       recording.setFile(null);
@@ -63,7 +64,7 @@ public void testCreate() {
 public void testSetGetFile() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
-                                "airDate","airTime", "channel", "category");
+                                "airDate","airTime", "channel", Sets.newHashSet("category"));
   File file = new File("filename");
 
   Recording recording = new Recording(episode);
@@ -89,7 +90,7 @@ public void testSetGetFile() throws Exception {
 public void testGetSourceId() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
-                                "airDate","airTime", "channel", "category");
+                                "airDate","airTime", "channel", Sets.newHashSet("category"));
   Recording recording = new Recording(episode);
 
   assertEquals("getSourceId", "sourceId", recording.getSourceId());
@@ -104,7 +105,7 @@ public void testGetSourceId() throws Exception {
 public void testGetUrl() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
-                                "airDate","airTime", "channel", "category");
+                                "airDate","airTime", "channel", Sets.newHashSet("category"));
 
   Recording recording = new Recording(episode);
 
@@ -120,7 +121,7 @@ public void testGetUrl() throws Exception {
 public void testGetId() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
-                                "airDate","airTime", "channel", "category");
+                                "airDate","airTime", "channel", Sets.newHashSet("category"));
 
   Recording recording = new Recording(episode);
 
@@ -136,7 +137,7 @@ public void testGetId() throws Exception {
 public void testGetName() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
-                                "airDate","airTime", "channel", "category");
+                                "airDate","airTime", "channel", Sets.newHashSet("category"));
 
   Recording recording = new Recording(episode);
 
@@ -152,7 +153,7 @@ public void testGetName() throws Exception {
 public void testGetFilename() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
-                                "airDate","airTime", "channel", "category");
+                                "airDate","airTime", "channel", Sets.newHashSet("category"));
 
 
   Recording recording = new Recording(episode);
@@ -168,7 +169,7 @@ public void testGetFilename() throws Exception {
   public void testGetFilenameNoFile() throws Exception {
     Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
                                   "series", "episode", "description", "iconUrl", "serviceUrl",
-                                  "airDate","airTime", "channel", "category");
+                                  "airDate","airTime", "channel", Sets.newHashSet("category"));
 
 
     Recording recording = new Recording(episode);
@@ -185,7 +186,7 @@ public void testGetFilename() throws Exception {
 public void testToString() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
-                                "airDate","airTime", "channel", "category");
+                                "airDate","airTime", "channel", Sets.newHashSet("category"));
 
 
   Recording recording = new Recording(episode);

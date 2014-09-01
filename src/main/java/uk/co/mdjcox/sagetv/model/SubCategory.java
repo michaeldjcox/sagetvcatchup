@@ -63,6 +63,13 @@ public class SubCategory extends Category {
   }
 
   /**
+   * Clears the map of child subcategories
+   */
+  public final void clearSubCategories() {
+    subCategories.clear();
+  }
+
+  /**
    * Adds an additional category id  which represents a parent category.
    *
    * @param parentId the id of the additional parent category

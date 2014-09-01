@@ -1,5 +1,6 @@
 package uk.co.mdjcox.sagetv.onlinevideo;
 
+import com.google.common.collect.Sets;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -184,7 +185,7 @@ public class PublisherTest {
 
     Episode episode = new Episode("sourceId", "episodeId", "programmeTitle", "episodeTitle",
                                   "series", "episode", "description", "iconUrl", "serviceUrl",
-                                  "airDate", "airTime", "channel", "category");
+                                  "airDate", "airTime", "channel", Sets.newHashSet("category"));
     programme.addEpisode(episode);
 
     publisher.publish(catalog);

@@ -68,13 +68,13 @@ public class CatchupModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public HtmlUtilsInterface providesHtmlUtls() throws Exception {
+    public HtmlUtilsInterface providesHtmlUtils() throws Exception {
         return HtmlUtils.instance();
     }
 
     @Provides
     @Singleton
-    public OsUtilsInterface providesOsUtlis() throws Exception {
+    public OsUtilsInterface providesOsUtils() throws Exception {
         return OsUtils.instance(providesLogger());
     }
 

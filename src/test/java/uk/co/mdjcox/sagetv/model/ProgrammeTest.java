@@ -1,5 +1,6 @@
 package uk.co.mdjcox.sagetv.model;
 
+import com.google.common.collect.Sets;
 import junit.framework.TestCase;
 
 import org.junit.After;
@@ -47,7 +48,7 @@ public void testAddEpisode() throws Exception {
 
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", "category");
+                                "airTime", "channel", Sets.newHashSet("category"));
   subcat.addEpisode(episode);
 
   assertEquals("Episodes should number 1", 1, subcat.getEpisodes().size());
@@ -77,7 +78,7 @@ public void testAddEpisode() throws Exception {
 
     Episode episode2 = new Episode("sourceId2", "id2", "programmeTitle2", "episodeTitle2", "series2",
                                   "episode2", "descripton2", "iconUrl2", "serviceUrl2", "airDate2",
-                                  "airTime2", "channel2", "category2");
+                                  "airTime2", "channel2", Sets.newHashSet("category2"));
 
     try {
       episodes.put("id2", episode2);
@@ -100,7 +101,7 @@ public void testRemoveEpisode() throws Exception {
 
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", "category");
+                                "airTime", "channel", Sets.newHashSet("category"));
   subcat.addEpisode(episode);
 
   assertEquals("Episodes should number 1", 1, subcat.getEpisodes().size());
@@ -130,7 +131,7 @@ public void testGetEpisodes() throws Exception {
 
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", "category");
+                                "airTime", "channel", Sets.newHashSet("category"));
   subcat.addEpisode(episode);
 
   assertEquals("Episodes should number 1", 1, subcat.getEpisodes().size());

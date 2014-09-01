@@ -49,7 +49,7 @@ public class CatchupTestModule extends AbstractModule {
     @Singleton
     public Logger providesLogger() throws Exception {
       if (logger == null) {
-        System.setProperty("logback.configurationFile", "/home/michael/Documents/sagetvcatchup/src/main/config/logback-test.xml");
+        System.setProperty("logback.configurationFile", "/home/michael/Documents/Projects/sagetvcatchup/src/main/config/logback-test.xml");
         logger = LoggerFactory.getLogger(this.getClass());
       }
         return logger;
@@ -57,13 +57,13 @@ public class CatchupTestModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public HtmlUtilsInterface providesHtmlUtls() throws Exception {
+    public HtmlUtilsInterface providesHtmlUtils() throws Exception {
         return HtmlUtils.instance();
     }
 
     @Provides
     @Singleton
-    public OsUtilsInterface providesOsUtlis() throws Exception {
+    public OsUtilsInterface providesOsUtils() throws Exception {
         return OsUtils.instance(providesLogger());
     }
 

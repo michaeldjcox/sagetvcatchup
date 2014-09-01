@@ -59,8 +59,9 @@ public class CatchupPlugin implements SageTVPlugin {
 
         try {
             AbstractModule module;
-            String home = System.getProperty("user.dir");
-            if (home.startsWith("/home/michael")) {
+            String workingDir = System.getProperty("user.dir");
+            String home = System.getProperty("user.home");
+            if (workingDir.startsWith(home) && workingDir.endsWith("sagetvcatchup")) {
                 System.err.println("Running in DEV");
                 module = new CatchupDevModule();
             } else {

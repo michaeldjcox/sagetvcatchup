@@ -24,11 +24,13 @@ import java.io.File;
  */
 public class CatchupDevModule extends AbstractModule {
 
-    private PropertiesFile properties;
+  private PropertiesFile properties;
     private Logger logger;
+    private String workingDir;
 
     @Override
     protected void configure() {
+        workingDir = System.getProperty("user.dir");
         install(new FactoryModuleBuilder()
                 .build(ScriptFactory.class));
         install(new FactoryModuleBuilder()
@@ -41,7 +43,7 @@ public class CatchupDevModule extends AbstractModule {
     @Singleton
     public Logger providesLogger() throws Exception {
         if (logger == null) {
-          System.setProperty("logback.configurationFile", "/home/michael/Documents/sagetvcatchup/src/main/config/logback-test.xml");
+          System.setProperty("logback.configurationFile", workingDir + "/src/main/config/logback-test.xml");
             logger = LoggerFactory.getLogger(CatchupPlugin.class);
         }
         return logger;
@@ -53,8 +55,8 @@ public class CatchupDevModule extends AbstractModule {
         String base = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "config" + File.separator + "catchup.properties";
         if (properties == null) {
             properties =  new PropertiesFile(base, true);
-            properties.setProperty("recordingDir", "/home/michael/Documents/sagetvcatchup/recordings");
-            properties.setProperty("pluginDir", "/home/michael/Documents/sagetvcatchup/src/main/plugins");
+            properties.setProperty("recordingDir", workingDir + "/recordings");
+            properties.setProperty("pluginDir", workingDir + "/src/main/plugins");
             properties.setProperty("podcasterPort", "8082");
         }
         return properties;
@@ -62,13 +64,13 @@ public class CatchupDevModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public HtmlUtilsInterface providesHtmlUtls() throws Exception {
+    public HtmlUtilsInterface providesHtmlUtils() throws Exception {
         return HtmlUtils.instance();
     }
 
     @Provides
     @Singleton
-    public OsUtilsInterface providesOsUtlis() throws Exception {
+    public OsUtilsInterface providesOsUtils() throws Exception {
         return OsUtils.instance(providesLogger());
     }
 

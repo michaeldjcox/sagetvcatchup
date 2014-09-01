@@ -7,6 +7,10 @@
  */
 package uk.co.mdjcox.sagetv.model;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -39,7 +43,7 @@ public class Episode {
   /** The TV channel on which the media file last aired */
   private String channel = "";
   /** The category of programme this media file falls into */
-  private String category = "";
+  private Set<String> genres = new TreeSet<String>();
 
   /**
    * Constructor for the episode meta data.
@@ -56,14 +60,14 @@ public class Episode {
    * @param airDate The date on which the media file last aired
    * @param airTime The time at which the media file last aired
    * @param channel The TV channel on which the media file last aired
-   * @param category The category of programme this media file falls into
+   * @param genres The genres of programme this media file falls into
    *
    * @throws NullPointerException if any parameter is <code>null</code>
    */
   public Episode(String sourceId, String id, String programmeTitle, String episodeTitle,
                  String series, String episode, String description, String iconUrl,
                  String serviceUrl, String airDate, String airTime, String channel,
-                 String category) {
+                 Set genres) {
     this.sourceId = checkNotNull(sourceId);
     this.id = checkNotNull(id);
     this.programmeTitle = checkNotNull(programmeTitle);
@@ -76,7 +80,7 @@ public class Episode {
     this.airDate = checkNotNull(airDate);
     this.airTime = checkNotNull(airTime);
     this.channel = checkNotNull(channel);
-    this.category = checkNotNull(category);
+    this.genres.addAll(checkNotNull(genres));
   }
 
   /**
@@ -280,23 +284,24 @@ public class Episode {
   }
 
   /**
-   * Gets the category of programme this episode belongs to
+   * Gets the genres of programme this episode belongs to
    *
-   * @return the category of programme this episode belongs to
+   * @return the genres of programme this episode belongs to
    */
-  public final String getCategory() {
-    return category;
+  public final Set<String> getGenres() {
+    return genres;
   }
 
   /**
    * Sets the category of programme that this episode belongs to
    *
-   * @param category The category of programme that this episode belongs to
+   * @param genre The category of programme that this episode belongs to
    *
    * @throws NullPointerException if a <code>null</code> value is provided
    */
-  public final void setCategory(String category) {
-    this.category = checkNotNull(category);
+  public final void addGenre(String genre) {
+    String newGenre = checkNotNull(genre);
+    genres.add(newGenre);
   }
 
   /**

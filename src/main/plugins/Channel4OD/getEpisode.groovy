@@ -52,7 +52,7 @@ details2 = MOVE_TO("<meta name=\"primaryBrandCategory\"", details)
 details2 = MOVE_TO("content=\"", details2)
 String genre = EXTRACT_TO("\"", details2)
 genre = REMOVE_HTML_TAGS(genre);
-episode.setCategory(genre);
+episode.addGenre(genre);
 LOG_INFO("Category: " + genre)
 
 // CHANNEL

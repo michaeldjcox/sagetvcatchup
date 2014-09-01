@@ -33,7 +33,7 @@ while (str != null) {
             "", // airDate
             "", // airTime
             "", // channel
-            "", // category
+            new HashSet(), // genre
     );
 
     category.addEpisode(subCat);
@@ -66,7 +66,7 @@ while (str != null) {
             "", // airDate
             "", // airTime
             "", // channel
-            "", // category
+            new HashSet(), // genre
     );
 
     category.addEpisode(subCat);
