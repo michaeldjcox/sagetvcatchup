@@ -35,10 +35,14 @@ public class ProgrammesScript extends Script {
     public Collection<Programme> getProgrammes(Source category) {
         Collection<Programme> programmes = new ArrayList<Programme>();
         try {
-            call("url", category.getServiceUrl(), "programmes", programmes);
+            call("category", category,  "url", category.getServiceUrl(), "programmes", programmes);
         } catch (Throwable e) {
-            getLogger().error("Unable to get programmes for: " + category, e);
+          category.addError("ERROR", category.getId(), "", "", category.getServiceUrl(), "Unable to get programmes: " + e.getMessage());
+          getLogger().error("Unable to get programmes for: " + category, e);
         } finally {
+          if (category.hasErrors()) {
+            getLogger().warn("Source " + category.getShortName() + " has errors");
+          }
             getLogger().info(category + " has " + programmes.size() + " programmes");
         }
         return programmes;

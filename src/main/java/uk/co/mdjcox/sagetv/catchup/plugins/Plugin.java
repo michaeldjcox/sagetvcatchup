@@ -54,12 +54,12 @@ public class Plugin {
         return programmesScript.getProgrammes(source);
     }
 
-    public void getEpisodes(Programme programme) {
-        episodesScript.getEpisodes(programme);
+    public void getEpisodes(Source source, Programme programme) {
+        episodesScript.getEpisodes(source, programme);
     }
 
-    public void getEpisode(Programme programme, Episode episode) {
-        episodeScript.getEpisode(programme, episode);
+    public void getEpisode(Source source, Programme programme, Episode episode) {
+        episodeScript.getEpisode(source, programme, episode);
     }
 
     public void playEpisode(Recording recording) {

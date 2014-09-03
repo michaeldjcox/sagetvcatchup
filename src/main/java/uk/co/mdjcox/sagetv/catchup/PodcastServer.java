@@ -10,11 +10,7 @@ import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.slf4j.Logger;
 
-import uk.co.mdjcox.sagetv.model.Catalog;
-import uk.co.mdjcox.sagetv.model.Category;
-import uk.co.mdjcox.sagetv.model.Episode;
-import uk.co.mdjcox.sagetv.model.Programme;
-import uk.co.mdjcox.sagetv.model.SubCategory;
+import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
@@ -28,6 +24,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 
 
 @Singleton
@@ -41,6 +38,7 @@ public class PodcastServer {
     private Recorder recorder;
     private HtmlUtilsInterface htmlUtils;
     private Map<String, Episode> episodes = new HashMap<String, Episode>();
+    private String errorResponse = "";
 
     @Inject
     private PodcastServer(Logger logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, Recorder recorder) throws Exception {
@@ -89,8 +87,10 @@ public class PodcastServer {
             String name = request.getParameter("name");
             getVideoResponse(response, name);
         } else if (target.startsWith("/stop")) {
-            String name = request.getParameter("name");
-            stopVideoResponse(response, name);
+          String name = request.getParameter("name");
+          stopVideoResponse(response, name);
+        } else if (target.startsWith("/errors")) {
+          getMessageResponse(response, errorResponse);
         } else {
             String serviceName = target.substring(1);
             String podcast = podcasts.get(serviceName);
@@ -227,6 +227,14 @@ public class PodcastServer {
                 resultStr += "<guid>" + episode.getServiceUrl() + "</guid>" + CRLF;
                 resultStr += "<description>" + htmlUtils.makeContentSafe(episode.getDescription()) + "</description>" + CRLF;
                 resultStr += "<itunes:image href=\"" + episode.getIconUrl() + "\"/>" + CRLF;
+
+//                if (!episode.getGenres().isEmpty()) {
+//                    for (String genre : episode.getGenres()) {
+//                        resultStr += " <itunes:category text=\""+genre+"\">";
+//                    }
+//                    resultStr +="</itunes:category>";
+//                }
+
                 resultStr += "<media:thumbnail url=\"" + episode.getIconUrl() + "\"/>" + CRLF;
                 int length = 999999;
                 String type = "video/mp4";
@@ -254,6 +262,7 @@ public class PodcastServer {
     }
 
     public void publish(Catalog catalog) {
+
         Map<String, String> newPodcasts = new HashMap<String, String>();
         Map<String, Episode> newEpisodes = new HashMap<String, Episode>();
         for (Category cat : catalog.getCategories()) {
@@ -273,6 +282,111 @@ public class PodcastServer {
         }
         podcasts = newPodcasts;
         episodes = newEpisodes;
+
+
+      TreeSet<ParseError> errorList = new TreeSet<ParseError>();
+      for (Category cat : catalog.getCategories()) {
+        if (cat.isSource()) {
+          if (cat.hasErrors()) {
+            errorList.addAll(cat.getErrors());
+          }
+        }
+        if (cat.isProgrammeCategory()) {
+          if (cat.hasErrors()) {
+            errorList.addAll(cat.getErrors());
+          }
+          Programme prog  = (Programme)cat;
+          if (prog.hasEpisodes()) {
+            for (Episode episode : prog.getEpisodes().values()) {
+              if (episode.hasErrors()) {
+                errorList.addAll(episode.getErrors());
+              }
+            }
+          }
+        }
+
+      }
+      StringBuilder errorsBuilder = new StringBuilder("<html>\n");
+      errorsBuilder.append("<title>Errors page</title>\n");
+      errorsBuilder.append("<style>\n");
+      errorsBuilder.append("table, th, td {\n");
+      errorsBuilder.append("border: 1px solid black;\n");
+      errorsBuilder.append("  border-collapse: collapse;\n");
+      errorsBuilder.append("}\n");
+      errorsBuilder.append("th, td {\n");
+      errorsBuilder.append("padding: 5px;\n");
+      errorsBuilder.append("text-align: left;\n");
+      errorsBuilder.append("}\n");
+      errorsBuilder.append("table.names th	{\n");
+      errorsBuilder.append("background-color: #c1c1c1;\n");
+      errorsBuilder.append("}\n");
+      errorsBuilder.append("</style>\n");
+      errorsBuilder.append("</head>\n");
+      errorsBuilder.append("<body>\n");
+      errorsBuilder.append("<table style=\"width:100%\">\n");
+      errorsBuilder.append("<tr>\n<th>Source</th>\n<th>Level</th>\n<th>Programme</th>\n<th>Episode</th>\n<th>Error</th>\n<th>URL</th>\n</tr>\n");
+      for (ParseError error : errorList) {
+        errorsBuilder.append("<tr>\n");
+        errorsBuilder.append("<td>");
+        errorsBuilder.append(error.getPlugin());
+        errorsBuilder.append("</td>\n");
+        errorsBuilder.append("<td>");
+        errorsBuilder.append(error.getLevel());
+        errorsBuilder.append("</td>\n");
+        errorsBuilder.append("<td>");
+        errorsBuilder.append(error.getProgramme());
+        errorsBuilder.append("</td>\n");
+        errorsBuilder.append("<td>");
+        errorsBuilder.append(error.getEpisode());
+        errorsBuilder.append("</td>\n");
+        errorsBuilder.append("<td>");
+        errorsBuilder.append(error.getMessage());
+        errorsBuilder.append("</td>\n");
+        errorsBuilder.append("<td>");
+        errorsBuilder.append("<a href=\"");
+        errorsBuilder.append(error.getSourceUrl());
+        errorsBuilder.append("\">");
+        errorsBuilder.append(error.getSourceUrl());
+        errorsBuilder.append("</a>");
+        errorsBuilder.append("</td>\n");
+        errorsBuilder.append("</tr>\n");
+      }
+        errorsBuilder.append("</table>\n");
+        errorsBuilder.append("</body>\n");
+      errorsBuilder.append("</html>");
+        errorResponse = errorsBuilder.toString();
     }
+
+  private void addErrors(StringBuilder errorsBuilder, ErrorRecorder cat) {
+    if (cat.hasErrors()) {
+      for (ParseError error : cat.getErrors()) {
+        errorsBuilder.append("<tr>");
+        errorsBuilder.append("<td>");
+        errorsBuilder.append(error.getPlugin());
+        errorsBuilder.append("</td>");
+        errorsBuilder.append("<td>");
+        errorsBuilder.append(error.getLevel());
+        errorsBuilder.append("</td>");
+        errorsBuilder.append("<td>");
+        errorsBuilder.append(error.getProgramme());
+        errorsBuilder.append("</td>");
+        errorsBuilder.append("<td>");
+        errorsBuilder.append(error.getEpisode());
+        errorsBuilder.append("</td>");
+        errorsBuilder.append("<td>");
+        errorsBuilder.append(error.getMessage());
+        errorsBuilder.append("</td>");
+        errorsBuilder.append("<td>");
+        errorsBuilder.append("<a href=\"");
+        errorsBuilder.append(error.getSourceUrl());
+        errorsBuilder.append("\">");
+        errorsBuilder.append(error.getSourceUrl());
+        errorsBuilder.append("</a>");
+        errorsBuilder.append("</td>");
+        errorsBuilder.append("</tr>");
+        errorsBuilder.append('\n');
+      }
+    }
+  }
 
 }

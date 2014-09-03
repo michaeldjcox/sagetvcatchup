@@ -2,6 +2,7 @@ package uk.co.mdjcox.sagetv.catchup.plugins;
 
 import org.slf4j.Logger;
 
+import uk.co.mdjcox.sagetv.model.ErrorRecorder;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
@@ -160,6 +161,11 @@ public abstract class GroovyScript extends groovy.lang.Script {
         logger.error(msg);
     }
 
+    public void LOG_ERROR(ErrorRecorder item, String plugin, String programme, String episode, String sourceUrl, String message) {
+      item.addError("ERROR", plugin, programme, episode, sourceUrl, message);
+      logger.error(message);
+    }
+
     public void LOG_ERROR(String msg, Throwable thrown) {
         logger.error(msg, thrown);
     }
@@ -171,6 +177,11 @@ public abstract class GroovyScript extends groovy.lang.Script {
     public void LOG_WARNING(String msg, Throwable thrown) {
         logger.warn(msg, thrown);
     }
+
+  public void LOG_WARNING(ErrorRecorder item, String plugin, String programme, String episode, String sourceUrl, String message) {
+    item.addError("WARNING", plugin, programme, episode, sourceUrl, message);
+    logger.warn(message);
+  }
 
     public void LOG_INFO(String msg) {
         logger.info(msg);
@@ -189,6 +200,14 @@ public abstract class GroovyScript extends groovy.lang.Script {
 
             }
         }
+    }
+
+    public String[] SPLIT(String string, String regex) {
+      if (string == null) {
+        return new String[0];
+      } else {
+        return string.split(regex);
+      }
     }
 
     public File WAIT_FOR_FILE(String filename, long timeoutMillis) {

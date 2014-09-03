@@ -7,12 +7,15 @@
  */
 package uk.co.mdjcox.sagetv.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Abstract base class of all types of media categories.
  */
-public abstract class Category {
+public abstract class Category implements ErrorRecorder {
 
   /** The unique id of this category */
   private String id="";
@@ -26,6 +29,8 @@ public abstract class Category {
   private String iconUrl="";
   /** The id of any category which includes this category */
   private String parentId="";
+  /** A list of parsing errors associated with this episode */
+  private List<ParseError> errors = new ArrayList<ParseError>();
 
   /**
    * Default constructor called by concrete subclasses.
@@ -203,6 +208,42 @@ public abstract class Category {
    */
   public final boolean isRoot() {
     return (this instanceof Root);
+  }
+
+  /**
+   * Returns a list of parsing errors associated with this episode
+   *
+   * @return list of parsing errors
+   */
+  @Override
+  public List<ParseError> getErrors() {
+    return errors;
+  }
+
+  /**
+   * Adds a parse error to the episode
+   *
+   * @param level a severity level for the error
+   * @param plugin the plugin name e.g. iplayer
+   * @param programme the programme name affected
+   * @param episode the episode name affected
+   * @param sourceUrl the source URL from which the information could not be parsed
+   * @param message a message indicating the nature of the failure
+   */
+  @Override
+  public void addError(String level, String plugin, String programme, String episode, String sourceUrl, String message) {
+    ParseError error = new ParseError(level, plugin, programme, episode, sourceUrl, message);
+    errors.add(error);
+  }
+
+  /**
+   * Indicates if there where parsing errors processing this episode
+   *
+   * @return <code><true/code> if there were parsing errors
+   */
+  @Override
+  public boolean hasErrors() {
+    return !errors.isEmpty();
   }
 
   /**

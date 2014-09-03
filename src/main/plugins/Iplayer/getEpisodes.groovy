@@ -8,7 +8,12 @@ url = REPLACE_LINK_PREFIX(url, "http://www.bbc.co.uk/iplayer/episodes");
 String str = GET_WEB_PAGE(url);
 
 if (str != null) {
-    if (str.contains("The programme you're looking for can't be found")) str = null;
+    if (str.contains("The programme you're looking for can't be found")) {
+        LOG_ERROR(category, "Iplayer", category.getId(), "", url, "Cannot list episodes - programme not found" );
+        str = null;
+    }
+} else {
+    LOG_ERROR(category, "Iplayer", category.getId(), "", url, "Cannot list episodes" );
 }
 
 String end = "</li>"; // "</a>";
@@ -16,17 +21,25 @@ String start = "<li class=\"list-item episode\"";
 
 while (str != null) {
     str = MOVE_TO(start, str)
-    if (str == null) break;
+    if (str == null) {
+        if (!category.hasEpisodes()) {
+            LOG_ERROR(category, "Iplayer", category.getId(), "", url, "Cannot list episodes - no episodes block found");
+        }
+        break;
+    }
     String programmeBlock = EXTRACT_TO(end, str)
     programmeBlock = MOVE_TO("<a href=\"", programmeBlock);
     link = EXTRACT_TO("\"", programmeBlock)
-    if (link == null) continue
+    if (link == null) {
+        LOG_ERROR(category, "Iplayer", category.getId(), "", url, "Cannot add episode - episode link not found" );
+        continue;
+    }
     link = MAKE_LINK_ABSOLUTE("http://www.bbc.co.uk", link);
     Episode subCat = new Episode(
             "Iplayer",
             "", // id
             "", //programmeTitle
-            "", //episodeTitle
+            MAKE_ID(link), //episodeTitle
             "", // series
             "", // episode
             "", //description

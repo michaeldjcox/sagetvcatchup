@@ -6,6 +6,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import org.slf4j.Logger;
 
 import uk.co.mdjcox.sagetv.model.Programme;
+import uk.co.mdjcox.sagetv.model.Source;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
@@ -29,14 +30,18 @@ public class EpisodesScript extends Script {
         super(logger, base + File.separator + "getEpisodes.groovy", htmlUtils, downloadUtils, osUtils, properties);
     }
 
-    public void getEpisodes(Programme category) {
+    public void getEpisodes(Source source, Programme category) {
         try {
             getLogger().info("Getting episodes for " + category);
             call("url", category.getServiceUrl(), "category", category);
         } catch (Throwable e) {
+            category.addError("ERROR", source.getId(), category.getId(), "", category.getServiceUrl(), "Unable to get episodes: " + e.getMessage());
             getLogger().error("Unable to get episodes for: " + category, e);
-        } finally {
-            getLogger().info(category + " has " + category.getEpisodes().size() + " episodes");
+        }finally {
+          if (category.hasErrors()) {
+            getLogger().warn("Programme " + category.getShortName() + " has errors");
+          }
+          getLogger().info(category + " has " + category.getEpisodes().size() + " episodes");
         }
     }
 

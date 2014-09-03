@@ -7,16 +7,14 @@
  */
 package uk.co.mdjcox.sagetv.model;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This class represents an individual playable media file.
  */
-public class Episode {
+public class Episode implements ErrorRecorder {
 
   /** The id of the media file source providing this file */
   private String sourceId = "";
@@ -44,6 +42,8 @@ public class Episode {
   private String channel = "";
   /** The category of programme this media file falls into */
   private Set<String> genres = new TreeSet<String>();
+  /** A list of parsing errors associated with this episode */
+  private List<ParseError> errors = new ArrayList<ParseError>();
 
   /**
    * Constructor for the episode meta data.
@@ -377,6 +377,42 @@ public class Episode {
   }
 
   /**
+   * Returns a list of parsing errors associated with this episode
+   *
+   * @return list of parsing errors
+   */
+  @Override
+  public List<ParseError> getErrors() {
+    return errors;
+  }
+
+  /**
+   * Adds a parse error to the episode
+   *
+   * @param level a severity level for the error
+   * @param plugin the plugin name e.g. iplayer
+   * @param programme the programme name affected
+   * @param episode the episode name affected
+   * @param sourceUrl the source URL from which the information could not be parsed
+   * @param message a message indicating the nature of the failure
+   */
+  @Override
+  public void addError(String level, String plugin, String programme, String episode, String sourceUrl, String message) {
+    ParseError error = new ParseError(level, plugin, programme, episode, sourceUrl, message);
+    errors.add(error);
+  }
+
+  /**
+   * Indicates if there where parsing errors processing this episode
+   *
+   * @return <code><true/code> if there were parsing errors
+   */
+  @Override
+  public boolean hasErrors() {
+    return !errors.isEmpty();
+  }
+
+  /**
    * Returns a string representation of the episode - its title.
    *
    * @return the string representation of the episode
@@ -385,4 +421,5 @@ public class Episode {
   public final String toString() {
     return episodeTitle;
   }
+
 }

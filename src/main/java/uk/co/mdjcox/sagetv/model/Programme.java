@@ -9,7 +9,9 @@ package uk.co.mdjcox.sagetv.model;
 
 import com.google.common.collect.ImmutableMap;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -76,6 +78,15 @@ public class Programme extends SubCategory {
   }
 
   /**
+   * Indicates if the programme has any episodes
+   *
+   * @return <code>true</code> if the programme has episodes
+   */
+  public final boolean hasEpisodes() {
+    return !episodes.isEmpty();
+  }
+
+  /**
    * Gets the podcast URL that will return this list of episodes.
    *
    * @return the podcast URL
@@ -94,6 +105,4 @@ public class Programme extends SubCategory {
   public void setPodcastUrl(String podcastUrl) {
     this.podcastUrl = checkNotNull(podcastUrl);
   }
-
-
 }

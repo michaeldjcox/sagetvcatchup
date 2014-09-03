@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Programme;
+import uk.co.mdjcox.sagetv.model.Source;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
@@ -30,19 +31,24 @@ public class EpisodeScript extends Script {
         super(logger, base + File.separator + "getEpisode.groovy", htmlUtils, downloadUtils, osUtils, properties);
     }
 
-    public void getEpisode(Programme programme, Episode episode) {
+    public void getEpisode(Source source, Programme programme, Episode episode) {
         try {
             getLogger().info("Getting episode at URL " + episode.getServiceUrl());
-            call("url", episode.getServiceUrl(), "episode", episode);
+            call("programme", programme, "url", episode.getServiceUrl(), "episode", episode);
             String iconUrl = programme.getIconUrl();
             if ((iconUrl == null) || iconUrl.isEmpty()) {
                 programme.setIconUrl(episode.getIconUrl());
             }
             getLogger().info("Found episode " + episode);
         } catch (Throwable e) {
+            programme.addError("ERROR", source.getId(), programme.getId(), episode.getEpisodeTitle(), episode.getServiceUrl(), "Unable to get an episode: " + e.getMessage());
             programme.removeEpisode(episode);
             getLogger().error(
                 "Unable to get an episode for: " + programme + " " + episode.getServiceUrl(), e);
+        } finally {
+          if (episode.hasErrors()) {
+            getLogger().warn("Programme " + programme.getShortName() + " episode " + episode.getEpisodeTitle() + " has errors");
+          }
         }
     }
 

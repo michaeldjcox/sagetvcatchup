@@ -48,11 +48,13 @@ public class Cataloger {
                 String pluginName = sourceCat.getId();
 
                 ArrayList<String> testProgrammes = new ArrayList<String>();
+                int testMaxProgrammes = Integer.MAX_VALUE;
                 if (props.getBoolean(pluginName + ".skip")) {
                     logger.info("Skipping plugin " + pluginName);
                     continue;
                 } else {
                     testProgrammes = props.getPropertySequence(pluginName + ".programmes");
+                    testMaxProgrammes = props.getInt(pluginName + ".maxprogrammes", Integer.MAX_VALUE);
                 }
 
                 newCategories.put(sourceCat.getId(), sourceCat);
@@ -66,9 +68,15 @@ public class Cataloger {
                 root.addSubCategory(sourceCat);
 
                 logger.info("Getting programmes found on: " + sourceCat);
-
+                int programmeCount = 0;
                 Collection<Programme> programmes = plugin.getProgrammes();
                 for (Programme programme : programmes) {
+
+                    programmeCount++;
+
+                    if (programmeCount > testMaxProgrammes) {
+                      break;
+                    }
 
                     String programmeId = programme.getId();
                     if (testProgrammes != null && !testProgrammes.isEmpty()) {
@@ -80,11 +88,11 @@ public class Cataloger {
 
                     programme.setPodcastUrl(podcastUrlBase + programmeId);
 
-                    plugin.getEpisodes(programme);
+                    plugin.getEpisodes(sourceCat, programme);
 
                     for (Episode episode : programme.getEpisodes().values()) {
 
-                        plugin.getEpisode(programme, episode);
+                        plugin.getEpisode(sourceCat, programme, episode);
                     }
 
                     if (programme.getEpisodes().size() == 0) {
@@ -196,6 +204,7 @@ public class Cataloger {
         }
     }
 
+  //TODO would be great if this was organised A-Z
     private void doGenreCategorisation(Source sourceCat, Programme programmeCat, Episode prog,
                                        Map<String, SubCategory> newSubCategories) {
         Set<String> genres = prog.getGenres();

@@ -26,7 +26,7 @@ public class SubCategory extends Category {
   /** List of {@link Category} ids that are parents of this category. */
   private Set<String> otherParentIds = new LinkedHashSet<String>();
   /** Map of child {@link Category} indexed by their ids. */
-  private Map<String, Category> subCategories = new LinkedHashMap<String, Category>();
+  private Map<String, Category> subCategories = new TreeMap<String, Category>();
 
   /**
    * Constructs a subcategory.
@@ -87,4 +87,12 @@ public class SubCategory extends Category {
     return ImmutableSet.copyOf(otherParentIds);
   }
 
+  /**
+   * Indicates if the programme has any subcategories
+   *
+   * @return <code>true</code> if the category has subcategories
+   */
+  public final boolean hasSubCategories() {
+    return !subCategories.isEmpty();
+  }
 }
