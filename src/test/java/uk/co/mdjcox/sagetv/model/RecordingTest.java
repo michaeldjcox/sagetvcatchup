@@ -42,7 +42,7 @@ public void testCreate() {
   @Test
   public void testSetFile() {
     try {
-      Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
+      Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
                                     "series", "episode", "description", "iconUrl", "serviceUrl",
                                     "airDate","airTime", "channel", Sets.newHashSet("category"));
       Recording recording = new Recording(episode);
@@ -62,7 +62,7 @@ public void testCreate() {
 */ 
 @Test
 public void testSetGetFile() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "channel", Sets.newHashSet("category"));
   File file = new File("filename");
@@ -88,7 +88,7 @@ public void testSetGetFile() throws Exception {
 */ 
 @Test
 public void testGetSourceId() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "channel", Sets.newHashSet("category"));
   Recording recording = new Recording(episode);
@@ -103,7 +103,7 @@ public void testGetSourceId() throws Exception {
 */ 
 @Test
 public void testGetUrl() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "channel", Sets.newHashSet("category"));
 
@@ -119,7 +119,7 @@ public void testGetUrl() throws Exception {
 */ 
 @Test
 public void testGetId() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "channel", Sets.newHashSet("category"));
 
@@ -135,7 +135,7 @@ public void testGetId() throws Exception {
 */ 
 @Test
 public void testGetName() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "channel", Sets.newHashSet("category"));
 
@@ -151,7 +151,7 @@ public void testGetName() throws Exception {
 */ 
 @Test
 public void testGetFilename() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "channel", Sets.newHashSet("category"));
 
@@ -167,7 +167,7 @@ public void testGetFilename() throws Exception {
 
   @Test
   public void testGetFilenameNoFile() throws Exception {
-    Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
+    Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
                                   "series", "episode", "description", "iconUrl", "serviceUrl",
                                   "airDate","airTime", "channel", Sets.newHashSet("category"));
 
@@ -184,7 +184,7 @@ public void testGetFilename() throws Exception {
 */ 
 @Test
 public void testToString() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle",
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "channel", Sets.newHashSet("category"));
 

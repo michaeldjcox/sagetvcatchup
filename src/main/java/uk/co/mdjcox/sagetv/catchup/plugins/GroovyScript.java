@@ -65,9 +65,13 @@ public abstract class GroovyScript extends groovy.lang.Script {
     }
 
     public String REPLACE_LINK_PREFIX(String existingUrl, String oldPrefix, String newPrefix) {
-        return existingUrl.replace(oldPrefix, newPrefix);
+        return existingUrl.replaceFirst(oldPrefix, newPrefix);
     }
 
+  public String REPLACE_LINK_TARGET(String existingUrl, String newSuffix) {
+    existingUrl = existingUrl.substring(0, existingUrl.indexOf("/"));
+    return existingUrl + newSuffix;
+  }
 
     public String SAMPLE_WEB_PAGE(String url) throws Exception {
         return downloadUtils.sampleFileString(url);
@@ -161,8 +165,8 @@ public abstract class GroovyScript extends groovy.lang.Script {
         logger.error(msg);
     }
 
-    public void LOG_ERROR(ErrorRecorder item, String plugin, String programme, String episode, String sourceUrl, String message) {
-      item.addError("ERROR", plugin, programme, episode, sourceUrl, message);
+    public void LOG_ERROR(ErrorRecorder item, String plugin, String programme, String episode, String message, String... sourceUrl) {
+      item.addError("ERROR", plugin, programme, episode, message, sourceUrl);
       logger.error(message);
     }
 
@@ -178,8 +182,8 @@ public abstract class GroovyScript extends groovy.lang.Script {
         logger.warn(msg, thrown);
     }
 
-  public void LOG_WARNING(ErrorRecorder item, String plugin, String programme, String episode, String sourceUrl, String message) {
-    item.addError("WARNING", plugin, programme, episode, sourceUrl, message);
+  public void LOG_WARNING(ErrorRecorder item, String plugin, String programme, String episode, String message, String... sourceUrl) {
+    item.addError("WARNING", plugin, programme, episode, message, sourceUrl);
     logger.warn(message);
   }
 

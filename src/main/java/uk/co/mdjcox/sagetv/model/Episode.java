@@ -22,6 +22,8 @@ public class Episode implements ErrorRecorder {
   private String id = "";
   /** The title of the programme */
   private String programmeTitle = "";
+  /** The title of the episode of the series */
+  private String seriesTitle = "";
   /** The title of the episode of the programme */
   private String episodeTitle = "";
   /** The series this episode belongs to */
@@ -51,6 +53,7 @@ public class Episode implements ErrorRecorder {
    * @param sourceId The id of the media file source providing this file
    * @param id The unique id for this media file
    * @param programmeTitle The title of the programme
+   * @param seriesTitle The title of the programme
    * @param episodeTitle The title of the episode of the programme
    * @param series The series this episode belongs to
    * @param episode The episode number within the series
@@ -64,13 +67,14 @@ public class Episode implements ErrorRecorder {
    *
    * @throws NullPointerException if any parameter is <code>null</code>
    */
-  public Episode(String sourceId, String id, String programmeTitle, String episodeTitle,
+  public Episode(String sourceId, String id, String programmeTitle, String seriesTitle, String episodeTitle,
                  String series, String episode, String description, String iconUrl,
                  String serviceUrl, String airDate, String airTime, String channel,
                  Set genres) {
     this.sourceId = checkNotNull(sourceId);
     this.id = checkNotNull(id);
     this.programmeTitle = checkNotNull(programmeTitle);
+    this.seriesTitle = checkNotNull(seriesTitle);
     this.episodeTitle = checkNotNull(episodeTitle);
     this.series = checkNotNull(series);
     this.episode = checkNotNull(episode);
@@ -181,6 +185,26 @@ public class Episode implements ErrorRecorder {
    */
   public final void setProgrammeTitle(String programmeTitle) {
     this.programmeTitle = checkNotNull(programmeTitle);
+  }
+
+  /**
+   * Gets the title of the series that this episode belongs to.
+   *
+   * @return the title of the series that this episode belongs to
+   */
+  public String getSeriesTitle() {
+    return seriesTitle;
+  }
+
+  /**
+   * Sets the series title of this media file
+   *
+   * @param seriesTitle The series title of the media file
+   *
+   * @throws NullPointerException if a <code>null</code> value is provided
+   */
+  public void setSeriesTitle(String seriesTitle) {
+    this.seriesTitle = seriesTitle;
   }
 
   /**
@@ -388,17 +412,16 @@ public class Episode implements ErrorRecorder {
 
   /**
    * Adds a parse error to the episode
-   *
-   * @param level a severity level for the error
+   *  @param level a severity level for the error
    * @param plugin the plugin name e.g. iplayer
    * @param programme the programme name affected
    * @param episode the episode name affected
-   * @param sourceUrl the source URL from which the information could not be parsed
    * @param message a message indicating the nature of the failure
+   * @param sourceUrl the source URL from which the information could not be parsed
    */
   @Override
-  public void addError(String level, String plugin, String programme, String episode, String sourceUrl, String message) {
-    ParseError error = new ParseError(level, plugin, programme, episode, sourceUrl, message);
+  public void addError(String level, String plugin, String programme, String episode, String message, String... sourceUrl) {
+    ParseError error = new ParseError(level, plugin, programme, episode, message, sourceUrl);
     errors.add(error);
   }
 

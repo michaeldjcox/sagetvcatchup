@@ -24,6 +24,7 @@ while (str != null) {
             "ITVPlayer",
             "", // id
             "", //programmeTitle
+            "", //seriesTitle
             "", //episodeTitle
             "", // series
             "", // episode
@@ -57,6 +58,7 @@ while (str != null) {
             "ITVPlayer",
             "", // id
             "", //programmeTitle
+            "", //seriesTitle
             "", //episodeTitle
             "", // series
             "", // episode

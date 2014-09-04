@@ -8,26 +8,25 @@ public class ParseError implements Comparable<ParseError> {
   private final String plugin;
   private final String programme;
   private final String episode;
-  private final String sourceUrl;
   private final String message;
+  private final String[] sourceUrl;
 
   /**
    * Constructs a parse error
-   *
    * @param level a severity level for the error
    * @param plugin the plugin name e.g. iplayer
    * @param programme the programme name affected
    * @param episode the episode name affected
-   * @param sourceUrl the source URL from which the information could not be parsed
    * @param message a message indicating the nature of the failure
+   * @param sourceUrl the source URL from which the information could not be parsed
    */
-  public ParseError(String level, String plugin, String programme, String episode, String sourceUrl, String message) {
+  public ParseError(String level, String plugin, String programme, String episode, String message, String... sourceUrl) {
     this.level = level;
     this.plugin = plugin;
     this.programme = programme;
     this.episode = episode;
-    this.sourceUrl = sourceUrl;
     this.message = message;
+    this.sourceUrl = sourceUrl;
   }
 
   public String getPlugin() {
@@ -46,7 +45,7 @@ public class ParseError implements Comparable<ParseError> {
     return episode;
   }
 
-  public String getSourceUrl() {
+  public String[] getSourceUrl() {
     return sourceUrl;
   }
 
@@ -66,7 +65,6 @@ public class ParseError implements Comparable<ParseError> {
     if (!message.equals(that.message)) return false;
     if (!plugin.equals(that.plugin)) return false;
     if (!programme.equals(that.programme)) return false;
-    if (!sourceUrl.equals(that.sourceUrl)) return false;
 
     return true;
   }
@@ -77,7 +75,6 @@ public class ParseError implements Comparable<ParseError> {
     result = 31 * result + plugin.hashCode();
     result = 31 * result + programme.hashCode();
     result = 31 * result + episode.hashCode();
-    result = 31 * result + sourceUrl.hashCode();
     result = 31 * result + message.hashCode();
     return result;
   }
@@ -93,8 +90,6 @@ public class ParseError implements Comparable<ParseError> {
     result = getEpisode().compareTo(o.getEpisode());
     if (result != 0) return result;
     result = getMessage().compareTo(o.getMessage());
-    if (result != 0) return result;
-    result = getSourceUrl().compareTo(o.getSourceUrl());
     return result;
   }
 }

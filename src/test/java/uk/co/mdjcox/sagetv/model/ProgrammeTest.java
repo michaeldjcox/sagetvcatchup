@@ -46,7 +46,7 @@ public void testEpisodesStartAtZero() {
 public void testAddEpisode() throws Exception {
   Programme subcat = new Programme("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle", "series",
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
                                 "airTime", "channel", Sets.newHashSet("category"));
   subcat.addEpisode(episode);
@@ -76,7 +76,7 @@ public void testAddEpisode() throws Exception {
 
     assertEquals("Episodes should number 0", 0, episodes.size());
 
-    Episode episode2 = new Episode("sourceId2", "id2", "programmeTitle2", "episodeTitle2", "series2",
+    Episode episode2 = new Episode("sourceId2", "id2", "programmeTitle2", "seriesTitle2", "episodeTitle2", "series2",
                                   "episode2", "descripton2", "iconUrl2", "serviceUrl2", "airDate2",
                                   "airTime2", "channel2", Sets.newHashSet("category2"));
 
@@ -99,7 +99,7 @@ public void testAddEpisode() throws Exception {
 public void testRemoveEpisode() throws Exception {
   Programme subcat = new Programme("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle", "series",
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
                                 "airTime", "channel", Sets.newHashSet("category"));
   subcat.addEpisode(episode);
@@ -129,7 +129,7 @@ public void testRemoveEpisode() throws Exception {
 public void testGetEpisodes() throws Exception {
   Programme subcat = new Programme("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "episodeTitle", "series",
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
                                 "airTime", "channel", Sets.newHashSet("category"));
   subcat.addEpisode(episode);

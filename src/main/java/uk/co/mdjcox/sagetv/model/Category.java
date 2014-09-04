@@ -222,17 +222,16 @@ public abstract class Category implements ErrorRecorder {
 
   /**
    * Adds a parse error to the episode
-   *
-   * @param level a severity level for the error
+   *  @param level a severity level for the error
    * @param plugin the plugin name e.g. iplayer
    * @param programme the programme name affected
    * @param episode the episode name affected
-   * @param sourceUrl the source URL from which the information could not be parsed
    * @param message a message indicating the nature of the failure
+   * @param sourceUrl the source URL from which the information could not be parsed
    */
   @Override
-  public void addError(String level, String plugin, String programme, String episode, String sourceUrl, String message) {
-    ParseError error = new ParseError(level, plugin, programme, episode, sourceUrl, message);
+  public void addError(String level, String plugin, String programme, String episode, String message, String... sourceUrl) {
+    ParseError error = new ParseError(level, plugin, programme, episode, message, sourceUrl);
     errors.add(error);
   }
 

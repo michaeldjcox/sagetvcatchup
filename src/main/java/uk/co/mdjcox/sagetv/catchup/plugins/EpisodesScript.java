@@ -35,7 +35,7 @@ public class EpisodesScript extends Script {
             getLogger().info("Getting episodes for " + category);
             call("url", category.getServiceUrl(), "category", category);
         } catch (Throwable e) {
-            category.addError("ERROR", source.getId(), category.getId(), "", category.getServiceUrl(), "Unable to get episodes: " + e.getMessage());
+            category.addError("ERROR", source.getId(), category.getId(), "", "Unable to get episodes: " + e.getMessage(), category.getServiceUrl());
             getLogger().error("Unable to get episodes for: " + category, e);
         }finally {
           if (category.hasErrors()) {

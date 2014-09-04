@@ -37,7 +37,7 @@ public class ProgrammesScript extends Script {
         try {
             call("category", category,  "url", category.getServiceUrl(), "programmes", programmes);
         } catch (Throwable e) {
-          category.addError("ERROR", category.getId(), "", "", category.getServiceUrl(), "Unable to get programmes: " + e.getMessage());
+          category.addError("ERROR", category.getId(), "", "", "Unable to get programmes: " + e.getMessage(), category.getServiceUrl());
           getLogger().error("Unable to get programmes for: " + category, e);
         } finally {
           if (category.hasErrors()) {

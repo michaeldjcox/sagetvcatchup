@@ -26,6 +26,7 @@ while (str != null) {
             "Channel4OD",
             "", // id
             "", //programmeTitle
+            "", //seriesTitle
             "", //episodeTitle
             "", // series
             "", // episode
@@ -57,6 +58,7 @@ while (str != null) {
             "Channel4OD",
             "", // id
             "", //programmeTitle
+            "", //seriesTitle
             "", //episodeTitle
             "", // series
             "", // episode

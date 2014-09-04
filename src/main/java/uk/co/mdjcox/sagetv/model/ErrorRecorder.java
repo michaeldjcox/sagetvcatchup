@@ -8,7 +8,7 @@ import java.util.List;
 public interface ErrorRecorder {
   List<ParseError> getErrors();
 
-  void addError(String level, String plugin, String programme, String episode, String sourceUrl, String message);
+  void addError(String level, String plugin, String programme, String episode, String message, String... sourceUrl);
 
   boolean hasErrors();
 }
