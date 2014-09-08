@@ -41,7 +41,7 @@ public class EpisodeScript extends Script {
             }
             getLogger().info("Found episode " + episode);
         } catch (Throwable e) {
-            programme.addError("ERROR", source.getId(), programme.getId(), episode.getEpisodeTitle(), "Unable to get an episode: " + e.getMessage(), episode.getServiceUrl());
+            programme.addError("ERROR", "Unable to get an episode: " + e.getMessage());
             programme.removeEpisode(episode);
             getLogger().error(
                 "Unable to get an episode for: " + programme + " " + episode.getServiceUrl(), e);

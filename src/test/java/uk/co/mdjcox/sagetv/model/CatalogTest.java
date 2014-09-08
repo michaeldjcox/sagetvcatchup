@@ -1,7 +1,5 @@
 package uk.co.mdjcox.sagetv.model;
 
-import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,8 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.Assert.fail;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
 
 /**
  * Catalog Tester.
@@ -44,7 +42,7 @@ public class CatalogTest {
 
     SubCategory
         cat =
-        new SubCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+        new SubCategory("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
     try {
       results.add(cat);
@@ -60,7 +58,7 @@ public class CatalogTest {
 
     SubCategory
         cat =
-        new SubCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+        new SubCategory("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
     Map<String, Category> input = new HashMap<String, Category>();
     input.put(cat.getId(), cat);
@@ -78,7 +76,7 @@ public class CatalogTest {
     Catalog catalog = new Catalog();
     SubCategory
         cat =
-        new SubCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+        new SubCategory("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
     Map<String, Category> input = new HashMap<String, Category>();
     input.put(cat.getId(), cat);
@@ -96,7 +94,7 @@ public class CatalogTest {
     Catalog catalog = new Catalog();
     SubCategory
         cat =
-        new SubCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+        new SubCategory("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
     try {
       catalog.setCategories(null);
@@ -114,7 +112,7 @@ public class CatalogTest {
     Catalog catalog = new Catalog();
     SubCategory
         cat =
-        new SubCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+        new SubCategory("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
     Map<String, Category> input = new HashMap<String, Category>();
     input.put(cat.getId(), cat);
@@ -126,7 +124,7 @@ public class CatalogTest {
 
     SubCategory
         cat2 =
-        new SubCategory("id2", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+        new SubCategory("sourceId", "id2", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
     input.put(cat2.getId(), cat2);
 
@@ -144,7 +142,7 @@ public class CatalogTest {
     Catalog catalog = new Catalog();
     SubCategory
         cat =
-        new SubCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+        new SubCategory("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
       catalog.addCategory(cat);
 

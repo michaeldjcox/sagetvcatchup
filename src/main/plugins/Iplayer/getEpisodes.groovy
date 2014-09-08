@@ -9,11 +9,11 @@ String str = GET_WEB_PAGE(url);
 
 if (str != null) {
     if (str.contains("The programme you're looking for can't be found")) {
-        LOG_ERROR(category, "Iplayer", category.getId(), "", "Cannot list episodes - programme not found", url );
+        LOG_ERROR(category, "Cannot list episodes - programme not found" );
         str = null;
     }
 } else {
-    LOG_ERROR(category, "Iplayer", category.getId(), "", "Cannot list episodes", url );
+    LOG_ERROR(category, "Cannot list episodes" );
 }
 
 String end = "</li>"; // "</a>";
@@ -23,7 +23,7 @@ while (str != null) {
     str = MOVE_TO(start, str)
     if (str == null) {
         if (!category.hasEpisodes()) {
-            LOG_ERROR(category, "Iplayer", category.getId(), "", "Cannot list episodes - no episodes block found", url);
+            LOG_ERROR(category, "Cannot list episodes - no episodes block found");
         }
         break;
     }
@@ -31,12 +31,12 @@ while (str != null) {
     programmeBlock = MOVE_TO("<a href=\"", programmeBlock);
     link = EXTRACT_TO("\"", programmeBlock)
     if (link == null) {
-        LOG_ERROR(category, "Iplayer", category.getId(), "", "Cannot add episode - episode link not found", url );
+        LOG_ERROR(category, "Cannot add episode - episode link not found" );
         continue;
     }
     link = MAKE_LINK_ABSOLUTE("http://www.bbc.co.uk", link);
     Episode subCat = new Episode(
-            "Iplayer",
+            source.getId(),
             "", // id
             category.getShortName(), //programmeTitle
             "", //seriesTitle

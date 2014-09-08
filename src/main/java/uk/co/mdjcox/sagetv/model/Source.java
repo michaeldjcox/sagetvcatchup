@@ -25,6 +25,6 @@ public class Source extends SubCategory {
    */
     public Source(String id, String shortName, String longName,
                   String serviceUrl, String iconUrl) {
-        super(id, shortName, longName, serviceUrl, iconUrl, "");
+        super(id, id, shortName, longName, serviceUrl, iconUrl, "");
     }
 }

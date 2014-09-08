@@ -9,8 +9,8 @@ import org.junit.Test;
 
 import java.util.Map;
 
-import static junit.framework.Assert.fail;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
 
 /** 
 * Programme Tester. 
@@ -32,7 +32,7 @@ public void after() throws Exception {
 
 @Test
 public void testEpisodesStartAtZero() {
-  Programme subcat = new Programme("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+  Programme subcat = new Programme("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
   assertEquals("Episodes should start from zero", 0, subcat.getEpisodes().size());
 }
 
@@ -44,7 +44,7 @@ public void testEpisodesStartAtZero() {
 */ 
 @Test
 public void testAddEpisode() throws Exception {
-  Programme subcat = new Programme("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+  Programme subcat = new Programme("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
@@ -70,7 +70,7 @@ public void testAddEpisode() throws Exception {
    */
   @Test
   public void testGetEpisodesImmutabilityTest() throws Exception {
-    Programme subcat = new Programme("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+    Programme subcat = new Programme("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
     Map<String, Episode> episodes = subcat.getEpisodes();
 
@@ -97,7 +97,7 @@ public void testAddEpisode() throws Exception {
 */ 
 @Test
 public void testRemoveEpisode() throws Exception {
-  Programme subcat = new Programme("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+  Programme subcat = new Programme("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
@@ -127,7 +127,7 @@ public void testRemoveEpisode() throws Exception {
 */ 
 @Test
 public void testGetEpisodes() throws Exception {
-  Programme subcat = new Programme("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+  Programme subcat = new Programme("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
@@ -152,7 +152,7 @@ public void testGetEpisodes() throws Exception {
    */
   @Test
   public void testGetPodcastUrl() throws Exception {
-    Programme subcat = new Programme("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+    Programme subcat = new Programme("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
     subcat.setPodcastUrl("podcastUrl");
     assertEquals("getPodcastUrl", "podcastUrl", subcat.getPodcastUrl());
   }
@@ -164,7 +164,7 @@ public void testGetEpisodes() throws Exception {
    */
   @Test
   public void testSetPodcastUrl() throws Exception {
-    Programme subcat = new Programme("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+    Programme subcat = new Programme("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
     subcat.setPodcastUrl("podcastUrl");
 
     assertEquals("setPodcastUrl", "podcastUrl", subcat.getPodcastUrl());
@@ -175,7 +175,7 @@ public void testGetEpisodes() throws Exception {
       return;
     }
 
-    TestCase.fail("Should have thrown NullPointerException");
+    fail("Should have thrown NullPointerException");
   }
 
 } 

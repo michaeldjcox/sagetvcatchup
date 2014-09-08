@@ -2,8 +2,8 @@ package Demand5
 
 String details = GET_WEB_PAGE(url);
 
-//details = MOVE_TO("<meta property=\"fb:app_id", details);
-//details = EXTRACT_TO("<body class=\"episodes_show_page\">", details);
+//programmeDetails = MOVE_TO("<meta property=\"fb:app_id", programmeDetails);
+//programmeDetails = EXTRACT_TO("<body class=\"episodes_show_page\">", programmeDetails);
 
 // PROGRAMME TITLE
 details2 = MOVE_TO("property=\"og:title\"", details)
@@ -17,7 +17,7 @@ episode.setProgrammeTitle(seriesTitle);
 LOG_INFO("SeriesTitle: " + seriesTitle)
 
 // EPISODE TITLE
-//details2 = MOVE_TO("<meta name=\"episodeTitle\"", details)
+//details2 = MOVE_TO("<meta name=\"episodeTitle\"", programmeDetails)
 //details2 = MOVE_TO("content=\"", details2)
 //String title = EXTRACT_TO("\"", details2)
 title = REMOVE_HTML_TAGS(result[0]);

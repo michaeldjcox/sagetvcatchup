@@ -150,22 +150,23 @@ public class Cataloger {
             return;
         }
 
-        String airdateId = sourceCat.getId() + "/AirDate";
+      String sourceId = sourceCat.getId();
+      String airdateId = sourceId + "/AirDate";
         SubCategory airdateCat = newSubCategories.get(airdateId);
         if (airdateCat == null) {
             airdateCat =
-                    new SubCategory(airdateId, "Air Date", "Air Date", sourceCat.getServiceUrl(),
-                            sourceCat.getIconUrl(), sourceCat.getId());
+                    new SubCategory(sourceId, airdateId, "Air Date", "Air Date", sourceCat.getServiceUrl(),
+                            sourceCat.getIconUrl(), sourceId);
             newSubCategories.put(airdateId, airdateCat);
             sourceCat.addSubCategory(airdateCat);
         }
         String
                 airDateInstanceId =
-                sourceCat.getId() + "/AirDate/" + airDateName.replace(" ", "").replace(",", "");
+                sourceId + "/AirDate/" + airDateName.replace(" ", "").replace(",", "");
         Programme airDateInstanceCat = (Programme) newSubCategories.get(airDateInstanceId);
         if (airDateInstanceCat == null) {
             airDateInstanceCat =
-                    new Programme(airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(),
+                    new Programme(sourceId, airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(),
                             sourceCat.getIconUrl(), airdateCat.getId());
             airDateInstanceCat.setPodcastUrl(podcastUrlBase + airDateInstanceId);
             newSubCategories.put(airDateInstanceId, airDateInstanceCat);
@@ -180,20 +181,21 @@ public class Cataloger {
         String channelName = prog.getChannel();
         if (channelName != null && !channelName.isEmpty()) {
 
-            String channelId = sourceCat.getId() + "/Channel";
+          String sourceId = sourceCat.getId();
+          String channelId = sourceId + "/Channel";
             SubCategory channelCat = newSubCategories.get(channelId);
             if (channelCat == null) {
                 channelCat =
-                        new SubCategory(channelId, "Channel", "Channel", sourceCat.getServiceUrl(),
-                                sourceCat.getIconUrl(), sourceCat.getId());
+                        new SubCategory(sourceId, channelId, "Channel", "Channel", sourceCat.getServiceUrl(),
+                                sourceCat.getIconUrl(), sourceId);
                 newSubCategories.put(channelId, channelCat);
                 sourceCat.addSubCategory(channelCat);
             }
-            String channelInstanceId = sourceCat.getId() + "/Channel/" + channelName.replace(" ", "");
+            String channelInstanceId = sourceId + "/Channel/" + channelName.replace(" ", "");
             SubCategory channelInstanceCat = newSubCategories.get(channelInstanceId);
             if (channelInstanceCat == null) {
                 channelInstanceCat =
-                        new SubCategory(channelInstanceId, channelName, channelName, sourceCat.getServiceUrl(),
+                        new SubCategory(sourceId, channelInstanceId, channelName, channelName, sourceCat.getServiceUrl(),
                                 sourceCat.getIconUrl(), channelCat.getId());
                 newSubCategories.put(channelInstanceId, channelInstanceCat);
                 channelCat.addSubCategory(channelInstanceCat);
@@ -210,20 +212,21 @@ public class Cataloger {
         Set<String> genres = prog.getGenres();
         if (genres != null && !genres.isEmpty()) {
             for (String genreName : genres) {
-                String genreId = sourceCat.getId() + "/Genre";
+              String sourceId = sourceCat.getId();
+              String genreId = sourceId + "/Genre";
                 SubCategory genreCat = newSubCategories.get(genreId);
                 if (genreCat == null) {
                     genreCat =
-                            new SubCategory(genreId, "Genre", "Genre", sourceCat.getServiceUrl(),
-                                    sourceCat.getIconUrl(), sourceCat.getId());
+                            new SubCategory(sourceId, genreId, "Genre", "Genre", sourceCat.getServiceUrl(),
+                                    sourceCat.getIconUrl(), sourceId);
                     newSubCategories.put(genreId, genreCat);
                     sourceCat.addSubCategory(genreCat);
                 }
-                String genreInstanceId = sourceCat.getId() + "/Genre/" + genreName.replace(" ", "");
+                String genreInstanceId = sourceId + "/Genre/" + genreName.replace(" ", "");
                 SubCategory genreInstanceCat = newSubCategories.get(genreInstanceId);
                 if (genreInstanceCat == null) {
                     genreInstanceCat =
-                            new SubCategory(genreInstanceId, genreName, genreName, sourceCat.getServiceUrl(),
+                            new SubCategory(sourceId, genreInstanceId, genreName, genreName, sourceCat.getServiceUrl(),
                                     sourceCat.getIconUrl(), genreCat.getId());
                     newSubCategories.put(genreInstanceId, genreInstanceCat);
                     genreCat.addSubCategory(genreInstanceCat);
@@ -245,20 +248,21 @@ public class Cataloger {
             azName = programmeTitle.substring(4, 5).toUpperCase();
         }
 
-        String atozId = sourceCat.getId() + "/AtoZ";
+      String sourceId = sourceCat.getId();
+      String atozId = sourceId + "/AtoZ";
         SubCategory atozCat = newSubCategories.get(atozId);
         if (atozCat == null) {
             atozCat =
-                    new SubCategory(atozId, "A to Z", "A to Z", sourceCat.getServiceUrl(),
-                            sourceCat.getIconUrl(), sourceCat.getId());
+                    new SubCategory(sourceId, atozId, "A to Z", "A to Z", sourceCat.getServiceUrl(),
+                            sourceCat.getIconUrl(), sourceId);
             newSubCategories.put(atozId, atozCat);
             sourceCat.addSubCategory(atozCat);
         }
-        String azId = sourceCat.getId() + "/AtoZ/" + azName;
+        String azId = sourceId + "/AtoZ/" + azName;
         SubCategory azCat = newSubCategories.get(azId);
         if (azCat == null) {
             azCat =
-                    new SubCategory(azId, azName, azName, sourceCat.getServiceUrl(), sourceCat.getIconUrl(),
+                    new SubCategory(sourceId, azId, azName, azName, sourceCat.getServiceUrl(), sourceCat.getIconUrl(),
                             atozCat.getId());
             newSubCategories.put(azId, azCat);
             atozCat.addSubCategory(azCat);

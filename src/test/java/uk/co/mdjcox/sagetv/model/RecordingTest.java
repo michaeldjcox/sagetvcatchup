@@ -7,8 +7,8 @@ import org.junit.After;
 
 import java.io.File;
 
-import static junit.framework.Assert.fail;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
 
 /** 
 * Recording Tester. 

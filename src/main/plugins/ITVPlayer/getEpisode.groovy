@@ -82,7 +82,7 @@ episode.setEpisode(episodeNo);
 LOG_INFO("Episode: " + episodeNo)
 
 // AIRING DATE
-//details2 = MOVE_TO("<col class=\"onTvDate\"", details)
+//details2 = MOVE_TO("<col class=\"onTvDate\"", programmeDetails)
 //details2 = MOVE_TO("<td", details2)
 //details2 = MOVE_TO(">", details2)
 //String date = EXTRACT_TO("<", details2)

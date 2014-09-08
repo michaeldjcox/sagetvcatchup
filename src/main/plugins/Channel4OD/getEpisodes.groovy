@@ -23,9 +23,9 @@ while (str != null) {
     link = EXTRACT_TO("\"", programmeBlock)
     link = MAKE_LINK_ABSOLUTE("http://www.channel4.com", link);
     Episode subCat = new Episode(
-            "Channel4OD",
+            category.getSourceId(),
             "", // id
-            "", //programmeTitle
+            category.getShortName(), //programmeTitle
             "", //seriesTitle
             "", //episodeTitle
             "", // series
@@ -55,9 +55,9 @@ while (str != null) {
     if (link == null) continue
     link = MAKE_LINK_ABSOLUTE("http://www.channel4.com", link);
     Episode subCat = new Episode(
-            "Channel4OD",
+            source.getId(),
             "", // id
-            "", //programmeTitle
+            category.getShortName(), //programmeTitle
             "", //seriesTitle
             "", //episodeTitle
             "", // series

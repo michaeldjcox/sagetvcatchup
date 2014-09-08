@@ -1,5 +1,6 @@
 package Demand5
 
+source.setSourceId("Demand5");
 source.setId("Demand5");
 source.setShortName("Demand5");
 source.setLongName("Demand5");

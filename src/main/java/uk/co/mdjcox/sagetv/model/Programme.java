@@ -9,9 +9,7 @@ package uk.co.mdjcox.sagetv.model;
 
 import com.google.common.collect.ImmutableMap;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -31,6 +29,7 @@ public class Programme extends SubCategory {
   /**
    * Constructor for the programme meta data.
    *
+   * @param sourceId The media source id of this category
    * @param id         The unique id of this category
    * @param shortName  The short name for this category
    * @param longName   The description of this category
@@ -39,9 +38,9 @@ public class Programme extends SubCategory {
    * @param parentId   The id of any category which includes this category
    * @throws NullPointerException if any of the parameters is <code>null</code>
    */
-  public Programme(String id, String shortName, String longName, String serviceUrl, String iconUrl,
+  public Programme(String sourceId, String id, String shortName, String longName, String serviceUrl, String iconUrl,
                    String parentId) {
-    super(id, shortName, longName, serviceUrl, iconUrl, parentId);
+    super(sourceId, id, shortName, longName, serviceUrl, iconUrl, parentId);
   }
 
   /**

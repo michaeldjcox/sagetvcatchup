@@ -31,6 +31,7 @@ public class SubCategory extends Category {
   /**
    * Constructs a subcategory.
    *
+   * @param sourceId The media source id of this category
    * @param id The unique id of this category
    * @param shortName The short name for this category
    * @param longName The description of this category
@@ -38,10 +39,10 @@ public class SubCategory extends Category {
    * @param iconUrl The URL of an icon associated with this category
    * @param parentId The id of any category which includes this category
    */
-  public SubCategory(String id, String shortName, String longName,
+  public SubCategory(String sourceId, String id, String shortName, String longName,
                      String serviceUrl, String iconUrl,
                      String parentId) {
-    super(id, shortName, longName, serviceUrl, iconUrl, parentId);
+    super(sourceId, id, shortName, longName, serviceUrl, iconUrl, parentId);
   }
 
   /**

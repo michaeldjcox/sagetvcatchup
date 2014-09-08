@@ -165,8 +165,8 @@ public abstract class GroovyScript extends groovy.lang.Script {
         logger.error(msg);
     }
 
-    public void LOG_ERROR(ErrorRecorder item, String plugin, String programme, String episode, String message, String... sourceUrl) {
-      item.addError("ERROR", plugin, programme, episode, message, sourceUrl);
+    public void LOG_ERROR(ErrorRecorder item, String message) {
+      item.addError("ERROR", message);
       logger.error(message);
     }
 
@@ -182,8 +182,8 @@ public abstract class GroovyScript extends groovy.lang.Script {
         logger.warn(msg, thrown);
     }
 
-  public void LOG_WARNING(ErrorRecorder item, String plugin, String programme, String episode, String message, String... sourceUrl) {
-    item.addError("WARNING", plugin, programme, episode, message, sourceUrl);
+  public void LOG_WARNING(ErrorRecorder item, String message) {
+    item.addError("WARNING", message);
     logger.warn(message);
   }
 

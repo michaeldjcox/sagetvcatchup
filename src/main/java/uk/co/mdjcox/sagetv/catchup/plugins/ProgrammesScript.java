@@ -32,18 +32,19 @@ public class ProgrammesScript extends Script {
         super(logger, base + File.separator + "getProgrammes.groovy", htmlUtils, downloadUtils, osUtils, properties);
     }
 
-    public Collection<Programme> getProgrammes(Source category) {
+    public Collection<Programme> getProgrammes(Source source) {
         Collection<Programme> programmes = new ArrayList<Programme>();
         try {
-            call("category", category,  "url", category.getServiceUrl(), "programmes", programmes);
+          source.addMetaUrl(source.getServiceUrl());
+            call("source", source,  "url", source.getServiceUrl(), "programmes", programmes);
         } catch (Throwable e) {
-          category.addError("ERROR", category.getId(), "", "", "Unable to get programmes: " + e.getMessage(), category.getServiceUrl());
-          getLogger().error("Unable to get programmes for: " + category, e);
+          source.addError("ERROR", "Unable to get programmes: " + e.getMessage());
+          getLogger().error("Unable to get programmes for: " + source, e);
         } finally {
-          if (category.hasErrors()) {
-            getLogger().warn("Source " + category.getShortName() + " has errors");
+          if (source.hasErrors()) {
+            getLogger().warn("Source " + source.getShortName() + " has errors");
           }
-            getLogger().info(category + " has " + programmes.size() + " programmes");
+            getLogger().info(source + " has " + programmes.size() + " programmes");
         }
         return programmes;
     }

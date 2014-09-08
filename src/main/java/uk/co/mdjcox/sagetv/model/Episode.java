@@ -46,6 +46,8 @@ public class Episode implements ErrorRecorder {
   private Set<String> genres = new TreeSet<String>();
   /** A list of parsing errors associated with this episode */
   private List<ParseError> errors = new ArrayList<ParseError>();
+  /** The metadata URLs used to populate this item */
+  private final Set<String> metaUrls = new HashSet<String>();
 
   /**
    * Constructor for the episode meta data.
@@ -401,6 +403,23 @@ public class Episode implements ErrorRecorder {
   }
 
   /**
+   * Adds a meta date URL used to populate this category
+   * @param metaUrl the URL
+   */
+  public void addMetaUrl(String metaUrl) {
+    metaUrls.add(metaUrl);
+
+  }
+
+  /**
+   * Gets the list of meta data URLs used to populate this category
+   * @return a set of URLs
+   */
+  public Set<String> getMetaUrls() {
+    return metaUrls;
+  }
+
+  /**
    * Returns a list of parsing errors associated with this episode
    *
    * @return list of parsing errors
@@ -411,17 +430,13 @@ public class Episode implements ErrorRecorder {
   }
 
   /**
-   * Adds a parse error to the episode
-   *  @param level a severity level for the error
-   * @param plugin the plugin name e.g. iplayer
-   * @param programme the programme name affected
-   * @param episode the episode name affected
+   * Adds a parse error to the id
+   * @param level a severity level for the error
    * @param message a message indicating the nature of the failure
-   * @param sourceUrl the source URL from which the information could not be parsed
    */
   @Override
-  public void addError(String level, String plugin, String programme, String episode, String message, String... sourceUrl) {
-    ParseError error = new ParseError(level, plugin, programme, episode, message, sourceUrl);
+  public void addError(String level, String message) {
+    ParseError error = new ParseError(this, level, message);
     errors.add(error);
   }
 

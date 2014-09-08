@@ -33,9 +33,9 @@ public class EpisodesScript extends Script {
     public void getEpisodes(Source source, Programme category) {
         try {
             getLogger().info("Getting episodes for " + category);
-            call("url", category.getServiceUrl(), "category", category);
+            call("source", source, "url", category.getServiceUrl(), "category", category);
         } catch (Throwable e) {
-            category.addError("ERROR", source.getId(), category.getId(), "", "Unable to get episodes: " + e.getMessage(), category.getServiceUrl());
+            category.addError("ERROR", "Unable to get episodes: " + e.getMessage());
             getLogger().error("Unable to get episodes for: " + category, e);
         }finally {
           if (category.hasErrors()) {

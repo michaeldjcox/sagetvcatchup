@@ -274,8 +274,6 @@ public class Publisher {
     parentId = htmlUtils.makeIdSafe(parentId);
     id = htmlUtils.makeIdSafe(id);
 
-    logger.info("Online adding subcategory: " + id);
-
     links.setProperty("xFeedPodcastCustom/" + id, "xPodcast" + parentId + ";xURLNone");
     links.setProperty(id + "/IsCategory", "true");
     links.setProperty(id + "/CategoryName", "xPodcast" + id);

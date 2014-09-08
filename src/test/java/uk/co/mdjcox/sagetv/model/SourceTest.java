@@ -4,10 +4,7 @@ import org.junit.Test;
 import org.junit.Before; 
 import org.junit.After;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
+import static junit.framework.TestCase.*;
 
 /** 
 * Source Tester. 

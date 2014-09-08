@@ -23,9 +23,9 @@ while (str != null) {
     if (link == null) continue
     link = MAKE_LINK_ABSOLUTE("http://www.channel5.com", link);
     Episode subCat = new Episode(
-            "Demand5",
+            source.getId(),
             "", // id
-            "", //programmeTitle
+            category.getShortName(), //programmeTitle
             "", //seriesTitle
             "", //episodeTitle
             "", // series

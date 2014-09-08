@@ -11,6 +11,7 @@ import org.mortbay.jetty.handler.AbstractHandler;
 import org.slf4j.Logger;
 
 import uk.co.mdjcox.sagetv.model.*;
+import uk.co.mdjcox.utils.HtmlBuilder;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -39,6 +41,12 @@ public class PodcastServer {
     private HtmlUtilsInterface htmlUtils;
     private Map<String, Episode> episodes = new HashMap<String, Episode>();
     private String errorResponse = "";
+    private String categoryResponse="";
+    private String programmeResponse="";
+    private String episodeResponse="";
+    private Map<String, String> programmeDetails = new HashMap<String, String>();
+    private Map<String, String> episodeDetails = new HashMap<String, String>();
+    private Map<String, String> categoryDetails = new HashMap<String, String>();
 
     @Inject
     private PodcastServer(Logger logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, Recorder recorder) throws Exception {
@@ -91,16 +99,34 @@ public class PodcastServer {
           stopVideoResponse(response, name);
         } else if (target.startsWith("/errors")) {
           getMessageResponse(response, errorResponse);
+        } else if (target.startsWith("/programmes")) {
+          getMessageResponse(response, programmeResponse);
+        } else if (target.startsWith("/episodes")) {
+          getMessageResponse(response, episodeResponse);
+        } else if (target.startsWith("/categories")) {
+          getMessageResponse(response, categoryResponse);
+        } else if (target.startsWith("/programme=")) {
+          String id = target.substring(target.indexOf('=') + 1);
+          String detailsResponse = programmeDetails.get(id);
+          getMessageResponse(response, detailsResponse);
+        } else if (target.startsWith("/episode=")) {
+          String id = target.substring(target.indexOf('=') + 1);
+          String detailsResponse = episodeDetails.get(id);
+          getMessageResponse(response, detailsResponse);
+        } else if (target.startsWith("/category=")) {
+          String id = target.substring(target.indexOf('=') + 1);
+          String detailsResponse = categoryDetails.get(id);
+          getMessageResponse(response, detailsResponse);
         } else {
-            String serviceName = target.substring(1);
-            String podcast = podcasts.get(serviceName);
-            if (podcast != null) {
-                getChannelResponse(response, podcast);
-            } else {
-                getMessageResponse(response, "Online service " + serviceName + " is unknown");
-            }
-        }
-        ((Request) request).setHandled(true);
+              String serviceName = target.substring(1);
+              String podcast = podcasts.get(serviceName);
+              if (podcast != null) {
+                  getChannelResponse(response, podcast);
+              } else {
+                  getMessageResponse(response, "Online service " + serviceName + " is unknown");
+              }
+          }
+          ((Request) request).setHandled(true);
     }
 
     private void stopVideoResponse(HttpServletResponse response,String name) throws ServletException, IOException {
@@ -283,9 +309,260 @@ public class PodcastServer {
         podcasts = newPodcasts;
         episodes = newEpisodes;
 
+      HtmlBuilder categoriesBuilder = new HtmlBuilder();
+      HtmlBuilder programmesBuilder = new HtmlBuilder();
+      HtmlBuilder episodesBuilder = new HtmlBuilder();
+
+      programmesBuilder.startDocument();
+      programmesBuilder.addPageHeader("Programmes");
+      programmesBuilder.startBody();
+      programmesBuilder.addHeading1("Programmes");
+      programmesBuilder.startTable();
+      programmesBuilder.addTableHeader("SourceId", "ParentId", "Id", "ShortName", "LongName", "ServiceUrl", "IconUrl", "PodcastUrl");
+
+      categoriesBuilder.startDocument();
+      categoriesBuilder.addPageHeader("Categories");
+      categoriesBuilder.startBody();
+      categoriesBuilder.addHeading1("Categories");
+      categoriesBuilder.startTable();
+      categoriesBuilder.addTableHeader("SourceId", "ParentId", "Id", "ShortName", "LongName", "ServiceUrl", "IconUrl");
+
+      episodesBuilder.startDocument();
+      episodesBuilder.addPageHeader("Episodes");
+      episodesBuilder.startBody();
+      episodesBuilder.addHeading1("Episodes");
+      episodesBuilder.startTable();
+      episodesBuilder.addTableHeader("SourceId", "Id", "Channel", "ProgrammeTitle", "Series", "SeriesTitle", "Episode", "EpisodeTitle", "Description", "PodcastTitle", "AirDate", "AirTime", "ServiceUrl", "IconUrl" );
+
+
+      for (Category cat : catalog.getCategories()) {
+        String detailStr = buildDetailsFor(cat);
+        if (cat.isProgrammeCategory() && cat.getParentId().isEmpty()) {
+          programmeDetails.put(cat.getId(), detailStr);
+          Programme prog = (Programme)cat;
+          HtmlBuilder linkBuilder1 = new HtmlBuilder();
+          linkBuilder1.addLink(cat.getServiceUrl(), cat.getServiceUrl());
+          HtmlBuilder linkBuilder2 = new HtmlBuilder();
+          linkBuilder2.addLink(cat.getIconUrl(), cat.getIconUrl());
+            HtmlBuilder linkBuilder3 = new HtmlBuilder();
+            linkBuilder3.addLink(prog.getPodcastUrl(), prog.getPodcastUrl());
+
+          HtmlBuilder linkBuilder4 = new HtmlBuilder();
+          String link = "/programme=" + prog.getId();
+          linkBuilder4.addLink(prog.getId(), link);
+
+          programmesBuilder.addTableRow(prog.getSourceId(), prog.getParentId(), linkBuilder4.toString(), prog.getShortName(), prog.getLongName(), linkBuilder1.toString(), linkBuilder2.toString(),linkBuilder3.toString());
+        } else {
+          categoryDetails.put(cat.getId(), detailStr);
+          HtmlBuilder linkBuilder1 = new HtmlBuilder();
+          linkBuilder1.addLink(cat.getServiceUrl(), cat.getServiceUrl());
+          HtmlBuilder linkBuilder2 = new HtmlBuilder();
+          linkBuilder2.addLink(cat.getIconUrl(), cat.getIconUrl());
+
+          HtmlBuilder linkBuilder4 = new HtmlBuilder();
+          String link = "/category=" + cat.getId();
+          linkBuilder4.addLink(cat.getId(), link);
+
+          categoriesBuilder.addTableRow(cat.getSourceId(), cat.getParentId(), linkBuilder4.toString(), cat.getShortName(), cat.getLongName(), linkBuilder1.toString(), linkBuilder2.toString());
+
+        }
+
+        if (cat instanceof Programme) {
+          for (Episode ep : ((Programme)cat).getEpisodes().values()) {
+            String detailStr2 = buildDetailsFor(ep);
+            episodeDetails.put(ep.getId(), detailStr2);
+            HtmlBuilder linkBuilder1 = new HtmlBuilder();
+            linkBuilder1.addLink(ep.getServiceUrl(), ep.getServiceUrl());
+            HtmlBuilder linkBuilder2 = new HtmlBuilder();
+            linkBuilder2.addLink(ep.getIconUrl(), ep.getIconUrl());
+
+            HtmlBuilder linkBuilder4 = new HtmlBuilder();
+            String link = "/episode=" + ep.getId();
+            linkBuilder4.addLink(ep.getId(), link);
+
+            episodesBuilder.addTableRow(ep.getSourceId(), linkBuilder4.toString(), ep.getChannel(), ep.getProgrammeTitle(), ep.getSeries(), ep.getSeriesTitle(), ep.getEpisode(), ep.getEpisodeTitle(), ep.getDescription(), ep.getPodcastTitle(), ep.getAirDate(), ep.getAirTime(), linkBuilder1.toString(), linkBuilder2.toString() );
+          }
+        }
+      }
+
+      programmesBuilder.stopTable();
+      programmesBuilder.stopBody();
+      programmesBuilder.stopDocument();
+
+      categoriesBuilder.stopTable();
+      categoriesBuilder.stopBody();
+      categoriesBuilder.stopDocument();
+
+      episodesBuilder.stopTable();
+      episodesBuilder.stopBody();
+      episodesBuilder.stopDocument();
+
+      programmeResponse = programmesBuilder.toString();
+      categoryResponse = categoriesBuilder.toString();
+      episodeResponse = episodesBuilder.toString();
 
       buildErrorResponse(catalog);
     }
+
+  private String buildDetailsFor(Episode cat) {
+    String pageTitle = "Details page for " + cat.getPodcastTitle();
+    HtmlBuilder htmlBuilder = new HtmlBuilder();
+    htmlBuilder.startDocument();
+    htmlBuilder.addPageHeader(pageTitle);
+    htmlBuilder.startBody();
+    htmlBuilder.addHeading1(cat.getPodcastTitle());
+
+    htmlBuilder.addHeading2("Details");
+
+    htmlBuilder.startTable();
+    htmlBuilder.addTableHeader("Field", "Value");
+
+    Map<String,String> data = new LinkedHashMap<String, String>();
+    data.put("SourceId", cat.getSourceId());
+    data.put("Type", cat.getClass().getSimpleName());
+    data.put("Id", cat.getId());
+    data.put("Channel", cat.getChannel());
+    data.put("ProgrammeTitle", cat.getProgrammeTitle());
+    data.put("SeriesTitle", cat.getSeriesTitle());
+    data.put("EpisodeTitle", cat.getEpisodeTitle());
+    data.put("Description", cat.getDescription());
+    data.put("Series", cat.getSeries());
+    data.put("Episode", cat.getEpisode());
+    HtmlBuilder listBuilder = new HtmlBuilder();
+    listBuilder.startList();
+    for (String genre : cat.getGenres()) {
+      listBuilder.addListItem(genre);
+    }
+    listBuilder.stopList();
+    data.put("Genres", listBuilder.toString());
+    data.put("Date", cat.getAirDate());
+    data.put("Time", cat.getAirTime());
+    HtmlBuilder linkBuilder1 = new HtmlBuilder();
+    linkBuilder1.addLink(cat.getIconUrl(), cat.getIconUrl());
+    data.put("IconUrl", linkBuilder1.toString());
+    HtmlBuilder linkBuilder2 = new HtmlBuilder();
+    linkBuilder2.addLink(cat.getServiceUrl(), cat.getServiceUrl());
+    data.put("ServiceUrl", linkBuilder2.toString());
+
+    HtmlBuilder metaListBuilder = new HtmlBuilder();
+    metaListBuilder.startList();
+    for (String sourceUrl : cat.getMetaUrls()) {
+      HtmlBuilder linkBuilder = new HtmlBuilder();
+      linkBuilder.addLink(sourceUrl, sourceUrl);
+      metaListBuilder.addListItem(linkBuilder.toString());
+    }
+    metaListBuilder.stopList();
+
+    data.put("MetaUrls", metaListBuilder.toString());
+
+    for (Map.Entry<String, String> entry : data.entrySet()) {
+      htmlBuilder.addTableRow(entry.getKey(), entry.getValue());
+    }
+
+    htmlBuilder.stopTable();
+
+    htmlBuilder.addHeading2("Errors");
+    htmlBuilder.startTable();
+    htmlBuilder.addTableHeader( "Level", "Error");
+    for (ParseError error : cat.getErrors()) {
+      htmlBuilder.addTableRow(error.getLevel(), error.getMessage());
+    }
+    htmlBuilder.stopTable();
+    htmlBuilder.stopBody();
+    htmlBuilder.stopDocument();
+    return htmlBuilder.toString();
+  }
+
+  private String buildDetailsFor(Category cat) {
+
+    String pageTitle = "Details page for " + cat.getLongName();
+    HtmlBuilder htmlBuilder = new HtmlBuilder();
+    htmlBuilder.startDocument();
+    htmlBuilder.addPageHeader(pageTitle);
+    htmlBuilder.startBody();
+    htmlBuilder.addHeading1(cat.getShortName());
+    htmlBuilder.addHeading2("Details");
+    htmlBuilder.startTable();
+    htmlBuilder.addTableHeader("Field", "Value");
+
+    Map<String,String> data = new LinkedHashMap<String, String>();
+    data.put("SourceId", cat.getSourceId());
+    data.put("Type", cat.getClass().getSimpleName());
+    data.put("Id", cat.getId());
+    data.put("ParentId", cat.getParentId());
+    data.put("ShortName", cat.getShortName());
+    data.put("LongName", cat.getLongName());
+    HtmlBuilder linkBuilder1 = new HtmlBuilder();
+    linkBuilder1.addLink(cat.getIconUrl(), cat.getIconUrl());
+    data.put("IconUrl", linkBuilder1.toString());
+    HtmlBuilder linkBuilder2 = new HtmlBuilder();
+    linkBuilder2.addLink(cat.getServiceUrl(), cat.getServiceUrl());
+    data.put("ServiceUrl", linkBuilder2.toString());
+
+    if (cat instanceof Programme) {
+      Programme prog = (Programme)cat;
+      HtmlBuilder linkBuilder3 = new HtmlBuilder();
+      linkBuilder3.addLink(prog.getPodcastUrl(), prog.getPodcastUrl());
+      data.put("PodcastUrl", linkBuilder3.toString());
+    }
+
+    for (Map.Entry<String, String> entry : data.entrySet()) {
+      htmlBuilder.addTableRow(entry.getKey(), entry.getValue());
+    }
+
+    HtmlBuilder listBuilder = new HtmlBuilder();
+    listBuilder.startList();
+    for (String sourceUrl : cat.getMetaUrls()) {
+      HtmlBuilder linkBuilder = new HtmlBuilder();
+      linkBuilder.addLink(sourceUrl, sourceUrl);
+      listBuilder.addListItem(linkBuilder.toString());
+    }
+    listBuilder.stopList();
+
+    data.put("MetaUrls", listBuilder.toString());
+
+    htmlBuilder.stopTable();
+
+    if (cat instanceof Programme) {
+
+      htmlBuilder.addHeading2("Episodes");
+
+      htmlBuilder.startTable();
+
+      htmlBuilder.addTableHeader("SourceId", "Id", "Channel", "ProgrammeTitle", "Series", "SeriesTitle", "Episode", "EpisodeTitle", "Description", "PodcastTitle", "AirDate", "AirTime", "ServiceUrl", "IconUrl" );
+
+
+      for (Episode ep : ((Programme)cat).getEpisodes().values()) {
+        String detailStr2 = buildDetailsFor(ep);
+        episodeDetails.put(ep.getId(), detailStr2);
+        HtmlBuilder linkBuilder5 = new HtmlBuilder();
+        linkBuilder5.addLink(ep.getServiceUrl(), ep.getServiceUrl());
+        HtmlBuilder linkBuilder6 = new HtmlBuilder();
+        linkBuilder6.addLink(ep.getIconUrl(), ep.getIconUrl());
+
+        HtmlBuilder linkBuilder4 = new HtmlBuilder();
+        String link = "/episode=" + ep.getId();
+        linkBuilder4.addLink(ep.getId(), link);
+
+        htmlBuilder.addTableRow(ep.getSourceId(), linkBuilder4.toString(), ep.getChannel(), ep.getProgrammeTitle(), ep.getSeries(), ep.getSeriesTitle(), ep.getEpisode(), ep.getEpisodeTitle(), ep.getDescription(), ep.getPodcastTitle(), ep.getAirDate(), ep.getAirTime(), linkBuilder5.toString(), linkBuilder6.toString());
+      }
+      htmlBuilder.stopTable();
+    }
+
+
+    htmlBuilder.addHeading2("Errors");
+    htmlBuilder.startTable();
+    htmlBuilder.addTableHeader( "Level", "Error");
+    for (ParseError error : cat.getErrors()) {
+      htmlBuilder.addTableRow(error.getLevel(), error.getMessage());
+    }
+    htmlBuilder.stopTable();
+
+    htmlBuilder.stopBody();
+    htmlBuilder.stopDocument();
+    return htmlBuilder.toString();
+  }
+
 
   private void buildErrorResponse(Catalog catalog) {
     TreeSet<ParseError> errorList = new TreeSet<ParseError>();
@@ -310,58 +587,46 @@ public class PodcastServer {
       }
 
     }
-    StringBuilder errorsBuilder = new StringBuilder("<html>\n");
-    errorsBuilder.append("<head>\n");
-    errorsBuilder.append("<title>Errors page</title>\n");
-    errorsBuilder.append("<style>\n");
-    errorsBuilder.append("table, th, td {\n");
-    errorsBuilder.append("border: 1px solid black;\n");
-    errorsBuilder.append("  border-collapse: collapse;\n");
-    errorsBuilder.append("}\n");
-    errorsBuilder.append("th, td {\n");
-    errorsBuilder.append("padding: 5px;\n");
-    errorsBuilder.append("text-align: left;\n");
-    errorsBuilder.append("}\n");
-    errorsBuilder.append("table.names th	{\n");
-    errorsBuilder.append("background-color: #c1c1c1;\n");
-    errorsBuilder.append("}\n");
-    errorsBuilder.append("</style>\n");
-    errorsBuilder.append("</head>\n");
-    errorsBuilder.append("<body>\n");
-    errorsBuilder.append("<table style=\"width:100%\">\n");
-    errorsBuilder.append("<tr>\n<th>Source</th>\n<th>Level</th>\n<th>Programme</th>\n<th>Episode</th>\n<th>Error</th>\n<th>URL</th>\n</tr>\n");
+    HtmlBuilder htmlBuilder = new HtmlBuilder();
+    htmlBuilder.startDocument();
+    htmlBuilder.addPageHeader("Errors page");
+    htmlBuilder.startBody();
+    htmlBuilder.addHeading1("Parsing errors");
+    htmlBuilder.startTable();
+    htmlBuilder.addTableHeader("Source", "Level", "Programme", "Episode", "Error", "URL");
     for (ParseError error : errorList) {
-      errorsBuilder.append("<tr>\n");
-      errorsBuilder.append("<td>");
-      errorsBuilder.append(error.getPlugin());
-      errorsBuilder.append("</td>\n");
-      errorsBuilder.append("<td>");
-      errorsBuilder.append(error.getLevel());
-      errorsBuilder.append("</td>\n");
-      errorsBuilder.append("<td>");
-      errorsBuilder.append(error.getProgramme());
-      errorsBuilder.append("</td>\n");
-      errorsBuilder.append("<td>");
-      errorsBuilder.append(error.getEpisode());
-      errorsBuilder.append("</td>\n");
-      errorsBuilder.append("<td>");
-      errorsBuilder.append(error.getMessage());
-      errorsBuilder.append("</td>\n");
-      errorsBuilder.append("<td><ul>");
+      HtmlBuilder listBuilder = new HtmlBuilder();
+      listBuilder.startList();
       for (String sourceUrl : error.getSourceUrl()) {
-        errorsBuilder.append("<li><a href=\"");
-        errorsBuilder.append(sourceUrl);
-        errorsBuilder.append("\">");
-        errorsBuilder.append(sourceUrl);
-        errorsBuilder.append("</a></li>");
+        HtmlBuilder linkBuilder = new HtmlBuilder();
+        linkBuilder.addLink(sourceUrl, sourceUrl);
+        listBuilder.addListItem(linkBuilder.toString());
       }
-      errorsBuilder.append("</ul></td>\n");
-      errorsBuilder.append("</tr>\n");
+
+      String link = error.getId();
+      HtmlBuilder linkBuilder = new HtmlBuilder();
+      if (error.getType().equals(Programme.class.getSimpleName())) {
+        linkBuilder.addLink(error.getId(), "/programme=" + error.getId());
+        link = linkBuilder.toString();
+      } else
+      if (error.getType().equals(Episode.class.getSimpleName())) {
+        linkBuilder.addLink(error.getId(), "/episode=" + error.getId());
+        link = linkBuilder.toString();
+      } else {
+        linkBuilder.addLink(error.getId(), "/category=" + error.getId());
+        link = linkBuilder.toString();
+      }
+
+      htmlBuilder.addTableRow(error.getSource(), error.getLevel(), error.getType(),
+              link, error.getMessage(), listBuilder.toString());
     }
-    errorsBuilder.append("</table>\n");
-    errorsBuilder.append("</body>\n");
-    errorsBuilder.append("</html>");
-    errorResponse = errorsBuilder.toString();
+    htmlBuilder.stopTable();
+    htmlBuilder.stopBody();
+    htmlBuilder.stopDocument();
+
+    errorResponse = htmlBuilder.toString();
   }
+
+
 
 }

@@ -3,19 +3,11 @@ package uk.co.mdjcox.sagetv.onlinevideo;
 import com.google.common.collect.Sets;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import uk.co.mdjcox.sagetv.catchup.CatchupTestModule;
-import uk.co.mdjcox.sagetv.model.Catalog;
-import uk.co.mdjcox.sagetv.model.Category;
-import uk.co.mdjcox.sagetv.model.Episode;
-import uk.co.mdjcox.sagetv.model.Programme;
-import uk.co.mdjcox.sagetv.model.Root;
-import uk.co.mdjcox.sagetv.model.Source;
-import uk.co.mdjcox.sagetv.model.SubCategory;
+import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.PropertiesFile;
 
 import java.io.File;
@@ -25,10 +17,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * Publisher Tester.
@@ -158,14 +147,14 @@ public class PublisherTest {
     Source source = new Source("sourceId", "sourceSourceName", "sourceLongName",
                                "sourceServiceUrl", "sourceIconUrl");
     catalog.addCategory(source);
-    SubCategory subcat = new SubCategory("subcatId", "subcatShortName", "subcatLongName",
+    SubCategory subcat = new SubCategory("sourceId", "subcatId", "subcatShortName", "subcatLongName",
                                          "subcatServiceUrl", "subcatIconUrl", "sourceId");
     catalog.addCategory(subcat);
-    SubCategory subcat2 = new SubCategory("subcatId2", "subcatShortName2", "subcatLongName2",
+    SubCategory subcat2 = new SubCategory("sourceId", "subcatId2", "subcatShortName2", "subcatLongName2",
                                           "subcatServiceUrl2", "subcatIconUrl2", "sourceId");
     catalog.addCategory(subcat2);
 
-    Programme programme = new Programme("programmeId", "programmeShortName", "programmeLongName",
+    Programme programme = new Programme("sourceId", "programmeId", "programmeShortName", "programmeLongName",
                                         "programmeServiceUrl", "programmeIconUdl", "subcatId");
     programme.setPodcastUrl("podcastUrl");
     programme.addOtherParentId("subcatId2");
@@ -173,13 +162,13 @@ public class PublisherTest {
 
     class TestCategory extends Category {
 
-      TestCategory(String id, String shortName, String longName, String serviceUrl,
+      TestCategory(String sourceId, String id, String shortName, String longName, String serviceUrl,
                    String iconUrl, String parentId) {
-        super(id, shortName, longName, serviceUrl, iconUrl, parentId);
+        super(sourceId, id, shortName, longName, serviceUrl, iconUrl, parentId);
       }
     };
 
-    TestCategory unknownCat = new TestCategory("id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
+    TestCategory unknownCat = new TestCategory("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
     catalog.addCategory(unknownCat);
 
 
@@ -356,13 +345,13 @@ public class PublisherTest {
     PropertiesFile linksFile = new PropertiesFile();
     PropertiesFile labelsFile = new PropertiesFile();
 
-    Programme programme = new Programme("callSign", "name", "description", "serviceUrl", "categoryIconUrl", "subcat");
+    Programme programme = new Programme("sourceId", "callSign", "name", "description", "serviceUrl", "categoryIconUrl", "subcat");
     programme.addOtherParentId("subcat2");
     programme.addOtherParentId("subcat3");
     programme.setPodcastUrl("podcastUrl");
 
     // TODO this test should probably fail - there should be a name
-    Programme programme2 = new Programme("callSign2", "", "", "serviceUrl", "", "");
+    Programme programme2 = new Programme("sourceId", "callSign2", "", "", "serviceUrl", "", "");
     programme2.setPodcastUrl("podcastUrl2");
     programme2.addOtherParentId("subcat2");
 
@@ -462,8 +451,8 @@ public class PublisherTest {
     method.setAccessible(true);
     PropertiesFile linksFile = new PropertiesFile();
     PropertiesFile labelsFile = new PropertiesFile();
-    SubCategory subCategory = new SubCategory("subcatId", "subcatTitle", "subCatDescription", "serviceUrl", "iconUrl", "parentId");
-    SubCategory subCategory2 = new SubCategory("subcatId2", "subcatTitle2", "subCatDescription2", "serviceUrl2", "", "parentId");
+    SubCategory subCategory = new SubCategory("sourceId", "subcatId", "subcatTitle", "subCatDescription", "serviceUrl", "iconUrl", "parentId");
+    SubCategory subCategory2 = new SubCategory("sourceId", "subcatId2", "subcatTitle2", "subCatDescription2", "serviceUrl2", "", "parentId");
 
     method.invoke(publisher, subCategory, linksFile, labelsFile);
 

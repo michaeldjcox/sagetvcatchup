@@ -21,9 +21,9 @@ while (str != null) {
     if (link == null) continue
     link = MAKE_LINK_ABSOLUTE("http://www.itv.com", link);
     Episode subCat = new Episode(
-            "ITVPlayer",
+            category.getSourceId(),
             "", // id
-            "", //programmeTitle
+            category.getShortName(), //programmeTitle
             "", //seriesTitle
             "", //episodeTitle
             "", // series
@@ -55,9 +55,9 @@ while (str != null) {
     if (link == null) continue
     link = MAKE_LINK_ABSOLUTE("http://www.itv.com", link);
     Episode subCat = new Episode(
-            "ITVPlayer",
+            source.getId(),
             "", // id
-            "", //programmeTitle
+            category.getShortName(), //programmeTitle
             "", //seriesTitle
             "", //episodeTitle
             "", // series

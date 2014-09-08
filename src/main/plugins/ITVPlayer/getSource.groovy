@@ -1,5 +1,6 @@
 package ITVPlayer
 
+source.setSourceId("ITVPlayer");
 source.setId("ITVPlayer");
 source.setShortName("ITV Player");
 source.setLongName("ITV Player");

@@ -32,6 +32,7 @@ while (str != null) {
     if ((linkName == null) || linkName.isEmpty()) linkName = link;
     subCatId = MAKE_ID(linkName);
     Programme subCat = new Programme(
+            source.getSourceId(),
             subCatId,
             linkName,
             linkName,

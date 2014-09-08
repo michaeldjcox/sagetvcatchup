@@ -8,7 +8,9 @@
 package uk.co.mdjcox.sagetv.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -17,6 +19,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public abstract class Category implements ErrorRecorder {
 
+  /** The unique id of this category */
+  private String sourceId="";
   /** The unique id of this category */
   private String id="";
   /** The short name for this category */
@@ -31,10 +35,14 @@ public abstract class Category implements ErrorRecorder {
   private String parentId="";
   /** A list of parsing errors associated with this episode */
   private List<ParseError> errors = new ArrayList<ParseError>();
+  /** The metadata URLs used to populate this item */
+  private final Set<String> metaUrls = new HashSet<String>();
+
 
   /**
    * Default constructor called by concrete subclasses.
    *
+   * @param sourceId The media source id of this category
    * @param id The unique id of this category
    * @param shortName The short name for this category
    * @param longName The description of this category
@@ -44,14 +52,33 @@ public abstract class Category implements ErrorRecorder {
    *
    * @throws NullPointerException if any of the parameters is <code>null</code>
    */
-  protected Category(String id, String shortName, String longName, String serviceUrl,
+  protected Category(String sourceId, String id, String shortName, String longName, String serviceUrl,
                      String iconUrl, String parentId) {
+    this.sourceId = checkNotNull(sourceId);
     this.id = checkNotNull(id);
     this.shortName = checkNotNull(shortName);
     this.longName = checkNotNull(longName);
     this.serviceUrl = checkNotNull(serviceUrl);
     this.iconUrl = checkNotNull(iconUrl);
     this.parentId = checkNotNull(parentId);
+  }
+
+  /**
+   * Gets the id of the media source providing this file
+   *
+   * @return The id of the media file source providing this file
+   */
+  public final String getSourceId() {
+    return sourceId;
+  }
+
+  /**
+   * Sets the id of the media source providing this file
+   *
+   * @return The id of the media file source providing this file
+   */
+  public void setSourceId(String sourceId) {
+    this.sourceId = sourceId;
   }
 
   /**
@@ -211,6 +238,23 @@ public abstract class Category implements ErrorRecorder {
   }
 
   /**
+   * Adds a meta date URL used to populate this category
+   * @param metaUrl the URL
+   */
+  public void addMetaUrl(String metaUrl) {
+    metaUrls.add(metaUrl);
+
+  }
+
+  /**
+   * Gets the list of meta data URLs used to populate this category
+   * @return a set of URLs
+   */
+  public Set<String> getMetaUrls() {
+    return metaUrls;
+  }
+
+  /**
    * Returns a list of parsing errors associated with this episode
    *
    * @return list of parsing errors
@@ -221,17 +265,13 @@ public abstract class Category implements ErrorRecorder {
   }
 
   /**
-   * Adds a parse error to the episode
-   *  @param level a severity level for the error
-   * @param plugin the plugin name e.g. iplayer
-   * @param programme the programme name affected
-   * @param episode the episode name affected
+   * Adds a parse error to the id
+   * @param level a severity level for the error
    * @param message a message indicating the nature of the failure
-   * @param sourceUrl the source URL from which the information could not be parsed
    */
   @Override
-  public void addError(String level, String plugin, String programme, String episode, String message, String... sourceUrl) {
-    ParseError error = new ParseError(level, plugin, programme, episode, message, sourceUrl);
+  public void addError(String level, String message) {
+    ParseError error = new ParseError(this, level, message);
     errors.add(error);
   }
 

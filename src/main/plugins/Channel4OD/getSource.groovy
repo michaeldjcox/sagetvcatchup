@@ -1,5 +1,6 @@
 package Channel4OD
 
+source.setSourceId("Channel4OD");
 source.setId("Channel4OD");
 source.setShortName("4OD");
 source.setLongName("4OD");
