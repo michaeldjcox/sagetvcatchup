@@ -14,27 +14,26 @@ String metadetails = GET_WEB_PAGE(metaurl);
 String programmeDetails = GET_WEB_PAGE(programmeUrl);
 
 // EPISODE TITLE
-String details = MOVE_TO("<display_title>", metadetails)
-details = MOVE_TO("<title>", details)
+String details = MOVE_TO("<title>", metadetails)
 String title = EXTRACT_TO("<", details)
 title = REMOVE_HTML_TAGS(title);
 
-details = MOVE_TO("<display_title>", metadetails)
-details = MOVE_TO("<subtitle>", details)
-String subtitle = EXTRACT_TO("<", details)
-subtitle = REMOVE_HTML_TAGS(subtitle);
+if (title == null) {
+    details = MOVE_TO("<display_title>", metadetails)
+    details = MOVE_TO("<title>", details)
+    title = EXTRACT_TO("<", details)
+    title = REMOVE_HTML_TAGS(title);
 
-if (subtitle != null) {
-  if (title == null) {
-      title = subtitle;
-  } else {
-      if (!subtitle.startsWith(title)) {
-          title = title + " " + subtitle
-      } else {
-          title = subtitle;
-      }
-  }
+    details = MOVE_TO("<display_title>", metadetails)
+    details = MOVE_TO("<subtitle>", details)
+    String subtitle = EXTRACT_TO("<", details)
+    subtitle = REMOVE_HTML_TAGS(subtitle);
+
+    if (subtitle != null) {
+        title=subtitle;
+    }   
 }
+
 
 if (title != null) {
     episode.setEpisodeTitle(title);
@@ -185,6 +184,7 @@ if (details == null) {
 details = MOVE_TO("<position", details);
 
 if (details == null || !details.startsWith("/>")) {
+    details = MOVE_TO(">", details);
     String seriesNumber = EXTRACT_TO("<", details)
     seriesNumber = REMOVE_HTML_TAGS(seriesNumber);
 
@@ -202,6 +202,7 @@ if (details == null || !details.startsWith("/>")) {
 // EPISODE
 details = MOVE_TO("<position", metadetails);
 if (details == null || !details.startsWith("/>")) {
+    details = MOVE_TO(">", details);
     String episodeNo = EXTRACT_TO("</position", details)
     episodeNo = REMOVE_HTML_TAGS(episodeNo);
 
@@ -221,7 +222,7 @@ details = MOVE_TO("<first_broadcast_date", metadetails)
 
 // If empty tag is present then there is no data to parse otherwise...
 if (details == null || !details.startsWith("/>")) {
-
+    details = MOVE_TO(">", details);
     details = EXTRACT_TO("</first_broadcast_date>", details)
 
     String time=null;
