@@ -20,4 +20,12 @@ public interface OsUtilsInterface {
     HashMap<String, String> getProcesses();
 
     void killProcessesContaining(String expression);
+
+    void waitFor(long millis);
+
+    void killProcessesMatching(String regex);
+
+    boolean isWindows();
+
+    boolean isUnix();
 }

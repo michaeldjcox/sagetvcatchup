@@ -32,11 +32,15 @@ import sage.SageTVPluginRegistry;
  * To change this template use File | Settings | File Templates.
  */
 
-// TODO - some issues parsing content meta-data
 // TODO - check video from other providers
-// TODO - how to stop playback and resume - how to tidy away broken fragments
-// TODO - why does sagetv giveup
-// TODO - parameter for how much download before playback
+// TODO - Can I place fully download videos directly in recordings for later?
+// TODO - Can request such downloads from the existing EPG?
+// TODO - is there any way I can incrementally update the catalog?
+// TODO - deployment in windows environment
+// TODO - upgrade sagetv to 7.1 and try podcast recorder with BBC iplayer
+// TODO - config from plugin - operations e.g recache, data i.e. last updated, no errors
+// TODO - really should write html to disk and read from there so its still there after a bounce
+
 
 public class CatchupPlugin implements SageTVPlugin {
 
@@ -121,7 +125,9 @@ public class CatchupPlugin implements SageTVPlugin {
                 }
             } ;
 
-            service.scheduleAtFixedRate(runnable, 1, 1200, TimeUnit.SECONDS);
+            long refreshRate = props.getInt("refreshRateHours");
+
+            service.scheduleAtFixedRate(runnable, 0, refreshRate, TimeUnit.HOURS);
 
         } catch (Exception e) {
             if (logger == null) {
@@ -239,7 +245,6 @@ public class CatchupPlugin implements SageTVPlugin {
     }
 
     private void stopRecording(Map map) {
-    // TODO make this more robust
     HtmlUtils htmlUtils = injector.getInstance(HtmlUtils.class);
     String episodeTitle = map.toString();
     episodeTitle = htmlUtils.moveTo("MediaFile[", episodeTitle);

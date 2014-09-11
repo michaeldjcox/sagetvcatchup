@@ -34,12 +34,18 @@ if (title == null) {
     }   
 }
 
-
 if (title != null) {
     episode.setEpisodeTitle(title);
     LOG_INFO("EpisodeTitle: " + title)
 } else {
     LOG_ERROR(episode, "Episode title not found");
+}
+
+// ID
+if (title != null) {
+    episode.setId(MAKE_ID(programme.getShortName() + "_" +  title))
+} else {
+    episode.setId(MAKE_ID(url));
 }
 
 // SERIES TITLE
@@ -59,13 +65,6 @@ if (seriesTitle != null) {
     LOG_INFO("SeriesTitle: " + seriesTitle)
 } else {
     LOG_WARNING(episode, "Series title not found");
-}
-
-// ID
-if (title != null) {
-    episode.setId(MAKE_ID(title))
-} else {
-    episode.setId(MAKE_ID(url));
 }
 
 // SYNOPSIS

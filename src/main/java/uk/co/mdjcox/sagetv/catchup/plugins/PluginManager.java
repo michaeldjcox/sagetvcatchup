@@ -44,7 +44,7 @@ public class PluginManager {
 
     public void load() {
 
-        String base = props.getProperty("pluginDir", "/opt/sagetv/server/catchup/plugins");
+        String base = props.getProperty("pluginDir", "/opt/sagetv/server/sagetvcatchup/plugins");
 
         File dir = new File(base);
         if (!dir.isDirectory()) {
@@ -64,7 +64,10 @@ public class PluginManager {
 
         for (File pluginDir : pluginDirs) {
             String sourceId = pluginDir.getName();
-            if (!sourceId.equals("Iplayer")) continue; // TODO take out
+          if (props.getBoolean(sourceId + ".skip")) {
+            logger.info("Skipping plugin " + sourceId);
+            continue;
+          }
             Plugin plugin = pluginFactory.createPlugin(sourceId, pluginDir.getAbsolutePath());
             plugin.init();
             plugins.put(sourceId, plugin);

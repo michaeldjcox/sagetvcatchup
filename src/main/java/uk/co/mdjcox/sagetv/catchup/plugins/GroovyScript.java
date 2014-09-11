@@ -117,12 +117,17 @@ public abstract class GroovyScript extends groovy.lang.Script {
         return osUtils.spawnProcess(osCommand, loggerName, true);
     }
 
-    public Process EXECUTE(String radioCommand, String loggerName, ArrayList<String> output, ArrayList<String> errors) throws Exception {
-        return osUtils.spawnProcess(radioCommand, loggerName, false, output, errors);
+    public Process EXECUTE(String osCommand, String loggerName, ArrayList<String> output, ArrayList<String> errors) throws Exception {
+        if (osUtils.isWindows()) {
+            osCommand = "cmd.exe /c \"" + osCommand + "\"";
+        } else {
+            osCommand = "sh -c \"" + osCommand + "\"";
+        }
+        return osUtils.spawnProcess(osCommand, loggerName, false, output, errors);
     }
 
-    public Process EXECUTE_AND_WAIT(String radioCommand, String loggerName, ArrayList<String> output, ArrayList<String> errors) throws Exception {
-        return osUtils.spawnProcess(radioCommand, loggerName, true, output, errors);
+    public Process EXECUTE_AND_WAIT(String osCommand, String loggerName, ArrayList<String> output, ArrayList<String> errors) throws Exception {
+        return osUtils.spawnProcess(osCommand, loggerName, true, output, errors);
     }
 
     public void KILL(String pid, String cmd) {
@@ -133,7 +138,12 @@ public abstract class GroovyScript extends groovy.lang.Script {
         osUtils.killProcessesContaining(expression);
     }
 
-    public HashMap<String, String> GET_PROCESSES() {
+  public void KILL_MATCHING(String regex) {
+    osUtils.killProcessesMatching(regex);
+  }
+
+
+  public HashMap<String, String> GET_PROCESSES() {
         return osUtils.getProcesses();
     }
 
@@ -192,18 +202,7 @@ public abstract class GroovyScript extends groovy.lang.Script {
     }
 
     public void WAIT_FOR(long millis) {
-        logger.info("Waiting for " + millis + "ms");
-        long stopTime = System.currentTimeMillis() + millis;
-        while (System.currentTimeMillis() < stopTime) {
-            try {
-                long left = stopTime -System.currentTimeMillis();
-                if (left > 0) {
-                    Thread.sleep(left);
-                }
-            } catch (InterruptedException e) {
-
-            }
-        }
+      osUtils.waitFor(millis);
     }
 
     public String[] SPLIT(String string, String regex) {
@@ -249,6 +248,10 @@ public abstract class GroovyScript extends groovy.lang.Script {
             WAIT_FOR(1000);
         }
         return "";
+    }
+
+    public boolean IS_WINDOWS() {
+        return osUtils.isWindows();
     }
 
 }

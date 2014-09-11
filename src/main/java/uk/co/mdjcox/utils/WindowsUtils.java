@@ -181,5 +181,15 @@ class WindowsUtils extends OsUtils {
         kill("taskkill /F /PID", pid);
         logger.info("Killed process " + pid + " for " + com);
     }
+
+  @Override
+  public boolean isWindows() {
+    return true;
+  }
+
+  @Override
+  public boolean isUnix() {
+    return false;
+  }
 }
 

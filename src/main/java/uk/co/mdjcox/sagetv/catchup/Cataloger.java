@@ -46,16 +46,9 @@ public class Cataloger {
 
                 Source sourceCat = plugin.getSource();
                 String pluginName = sourceCat.getId();
-
-                ArrayList<String> testProgrammes = new ArrayList<String>();
-                int testMaxProgrammes = Integer.MAX_VALUE;
-                if (props.getBoolean(pluginName + ".skip")) {
-                    logger.info("Skipping plugin " + pluginName);
-                    continue;
-                } else {
-                    testProgrammes = props.getPropertySequence(pluginName + ".programmes");
-                    testMaxProgrammes = props.getInt(pluginName + ".maxprogrammes", Integer.MAX_VALUE);
-                }
+              
+                ArrayList<String> testProgrammes = props.getPropertySequence(pluginName + ".programmes");
+                int testMaxProgrammes = props.getInt(pluginName + ".maxprogrammes", Integer.MAX_VALUE);
 
                 newCategories.put(sourceCat.getId(), sourceCat);
 
@@ -206,7 +199,6 @@ public class Cataloger {
         }
     }
 
-  //TODO would be great if this was organised A-Z
     private void doGenreCategorisation(Source sourceCat, Programme programmeCat, Episode prog,
                                        Map<String, SubCategory> newSubCategories) {
         Set<String> genres = prog.getGenres();
@@ -240,14 +232,18 @@ public class Cataloger {
     private void doAtoZcategorisation(Source sourceCat, Programme programmeCat,
                                       Map<String, SubCategory> newSubCategories) {
         // A to Z
-        String programmeTitle = programmeCat.getShortName();
-        String azName;
-        if (!programmeTitle.startsWith("The ") && !programmeTitle.startsWith("the ")) {
-            azName = programmeTitle.substring(0, 1).toUpperCase();
-        } else {
-            azName = programmeTitle.substring(4, 5).toUpperCase();
+        String azName = programmeCat.getShortName();
+        if (azName.startsWith("The ") || azName.startsWith("the ")) {
+            azName = azName.substring(4);
         }
 
+        int i=0;
+        while (!azName.isEmpty() && !Character.isLetterOrDigit(azName.charAt(i++))) {
+            azName = azName.substring(1);
+        }
+
+        azName = azName.substring(0, 1).toUpperCase();
+        
       String sourceId = sourceCat.getId();
       String atozId = sourceId + "/AtoZ";
         SubCategory atozCat = newSubCategories.get(atozId);

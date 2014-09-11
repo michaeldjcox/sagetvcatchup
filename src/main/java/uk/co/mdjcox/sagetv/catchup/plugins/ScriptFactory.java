@@ -21,5 +21,4 @@ public interface ScriptFactory {
     PlayScript createPlayScript(String base);
 
     StopScript createStopScript(String base);
-
 }

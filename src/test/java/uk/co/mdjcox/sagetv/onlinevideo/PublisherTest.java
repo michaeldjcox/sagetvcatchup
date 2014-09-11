@@ -124,7 +124,6 @@ public class PublisherTest {
     if (!linkFile.exists()) linkFile.createNewFile();
     if (!labelFile.exists()) labelFile.createNewFile();
 
-    //TODO work out how to test case where delete returns false
     // Test failed deletion
 //      try {
 //        publisher.unpublish();
@@ -350,7 +349,6 @@ public class PublisherTest {
     programme.addOtherParentId("subcat3");
     programme.setPodcastUrl("podcastUrl");
 
-    // TODO this test should probably fail - there should be a name
     Programme programme2 = new Programme("sourceId", "callSign2", "", "", "serviceUrl", "", "");
     programme2.setPodcastUrl("podcastUrl2");
     programme2.addOtherParentId("subcat2");

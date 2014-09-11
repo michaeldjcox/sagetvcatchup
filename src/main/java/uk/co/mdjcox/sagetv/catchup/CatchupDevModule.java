@@ -51,8 +51,14 @@ public class CatchupDevModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public PropertiesInterface providesProperties() throws Exception {
-        String base = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "config" + File.separator + "catchup.properties";
+    public PropertiesInterface providesProperties(OsUtilsInterface osUtils) throws Exception {
+      String propFileName = "sagetvcatchup.unix.properties";
+      if (osUtils.isWindows()) {
+        propFileName = "sagetvcatchup.windows.properties";
+      } else {
+        propFileName = "sagetvcatchup.unix.properties";
+      }
+      String base = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "config" + File.separator + propFileName;
         if (properties == null) {
             properties =  new PropertiesFile(base, true);
             properties.setProperty("recordingDir", workingDir + "/recordings");

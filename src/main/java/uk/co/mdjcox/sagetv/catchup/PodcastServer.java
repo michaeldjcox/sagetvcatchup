@@ -11,9 +11,7 @@ import org.mortbay.jetty.handler.AbstractHandler;
 import org.slf4j.Logger;
 
 import uk.co.mdjcox.sagetv.model.*;
-import uk.co.mdjcox.utils.HtmlBuilder;
-import uk.co.mdjcox.utils.HtmlUtilsInterface;
-import uk.co.mdjcox.utils.PropertiesInterface;
+import uk.co.mdjcox.utils.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +37,7 @@ public class PodcastServer {
     private Map<String, String> podcasts = new HashMap<String, String>();
     private Recorder recorder;
     private HtmlUtilsInterface htmlUtils;
+    private OsUtilsInterface osUtils;
     private Map<String, Episode> episodes = new HashMap<String, Episode>();
     private String errorResponse = "";
     private String categoryResponse="";
@@ -49,10 +48,12 @@ public class PodcastServer {
     private Map<String, String> categoryDetails = new HashMap<String, String>();
 
     @Inject
-    private PodcastServer(Logger logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, Recorder recorder) throws Exception {
+    private PodcastServer(Logger logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, OsUtilsInterface osUtils, Recorder recorder) throws Exception {
         this.logger = logger;
         this.htmlUtils = htmlUtils;
-        handler = new AbstractHandler() {
+        this.osUtils = osUtils;
+
+      handler = new AbstractHandler() {
             public void handle(String target,
                                HttpServletRequest request,
                                HttpServletResponse response,
@@ -92,7 +93,8 @@ public class PodcastServer {
         if (target.equals("/logo.png")) {
             getLogoResponse(response);
         } else if (target.startsWith("/play")) {
-            String name = request.getParameter("name");
+          logger.info("HTTP request for " + target);
+          String name = request.getParameter("name");
             getVideoResponse(response, name);
         } else if (target.startsWith("/stop")) {
           String name = request.getParameter("name");
@@ -143,43 +145,71 @@ public class PodcastServer {
         recorder.stop(episode);
     }
 
-    private void getVideoResponse(HttpServletResponse response, String name) throws ServletException {
-        try {
+  private void getVideoResponse(HttpServletResponse response, String name) throws ServletException {
+    try {
 
-            Episode episode = episodes.get(name);
+      Episode episode = episodes.get(name);
 
-            File file = recorder.start(episode);
-            logger.info("Streaming " + file + " exists=" + file.exists());
+      File file = recorder.start(episode);
+      logger.info("Streaming " + file + " exists=" + file.exists());
 
-            FileInputStream in = new FileInputStream(file);
-            response.setContentType("video/mp4");
-            response.setCharacterEncoding("ISO-8859-1");
-            response.setContentLength((int) file.length());
+      FileInputStream in = new FileInputStream(file);
+      response.setContentType("video/mp4");
+      response.setCharacterEncoding("ISO-8859-1");
+      response.setContentLength(Integer.MAX_VALUE);
+      OutputStream out = response.getOutputStream();
 
+      // Copy the contents of the file to the output stream
 
-//            URLConnection conn = resource.openConnection();
-//            response.setContentType(conn.getContentType());
-//            response.setCharacterEncoding(conn.getContentEncoding());
-//            response.setContentLength(conn.getContentLength());
-//            InputStream in = conn.getInputStream();
-            OutputStream out = response.getOutputStream();
+      byte[] buf = new byte[100];
+      int served = 0;
+      int count = 0;
+      int lastReport = 0;
 
-            // Copy the contents of the file to the output stream
-            byte[] buf = new byte[100];
-            int served = 0;
-            int count = 0;
-            while ((count = in.read(buf)) >= 0) {
-                out.write(buf, 0, count);
-                served += count;
-                out.flush();
+      long lastServed = System.currentTimeMillis();
+
+      try {
+        while (recorder.isRecording(episode)) {
+          while ((count = in.read(buf)) >= 0) {
+            out.write(buf, 0, count);
+            served += count;
+            out.flush();
+          }
+          osUtils.waitFor(1000);
+          if (served > lastReport) {
+            logger.info("Streaming of " + name + " continues after serving " + served + "/" + file.length());
+            lastReport = served;
+            lastServed = System.currentTimeMillis();
+          } else {
+            if ((System.currentTimeMillis() - lastServed) > 10000) {
+              break;
             }
-            in.close();
-            out.close();
-            logger.info("Streamed " + served + " bytes of " + name + " of expected " + file.length());
-        } catch (Exception e) {
-            throw new ServletException("Failed to stream video", e);
+          }
         }
+        logger.info("Streaming of " + name + " stopped due to external process completion");
+      } finally {
+        try {
+          if (in != null) {
+            in.close();
+          }
+        } catch (IOException e) {
+          // Ignore
+        }
+        try {
+          if (out != null) {
+            out.close();
+          }
+        } catch (IOException e) {
+          // Ignore
+        }
+        recorder.stop(episode);
+        logger.info("Streaming of " + name + " stopped after serving " + served + "/" + file.length());
+      }
+    } catch (Exception e) {
+      logger.warn("Streaming of " + name + " stopped due to exception ", e);
+      throw new ServletException("Failed to stream video", e);
     }
+  }
 
     private void getChannelResponse(HttpServletResponse response, String podcast)
             throws ServletException {

@@ -16,20 +16,26 @@ import static com.google.inject.internal.util.$Preconditions.checkNotNull;
  */
 public class Recording {
 
+  /** The directory where the recording will be kept */
+  private final String recordingDir;
   /** The disk file containing the recording */
   private File file;
+  /** The process doing the recording */
+  private Process process;
   /** The episode being recorded */
   private Episode episode;
 
   /**
    * Constructor of the recording object.
    *
+   * @param recordingDir the directory where the recording will be kept
    * @param episode the episode being recorded
    *
    * @throws NullPointerException if a <code>null</code> episode is provided
    */
-  public Recording(Episode episode) {
+  public Recording(Episode episode, String recordingDir) {
     this.episode = checkNotNull(episode);
+    this.recordingDir = checkNotNull(recordingDir);
   }
 
   /**
@@ -50,6 +56,14 @@ public class Recording {
    */
   public final void setFile(File file) {
     this.file = checkNotNull(file);
+  }
+
+  /**
+   * Sets the process doing the recording
+   * @param process the process
+   */
+  public void setProcess(Process process) {
+    this.process = process;
   }
 
   /**
@@ -101,6 +115,32 @@ public class Recording {
   }
 
   /**
+   * Gets the recording directory where the recording will be placed
+   *
+   * @return the recording dir
+   */
+  public String getRecordingDir() {
+    return recordingDir;
+  }
+
+  /**
+   * Indicates if the recording is in progress
+   *
+   * @return <code>true</code> if the recording is in progress
+   */
+  public boolean isInProgress() {
+    try {
+      if (process != null) {
+        int exitValue = process.exitValue();
+        return false;
+      }
+    } catch (IllegalThreadStateException e) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Returns a string representation of the recording
    *
    * @return a string representation of the recording
@@ -109,4 +149,5 @@ public class Recording {
   public final String toString() {
     return episode.toString();
   }
+
 }

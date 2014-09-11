@@ -91,7 +91,8 @@ public class HtmlUtils implements HtmlUtilsInterface {
     public String makeIdSafe(String id) {
         String newId = "";
         for (char character : id.toCharArray()) {
-            if (Character.isLetterOrDigit(character)) {
+          String charStr = "" + character;
+            if (charStr.matches("[a-z,A-Z,0-9,-,_]")) {
                 newId += character;
             }
         }

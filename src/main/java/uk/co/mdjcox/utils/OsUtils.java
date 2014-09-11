@@ -17,11 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 public abstract class OsUtils implements OsUtilsInterface {
@@ -244,7 +240,7 @@ public abstract class OsUtils implements OsUtilsInterface {
                     commandString += split[i] + " ";
                 }
                 if (split.length > 1) {
-                    logger.info(split[split.length-1].trim() + "=" + commandString.trim());
+//                    logger.info(split[split.length-1].trim() + "=" + commandString.trim());
                     results.put(commandString.trim(), split[split.length-1].trim());
                 }
             }
@@ -254,19 +250,62 @@ public abstract class OsUtils implements OsUtilsInterface {
         return results;
     }
 
-    public void killProcessesContaining(String token) {
-        HashMap<String, String> processes = getProcesses();
-        for (String process : processes.keySet()) {
-            String pid = processes.get(process);
-            logger.info("Checking if " + pid + " " + process + " contains " + token);
-            if (process.contains(token)) {
-                killProcess(pid, process);
-            }
-        }
+  @Override
+  public void killProcessesMatching(String regex) {
+    HashMap<String, String> processes = getProcesses();
+    Set<String> kills = new HashSet<String>();
+    for (String process : processes.keySet()) {
+      String pid = processes.get(process);
+      if (process.matches(regex)) {
+        killProcess(pid, process);
+        kills.add(pid);
+      }
     }
 
+    if (kills.isEmpty()) {
+      logger.warn("Failed to kill any process matching " + regex);
+    } else {
+      logger.info("Killed processes " + kills + " which matched " + regex);
+    }
 
-    protected void kill(String command, String pid) {
+  }
+
+  public void killProcessesContaining(String token) {
+        HashMap<String, String> processes = getProcesses();
+        Set<String> kills = new HashSet<String>();
+        for (String process : processes.keySet()) {
+            String pid = processes.get(process);
+            if (process.contains(token)) {
+                killProcess(pid, process);
+                kills.add(pid);
+            }
+        }
+
+        if (kills.isEmpty()) {
+          logger.warn("Failed to kill any process containing " + token);
+        } else {
+          logger.info("Killed processes " + kills + " which contained " + token);
+        }
+
+    }
+
+    @Override
+    public void waitFor(long millis) {
+      logger.info("Waiting for " + millis + "ms");
+      long stopTime = System.currentTimeMillis() + millis;
+      while (System.currentTimeMillis() < stopTime) {
+        try {
+          long left = stopTime -System.currentTimeMillis();
+          if (left > 0) {
+            Thread.sleep(left);
+          }
+        } catch (InterruptedException e) {
+
+        }
+      }
+    }
+
+  protected void kill(String command, String pid) {
         if ((pid == null) || pid.trim().isEmpty()) return;
         try {
             Process process = Runtime.getRuntime().exec(command  + " " + pid);

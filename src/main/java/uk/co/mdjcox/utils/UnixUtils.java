@@ -26,7 +26,7 @@ class UnixUtils extends OsUtils {
     }
 
     public void killProcess(String pid, String com) {
-        kill("kill -9", pid);
+        kill("kill ", pid);
     }
 
     protected HashMap<String, String> getProcesses(String command) {
@@ -52,4 +52,14 @@ class UnixUtils extends OsUtils {
         return results;
     }
 
+
+  @Override
+  public boolean isWindows() {
+    return false;
+  }
+
+  @Override
+  public boolean isUnix() {
+    return true;
+  }
 }

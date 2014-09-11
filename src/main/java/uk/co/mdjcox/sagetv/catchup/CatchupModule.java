@@ -46,10 +46,16 @@ public class CatchupModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public PropertiesInterface providesProperties() throws Exception {
+    public PropertiesInterface providesProperties(OsUtilsInterface osUtils) throws Exception {
         if (properties == null) {
-          String base =  System.getProperty("user.dir") + File.separator + "catchup" + File.separator;
-            String props = base + "config" + File.separator + "catchup.properties";
+          String propFileName = "sagetvcatchup.unix.properties";
+          if (osUtils.isWindows()) {
+            propFileName = "sagetvcatchup.windows.properties";
+          } else {
+            propFileName = "sagetvcatchup.unix.properties";
+          }
+          String base =  System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator;
+            String props = base + "config" + File.separator + propFileName;
             properties = new PropertiesFile(props, true);
         }
         return properties;
@@ -59,7 +65,7 @@ public class CatchupModule extends AbstractModule {
     @Singleton
     public Logger providesLogger() throws Exception {
         if (logger == null) {
-          String base =  System.getProperty("user.dir") + File.separator + "catchup" + File.separator;
+          String base =  System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator;
           System.setProperty("logback.configurationFile", base + "config" + File.separator + "logback.xml");
           logger = LoggerFactory.getLogger(CatchupPlugin.class);
         }

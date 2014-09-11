@@ -27,6 +27,7 @@ public class Plugin {
     private PlayScript playScript;
     private StopScript stopScript;
     private Source source;
+
     @Inject
     private ScriptFactory scriptFactory;
 
@@ -74,4 +75,6 @@ public class Plugin {
     public String toString() {
         return "Plugin:" + source;
     }
+
+
 }
