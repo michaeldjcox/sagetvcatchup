@@ -12,8 +12,8 @@
 
     <scm>
         <url>https://github.com/michaeldjcox/sagetvcatchup</url>
-        <connection>scm:git:git://github.com/michaeldjcox/sagetvcatchup.git</connection>
-        <developerConnection>scm:git:git@github.com:michaeldjcox/sagetvcatchup.git</developerConnection>
+        <connection>scm:git:https://github.com/michaeldjcox/sagetvcatchup.git</connection>
+        <developerConnection>scm:git:https://github.com/michaeldjcox/sagetvcatchup.git</developerConnection>
     </scm>
 
     <issueManagement>
