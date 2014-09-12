@@ -118,11 +118,6 @@ public abstract class GroovyScript extends groovy.lang.Script {
     }
 
     public Process EXECUTE(String osCommand, String loggerName, ArrayList<String> output, ArrayList<String> errors) throws Exception {
-        if (osUtils.isWindows()) {
-            osCommand = "cmd.exe /c \"" + osCommand + "\"";
-        } else {
-            osCommand = "sh -c \"" + osCommand + "\"";
-        }
         return osUtils.spawnProcess(osCommand, loggerName, false, output, errors);
     }
 

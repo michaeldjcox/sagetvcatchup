@@ -16,36 +16,32 @@ import uk.co.mdjcox.utils.*;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
-
+/**
+ * The web server.
+ *
+ * This holds no state whatsoever
+ */
 @Singleton
 public class PodcastServer {
+
 
     private Logger logger;
     private Server server;
     private Handler handler;
     private int port;
-    private Map<String, String> podcasts = new HashMap<String, String>();
     private Recorder recorder;
     private HtmlUtilsInterface htmlUtils;
     private OsUtilsInterface osUtils;
-    private Map<String, Episode> episodes = new HashMap<String, Episode>();
-    private String errorResponse = "";
-    private String categoryResponse="";
-    private String programmeResponse="";
-    private String episodeResponse="";
-    private Map<String, String> programmeDetails = new HashMap<String, String>();
-    private Map<String, String> episodeDetails = new HashMap<String, String>();
-    private Map<String, String> categoryDetails = new HashMap<String, String>();
+    private final String htdocsDir;
+    private final String stagingDir;
 
     @Inject
     private PodcastServer(Logger logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, OsUtilsInterface osUtils, Recorder recorder) throws Exception {
@@ -68,6 +64,12 @@ public class PodcastServer {
         server.setConnectors(new Connector[]{connector});
         server.setHandler(handler);
         this.recorder = recorder;
+        htdocsDir = props.getString("htdocsDir");
+        File file = new File(htdocsDir);
+        Files.createDirectories(file.toPath());
+        stagingDir = props.getString("stagingDir");
+        file = new File(stagingDir);
+        Files.createDirectories(file.toPath());
     }
 
     public void start() throws Exception {
@@ -93,40 +95,33 @@ public class PodcastServer {
         if (target.equals("/logo.png")) {
             getLogoResponse(response);
         } else if (target.startsWith("/play")) {
-          logger.info("HTTP request for " + target);
-          String name = request.getParameter("name");
-            getVideoResponse(response, name);
+            String sourceId = request.getParameter("sourceId");
+            String id = request.getParameter("id");
+            String url = request.getParameter("url");
+            getVideoResponse(response, sourceId, id, url);
         } else if (target.startsWith("/stop")) {
-          String name = request.getParameter("name");
-          stopVideoResponse(response, name);
+          String id = request.getParameter("id");
+          stopVideoResponse(response, id);
         } else if (target.startsWith("/errors")) {
-          getMessageResponse(response, errorResponse);
+          getCachedHtmlResponse(response, "errors");
         } else if (target.startsWith("/programmes")) {
-          getMessageResponse(response, programmeResponse);
+            getCachedHtmlResponse(response, "programmes");
         } else if (target.startsWith("/episodes")) {
-          getMessageResponse(response, episodeResponse);
+            getCachedHtmlResponse(response, "episodes");
         } else if (target.startsWith("/categories")) {
-          getMessageResponse(response, categoryResponse);
+            getCachedHtmlResponse(response, "categories");
         } else if (target.startsWith("/programme=")) {
-          String id = target.substring(target.indexOf('=') + 1);
-          String detailsResponse = programmeDetails.get(id);
-          getMessageResponse(response, detailsResponse);
+            String id = target.substring(target.indexOf('=') + 1);
+            getCachedHtmlResponse(response, "programme-" + id);
         } else if (target.startsWith("/episode=")) {
           String id = target.substring(target.indexOf('=') + 1);
-          String detailsResponse = episodeDetails.get(id);
-          getMessageResponse(response, detailsResponse);
+            getCachedHtmlResponse(response, "episode-" + id);
         } else if (target.startsWith("/category=")) {
           String id = target.substring(target.indexOf('=') + 1);
-          String detailsResponse = categoryDetails.get(id);
-          getMessageResponse(response, detailsResponse);
+            getCachedHtmlResponse(response, "category-" + id);
         } else {
-              String serviceName = target.substring(1);
-              String podcast = podcasts.get(serviceName);
-              if (podcast != null) {
-                  getChannelResponse(response, podcast);
-              } else {
-                  getMessageResponse(response, "Online service " + serviceName + " is unknown");
-              }
+            String serviceName = target.substring(1);
+            getCachedPodcastResponse(response, "podcast-" + serviceName);
           }
           ((Request) request).setHandled(true);
     }
@@ -139,18 +134,13 @@ public class PodcastServer {
         getMessageResponse(response, "Podcast terminated");
     }
 
-    public void stopRecording(String name) {
-        Episode episode = episodes.get(name);
-
-        recorder.stop(episode);
+    public void stopRecording(String id) {
+        recorder.stop(id);
     }
 
-  private void getVideoResponse(HttpServletResponse response, String name) throws ServletException {
+  private void getVideoResponse(HttpServletResponse response, String sourceId, String id, String url) throws ServletException {
     try {
-
-      Episode episode = episodes.get(name);
-
-      File file = recorder.start(episode);
+      File file = recorder.start(sourceId, id, url);
       logger.info("Streaming " + file + " exists=" + file.exists());
 
       FileInputStream in = new FileInputStream(file);
@@ -169,7 +159,7 @@ public class PodcastServer {
       long lastServed = System.currentTimeMillis();
 
       try {
-        while (recorder.isRecording(episode)) {
+        while (recorder.isRecording(id)) {
           while ((count = in.read(buf)) >= 0) {
             out.write(buf, 0, count);
             served += count;
@@ -177,7 +167,7 @@ public class PodcastServer {
           }
           osUtils.waitFor(1000);
           if (served > lastReport) {
-            logger.info("Streaming of " + name + " continues after serving " + served + "/" + file.length());
+            logger.info("Streaming of " + id + " continues after serving " + served + "/" + file.length());
             lastReport = served;
             lastServed = System.currentTimeMillis();
           } else {
@@ -186,7 +176,7 @@ public class PodcastServer {
             }
           }
         }
-        logger.info("Streaming of " + name + " stopped due to external process completion");
+        logger.info("Streaming of " + id + " stopped due to external process completion");
       } finally {
         try {
           if (in != null) {
@@ -202,25 +192,14 @@ public class PodcastServer {
         } catch (IOException e) {
           // Ignore
         }
-        recorder.stop(episode);
-        logger.info("Streaming of " + name + " stopped after serving " + served + "/" + file.length());
+        recorder.stop(id);
+        logger.info("Streaming of " + id + " stopped after serving " + served + "/" + file.length());
       }
     } catch (Exception e) {
-      logger.warn("Streaming of " + name + " stopped due to exception ", e);
+      logger.warn("Streaming of " + id + " stopped due to exception ", e);
       throw new ServletException("Failed to stream video", e);
     }
   }
-
-    private void getChannelResponse(HttpServletResponse response, String podcast)
-            throws ServletException {
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/xhtml+xml");
-        try {
-            response.getWriter().println(podcast);
-        } catch (Exception e) {
-            throw new ServletException("Failed to compose podcast XML", e);
-        }
-    }
 
     private void getMessageResponse(HttpServletResponse response, String message)
             throws IOException {
@@ -228,6 +207,31 @@ public class PodcastServer {
         response.setContentType("text/html");
         response.getWriter().println("<h1>" + message + "</h1>");
     }
+
+    private void getCachedPodcastResponse(HttpServletResponse response, String podcast)
+            throws ServletException {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/xhtml+xml");
+        try {
+            String message = getFromCache(podcast + ".xml");
+            response.getWriter().println(message);
+        } catch (Exception e) {
+            throw new ServletException("Failed to find podcast", e);
+        }
+    }
+
+    private void getCachedHtmlResponse(HttpServletResponse response, String pageName)
+            throws ServletException {
+        try {
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("text/html");
+            String message = getFromCache(pageName + ".html");
+            response.getWriter().println(message);
+        } catch (Exception e) {
+            throw new ServletException("Failed to find page", e);
+        }
+    }
+
 
     private void getLogoResponse(HttpServletResponse response)
             throws IOException {
@@ -294,7 +298,7 @@ public class PodcastServer {
                 resultStr += "<media:thumbnail url=\"" + episode.getIconUrl() + "\"/>" + CRLF;
                 int length = 999999;
                 String type = "video/mp4";
-                resultStr += "<enclosure url=\"" + "http://localhost:"+port+"/play?name=" + episode.getId() + "\" length=\"" + length + "\" type=\"" + type + "\"/>" + CRLF;
+                resultStr += "<enclosure url=\"" + "http://localhost:"+port+"/play?sourceId=" + episode.getSourceId() + "&id=" + episode.getId() +"&url=" + episode.getServiceUrl()+ "\" length=\"" + length + "\" type=\"" + type + "\"/>" + CRLF;
                 resultStr += "</item>" + CRLF;
             }
         } else if (service.isSubCategory()) {
@@ -318,14 +322,23 @@ public class PodcastServer {
     }
 
     public void publish(Catalog catalog) {
+        try {
+            clearStaging();
+            stagePages(catalog);
+            pushContent();
+        } catch (Exception e) {
+            logger.error("Failed to publish catalog to html server", e);
+            e.printStackTrace();
+        }
+    }
 
-        Map<String, String> newPodcasts = new HashMap<String, String>();
+    private void stagePages(Catalog catalog) throws Exception {
         Map<String, Episode> newEpisodes = new HashMap<String, Episode>();
         for (Category cat : catalog.getCategories()) {
             try {
                 logger.info("Building podcast for " + cat);
                 String podcast = buildPodcastFor(cat);
-                newPodcasts.put(cat.getId(), podcast);
+                writeToStaging("podcast-" + cat.getId() + ".xml", podcast);
 
                 if (cat instanceof Programme) {
                     for (Episode ep : ((Programme)cat).getEpisodes().values()) {
@@ -336,103 +349,207 @@ public class PodcastServer {
                 logger.error("Failed to build podcast for " + cat, e);
             }
         }
-        podcasts = newPodcasts;
-        episodes = newEpisodes;
 
-      HtmlBuilder categoriesBuilder = new HtmlBuilder();
-      HtmlBuilder programmesBuilder = new HtmlBuilder();
-      HtmlBuilder episodesBuilder = new HtmlBuilder();
+        HtmlBuilder categoriesBuilder = new HtmlBuilder();
+        HtmlBuilder programmesBuilder = new HtmlBuilder();
+        HtmlBuilder episodesBuilder = new HtmlBuilder();
 
-      programmesBuilder.startDocument();
-      programmesBuilder.addPageHeader("Programmes");
-      programmesBuilder.startBody();
-      programmesBuilder.addHeading1("Programmes");
-      programmesBuilder.startTable();
-      programmesBuilder.addTableHeader("SourceId", "ParentId", "Id", "ShortName", "LongName", "ServiceUrl", "IconUrl", "PodcastUrl");
+        programmesBuilder.startDocument();
+        programmesBuilder.addPageHeader("Programmes");
+        programmesBuilder.startBody();
+        programmesBuilder.addHeading1("Programmes");
+        programmesBuilder.startTable();
+        programmesBuilder.addTableHeader("SourceId", "ParentId", "Id", "ShortName", "LongName", "ServiceUrl", "IconUrl", "PodcastUrl");
 
-      categoriesBuilder.startDocument();
-      categoriesBuilder.addPageHeader("Categories");
-      categoriesBuilder.startBody();
-      categoriesBuilder.addHeading1("Categories");
-      categoriesBuilder.startTable();
-      categoriesBuilder.addTableHeader("SourceId", "ParentId", "Id", "ShortName", "LongName", "ServiceUrl", "IconUrl");
+        categoriesBuilder.startDocument();
+        categoriesBuilder.addPageHeader("Categories");
+        categoriesBuilder.startBody();
+        categoriesBuilder.addHeading1("Categories");
+        categoriesBuilder.startTable();
+        categoriesBuilder.addTableHeader("SourceId", "ParentId", "Id", "ShortName", "LongName", "ServiceUrl", "IconUrl");
 
-      episodesBuilder.startDocument();
-      episodesBuilder.addPageHeader("Episodes");
-      episodesBuilder.startBody();
-      episodesBuilder.addHeading1("Episodes");
-      episodesBuilder.startTable();
-      episodesBuilder.addTableHeader("SourceId", "Id", "Channel", "ProgrammeTitle", "Series", "SeriesTitle", "Episode", "EpisodeTitle", "Description", "PodcastTitle", "AirDate", "AirTime", "ServiceUrl", "IconUrl" );
+        episodesBuilder.startDocument();
+        episodesBuilder.addPageHeader("Episodes");
+        episodesBuilder.startBody();
+        episodesBuilder.addHeading1("Episodes");
+        episodesBuilder.startTable();
+        episodesBuilder.addTableHeader("SourceId", "Id", "Channel", "ProgrammeTitle", "Series", "SeriesTitle", "Episode", "EpisodeTitle", "Description", "PodcastTitle", "AirDate", "AirTime", "ServiceUrl", "IconUrl" );
 
 
-      for (Category cat : catalog.getCategories()) {
-        String detailStr = buildDetailsFor(cat);
-        if (cat.isProgrammeCategory() && cat.getParentId().isEmpty()) {
-          programmeDetails.put(cat.getId(), detailStr);
-          Programme prog = (Programme)cat;
-          HtmlBuilder linkBuilder1 = new HtmlBuilder();
-          linkBuilder1.addLink(cat.getServiceUrl(), cat.getServiceUrl());
-          HtmlBuilder linkBuilder2 = new HtmlBuilder();
-          linkBuilder2.addLink(cat.getIconUrl(), cat.getIconUrl());
-            HtmlBuilder linkBuilder3 = new HtmlBuilder();
-            linkBuilder3.addLink(prog.getPodcastUrl(), prog.getPodcastUrl());
-
-          HtmlBuilder linkBuilder4 = new HtmlBuilder();
-          String link = "/programme=" + prog.getId();
-          linkBuilder4.addLink(prog.getId(), link);
-
-          programmesBuilder.addTableRow(prog.getSourceId(), prog.getParentId(), linkBuilder4.toString(), prog.getShortName(), prog.getLongName(), linkBuilder1.toString(), linkBuilder2.toString(),linkBuilder3.toString());
-        } else {
-          categoryDetails.put(cat.getId(), detailStr);
-          HtmlBuilder linkBuilder1 = new HtmlBuilder();
-          linkBuilder1.addLink(cat.getServiceUrl(), cat.getServiceUrl());
-          HtmlBuilder linkBuilder2 = new HtmlBuilder();
-          linkBuilder2.addLink(cat.getIconUrl(), cat.getIconUrl());
-
-          HtmlBuilder linkBuilder4 = new HtmlBuilder();
-          String link = "/category=" + cat.getId();
-          linkBuilder4.addLink(cat.getId(), link);
-
-          categoriesBuilder.addTableRow(cat.getSourceId(), cat.getParentId(), linkBuilder4.toString(), cat.getShortName(), cat.getLongName(), linkBuilder1.toString(), linkBuilder2.toString());
-
-        }
-
-        if (cat instanceof Programme) {
-          for (Episode ep : ((Programme)cat).getEpisodes().values()) {
-            String detailStr2 = buildDetailsFor(ep);
-            episodeDetails.put(ep.getId(), detailStr2);
+        for (Category cat : catalog.getCategories()) {
+          String detailStr = buildDetailsFor(cat);
+          if (cat.isProgrammeCategory() && cat.getParentId().isEmpty()) {
+            writeToStaging("programme-" + cat.getId() + ".html", detailStr);
+            Programme prog = (Programme)cat;
             HtmlBuilder linkBuilder1 = new HtmlBuilder();
-            linkBuilder1.addLink(ep.getServiceUrl(), ep.getServiceUrl());
+            linkBuilder1.addLink(cat.getServiceUrl(), cat.getServiceUrl());
             HtmlBuilder linkBuilder2 = new HtmlBuilder();
-            linkBuilder2.addLink(ep.getIconUrl(), ep.getIconUrl());
+            linkBuilder2.addLink(cat.getIconUrl(), cat.getIconUrl());
+              HtmlBuilder linkBuilder3 = new HtmlBuilder();
+              linkBuilder3.addLink(prog.getPodcastUrl(), prog.getPodcastUrl());
 
             HtmlBuilder linkBuilder4 = new HtmlBuilder();
-            String link = "/episode=" + ep.getId();
-            linkBuilder4.addLink(ep.getId(), link);
+            String link = "/programme=" + prog.getId();
+            linkBuilder4.addLink(prog.getId(), link);
 
-            episodesBuilder.addTableRow(ep.getSourceId(), linkBuilder4.toString(), ep.getChannel(), ep.getProgrammeTitle(), ep.getSeries(), ep.getSeriesTitle(), ep.getEpisode(), ep.getEpisodeTitle(), ep.getDescription(), ep.getPodcastTitle(), ep.getAirDate(), ep.getAirTime(), linkBuilder1.toString(), linkBuilder2.toString() );
+            programmesBuilder.addTableRow(prog.getSourceId(), prog.getParentId(), linkBuilder4.toString(), prog.getShortName(), prog.getLongName(), linkBuilder1.toString(), linkBuilder2.toString(),linkBuilder3.toString());
+          } else {
+              writeToStaging("category-" + cat.getId() + ".html", detailStr);
+            HtmlBuilder linkBuilder1 = new HtmlBuilder();
+            linkBuilder1.addLink(cat.getServiceUrl(), cat.getServiceUrl());
+            HtmlBuilder linkBuilder2 = new HtmlBuilder();
+            linkBuilder2.addLink(cat.getIconUrl(), cat.getIconUrl());
+
+            HtmlBuilder linkBuilder4 = new HtmlBuilder();
+            String link = "/category=" + cat.getId();
+            linkBuilder4.addLink(cat.getId(), link);
+
+            categoriesBuilder.addTableRow(cat.getSourceId(), cat.getParentId(), linkBuilder4.toString(), cat.getShortName(), cat.getLongName(), linkBuilder1.toString(), linkBuilder2.toString());
+
+          }
+
+          if (cat instanceof Programme) {
+            for (Episode ep : ((Programme)cat).getEpisodes().values()) {
+              String detailStr2 = buildDetailsFor(ep);
+                writeToStaging("episode-" + ep.getId() + ".html", detailStr2);
+                HtmlBuilder linkBuilder1 = new HtmlBuilder();
+              linkBuilder1.addLink(ep.getServiceUrl(), ep.getServiceUrl());
+              HtmlBuilder linkBuilder2 = new HtmlBuilder();
+              linkBuilder2.addLink(ep.getIconUrl(), ep.getIconUrl());
+
+              HtmlBuilder linkBuilder4 = new HtmlBuilder();
+              String link = "/episode=" + ep.getId();
+              linkBuilder4.addLink(ep.getId(), link);
+
+              episodesBuilder.addTableRow(ep.getSourceId(), linkBuilder4.toString(), ep.getChannel(), ep.getProgrammeTitle(), ep.getSeries(), ep.getSeriesTitle(), ep.getEpisode(), ep.getEpisodeTitle(), ep.getDescription(), ep.getPodcastTitle(), ep.getAirDate(), ep.getAirTime(), linkBuilder1.toString(), linkBuilder2.toString() );
+            }
           }
         }
-      }
 
-      programmesBuilder.stopTable();
-      programmesBuilder.stopBody();
-      programmesBuilder.stopDocument();
+        programmesBuilder.stopTable();
+        programmesBuilder.stopBody();
+        programmesBuilder.stopDocument();
 
-      categoriesBuilder.stopTable();
-      categoriesBuilder.stopBody();
-      categoriesBuilder.stopDocument();
+        categoriesBuilder.stopTable();
+        categoriesBuilder.stopBody();
+        categoriesBuilder.stopDocument();
 
-      episodesBuilder.stopTable();
-      episodesBuilder.stopBody();
-      episodesBuilder.stopDocument();
+        episodesBuilder.stopTable();
+        episodesBuilder.stopBody();
+        episodesBuilder.stopDocument();
 
-      programmeResponse = programmesBuilder.toString();
-      categoryResponse = categoriesBuilder.toString();
-      episodeResponse = episodesBuilder.toString();
+        String programmeResponse = programmesBuilder.toString();
+        writeToStaging("programmes.html", programmeResponse);
 
-      buildErrorResponse(catalog);
+        String categoryResponse = categoriesBuilder.toString();
+        writeToStaging("categories.html", categoryResponse);
+
+        String episodesResponse = episodesBuilder.toString();
+        writeToStaging("episodes.html", episodesResponse);
+
+        buildErrorResponse(catalog);
     }
+
+    private void writeToStaging(String name, String content) throws Exception {
+        name = name.replace("/", "_");
+        name = name.replace("\\", "_");
+        File file = new File(stagingDir + File.separator + name);
+        FileWriter fwriter = null;
+        PrintWriter writer = null;
+
+        try  {
+            fwriter = new FileWriter(file);
+            writer = new PrintWriter(fwriter);
+            writer.println(content);
+            writer.flush();
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (Exception e) {
+                    // Ignore
+                }
+            }
+            if (fwriter != null) {
+                try {
+                    fwriter.close();
+                } catch (Exception e) {
+                    // Ignore
+                }
+            }
+        }
+    }
+
+  private String getFromCache(String name) throws Exception {
+      name = name.replace("/", "_");
+      name = name.replace("\\", "_");
+
+      File file = new File(htdocsDir + File.separator + name);
+      FileReader reader = null;
+      BufferedReader breader = null;
+      try {
+          reader = new FileReader(file);
+          breader = new BufferedReader(reader);
+          String result = "";
+          String line = "";
+          while ((line = breader.readLine()) != null) {
+              result+=line;
+              result+="\n";
+          }
+
+          if (result == null) {
+              throw new Exception("No data found in page " + name);
+          }
+          return result;
+      } finally {
+          if (breader != null) {
+              try {
+                  breader.close();
+              } catch (Exception e) {
+                  // Ignore
+              }
+          }
+          if (reader != null) {
+              try {
+                  reader.close();
+              } catch (Exception e) {
+                  // Ignore
+              }
+          }
+      }
+  }
+
+  private void clearStaging() throws Exception {
+      logger.info("Clear staging");
+      File folder = new File(stagingDir);
+      deleteFolder(folder);
+      Files.createDirectories(folder.toPath());
+  }
+
+    private void deleteFolder(File folder) {
+        logger.info("Deleting old htdocs");
+        File[] files = folder.listFiles();
+        if(files!=null) { //some JVMs return null for empty dirs
+            for(File f: files) {
+                if(f.isDirectory()) {
+                    deleteFolder(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        folder.delete();
+    }
+
+  private void pushContent() throws Exception {
+      logger.info("Pushing staging to htdocs");
+      File staging = new File(stagingDir);
+      File htdocs = new File(htdocsDir);
+      File htdocsOld = new File(htdocsDir+".old");
+      Files.move(htdocs.toPath(), htdocsOld.toPath());
+      Files.move(staging.toPath(), htdocs.toPath());
+      deleteFolder(htdocsOld);
+  }
 
   private String buildDetailsFor(Episode cat) {
     String pageTitle = "Details page for " + cat.getPodcastTitle();
@@ -563,8 +680,6 @@ public class PodcastServer {
 
 
       for (Episode ep : ((Programme)cat).getEpisodes().values()) {
-        String detailStr2 = buildDetailsFor(ep);
-        episodeDetails.put(ep.getId(), detailStr2);
         HtmlBuilder linkBuilder5 = new HtmlBuilder();
         linkBuilder5.addLink(ep.getServiceUrl(), ep.getServiceUrl());
         HtmlBuilder linkBuilder6 = new HtmlBuilder();
@@ -594,7 +709,7 @@ public class PodcastServer {
   }
 
 
-  private void buildErrorResponse(Catalog catalog) {
+  private void buildErrorResponse(Catalog catalog) throws Exception {
     TreeSet<ParseError> errorList = new TreeSet<ParseError>();
     for (Category cat : catalog.getCategories()) {
       if (cat.isSource()) {
@@ -654,7 +769,8 @@ public class PodcastServer {
     htmlBuilder.stopBody();
     htmlBuilder.stopDocument();
 
-    errorResponse = htmlBuilder.toString();
+    String errorResponse = htmlBuilder.toString();
+    writeToStaging("errors.html", errorResponse);
   }
 
 

@@ -1,6 +1,5 @@
 package uk.co.mdjcox.sagetv.model;
 
-import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.junit.Before; 
 import org.junit.After;
@@ -31,7 +30,7 @@ public void after() throws Exception {
 @Test
 public void testCreate() {
   try {
-    Recording recording = new Recording(null, null);
+    Recording recording = new Recording(null, null, null, null);
   } catch (NullPointerException e) {
     return;
   }
@@ -42,10 +41,7 @@ public void testCreate() {
   @Test
   public void testSetFile() {
     try {
-      Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
-                                    "series", "episode", "description", "iconUrl", "serviceUrl",
-                                    "airDate","airTime", "channel", Sets.newHashSet("category"));
-      Recording recording = new Recording(episode, System.getProperty("user.dir"));
+      Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
 
       recording.setFile(null);
     } catch (NullPointerException e) {
@@ -62,12 +58,9 @@ public void testCreate() {
 */ 
 @Test
 public void testSetGetFile() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
-                                "series", "episode", "description", "iconUrl", "serviceUrl",
-                                "airDate","airTime", "channel", Sets.newHashSet("category"));
   File file = new File("filename");
 
-  Recording recording = new Recording(episode, System.getProperty("user.dir"));
+  Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
 
   File file3 = recording.getFile();
 
@@ -88,10 +81,7 @@ public void testSetGetFile() throws Exception {
 */ 
 @Test
 public void testGetSourceId() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
-                                "series", "episode", "description", "iconUrl", "serviceUrl",
-                                "airDate","airTime", "channel", Sets.newHashSet("category"));
-  Recording recording = new Recording(episode, System.getProperty("user.dir"));
+  Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
 
   assertEquals("getSourceId", "sourceId", recording.getSourceId());
 }
@@ -103,13 +93,10 @@ public void testGetSourceId() throws Exception {
 */ 
 @Test
 public void testGetUrl() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
-                                "series", "episode", "description", "iconUrl", "serviceUrl",
-                                "airDate","airTime", "channel", Sets.newHashSet("category"));
 
-  Recording recording = new Recording(episode, System.getProperty("user.dir"));
+  Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
 
-  assertEquals("getUrl", "serviceUrl", recording.getUrl());
+  assertEquals("getUrl", "url", recording.getUrl());
 } 
 
 /** 
@@ -119,29 +106,10 @@ public void testGetUrl() throws Exception {
 */ 
 @Test
 public void testGetId() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
-                                "series", "episode", "description", "iconUrl", "serviceUrl",
-                                "airDate","airTime", "channel", Sets.newHashSet("category"));
 
-  Recording recording = new Recording(episode, System.getProperty("user.dir"));
+  Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
 
   assertEquals("getId", "id", recording.getId());
-}
-
-/** 
-* 
-* Method: getName() 
-* 
-*/ 
-@Test
-public void testGetName() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
-                                "series", "episode", "description", "iconUrl", "serviceUrl",
-                                "airDate","airTime", "channel", Sets.newHashSet("category"));
-
-  Recording recording = new Recording(episode, System.getProperty("user.dir"));
-
-  assertEquals("getName", "episodeTitle", recording.getName());
 }
 
 /** 
@@ -151,12 +119,8 @@ public void testGetName() throws Exception {
 */ 
 @Test
 public void testGetFilename() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
-                                "series", "episode", "description", "iconUrl", "serviceUrl",
-                                "airDate","airTime", "channel", Sets.newHashSet("category"));
 
-
-  Recording recording = new Recording(episode, System.getProperty("user.dir"));
+  Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
 
   File file = new File("filename");
 
@@ -167,12 +131,8 @@ public void testGetFilename() throws Exception {
 
   @Test
   public void testGetFilenameNoFile() throws Exception {
-    Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
-                                  "series", "episode", "description", "iconUrl", "serviceUrl",
-                                  "airDate","airTime", "channel", Sets.newHashSet("category"));
 
-
-    Recording recording = new Recording(episode, System.getProperty("user.dir"));
+    Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
 
     assertEquals("getFileName", "", recording.getFilename());
   }
@@ -184,14 +144,10 @@ public void testGetFilename() throws Exception {
 */ 
 @Test
 public void testToString() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
-                                "series", "episode", "description", "iconUrl", "serviceUrl",
-                                "airDate","airTime", "channel", Sets.newHashSet("category"));
 
+  Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
 
-  Recording recording = new Recording(episode, System.getProperty("user.dir"));
-
-  assertEquals("toString", episode.toString(), recording.toString());
+  assertEquals("toString", "id", recording.toString());
 
 }
 

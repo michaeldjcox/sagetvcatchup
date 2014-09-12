@@ -32,14 +32,20 @@ import sage.SageTVPluginRegistry;
  * To change this template use File | Settings | File Templates.
  */
 
+// In priority order...
+
+// TODO - maven release
+// TODO - deployment in windows environment
+// TODO - upgrade sagetv to 7.1 and try podcast recorder with BBC iplayer
+
+// TODO - config from plugin - operations e.g recache, data i.e. last updated, no errors
+// TODO - is there any way I can incrementally update the catalog?
+
 // TODO - check video from other providers
 // TODO - Can I place fully download videos directly in recordings for later?
 // TODO - Can request such downloads from the existing EPG?
-// TODO - is there any way I can incrementally update the catalog?
-// TODO - deployment in windows environment
-// TODO - upgrade sagetv to 7.1 and try podcast recorder with BBC iplayer
-// TODO - config from plugin - operations e.g recache, data i.e. last updated, no errors
-// TODO - really should write html to disk and read from there so its still there after a bounce
+// TODO - Can we use Sage Favourites to establish a favourites category?
+
 
 
 public class CatchupPlugin implements SageTVPlugin {

@@ -2,13 +2,10 @@ package uk.co.mdjcox.sagetv.catchup;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
 import org.slf4j.Logger;
-
-import uk.co.mdjcox.sagetv.model.Episode;
-import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
+import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
@@ -31,8 +28,8 @@ public class Recorder {
     private final String recordingDir;
 
     @Inject
-    private Recorder(Logger thelogger, PluginManager pluginManager, PropertiesInterface props) {
-        this.logger = thelogger;
+    private Recorder(Logger theLogger, PluginManager pluginManager, PropertiesInterface props) {
+        this.logger = theLogger;
         this.pluginManager = pluginManager;
         this.recordingDir = props.getProperty("recordingDir", "/opt/sagetv/server/sagetvcatchup/plugins");
 
@@ -52,36 +49,33 @@ public class Recorder {
         }));
     }
 
-    public File start(Episode episode) throws Exception {
+    public File start(String sourceId, String id, String url) throws Exception {
 
         File dir = new File(recordingDir);
         if (!dir.exists()) {
             Files.createDirectories(dir.toPath());
         }
 
-        String url = episode.getServiceUrl();
-        String episodeName = episode.getEpisodeTitle();
-
-        logger.info("Looking for recording of " + episode);
-        Recording recording = currentRecordings.get(episodeName);
+        logger.info("Looking for recording of " + id);
+        Recording recording = currentRecordings.get(id);
         if ((recording != null) && recording.isInProgress()) {
-            logger.info("Recording in progress for " + episode);
+            logger.info("Recording in progress for " + id);
             if (recording.getFile() == null) {
                 synchronized (recording) {
                     recording.wait();
                 }
             }
-            logger.info("Returning file " + recording.getFile() + " for " + episodeName);
+            logger.info("Returning file " + recording.getFile() + " for " + id);
             return recording.getFile();
         }
 
         logger.info("Starting recording of " + url);
 
 
-        recording = new Recording(episode, recordingDir);
-        currentRecordings.put(episodeName, recording);
+        recording = new Recording(sourceId, id, url, recordingDir);
+        currentRecordings.put(id, recording);
 
-        Plugin plugin = pluginManager.getPlugin(episode.getSourceId());
+        Plugin plugin = pluginManager.getPlugin(sourceId);
         plugin.playEpisode(recording);
 
         synchronized (recording) {
@@ -93,17 +87,15 @@ public class Recorder {
         return recording.getFile();
     }
 
-    public void stop(Episode episode) {
-        String name = episode.getEpisodeTitle();
-
-        Recording recording = currentRecordings.get(name);
+    public void stop(String id) {
+        Recording recording = currentRecordings.get(id);
 
         if (recording != null) {
-            logger.info("Going to stop playback of " + name);
+            logger.info("Going to stop playback of " + id);
 
             stop(recording);
         } else {
-            logger.info("Cannot find recording of " + name);
+            logger.info("Cannot find recording of " + id);
 
         }
     }
@@ -113,18 +105,18 @@ public class Recorder {
         if (recording != null) {
             Plugin plugin = pluginManager.getPlugin(recording.getSourceId());
             plugin.stopEpisode(recording);
-            currentRecordings.remove(recording.getName());
+            currentRecordings.remove(recording.getId());
+// Don't want to delete as there may be a resume
 //            recording.getFile().delete();
+
         }
     }
 
-    public boolean isRecording(Episode episode) {
-        String name = episode.getEpisodeTitle();
-
-        Recording recording = currentRecordings.get(name);
+    public boolean isRecording(String id) {
+        Recording recording = currentRecordings.get(id);
 
         if (recording != null) {
-            logger.info("Checking playback of " + name);
+            logger.info("Checking playback of " + id);
 
             return recording.isInProgress();
         }
