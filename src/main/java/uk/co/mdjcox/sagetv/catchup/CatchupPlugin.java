@@ -14,11 +14,13 @@ import uk.co.mdjcox.sagetv.onlinevideo.PublisherFactory;
 import uk.co.mdjcox.utils.HtmlUtils;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import sage.SageTVPlugin;
 import sage.SageTVPluginRegistry;
@@ -50,8 +52,13 @@ import sage.SageTVPluginRegistry;
 
 public class CatchupPlugin implements SageTVPlugin {
 
+    private static final String PULL_UPGRADE = "pullUpgrade";
     public static Logger logger;
     public static Injector injector;
+
+    private LinkedHashMap<String, Integer> types = new LinkedHashMap<String, Integer>();
+    private LinkedHashMap<String, String> labels = new LinkedHashMap<String, String>();
+    private LinkedHashMap<String, String> help = new LinkedHashMap<String, String>();
 
     private SageTVPluginRegistry registry;
     private PodcastServer server;
@@ -62,6 +69,7 @@ public class CatchupPlugin implements SageTVPlugin {
   @Inject
   public CatchupPlugin(sage.SageTVPluginRegistry registry) {
         this.registry = registry;
+      init();
     }
 
     @Override
@@ -180,24 +188,38 @@ public class CatchupPlugin implements SageTVPlugin {
         }
     }
 
+    private void init() {
+        types.put(PULL_UPGRADE, CONFIG_BUTTON);
+
+        labels.put(PULL_UPGRADE, "Check for upgrade");
+
+        help.put(PULL_UPGRADE,"Get SageTV to pull a new dev version");
+
+    }
+
     @Override
     public String[] getConfigSettings() {
+        return labels.keySet().toArray(new String[labels.size()]);
+    }
+
+    @Override
+    public String getConfigValue(String property) {
+
+        if (property.equals(PULL_UPGRADE)) {
+            return "Click here";
+        } else {
+            return "";
+        }
+    }
+
+    @Override
+    public String[] getConfigValues(String property) {
         return new String[0];
     }
 
     @Override
-    public String getConfigValue(String s) {
-        return null;
-    }
-
-    @Override
-    public String[] getConfigValues(String s) {
-        return new String[0];
-    }
-
-    @Override
-    public int getConfigType(String s) {
-        return 0;
+    public int getConfigType(String property) {
+        return types.get(property);
     }
 
     @Override
@@ -206,8 +228,17 @@ public class CatchupPlugin implements SageTVPlugin {
     }
 
     @Override
-    public void setConfigValues(String s, String[] strings) {
-
+    public void setConfigValues(String property, String[] strings) {
+        if (property.equals(PULL_UPGRADE)) {
+            logger.info("Checking for dev upgrade");
+            try {
+                String file = HtmlUtils.instance().getFileString("http://mintpad/sagetvcatchup/download/SageTVPluginsDev.xml");
+                logger.info("Found:");
+                logger.info(file);
+            } catch (Exception e) {
+                logger.info("Failed to check for upgrade", e);
+            }
+        }
     }
 
     @Override
@@ -216,17 +247,24 @@ public class CatchupPlugin implements SageTVPlugin {
     }
 
     @Override
-    public String getConfigHelpText(String s) {
-        return null;
+    public String getConfigHelpText(String property) {
+        return help.get(property);
     }
 
     @Override
-    public String getConfigLabel(String s) {
-        return null;
+    public String getConfigLabel(String property) {
+        return labels.get(property);
     }
 
     @Override
     public void resetConfig() {
+        try {
+            logger.info("Resetting config");
+            init();
+            logger.info("Done reseting config ");
+        } catch (Throwable e) {
+            logger.error("Failed to reset config", e);
+        }
 
     }
 
