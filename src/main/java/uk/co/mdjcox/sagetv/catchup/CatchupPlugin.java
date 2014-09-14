@@ -152,17 +152,9 @@ public class CatchupPlugin implements SageTVPlugin {
         service.shutdownNow();
 
         try {
-            if (sagetvPublisher != null) {
-                sagetvPublisher.unpublish();
-            }
-        } catch (Exception e) {
-            logger.error("Failed to remove online video properties", e);
-        }
-
-        try {
-            registry.eventSubscribe(this, "PlaybackStopped");
-            registry.eventSubscribe(this, "PlaybackStarted");
-            registry.eventSubscribe(this, "PlaybackFinished");
+            registry.eventUnsubscribe(this, "PlaybackStopped");
+            registry.eventUnsubscribe(this, "PlaybackStarted");
+            registry.eventUnsubscribe(this, "PlaybackFinished");
         } catch (Exception e) {
             logger.error("Failed to unsubscribe from events", e);
         }
@@ -179,6 +171,13 @@ public class CatchupPlugin implements SageTVPlugin {
     @Override
     public void destroy() {
         logger.info("Destroying catchup plugin");
+        try {
+            if (sagetvPublisher != null) {
+                sagetvPublisher.unpublish();
+            }
+        } catch (Exception e) {
+            logger.error("Failed to remove online video properties", e);
+        }
     }
 
     @Override

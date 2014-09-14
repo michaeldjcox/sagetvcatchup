@@ -7,6 +7,9 @@
     <dependencySets>
         <dependencySet>
             <outputDirectory>JARs</outputDirectory>
+            <excludes>
+                <exclude>*sagetvcatchup*</exclude>
+            </excludes>
         </dependencySet>
     </dependencySets>
     <fileSets>
@@ -16,10 +19,17 @@
             <includes>
                 <include>*.jar</include>
             </includes>
+            <excludes>
+                <exclude>*sagetvcatchup*</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <directory>${basedir}/src/main/plugins</directory>
             <outputDirectory>sagetvcatchup/plugins</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/src/main/recordings</directory>
+            <outputDirectory>sagetvcatchup/recordings</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${basedir}/src/main/config</directory>
@@ -33,4 +43,11 @@
             <outputDirectory>sagetvcatchup/logs</outputDirectory>
         </fileSet>
     </fileSets>
+    <files>
+        <file>
+            <source>target/${artifactId}-${version}.${packaging}</source>
+            <outputDirectory>JARs/</outputDirectory>
+            <destName>${artifactId}.${packaging}</destName>
+        </file>
+    </files>
 </assembly>

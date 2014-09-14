@@ -298,7 +298,7 @@ public class PodcastServer {
                 resultStr += "<media:thumbnail url=\"" + episode.getIconUrl() + "\"/>" + CRLF;
                 int length = 999999;
                 String type = "video/mp4";
-                resultStr += "<enclosure url=\"" + "http://localhost:"+port+"/play?sourceId=" + episode.getSourceId() + "&id=" + episode.getId() +"&url=" + episode.getServiceUrl()+ "\" length=\"" + length + "\" type=\"" + type + "\"/>" + CRLF;
+                resultStr += "<enclosure url=\"" + "http://localhost:"+port+"/play?sourceId=" + episode.getSourceId() + "&amp;id=" + episode.getId() +"&amp;url=" + episode.getServiceUrl()+ "\" length=\"" + length + "\" type=\"" + type + "\"/>" + CRLF;
                 resultStr += "</item>" + CRLF;
             }
         } else if (service.isSubCategory()) {
