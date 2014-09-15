@@ -11,9 +11,13 @@ import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.onlinevideo.Publisher;
 import uk.co.mdjcox.sagetv.onlinevideo.PublisherFactory;
+import uk.co.mdjcox.utils.DownloadUtils;
+import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtils;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
+import java.io.File;
+import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -36,9 +40,9 @@ import sage.SageTVPluginRegistry;
 
 // In priority order...
 
-// TODO - maven release
 // TODO - deployment in windows environment
 // TODO - upgrade sagetv to 7.1 and try podcast recorder with BBC iplayer
+// TODO - Should cache downloaded html/xml and only update if changed
 
 // TODO - config from plugin - operations e.g recache, data i.e. last updated, no errors
 // TODO - is there any way I can incrementally update the catalog?
@@ -66,9 +70,13 @@ public class CatchupPlugin implements SageTVPlugin {
     private ScheduledExecutorService service;
     private Publisher sagetvPublisher;
 
-  @Inject
+    private DownloadUtilsInterface downloadUtils;
+    private String pullUpgradeValue="Click here";
+
+    @Inject
   public CatchupPlugin(sage.SageTVPluginRegistry registry) {
         this.registry = registry;
+      this.downloadUtils = DownloadUtils.instance();
       init();
     }
 
@@ -199,14 +207,17 @@ public class CatchupPlugin implements SageTVPlugin {
 
     @Override
     public String[] getConfigSettings() {
+        logger.info("Get config settings");
         return labels.keySet().toArray(new String[labels.size()]);
     }
 
     @Override
     public String getConfigValue(String property) {
+        logger.info("Get config value " + property);
 
         if (property.equals(PULL_UPGRADE)) {
-            return "Click here";
+            logger.info("Returning " + pullUpgradeValue);
+            return pullUpgradeValue;
         } else {
             return "";
         }
@@ -223,22 +234,37 @@ public class CatchupPlugin implements SageTVPlugin {
     }
 
     @Override
-    public void setConfigValue(String s, String s1) {
+    public void setConfigValue(String property, String value) {
+        if (property.equals(PULL_UPGRADE)) {
+            logger.info("Checking for dev upgrade");
+            try {
+                String updateUrl = "http://mintpad/sagetvcatchup/download/SageTVPluginsDev.xml";
+                String downloadTo = System.getProperty("user.dir")  + File.separator+ "SageTVPluginsDev.xml";
+                downloadUtils.downloadFile(new URL(updateUrl), downloadTo);
+                logger.info("Downloaded " + downloadTo);
+                pullUpgradeValue = "Done";
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
 
+                        }
+                        pullUpgradeValue = "Click here";
+                    }
+                });
+                thread.start();
+            } catch (Exception e) {
+                pullUpgradeValue = "Failed";
+                logger.info("Failed to check for upgrade", e);
+            }
+        }
     }
 
     @Override
     public void setConfigValues(String property, String[] strings) {
-        if (property.equals(PULL_UPGRADE)) {
-            logger.info("Checking for dev upgrade");
-            try {
-                String file = HtmlUtils.instance().getFileString("http://mintpad/sagetvcatchup/download/SageTVPluginsDev.xml");
-                logger.info("Found:");
-                logger.info(file);
-            } catch (Exception e) {
-                logger.info("Failed to check for upgrade", e);
-            }
-        }
+
     }
 
     @Override
