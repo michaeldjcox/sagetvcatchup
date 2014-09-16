@@ -3,3 +3,7 @@ logs/
 out/
 recordings/
 target/
+buildNumber.properties
+htdocs/
+staging/
+iplayerExtract.xml
