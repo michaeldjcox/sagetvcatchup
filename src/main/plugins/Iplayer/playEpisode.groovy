@@ -1,6 +1,5 @@
 package Iplayer
 
-// TODO Should I need to pass in get_iplayer dir if PATH is properly set up
 String iplayerDir = GET_STRING_PROPERTY("Iplayer.scriptDir");
 String iplayerCmd = GET_STRING_PROPERTY("Iplayer.command");
 
@@ -9,7 +8,6 @@ String command = iplayerCmd + " " + recording.getUrl() + " --attempts 0 --force 
 if (IS_WINDOWS()) {
     command = "cmd.exe /c \"" + "cd " + iplayerDir + " && "+ iplayerCmd + " " + recording.getUrl() + " --attempts 0 --force -o " + recording.getRecordingDir() + File.separator + "\"";
 }
-
 
 ArrayList<String> output = new ArrayList<String>();
 Process proc = EXECUTE(command, "record", output, null);

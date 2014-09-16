@@ -174,6 +174,18 @@ public abstract class OsUtils implements OsUtilsInterface {
 
     private String[] getEnvAsStrings(String envVar) {
         Map<String, String> envp = System.getenv();
+        if (isWindows()) {
+            String userDir = System.getProperty("user.dir");
+            String homepath = userDir.substring(2);
+            String homedrive = userDir.substring(0, userDir.indexOf("\\"));
+
+            if (!envp.containsKey("HOMEPATH")) {
+                envp.put("HOMEPATH", homepath);
+                envp.put("HOMEDRIVE", homedrive);
+                logger.info("Setting homedrive to " + homedrive);
+                logger.info("Setting homepath to " + homepath);
+            }
+        }
         Set set = envp.entrySet();
         Iterator itr = set.iterator();
         String[] env = new String[envp.size()+1];
