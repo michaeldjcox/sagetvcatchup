@@ -10,6 +10,7 @@ import uk.co.mdjcox.sagetv.catchup.plugins.*;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created with IntelliJ IDEA. User: michael Date: 28/03/13 Time: 17:34 To change this template use
@@ -22,6 +23,8 @@ public class Cataloger {
     private PropertiesInterface props;
     private PluginManager pluginManager;
     private String podcastUrlBase;
+    private String progressString = "Waiting";
+    private AtomicBoolean stop = new AtomicBoolean(false);
 
     @Inject
     private Cataloger(Logger logger, PropertiesInterface props, PluginManager pluginManager) {
@@ -33,6 +36,9 @@ public class Cataloger {
     }
 
     public Catalog catalog() {
+
+        progressString = "Started";
+
         Catalog catalog = new Catalog();
 
         try {
@@ -43,10 +49,13 @@ public class Cataloger {
             newCategories.put(root.getId(), root);
 
             for (Plugin plugin : pluginManager.getPlugins()) {
+                checkForStop();
 
                 Source sourceCat = plugin.getSource();
                 String pluginName = sourceCat.getId();
-              
+
+                progressString = "Doing " + pluginName;
+
                 ArrayList<String> testProgrammes = props.getPropertySequence(pluginName + ".programmes");
                 int testMaxProgrammes = props.getInt(pluginName + ".maxprogrammes", Integer.MAX_VALUE);
 
@@ -65,11 +74,16 @@ public class Cataloger {
                 Collection<Programme> programmes = plugin.getProgrammes();
                 for (Programme programme : programmes) {
 
+                    checkForStop();
+
                     programmeCount++;
 
                     if (programmeCount > testMaxProgrammes) {
-                      break;
+                        break;
                     }
+
+                    progressString = "Doing " + pluginName + " programme " + programmeCount + "/" + programmes.size();
+
 
                     String programmeId = programme.getId();
                     if (testProgrammes != null && !testProgrammes.isEmpty()) {
@@ -84,6 +98,7 @@ public class Cataloger {
                     plugin.getEpisodes(sourceCat, programme);
 
                     for (Episode episode : programme.getEpisodes().values()) {
+                        checkForStop();
 
                         plugin.getEpisode(sourceCat, programme, episode);
                     }
@@ -96,6 +111,8 @@ public class Cataloger {
                     newEpisodes.putAll(programme.getEpisodes());
                 }
 
+                checkForStop();
+
                 sourceCat.clearSubCategories();
 
                 logger.info("Found " + newProgCategories.size() + " Programmes");
@@ -103,7 +120,12 @@ public class Cataloger {
 
                 Map<String, SubCategory> newSubCategories = new LinkedHashMap<String, SubCategory>();
 
+
+                progressString = "Doing " + pluginName + " additional categorisation";
+
                 for (Programme programmeCat : newProgCategories.values()) {
+
+                    checkForStop();
                     logger.info("Categorising " + programmeCat);
                     doAtoZcategorisation(sourceCat, programmeCat, newSubCategories);
 
@@ -129,11 +151,24 @@ public class Cataloger {
 
             catalog.setCategories(newCategories);
 
+            progressString = "Finished cataloging";
+
+            return catalog;
+
         } catch (Exception e) {
             logger.error("Failed to refresh properties file", e);
+            if (!e.getMessage().equals("Stopped on request")) {
+                progressString = "Failed to catalog";
+            }
+            return null;
         }
+    }
 
-        return catalog;
+    private void checkForStop() {
+        if (stop.getAndSet(false)) {
+            progressString = "Stopped";
+            throw new RuntimeException("Stopped on request");
+        }
     }
 
     private void doAirDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode,
@@ -268,4 +303,15 @@ public class Cataloger {
         azCat.addSubCategory(programmeCat);
     }
 
+    public String getProgress() {
+        return progressString;
+    }
+
+    public void setProgress(String progress) {
+        progressString = progress;
+    }
+
+    public void stop() {
+        stop.set(true);
+    }
 }

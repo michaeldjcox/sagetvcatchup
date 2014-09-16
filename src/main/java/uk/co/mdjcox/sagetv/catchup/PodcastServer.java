@@ -41,6 +41,7 @@ public class PodcastServer {
     private HtmlUtilsInterface htmlUtils;
     private OsUtilsInterface osUtils;
     private final String htdocsDir;
+    private final String logDir;
     private final String stagingDir;
 
     @Inject
@@ -70,6 +71,8 @@ public class PodcastServer {
         stagingDir = props.getString("stagingDir");
         file = new File(stagingDir);
         Files.createDirectories(file.toPath());
+
+        logDir = System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator + "logs";
     }
 
     public void start() throws Exception {
@@ -102,8 +105,10 @@ public class PodcastServer {
         } else if (target.startsWith("/stop")) {
           String id = request.getParameter("id");
           stopVideoResponse(response, id);
-        } else if (target.startsWith("/errors")) {
-          getCachedHtmlResponse(response, "errors");
+        } else if (target.startsWith("/log")) {
+          getLogFileResponse(response, "sagetvcatchup.log");
+        }  else if (target.startsWith("/errors")) {
+            getCachedHtmlResponse(response, "errors");
         } else if (target.startsWith("/programmes")) {
             getCachedHtmlResponse(response, "programmes");
         } else if (target.startsWith("/episodes")) {
@@ -213,7 +218,7 @@ public class PodcastServer {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/xhtml+xml");
         try {
-            String message = getFromCache(podcast + ".xml");
+            String message = getFromCache(htdocsDir, podcast + ".xml");
             response.getWriter().println(message);
         } catch (Exception e) {
             throw new ServletException("Failed to find podcast", e);
@@ -225,8 +230,49 @@ public class PodcastServer {
         try {
             response.setCharacterEncoding("UTF-8");
             response.setContentType("text/html");
-            String message = getFromCache(pageName + ".html");
+            String message = getFromCache(htdocsDir, pageName + ".html");
             response.getWriter().println(message);
+        } catch (Exception e) {
+            throw new ServletException("Failed to find page", e);
+        }
+    }
+
+    private void getLogFileResponse(HttpServletResponse response, String name)
+            throws ServletException {
+        try {
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("text/plain");
+            File file = new File(logDir + File.separator + name);
+            FileReader reader = null;
+            BufferedReader breader = null;
+            try {
+                reader = new FileReader(file);
+                breader = new BufferedReader(reader);
+                String line = "";
+                while (true) {
+                    while ((line = breader.readLine()) != null) {
+                        response.getWriter().println(line);
+                    }
+
+                    response.flushBuffer();
+                    Thread.sleep(2000);
+                }
+            } finally {
+                if (breader != null) {
+                    try {
+                        breader.close();
+                    } catch (Exception e) {
+                        // Ignore
+                    }
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (Exception e) {
+                        // Ignore
+                    }
+                }
+                            }
         } catch (Exception e) {
             throw new ServletException("Failed to find page", e);
         }
@@ -480,11 +526,11 @@ public class PodcastServer {
         }
     }
 
-  private String getFromCache(String name) throws Exception {
+  private String getFromCache(String dir, String name) throws Exception {
       name = name.replace("/", "_");
       name = name.replace("\\", "_");
 
-      File file = new File(htdocsDir + File.separator + name);
+      File file = new File(dir + File.separator + name);
       FileReader reader = null;
       BufferedReader breader = null;
       try {

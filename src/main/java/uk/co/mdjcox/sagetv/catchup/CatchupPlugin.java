@@ -7,11 +7,11 @@ import com.google.inject.Injector;
 
 import org.slf4j.Logger;
 
+import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.onlinevideo.Publisher;
 import uk.co.mdjcox.sagetv.onlinevideo.PublisherFactory;
-import uk.co.mdjcox.utils.DownloadUtils;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtils;
 import uk.co.mdjcox.utils.PropertiesInterface;
@@ -20,11 +20,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
+import java.util.concurrent.*;
 
 import sage.SageTVPlugin;
 import sage.SageTVPluginRegistry;
@@ -57,6 +53,14 @@ import sage.SageTVPluginRegistry;
 public class CatchupPlugin implements SageTVPlugin {
 
     private static final String PULL_UPGRADE = "pullUpgrade";
+
+    private static final String CATALOG_IN_PROGRESS = "catalogProgress";
+
+    private static final String START_CATALOG = "startCatalog";
+
+    private static final String STOP_CATALOG = "stopCatalog";
+
+
     public static Logger logger;
     public static Injector injector;
 
@@ -72,12 +76,18 @@ public class CatchupPlugin implements SageTVPlugin {
 
     private DownloadUtilsInterface downloadUtils;
     private String pullUpgradeValue="Click here";
+    private String startCatalogValue="Click here";
+    private String stopCatalogValue="Click here";
+
+    private PropertiesInterface props;
+    private Cataloger cataloger;
+    private boolean catalogRunning;
+    private ScheduledFuture<?> future;
+    private PluginManager pluginManager;
 
     @Inject
   public CatchupPlugin(sage.SageTVPluginRegistry registry) {
         this.registry = registry;
-      this.downloadUtils = DownloadUtils.instance();
-      init();
     }
 
     @Override
@@ -101,8 +111,10 @@ public class CatchupPlugin implements SageTVPlugin {
 
             logger.info("Starting catchup plugin");
 
-            PropertiesInterface props = injector.getInstance(PropertiesInterface.class);
+            props = injector.getInstance(PropertiesInterface.class);
             logger.info(props.toString());
+
+            this.downloadUtils = injector.getInstance(DownloadUtilsInterface.class);
 
             service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
                 @Override
@@ -118,8 +130,8 @@ public class CatchupPlugin implements SageTVPlugin {
                 registry.eventSubscribe(this, "PlaybackFinished");
             }
 
-            PluginManager pluginManager = injector.getInstance(PluginManager.class);
-            final Cataloger harvester = injector.getInstance(Cataloger.class);
+            pluginManager = injector.getInstance(PluginManager.class);
+            cataloger = injector.getInstance(Cataloger.class);
             server = injector.getInstance(PodcastServer.class);
 
             String fileName = props.getString("fileName");
@@ -133,23 +145,15 @@ public class CatchupPlugin implements SageTVPlugin {
             pluginManager.load();
             server.start();
 
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        logger.info("Refreshing catalog");
-                        Catalog catalog = harvester.catalog();
-                        server.publish(catalog);
-                        sagetvPublisher.publish(catalog);
-                    } catch (Exception e) {
-                        logger.error("Failed to refresh catalog", e);
-                    }
-                }
-            } ;
+            init();
+
+            Runnable runnable = getCatalogRunnable();
 
             long refreshRate = props.getInt("refreshRateHours");
 
-            service.scheduleAtFixedRate(runnable, 0, refreshRate, TimeUnit.HOURS);
+            future = service.scheduleAtFixedRate(runnable, 0, refreshRate, TimeUnit.HOURS);
+
+
 
         } catch (Exception e) {
             if (logger == null) {
@@ -159,6 +163,30 @@ public class CatchupPlugin implements SageTVPlugin {
                 logger.error("Failed to start catchup plugin", e);
             }
         }
+    }
+
+    private Runnable getCatalogRunnable() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    catalogRunning = true;
+                    logger.info("Refreshing catalog");
+                    Catalog catalog = cataloger.catalog();
+                    if (catalog != null) {
+                        cataloger.setProgress("Publishing catalog");
+                        server.publish(catalog);
+                        sagetvPublisher.publish(catalog);
+                        cataloger.setProgress("Finished");
+                    } 
+                } catch (Exception e) {
+                    logger.error("Failed to refresh catalog", e);
+                    cataloger.setProgress("Failed");
+                } finally {
+                    catalogRunning = false;
+                }
+            }
+        };
     }
 
     @Override
@@ -197,30 +225,73 @@ public class CatchupPlugin implements SageTVPlugin {
     }
 
     private void init() {
+        types.put(CATALOG_IN_PROGRESS, CONFIG_TEXT);
+        labels.put(CATALOG_IN_PROGRESS, "Catalog progress");
+        help.put(CATALOG_IN_PROGRESS,"Show catalog progress");
+
+        types.put(START_CATALOG, CONFIG_BUTTON);
+        labels.put(START_CATALOG, "Start cataloging");
+        help.put(START_CATALOG,"Force cataloging to start immediately");
+
+        types.put(STOP_CATALOG, CONFIG_BUTTON);
+        labels.put(STOP_CATALOG, "Stop cataloging");
+        help.put(STOP_CATALOG,"Force cataloging to stop immediately");
+
+        if (pluginManager != null) {
+            for (Plugin plugin : pluginManager.getPlugins()) {
+                String name = plugin.getSource().getId();
+                String propName = name + ".maxprogrammes";
+                types.put(propName, CONFIG_INTEGER);
+                labels.put(propName, name + " max programmes");
+                help.put(propName, name + " max programmes");
+            }
+        }
+
         types.put(PULL_UPGRADE, CONFIG_BUTTON);
-
         labels.put(PULL_UPGRADE, "Check for upgrade");
-
         help.put(PULL_UPGRADE,"Get SageTV to pull a new dev version");
-
     }
 
     @Override
     public String[] getConfigSettings() {
-        logger.info("Get config settings");
         return labels.keySet().toArray(new String[labels.size()]);
     }
 
     @Override
     public String getConfigValue(String property) {
-        logger.info("Get config value " + property);
-
         if (property.equals(PULL_UPGRADE)) {
-            logger.info("Returning " + pullUpgradeValue);
             return pullUpgradeValue;
-        } else {
-            return "";
         }
+
+        if (property.equals(CATALOG_IN_PROGRESS)) {
+            String progress = cataloger.getProgress();
+            if ("Finished".equals(progress) || "Failed".equals(progress) || "Waiting".equals(progress)) {
+                long delay = future.getDelay(TimeUnit.MINUTES);
+                progress += " - next attempt " + (delay / 60) + "hrs " + (delay % 60) + "mins";
+            }
+            return progress;
+        }
+
+        if (property.equals(START_CATALOG)) {
+            return startCatalogValue;
+        }
+
+        if (property.equals(STOP_CATALOG)) {
+            return stopCatalogValue;
+        }
+
+        if (pluginManager != null) {
+            for (Plugin plugin : pluginManager.getPlugins()) {
+                String name = plugin.getSource().getId();
+                String propName = name + ".maxprogrammes";
+                if (property.equals(propName)) {
+                    return String.valueOf(props.getInt(propName, Integer.MAX_VALUE));
+                }
+            }
+        }
+
+
+        return "";
     }
 
     @Override
@@ -258,6 +329,72 @@ public class CatchupPlugin implements SageTVPlugin {
             } catch (Exception e) {
                 pullUpgradeValue = "Failed";
                 logger.info("Failed to check for upgrade", e);
+            }
+        }
+
+        if (property.equals(START_CATALOG)) {
+            logger.info("Force catalog start");
+            try {
+                if (catalogRunning) {
+                    startCatalogValue = "Already running";
+                } else {
+                    service.schedule(getCatalogRunnable(), 0, TimeUnit.SECONDS);
+
+                    startCatalogValue = "Started catalog";
+                }
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+
+                        }
+                        startCatalogValue = "Click here";
+                    }
+                });
+                thread.start();
+            } catch (Exception e) {
+                startCatalogValue = "Failed";
+                logger.info("Failed to start catalog", e);
+            }
+        }
+
+        if (property.equals(STOP_CATALOG)) {
+            logger.info("Force catalog stop");
+            try {
+                if (!catalogRunning) {
+                    stopCatalogValue = "Already stopped";
+                } else {
+                    stopCatalogValue = "Stopping catalog";
+
+                    cataloger.stop();
+                }
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+
+                        }
+                        stopCatalogValue = "Click here";
+                    }
+                });
+                thread.start();
+            } catch (Exception e) {
+                stopCatalogValue = "Failed";
+                logger.info("Failed to stop catalog", e);
+            }
+        }
+
+        if (pluginManager != null) {
+            for (Plugin plugin : pluginManager.getPlugins()) {
+                String name = plugin.getSource().getId();
+                String propName = name + ".maxprogrammes";
+                if (property.equals(propName)) {
+                    props.setProperty(propName, value);
+                }
             }
         }
     }
