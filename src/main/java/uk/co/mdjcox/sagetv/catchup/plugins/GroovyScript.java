@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created with IntelliJ IDEA.
@@ -208,36 +209,52 @@ public abstract class GroovyScript extends groovy.lang.Script {
       }
     }
 
-    public File WAIT_FOR_FILE(String filename, long timeoutMillis) {
+    public File WAIT_FOR_FILE(String filename, long timeoutMillis, AtomicBoolean stopFlag) {
         logger.info("Waiting for existence of " + filename);
         long stopTime = System.currentTimeMillis() + timeoutMillis;
         File file = new File(filename);
         while (!file.exists() || (System.currentTimeMillis() > stopTime)) {
+            if (stopFlag.get()) {
+                break;
+            }
             WAIT_FOR(1000);
         }
         return file;
     }
 
-    public File WAIT_FOR_FILE_OF_SIZE(String filename, long atLeastSize, long timeoutMillis) {
+    public File WAIT_FOR_FILE_OF_SIZE(String filename, long atLeastSize, long timeoutMillis, AtomicBoolean stopFlag) {
         logger.info("Waiting for " + filename + " to attain size of " + atLeastSize);
         long stopTime = System.currentTimeMillis() + timeoutMillis;
         File file = new File(filename);
         while (!file.exists() || (file.length() < atLeastSize)) {
+            if (stopFlag.get()) {
+                break;
+            }
             WAIT_FOR(1000);
             if (System.currentTimeMillis() > stopTime) break;
         }
         return file;
     }
 
-    public String WAIT_FOR_OUTPUT(String prefix, ArrayList<String> output, long timeoutMillis) {
+    public String WAIT_FOR_OUTPUT(String prefix, ArrayList<String> output, long timeoutMillis, AtomicBoolean stopFlag) {
         long stopTime = System.currentTimeMillis() + timeoutMillis;
         out:
         while (System.currentTimeMillis() < stopTime) {
             for (String result : output) {
+
+                if (stopFlag.get()) {
+                    break;
+                }
+
                 if (result.startsWith(prefix)) {
                     return result;
                 }
             }
+
+            if (stopFlag.get()) {
+                break;
+            }
+
             LOG_INFO("Waiting for '" + prefix + "' in job output");
 
             WAIT_FOR(1000);
@@ -249,4 +266,9 @@ public abstract class GroovyScript extends groovy.lang.Script {
         return osUtils.isWindows();
     }
 
+    public String GET_RELATIVE_PATH(String absoluteStart, String absoluteFinish) {
+        File start = new File(absoluteStart);
+        File finish = new File(absoluteFinish);
+        return start.toPath().relativize(finish.toPath()).toString();
+    }
 }

@@ -2,9 +2,7 @@ package uk.co.mdjcox.sagetv.catchup.plugins;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-
 import org.slf4j.Logger;
-
 import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;

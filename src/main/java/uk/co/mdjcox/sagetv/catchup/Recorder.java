@@ -10,6 +10,8 @@ import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -49,7 +51,7 @@ public class Recorder {
         }));
     }
 
-    public File start(String sourceId, String id, String url) throws Exception {
+    public File start(String sourceId, String id, String name, String url) throws Exception {
 
         File dir = new File(recordingDir);
         if (!dir.exists()) {
@@ -58,6 +60,9 @@ public class Recorder {
 
         logger.info("Looking for recording of " + id);
         Recording recording = currentRecordings.get(id);
+        if ((recording != null) && recording.isStopped()) {
+            throw new Exception("Recording has been stopped");
+        }
         if ((recording != null) && recording.isInProgress()) {
             logger.info("Recording in progress for " + id);
             if (recording.getFile() == null) {
@@ -72,7 +77,7 @@ public class Recorder {
         logger.info("Starting recording of " + url);
 
 
-        recording = new Recording(sourceId, id, url, recordingDir);
+        recording = new Recording(sourceId, id, name, url, recordingDir);
         currentRecordings.put(id, recording);
 
         Plugin plugin = pluginManager.getPlugin(sourceId);
@@ -84,7 +89,36 @@ public class Recorder {
 
         logger.info("Returning file " + recording.getFile() + " for " + url);
 
-        return recording.getFile();
+        File file = recording.getFile();
+
+        if (file == null) {
+            throw new Exception("No recording file found");
+        }
+
+        return file;
+    }
+
+    public String requestStopAll() {
+        if (!isRecording()) {
+            return "All recordings already stopped";
+        } else {
+            ArrayList<Recording> recordings = new ArrayList<Recording>(currentRecordings.values());
+            for (Recording recording : recordings) {
+                recording.setStopped();
+            }
+            return "All recordings stopping";
+        }
+    }
+
+    public String requestStop(String id) {
+        Recording recording = currentRecordings.get(id);
+        if (recording != null) {
+            if (!recording.isStopped()) {
+                recording.setStopped();
+                return "Recording " + id + " stopping";
+            }
+        }
+        return "Recording " + id + " already stopped";
     }
 
     public void stop(String id) {
@@ -100,14 +134,28 @@ public class Recorder {
         }
     }
 
-    private void stop(Recording recording) {
+    private void stop(final Recording recording) {
 
         if (recording != null) {
+            logger.info("Stopping recording of " + recording.getId());
+            recording.setStopped();
             Plugin plugin = pluginManager.getPlugin(recording.getSourceId());
             plugin.stopEpisode(recording);
-            currentRecordings.remove(recording.getId());
-// Don't want to delete as there may be a resume
-//            recording.getFile().delete();
+            // TODO If resume would work
+            recording.getFile().delete();
+            // Block sage form replaying for a bit
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    } finally {
+                        currentRecordings.remove(recording.getId());
+                    }
+                }
+            }).start();
 
         }
     }
@@ -122,5 +170,27 @@ public class Recorder {
         }
 
         return false;
+    }
+
+    public boolean isRecording() {
+        return !currentRecordings.isEmpty();
+    }
+
+    public Collection<Recording> getCurrentRecordings() {
+        return currentRecordings.values();
+    }
+
+
+    public int getRecordingCount() {
+        return currentRecordings.size();
+    }
+
+    public boolean isStopped(String id) {
+        Recording recording = currentRecordings.get(id);
+        if (recording == null) {
+            return true;
+        } else {
+            return recording.isStopped();
+        }
     }
 }

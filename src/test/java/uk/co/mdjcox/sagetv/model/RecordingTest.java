@@ -30,7 +30,7 @@ public void after() throws Exception {
 @Test
 public void testCreate() {
   try {
-    Recording recording = new Recording(null, null, null, null);
+    Recording recording = new Recording(null, null, null, null, null);
   } catch (NullPointerException e) {
     return;
   }
@@ -41,7 +41,7 @@ public void testCreate() {
   @Test
   public void testSetFile() {
     try {
-      Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
+      Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
 
       recording.setFile(null);
     } catch (NullPointerException e) {
@@ -60,7 +60,7 @@ public void testCreate() {
 public void testSetGetFile() throws Exception {
   File file = new File("filename");
 
-  Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
+  Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
 
   File file3 = recording.getFile();
 
@@ -81,7 +81,7 @@ public void testSetGetFile() throws Exception {
 */ 
 @Test
 public void testGetSourceId() throws Exception {
-  Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
+  Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
 
   assertEquals("getSourceId", "sourceId", recording.getSourceId());
 }
@@ -94,7 +94,7 @@ public void testGetSourceId() throws Exception {
 @Test
 public void testGetUrl() throws Exception {
 
-  Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
+  Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
 
   assertEquals("getUrl", "url", recording.getUrl());
 } 
@@ -107,7 +107,7 @@ public void testGetUrl() throws Exception {
 @Test
 public void testGetId() throws Exception {
 
-  Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
+  Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
 
   assertEquals("getId", "id", recording.getId());
 }
@@ -120,7 +120,7 @@ public void testGetId() throws Exception {
 @Test
 public void testGetFilename() throws Exception {
 
-  Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
+  Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
 
   File file = new File("filename");
 
@@ -132,7 +132,7 @@ public void testGetFilename() throws Exception {
   @Test
   public void testGetFilenameNoFile() throws Exception {
 
-    Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
+    Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
 
     assertEquals("getFileName", "", recording.getFilename());
   }
@@ -145,7 +145,7 @@ public void testGetFilename() throws Exception {
 @Test
 public void testToString() throws Exception {
 
-  Recording recording = new Recording("sourceId", "id", "url", System.getProperty("user.dir"));
+  Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
 
   assertEquals("toString", "id", recording.toString());
 

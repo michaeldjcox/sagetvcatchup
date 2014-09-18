@@ -72,6 +72,8 @@ public class Publisher {
    * @return true if the property files were deleted
    */
   public boolean unpublish() throws Exception {
+    logger.info("Removing online video files");
+
     boolean deleteLink = true;
     boolean deleteLabel = true;
 

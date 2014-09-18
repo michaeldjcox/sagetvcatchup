@@ -173,7 +173,7 @@ public abstract class OsUtils implements OsUtilsInterface {
 
 
     private String[] getEnvAsStrings(String envVar) {
-        Map<String, String> envp = System.getenv();
+        Map<String, String> envp = new TreeMap(System.getenv());
         if (isWindows()) {
             String userDir = System.getProperty("user.dir");
             String homepath = userDir.substring(2);

@@ -184,7 +184,7 @@
                         <replacement>
                             <token>_MD5_</token>
                             <valueFile>
-                                ${settings.localRepository}/uk/co/mdjcox/${project.artifactId}/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}-plugin.zip.md5
+                                /var/www/sagetvcatchup/download/${project.version}/${project.artifactId}-${project.version}-plugin.zip.md5
                             </valueFile>
                         </replacement>
                     </replacements>

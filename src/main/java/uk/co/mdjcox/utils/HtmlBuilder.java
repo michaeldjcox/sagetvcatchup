@@ -116,5 +116,10 @@ public class HtmlBuilder  {
     html.append("<h2>");
     html.append(title);
     html.append("</h2>");
+
   }
+
+    public void addBreak() {
+        html.append("<br/>");
+    }
 }

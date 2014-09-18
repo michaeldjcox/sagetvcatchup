@@ -7,6 +7,7 @@ import com.google.inject.Injector;
 
 import org.slf4j.Logger;
 
+import sage.SageTV;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
@@ -36,15 +37,22 @@ import sage.SageTVPluginRegistry;
 
 // In priority order...
 
-// TODO - deployment in windows environment
-// TODO - upgrade sagetv to 7.1 and try podcast recorder with BBC iplayer
-// TODO - Should cache downloaded html/xml and only update if changed
+// TODO - TEST - plugin config - how many recorders? stop all
+// TODO - TEST - on start up existing online files get deleted - need to make this happen on uninstall only
 
-// TODO - config from plugin - operations e.g recache, data i.e. last updated, no errors
+// TODO - make the stop and play rock solid
+// TODO - home page
+
+// TODO - why does desktop PC not always see laptop by name mintpad
+
+
+
+// TODO - can resume be made to work
 // TODO - is there any way I can incrementally update the catalog?
 
 // TODO - check video from other providers
 // TODO - Can I place fully download videos directly in recordings for later?
+// TODO - Can I implement my own record button and loose podcast recorder
 // TODO - Can request such downloads from the existing EPG?
 // TODO - Can we use Sage Favourites to establish a favourites category?
 
@@ -60,6 +68,9 @@ public class CatchupPlugin implements SageTVPlugin {
 
     private static final String STOP_CATALOG = "stopCatalog";
 
+    private static final String RECORDINGS_IN_PROGRESS = "recordingProgress";
+
+    private static final String STOP_RECORDING = "stopRecording";
 
     public static Logger logger;
     public static Injector injector;
@@ -78,12 +89,14 @@ public class CatchupPlugin implements SageTVPlugin {
     private String pullUpgradeValue="Click here";
     private String startCatalogValue="Click here";
     private String stopCatalogValue="Click here";
+    private String stopRecordingValue="Click here";
 
     private PropertiesInterface props;
     private Cataloger cataloger;
     private boolean catalogRunning;
     private ScheduledFuture<?> future;
     private PluginManager pluginManager;
+    private Recorder recorder;
 
     @Inject
   public CatchupPlugin(sage.SageTVPluginRegistry registry) {
@@ -130,6 +143,7 @@ public class CatchupPlugin implements SageTVPlugin {
                 registry.eventSubscribe(this, "PlaybackFinished");
             }
 
+            recorder = injector.getInstance(Recorder.class);
             pluginManager = injector.getInstance(PluginManager.class);
             cataloger = injector.getInstance(Cataloger.class);
             server = injector.getInstance(PodcastServer.class);
@@ -210,11 +224,26 @@ public class CatchupPlugin implements SageTVPlugin {
         } catch (Exception e) {
             logger.error("Failed to stop podcast", e);
         }
+
+        try {
+            boolean enabled = getSageTVProperty(
+                    "sagetv_core_plugins/sagetvcatchup/enabled", "false").equals("true");
+
+            if (!enabled) {
+                uninstall();
+            }
+        } catch (Exception e) {
+            logger.error("Failed to check for uninstall", e);
+        }
+
     }
 
-    @Override
-    public void destroy() {
-        logger.info("Destroying catchup plugin");
+    private static String getSageTVProperty(String property, String defaultValue) throws Exception {
+        return (String) SageTV.api("GetServerProperty", new Object[]{property, defaultValue});
+    }
+
+    private void uninstall() {
+        logger.info("Uninstalling catchup plugin");
         try {
             if (sagetvPublisher != null) {
                 sagetvPublisher.unpublish();
@@ -222,6 +251,11 @@ public class CatchupPlugin implements SageTVPlugin {
         } catch (Exception e) {
             logger.error("Failed to remove online video properties", e);
         }
+    }
+
+    @Override
+    public void destroy() {
+        logger.info("Destroying catchup plugin");
     }
 
     private void init() {
@@ -246,6 +280,14 @@ public class CatchupPlugin implements SageTVPlugin {
                 help.put(propName, name + " max programmes");
             }
         }
+
+        types.put(RECORDINGS_IN_PROGRESS, CONFIG_TEXT);
+        labels.put(RECORDINGS_IN_PROGRESS, "Recordings in progress");
+        help.put(RECORDINGS_IN_PROGRESS,"Show number of recordings progress");
+
+        types.put(STOP_RECORDING, CONFIG_BUTTON);
+        labels.put(STOP_RECORDING, "Stop recording");
+        help.put(STOP_RECORDING,"Force all recording to stop immediately");
 
         types.put(PULL_UPGRADE, CONFIG_BUTTON);
         labels.put(PULL_UPGRADE, "Check for upgrade");
@@ -278,6 +320,14 @@ public class CatchupPlugin implements SageTVPlugin {
 
         if (property.equals(STOP_CATALOG)) {
             return stopCatalogValue;
+        }
+
+        if (property.equals(STOP_RECORDING)) {
+            return stopRecordingValue;
+        }
+
+        if (property.equals(RECORDINGS_IN_PROGRESS)) {
+            return String.valueOf(recorder.getRecordingCount());
         }
 
         if (pluginManager != null) {
@@ -388,6 +438,29 @@ public class CatchupPlugin implements SageTVPlugin {
             }
         }
 
+        if (property.equals(STOP_RECORDING)) {
+            logger.info("Force recording stop");
+            try {
+                stopRecordingValue = recorder.requestStopAll();
+                ;
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+
+                        }
+                        stopRecordingValue = "Click here";
+                    }
+                });
+                thread.start();
+            } catch (Exception e) {
+                stopRecordingValue = "Failed";
+                logger.info("Failed to stop recording", e);
+            }
+        }
+
         if (pluginManager != null) {
             for (Plugin plugin : pluginManager.getPlugins()) {
                 String name = plugin.getSource().getId();
@@ -439,29 +512,25 @@ public class CatchupPlugin implements SageTVPlugin {
         } else
         if (s.equals("PlaybackStopped")) {
             logger.info("Playback stopped of " + map);
-            stopRecording(map);
         } else
         if (s.equals("PlaybackFinished")) {
             logger.info("Playback finished of " + map);
-            stopRecording(map);
         } else {
             logger.info("Received event " + s);
         }
 
     }
 
-    private void stopRecording(Map map) {
-    HtmlUtils htmlUtils = injector.getInstance(HtmlUtils.class);
-    String episodeTitle = map.toString();
-    episodeTitle = htmlUtils.moveTo("MediaFile[", episodeTitle);
-    episodeTitle = htmlUtils.moveTo("\"", episodeTitle);
-    episodeTitle = htmlUtils.extractTo("\"", episodeTitle);
-    episodeTitle = htmlUtils.makeIdSafe(episodeTitle);
-
-    server.stopRecording(episodeTitle);
-
-}
-
+//    private void stopRecordingFromSage(Map map) {
+//        HtmlUtils htmlUtils = injector.getInstance(HtmlUtils.class);
+//        String episodeTitle = map.toString();
+//        episodeTitle = htmlUtils.moveTo("MediaFile[", episodeTitle);
+//        episodeTitle = htmlUtils.moveTo("\"", episodeTitle);
+//        episodeTitle = htmlUtils.extractTo("\"", episodeTitle);
+//        episodeTitle = htmlUtils.makeIdSafe(episodeTitle);
+//
+//        server.stopRecordingByName(episodeTitle);
+//    }
 
     public static void main(String[] args) {
         CatchupPlugin plugin = new CatchupPlugin(null);

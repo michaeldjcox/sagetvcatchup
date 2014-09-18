@@ -8,6 +8,7 @@
 package uk.co.mdjcox.sagetv.model;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.inject.internal.util.$Preconditions.checkNotNull;
 
@@ -31,6 +32,8 @@ public class Recording {
     private String sourceId;
     private String serviceUrl;
     private String id;
+    private String name;
+    private AtomicBoolean stopFlag = new AtomicBoolean(false);
 
     /**
      * Constructor of the recordin gobject which details a recording in progress
@@ -39,11 +42,20 @@ public class Recording {
      * @param serviceUrl   the service URL of the recording
      * @param recordingDir the directory where the recording will be kept
      */
-    public Recording(String sourceId, String id, String serviceUrl, String recordingDir) {
+    public Recording(String sourceId, String id, String name, String serviceUrl, String recordingDir) {
         this.recordingDir = checkNotNull(recordingDir);
         this.id = checkNotNull(id);
         this.serviceUrl = checkNotNull(serviceUrl);
         this.sourceId = checkNotNull(sourceId);
+        this.name = checkNotNull(name);
+    }
+
+    /**
+     * Gets the name of the episode
+     * @return the name of the episode
+     */
+    public String getName() {
+        return name;
     }
 
     /**
@@ -149,4 +161,15 @@ public class Recording {
         return id;
     }
 
+    public boolean isStopped() {
+        return stopFlag.get();
+    }
+
+    public void setStopped() {
+        stopFlag.set(true);
+    }
+
+    public AtomicBoolean getStopFlag() {
+        return stopFlag;
+    }
 }
