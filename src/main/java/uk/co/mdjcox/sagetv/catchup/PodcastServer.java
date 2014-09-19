@@ -29,9 +29,10 @@ import java.util.*;
  * This holds no state whatsoever
  */
 @Singleton
-public class PodcastServer {
+public class PodcastServer implements CatalogPublisher {
 
 
+    private final Cataloger cataloger;
     private Logger logger;
     private Server server;
     private Handler handler;
@@ -44,7 +45,7 @@ public class PodcastServer {
     private final String stagingDir;
 
     @Inject
-    private PodcastServer(Logger logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, OsUtilsInterface osUtils, Recorder recorder) throws Exception {
+    private PodcastServer(Logger logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils, OsUtilsInterface osUtils, Cataloger cataloger, Recorder recorder) throws Exception {
         this.logger = logger;
         this.htmlUtils = htmlUtils;
         this.osUtils = osUtils;
@@ -64,14 +65,14 @@ public class PodcastServer {
         server.setConnectors(new Connector[]{connector});
         server.setHandler(handler);
         this.recorder = recorder;
+        this.cataloger = cataloger;
         htdocsDir = props.getString("htdocsDir");
         File file = new File(htdocsDir);
         Files.createDirectories(file.toPath());
         stagingDir = props.getString("stagingDir");
         file = new File(stagingDir);
         Files.createDirectories(file.toPath());
-
-        logDir = System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator + "logs";
+        logDir = props.getString("logDir");
     }
 
     public void start() throws Exception {
@@ -100,6 +101,10 @@ public class PodcastServer {
             String id = request.getParameter("id");
             String[] otherIds = getEpisodeFromCache(id);
             getVideoResponse(response, otherIds[0], id, otherIds[1], otherIds[2]);
+        } else if (target.startsWith("/stopcat")) {
+            stopCataloging(response);
+        } else if (target.startsWith("/startcat")) {
+            startCataloging(response);
         } else if (target.startsWith("/stopall")) {
             stopAllRecording(response);
         } else if (target.startsWith("/stop")) {
@@ -126,11 +131,23 @@ public class PodcastServer {
         } else if (target.startsWith("/category=")) {
             String id = target.substring(target.indexOf('=') + 1);
             getCachedHtmlResponse(response, "category-" + id);
+        } else if (target.equals("/") || target.equals("/index.html")) {
+            getIndexResponse(response);
         } else {
             String serviceName = target.substring(1);
             getCachedPodcastResponse(response, "podcast-" + serviceName);
         }
           ((Request) request).setHandled(true);
+    }
+
+    private void stopCataloging(HttpServletResponse response) throws ServletException, IOException {
+        String result = cataloger.stop();
+        getMessageResponse(response, result);
+    }
+
+    private void startCataloging(HttpServletResponse response) throws ServletException, IOException {
+        String result = cataloger.start();
+        getMessageResponse(response, result);
     }
 
     private String[] getEpisodeFromCache(String id) throws ServletException {
@@ -202,82 +219,28 @@ public class PodcastServer {
     }
 
     private void getVideoResponse(HttpServletResponse response, String sourceId, final String id, String name, String url) throws ServletException, IOException {
-        FileInputStream in = null;
-        OutputStream out = null;
+         OutputStream out = null;
 
         try {
-
-            File file = recorder.start(sourceId, id, name, url);
-
-            logger.info("Streaming " + file + " exists=" + file.exists());
-
-            in = new FileInputStream(file);
             response.setContentType("video/mp4");
             response.setCharacterEncoding("ISO-8859-1");
             response.setContentLength(Integer.MAX_VALUE);
-
             out = response.getOutputStream();
-
-            // Copy the contents of the file to the output stream
-
-            byte[] buf = new byte[100];
-            int served = 0;
-            int count = 0;
-            int lastReport = 0;
-
-            long lastServed = System.currentTimeMillis();
-
-            try {
-                while (recorder.isRecording(id) && !recorder.isStopped(id)) {
-                    while ((count = in.read(buf)) >= 0 && !recorder.isStopped(id)) {
-                        out.write(buf, 0, count);
-                        served += count;
-                        out.flush();
-                    }
-                    osUtils.waitFor(1000);
-                    if (served > lastReport) {
-                        logger.info("Streaming of " + id + " continues after serving " + served + "/" + file.length());
-                        lastReport = served;
-                        lastServed = System.currentTimeMillis();
-                    } else {
-                        if ((System.currentTimeMillis() - lastServed) > 10000) {
-                            break;
-                        }
-                    }
-                }
-                if (recorder.isStopped(id)) {
-                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                    logger.info("Streaming of " + id + " stopped due to stop request");
-                } else {
-                    logger.info("Streaming of " + id + " stopped due to completion");
-                }
-            } finally {
-                logger.info("Streaming of " + id + " stopped after serving " + served + "/" + file.length());
-            }
+            recorder.record(out, sourceId, id, name, url);
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            logger.warn("Streaming of " + id + " stopped due to exception ", e);
-            throw new ServletException("Failed to stream video", e);
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException e) {
-                // Ignore
-            }
             try {
                 if (out != null) {
                     out.close();
                 }
-            } catch (IOException e) {
+            } catch (IOException e1) {
                 // Ignore
             }
-            try {
-                recorder.stop(id);
-            } catch (Exception e) {
-                logger.error("Failed to stop recording in the recorder", e);
-            }
+
+            logger.warn("Streaming of " + id + " stopped due to exception ", e);
+            throw new ServletException("Failed to stream video", e);
+        } finally {
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            response.flushBuffer();
         }
     }
 
@@ -446,10 +409,12 @@ public class PodcastServer {
         try {
             clearStaging();
             stagePages(catalog);
-            pushContent();
         } catch (Exception e) {
+            catalog.addError("Failed to publish to html server " + e.getMessage());
             logger.error("Failed to publish catalog to html server", e);
-            e.printStackTrace();
+        } finally {
+            buildErrorResponse(catalog);
+            pushContent();
         }
     }
 
@@ -567,8 +532,52 @@ public class PodcastServer {
 
         String episodesResponse = episodesBuilder.toString();
         writeToStaging("episodes.html", episodesResponse);
+    }
 
-        buildErrorResponse(catalog);
+    private void getIndexResponse(HttpServletResponse response) throws IOException {
+        HtmlBuilder htmlBuilder = new HtmlBuilder();
+        htmlBuilder.startDocument();
+        htmlBuilder.addPageHeader("SageTV Catchup");
+        htmlBuilder.startBody();
+        htmlBuilder.addHeading1("SageTV Catchup");
+        htmlBuilder.addHeading2("Status");
+        htmlBuilder.boldOn();
+        htmlBuilder.addParagraph("Catalog progress:");
+        htmlBuilder.boldOff();
+        htmlBuilder.addParagraph(cataloger.getProgress());
+        htmlBuilder.boldOn();
+        htmlBuilder.addParagraph("Recording progress:");
+        htmlBuilder.boldOff();
+        htmlBuilder.addParagraph(String.valueOf(recorder.getRecordingCount()));
+        htmlBuilder.addLink("Catalog Errors", "/errors");
+        htmlBuilder.addBreak();
+        htmlBuilder.addLink("Recordings", "/recordings");
+        htmlBuilder.addBreak();
+        htmlBuilder.addLink("Logs", "/logs");
+        htmlBuilder.addHeading2("Controls");
+        htmlBuilder.addLink("Stop all recording", "/stopall");
+        htmlBuilder.addBreak();
+        htmlBuilder.addLink("Start cataloging", "/startcat");
+        htmlBuilder.addBreak();
+        htmlBuilder.addLink("Stop cataloging", "/stopcat");
+        htmlBuilder.addBreak();
+
+        htmlBuilder.addHeading2("Catalog");
+        htmlBuilder.addLink("Podcasts", "/ALL");
+        htmlBuilder.addBreak();
+        htmlBuilder.addLink("Categories", "/categories");
+        htmlBuilder.addBreak();
+        htmlBuilder.addLink("Programmes", "/programmes");
+        htmlBuilder.addBreak();
+        htmlBuilder.addLink("Episodes", "/episodes");
+        htmlBuilder.stopBody();
+        htmlBuilder.stopDocument();
+
+        String indexResponse = htmlBuilder.toString();
+
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html");
+        response.getWriter().println(indexResponse);
     }
 
     private void writeToStaging(String name, String content) throws Exception {
@@ -662,14 +671,18 @@ public class PodcastServer {
         folder.delete();
     }
 
-  private void pushContent() throws Exception {
-      logger.info("Pushing staging to htdocs");
-      File staging = new File(stagingDir);
-      File htdocs = new File(htdocsDir);
-      File htdocsOld = new File(htdocsDir+".old");
-      Files.move(htdocs.toPath(), htdocsOld.toPath());
-      Files.move(staging.toPath(), htdocs.toPath());
-      deleteFolder(htdocsOld);
+  private void pushContent()  {
+      try {
+          logger.info("Pushing staging to htdocs");
+          File staging = new File(stagingDir);
+          File htdocs = new File(htdocsDir);
+          File htdocsOld = new File(htdocsDir+".old");
+          Files.move(htdocs.toPath(), htdocsOld.toPath());
+          Files.move(staging.toPath(), htdocs.toPath());
+          deleteFolder(htdocsOld);
+      } catch (Exception e) {
+          logger.error("Failed to publish staged html content", e);
+      }
   }
 
   private String buildDetailsFor(Episode cat) {
@@ -831,10 +844,10 @@ public class PodcastServer {
   }
 
 
-  private void buildErrorResponse(Catalog catalog) throws Exception {
+  private void buildErrorResponse(Catalog catalog) {
     TreeSet<ParseError> errorList = new TreeSet<ParseError>();
     for (Category cat : catalog.getCategories()) {
-      if (cat.isSource()) {
+      if (cat.isSource() || cat.isRoot()) {
         if (cat.hasErrors()) {
           errorList.addAll(cat.getErrors());
         }
@@ -858,7 +871,7 @@ public class PodcastServer {
     htmlBuilder.startDocument();
     htmlBuilder.addPageHeader("Errors page");
     htmlBuilder.startBody();
-    htmlBuilder.addHeading1("Parsing errors");
+    htmlBuilder.addHeading1("Cataloging errors");
     htmlBuilder.startTable();
     htmlBuilder.addTableHeader("Source", "Level", "Programme", "Episode", "Error", "URL");
     for (ParseError error : errorList) {
@@ -892,6 +905,10 @@ public class PodcastServer {
     htmlBuilder.stopDocument();
 
     String errorResponse = htmlBuilder.toString();
-    writeToStaging("errors.html", errorResponse);
+      try {
+          writeToStaging("errors.html", errorResponse);
+      } catch (Exception e) {
+          logger.error("Failed to build errors page", e);
+      }
   }
 }

@@ -61,4 +61,12 @@ public class Catalog {
     this.categories.put(cat.getId(), cat);
   }
 
+    public void addError(String error) {
+        Category cat = categories.get("ALL");
+        if (cat != null) {
+            cat.addError("FATAL", error);
+        }
+    }
+
+
 }

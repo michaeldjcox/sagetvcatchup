@@ -4,21 +4,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.ScriptFactory;
-import uk.co.mdjcox.sagetv.onlinevideo.PublisherFactory;
-import uk.co.mdjcox.utils.DownloadUtils;
-import uk.co.mdjcox.utils.DownloadUtilsInterface;
-import uk.co.mdjcox.utils.HtmlUtils;
-import uk.co.mdjcox.utils.HtmlUtilsInterface;
-import uk.co.mdjcox.utils.OsUtils;
-import uk.co.mdjcox.utils.OsUtilsInterface;
-import uk.co.mdjcox.utils.PropertiesFile;
-import uk.co.mdjcox.utils.PropertiesInterface;
+import uk.co.mdjcox.utils.*;
 
 import java.io.File;
 
@@ -40,8 +30,6 @@ public class CatchupModule extends AbstractModule {
                 .build(ScriptFactory.class));
         install(new FactoryModuleBuilder()
                 .build(PluginFactory.class));
-      install(new FactoryModuleBuilder()
-                  .build(PublisherFactory.class));
     }
 
     @Provides
@@ -57,6 +45,8 @@ public class CatchupModule extends AbstractModule {
           String base =  System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator;
             String props = base + "config" + File.separator + propFileName;
             properties = new PropertiesFile(props, true);
+            String workingDir = System.getProperty("user.dir");
+            properties.setProperty("logDir", workingDir + File.separator + "sagetvcatchup" + File.separator + "logs");
         }
         return properties;
     }

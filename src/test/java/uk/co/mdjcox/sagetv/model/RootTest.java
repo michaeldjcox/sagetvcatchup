@@ -32,7 +32,7 @@ public void after() throws Exception {
   @Test
   public void testGetId() throws Exception {
     Root category = new Root("shortName", "longName", "serviceUrl", "iconUrl");
-    assertEquals("getId", "", category.getId());
+    assertEquals("getId", "ALL", category.getId());
   }
 
   /**

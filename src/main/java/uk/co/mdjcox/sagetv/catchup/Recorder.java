@@ -6,9 +6,13 @@ import org.slf4j.Logger;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.Recording;
+import uk.co.mdjcox.utils.OsUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,14 +29,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Recorder {
 
     private final Logger logger;
+    private final OsUtilsInterface osUtils;
     private PluginManager pluginManager;
     private ConcurrentHashMap<String, Recording> currentRecordings = new ConcurrentHashMap<String, Recording>();
     private final String recordingDir;
 
     @Inject
-    private Recorder(Logger theLogger, PluginManager pluginManager, PropertiesInterface props) {
+    private Recorder(Logger theLogger, PluginManager pluginManager, PropertiesInterface props, OsUtilsInterface osUtils) {
         this.logger = theLogger;
         this.pluginManager = pluginManager;
+        this.osUtils = osUtils;
         this.recordingDir = props.getProperty("recordingDir", "/opt/sagetv/server/sagetvcatchup/plugins");
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -51,7 +57,7 @@ public class Recorder {
         }));
     }
 
-    public File start(String sourceId, String id, String name, String url) throws Exception {
+    private File start(String sourceId, String id, String name, String url) throws Exception {
 
         File dir = new File(recordingDir);
         if (!dir.exists()) {
@@ -191,6 +197,71 @@ public class Recorder {
             return true;
         } else {
             return recording.isStopped();
+        }
+    }
+
+    public void record(OutputStream out, String sourceId, final String id, String name, String url) throws Exception {
+        FileInputStream in = null;
+
+        try {
+
+            File file = start(sourceId, id, name, url);
+
+            logger.info("Streaming " + file + " exists=" + file.exists());
+
+            in = new FileInputStream(file);
+
+            // Copy the contents of the file to the output stream
+
+            byte[] buf = new byte[100];
+            int served = 0;
+            int count = 0;
+            int lastReport = 0;
+
+            long lastServed = System.currentTimeMillis();
+
+            try {
+                while (isRecording(id) && !isStopped(id)) {
+                    while ((count = in.read(buf)) >= 0 && !isStopped(id)) {
+                        out.write(buf, 0, count);
+                        served += count;
+                        out.flush();
+                    }
+                    osUtils.waitFor(1000);
+                    if (served > lastReport) {
+                        logger.info("Streaming of " + id + " continues after serving " + served + "/" + file.length());
+                        lastReport = served;
+                        lastServed = System.currentTimeMillis();
+                    } else {
+                        if ((System.currentTimeMillis() - lastServed) > 10000) {
+                            break;
+                        }
+                    }
+                }
+                if (isStopped(id)) {
+                    logger.info("Streaming of " + id + " stopped due to stop request");
+                } else {
+                    logger.info("Streaming of " + id + " stopped due to completion");
+                }
+            } finally {
+                logger.info("Streaming of " + id + " stopped after serving " + served + "/" + file.length());
+            }
+        } catch (Exception e) {
+            logger.warn("Streaming of " + id + " stopped due to exception ", e);
+            throw new Exception("Failed to stream video", e);
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException e) {
+                // Ignore
+            }
+            try {
+                stop(id);
+            } catch (Exception e) {
+                logger.error("Failed to stop recording in the recorder", e);
+            }
         }
     }
 }

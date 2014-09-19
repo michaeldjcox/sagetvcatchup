@@ -23,6 +23,6 @@ public class Root extends SubCategory {
    * @param iconUrl The URL of an icon associated with this category
    */
     public Root(String shortName, String longName, String serviceUrl, String iconUrl) {
-        super("", "", shortName, longName, serviceUrl, iconUrl, "");
+        super("", "ALL", shortName, longName, serviceUrl, iconUrl, "");
     }
 }

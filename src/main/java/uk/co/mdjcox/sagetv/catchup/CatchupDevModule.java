@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.ScriptFactory;
-import uk.co.mdjcox.sagetv.onlinevideo.PublisherFactory;
 import uk.co.mdjcox.utils.*;
 
 import java.io.File;
@@ -35,8 +34,6 @@ public class CatchupDevModule extends AbstractModule {
                 .build(ScriptFactory.class));
         install(new FactoryModuleBuilder()
                 .build(PluginFactory.class));
-      install(new FactoryModuleBuilder()
-                  .build(PublisherFactory.class));
     }
 
     @Provides
@@ -64,7 +61,7 @@ public class CatchupDevModule extends AbstractModule {
             properties.setProperty("recordingDir", workingDir + "/recordings");
             properties.setProperty("htdocsDir", workingDir + "/htdocs");
             properties.setProperty("stagingDir", workingDir + "/staging");
-
+            properties.setProperty("logDir", workingDir + "/logs");
             properties.setProperty("pluginDir", workingDir + "/src/main/plugins");
             properties.setProperty("podcasterPort", "8082");
         }

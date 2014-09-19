@@ -4,27 +4,22 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-
 import org.slf4j.Logger;
-
 import sage.SageTV;
+import sage.SageTVPlugin;
+import sage.SageTVPluginRegistry;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
-import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
-import uk.co.mdjcox.sagetv.onlinevideo.Publisher;
-import uk.co.mdjcox.sagetv.onlinevideo.PublisherFactory;
+import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
-import uk.co.mdjcox.utils.HtmlUtils;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
-
-import sage.SageTVPlugin;
-import sage.SageTVPluginRegistry;
 
 
 /**
@@ -82,8 +77,7 @@ public class CatchupPlugin implements SageTVPlugin {
     private SageTVPluginRegistry registry;
     private PodcastServer server;
 
-    private ScheduledExecutorService service;
-    private Publisher sagetvPublisher;
+    private SageTvPublisher sagetvPublisher;
 
     private DownloadUtilsInterface downloadUtils;
     private String pullUpgradeValue="Click here";
@@ -93,8 +87,6 @@ public class CatchupPlugin implements SageTVPlugin {
 
     private PropertiesInterface props;
     private Cataloger cataloger;
-    private boolean catalogRunning;
-    private ScheduledFuture<?> future;
     private PluginManager pluginManager;
     private Recorder recorder;
 
@@ -129,13 +121,6 @@ public class CatchupPlugin implements SageTVPlugin {
 
             this.downloadUtils = injector.getInstance(DownloadUtilsInterface.class);
 
-            service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, "catchup-scheduler");
-                }
-            });
-
 
             if (registry != null) {
                 registry.eventSubscribe(this, "PlaybackStopped");
@@ -143,32 +128,25 @@ public class CatchupPlugin implements SageTVPlugin {
                 registry.eventSubscribe(this, "PlaybackFinished");
             }
 
-            recorder = injector.getInstance(Recorder.class);
+
             pluginManager = injector.getInstance(PluginManager.class);
-            cataloger = injector.getInstance(Cataloger.class);
             server = injector.getInstance(PodcastServer.class);
-
-            String fileName = props.getString("fileName");
-            String STV = props.getString("STV");
-
-            PublisherFactory publisherFactory =  injector.getInstance(PublisherFactory.class);
-            sagetvPublisher = publisherFactory.createPublisher(fileName, STV);
+            cataloger = injector.getInstance(Cataloger.class);
+            sagetvPublisher = injector.getInstance(SageTvPublisher.class);
+            recorder = injector.getInstance(Recorder.class);
 
             Recorder recorder = injector.getInstance(Recorder.class);
 
             pluginManager.load();
             server.start();
 
+            List<CatalogPublisher> publishers = new ArrayList<CatalogPublisher>();
+            publishers.add(sagetvPublisher);
+            publishers.add(server);
+
+            cataloger.init(publishers);
+
             init();
-
-            Runnable runnable = getCatalogRunnable();
-
-            long refreshRate = props.getInt("refreshRateHours");
-
-            future = service.scheduleAtFixedRate(runnable, 0, refreshRate, TimeUnit.HOURS);
-
-
-
         } catch (Exception e) {
             if (logger == null) {
                System.err.println("Failed to start catchup plugin");
@@ -179,35 +157,14 @@ public class CatchupPlugin implements SageTVPlugin {
         }
     }
 
-    private Runnable getCatalogRunnable() {
-        return new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    catalogRunning = true;
-                    logger.info("Refreshing catalog");
-                    Catalog catalog = cataloger.catalog();
-                    if (catalog != null) {
-                        cataloger.setProgress("Publishing catalog");
-                        server.publish(catalog);
-                        sagetvPublisher.publish(catalog);
-                        cataloger.setProgress("Finished");
-                    } 
-                } catch (Exception e) {
-                    logger.error("Failed to refresh catalog", e);
-                    cataloger.setProgress("Failed");
-                } finally {
-                    catalogRunning = false;
-                }
-            }
-        };
-    }
 
     @Override
     public void stop() {
         logger.info("Stopping catchup plugin");
 
-        service.shutdownNow();
+        if (cataloger != null) {
+            cataloger.shutdown();
+        }
 
         try {
             registry.eventUnsubscribe(this, "PlaybackStopped");
@@ -306,12 +263,7 @@ public class CatchupPlugin implements SageTVPlugin {
         }
 
         if (property.equals(CATALOG_IN_PROGRESS)) {
-            String progress = cataloger.getProgress();
-            if ("Finished".equals(progress) || "Failed".equals(progress) || "Waiting".equals(progress)) {
-                long delay = future.getDelay(TimeUnit.MINUTES);
-                progress += " - next attempt " + (delay / 60) + "hrs " + (delay % 60) + "mins";
-            }
-            return progress;
+            return cataloger.getProgress();
         }
 
         if (property.equals(START_CATALOG)) {
@@ -383,82 +335,15 @@ public class CatchupPlugin implements SageTVPlugin {
         }
 
         if (property.equals(START_CATALOG)) {
-            logger.info("Force catalog start");
-            try {
-                if (catalogRunning) {
-                    startCatalogValue = "Already running";
-                } else {
-                    service.schedule(getCatalogRunnable(), 0, TimeUnit.SECONDS);
-
-                    startCatalogValue = "Started catalog";
-                }
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-
-                        }
-                        startCatalogValue = "Click here";
-                    }
-                });
-                thread.start();
-            } catch (Exception e) {
-                startCatalogValue = "Failed";
-                logger.info("Failed to start catalog", e);
-            }
+            forceCatalogStart();
         }
 
         if (property.equals(STOP_CATALOG)) {
-            logger.info("Force catalog stop");
-            try {
-                if (!catalogRunning) {
-                    stopCatalogValue = "Already stopped";
-                } else {
-                    stopCatalogValue = "Stopping catalog";
-
-                    cataloger.stop();
-                }
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-
-                        }
-                        stopCatalogValue = "Click here";
-                    }
-                });
-                thread.start();
-            } catch (Exception e) {
-                stopCatalogValue = "Failed";
-                logger.info("Failed to stop catalog", e);
-            }
+            forceCatalogStop();
         }
 
         if (property.equals(STOP_RECORDING)) {
-            logger.info("Force recording stop");
-            try {
-                stopRecordingValue = recorder.requestStopAll();
-                ;
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-
-                        }
-                        stopRecordingValue = "Click here";
-                    }
-                });
-                thread.start();
-            } catch (Exception e) {
-                stopRecordingValue = "Failed";
-                logger.info("Failed to stop recording", e);
-            }
+            forceStopRecording();
         }
 
         if (pluginManager != null) {
@@ -469,6 +354,73 @@ public class CatchupPlugin implements SageTVPlugin {
                     props.setProperty(propName, value);
                 }
             }
+        }
+    }
+
+    private void forceStopRecording() {
+        logger.info("Force recording stop");
+        try {
+            stopRecordingValue = recorder.requestStopAll();
+            ;
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+
+                    }
+                    stopRecordingValue = "Click here";
+                }
+            });
+            thread.start();
+        } catch (Exception e) {
+            stopRecordingValue = "Failed";
+            logger.info("Failed to stop recording", e);
+        }
+    }
+
+    private void forceCatalogStop() {
+        logger.info("Force catalog stop");
+        try {
+            stopCatalogValue = cataloger.stop();
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+
+                    }
+                    stopCatalogValue = "Click here";
+                }
+            });
+            thread.start();
+        } catch (Exception e) {
+            stopCatalogValue = "Failed";
+            logger.info("Failed to stop catalog", e);
+        }
+    }
+
+    private void forceCatalogStart() {
+        logger.info("Force catalog start");
+        try {
+            startCatalogValue = cataloger.start();
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+
+                    }
+                    startCatalogValue = "Click here";
+                }
+            });
+            thread.start();
+        } catch (Exception e) {
+            startCatalogValue = "Failed";
+            logger.info("Failed to start catalog", e);
         }
     }
 

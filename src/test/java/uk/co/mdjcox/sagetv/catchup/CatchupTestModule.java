@@ -8,10 +8,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.ScriptFactory;
-import uk.co.mdjcox.sagetv.onlinevideo.PublisherFactory;
 import uk.co.mdjcox.utils.*;
 
 /**
@@ -34,8 +32,6 @@ public class CatchupTestModule extends AbstractModule {
                   .build(ScriptFactory.class));
       install(new FactoryModuleBuilder()
                   .build(PluginFactory.class));
-      install(new FactoryModuleBuilder()
-                  .build(PublisherFactory.class));;
         MockitoAnnotations.initMocks(this);
     }
 

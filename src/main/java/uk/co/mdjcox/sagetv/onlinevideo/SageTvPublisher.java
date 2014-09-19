@@ -13,6 +13,7 @@ import com.google.inject.assistedinject.Assisted;
 
 import org.slf4j.Logger;
 
+import uk.co.mdjcox.sagetv.catchup.CatalogPublisher;
 import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.model.Category;
 import uk.co.mdjcox.sagetv.model.Programme;
@@ -20,6 +21,7 @@ import uk.co.mdjcox.sagetv.model.SubCategory;
 import uk.co.mdjcox.sagetv.model.Source;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesFile;
+import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -38,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <code>OnlineVideos</code> subdirectory of the <code>STV</code> directory.
  */
 @Singleton
-public class Publisher {
+public class SageTvPublisher implements CatalogPublisher {
 
   /** The logger to be used for debug output */
   private Logger logger;
@@ -54,16 +56,17 @@ public class Publisher {
    *
    * @param logger The logger to be used for debug output
    * @param htmlUtils The utilities used to perform some string manipulation
-   * @param qualifier The qualifier added to the custom SageTV online video link and UIText files
-   * @param stvDirectory The SageTV STV directory
+   * @param props The properties file
    */
   @Inject
-  private Publisher(Logger logger, HtmlUtilsInterface htmlUtils, @Assisted("qualifier") String qualifier, @Assisted("STV") String stvDirectory)
+  private SageTvPublisher(Logger logger, HtmlUtilsInterface htmlUtils, PropertiesInterface props)
   {
-    this.logger = logger;
-    this.qualifier = checkNotNull(qualifier);
-    this.STV = stvDirectory;
-    this.htmlUtils = htmlUtils;
+      this.qualifier = props.getString("fileName");
+      this.STV = props.getString("STV");
+      checkNotNull(qualifier);
+      checkNotNull(STV);
+      this.logger = logger;
+      this.htmlUtils = htmlUtils;
   }
 
   /**
@@ -143,40 +146,45 @@ public class Publisher {
    *
    * @throws Exception if the property files cannot be created.
    */
-  public void publish(Catalog catalog) throws Exception {
-    Collection<Category> categories = catalog.getCategories();
+  public void publish(Catalog catalog)  {
+      try {
+          Collection<Category> categories = catalog.getCategories();
 
-    String linkFile = getLinkFile(qualifier);
-    String labelFile = getLabelFile(qualifier);
+          String linkFile = getLinkFile(qualifier);
+          String labelFile = getLabelFile(qualifier);
 
-    logger.info("Publishing to " + linkFile);
-    logger.info("Publishing to " + labelFile);
+          logger.info("Publishing to " + linkFile);
+          logger.info("Publishing to " + labelFile);
 
-    PropertiesFile links = new PropertiesFile(linkFile, false);
-    PropertiesFile labels = new PropertiesFile(labelFile, false);
+          PropertiesFile links = new PropertiesFile(linkFile, false);
+          PropertiesFile labels = new PropertiesFile(labelFile, false);
 
-    links.clear();
-    labels.clear();
+          links.clear();
+          labels.clear();
 
-    for (Category category : categories) {
-      if (category.isRoot()) {
-        continue;
-      } else if (category.isSource()) {
-        logger.info("Online adding source " + category.getId());
-        addSource((Source)category, links, labels);
-      } else if (category.isProgrammeCategory()) {
-        logger.info("Online adding programme " + category.getId());
-        addProgramme((Programme) category, links, labels);
-      } else if (category.isSubCategory()) {
-        logger.info("Online adding subcategory " + category.getId());
-        addSubCategory((SubCategory)category, links, labels);
-      } else {
-        logger.error(category.getId() + " was not handled");
+          for (Category category : categories) {
+            if (category.isRoot()) {
+              continue;
+            } else if (category.isSource()) {
+              logger.info("Online adding source " + category.getId());
+              addSource((Source)category, links, labels);
+            } else if (category.isProgrammeCategory()) {
+              logger.info("Online adding programme " + category.getId());
+              addProgramme((Programme) category, links, labels);
+            } else if (category.isSubCategory()) {
+              logger.info("Online adding subcategory " + category.getId());
+              addSubCategory((SubCategory)category, links, labels);
+            } else {
+              logger.error(category.getId() + " was not handled");
+            }
+          }
+
+          links.commit(linkFile, new LinksPropertyLayout());
+          labels.commit(labelFile, new LabelsPropertyLayout());
+      } catch (Exception e) {
+          catalog.addError("Failed to publish to SageTV " + e.getMessage());
+          logger.error("Failed to publish to SageTV", e);
       }
-    }
-
-    links.commit(linkFile, new LinksPropertyLayout());
-    labels.commit(labelFile, new LabelsPropertyLayout());
 
   }
 

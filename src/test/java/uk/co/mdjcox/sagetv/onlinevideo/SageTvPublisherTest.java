@@ -9,6 +9,7 @@ import org.junit.Test;
 import uk.co.mdjcox.sagetv.catchup.CatchupTestModule;
 import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.PropertiesFile;
+import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -18,6 +19,7 @@ import java.util.TreeMap;
 
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 /**
  * Publisher Tester.
@@ -26,11 +28,12 @@ import static org.junit.Assert.*;
  * @version 1.0
  * @since <pre>Mar 25, 2013</pre>
  */
-public class PublisherTest {
+public class SageTvPublisherTest {
 
-  private Publisher publisher;
+  private SageTvPublisher sageTvPublisher;
+    private PropertiesInterface props;
 
-  @Before
+    @Before
   public void before() throws Exception {
     String tmpDir = System.getProperty("java.io.tmpdir", ".");
     File tmpDirFle = new File(tmpDir + File.separator + "OnlineVideos");
@@ -42,9 +45,13 @@ public class PublisherTest {
 
     CatchupTestModule module = new CatchupTestModule();
     Injector injector = Guice.createInjector(module);
-    PublisherFactory publisherFactory = injector.getInstance(PublisherFactory.class);
-    publisher = publisherFactory.createPublisher("test", tmpDir);
 
+      props = injector.getInstance(PropertiesInterface.class);
+
+      when(props.getString("fileName")).thenReturn("test");
+      when(props.getString("STV")).thenReturn(tmpDir);
+
+      sageTvPublisher = injector.getInstance(SageTvPublisher.class);
   }
 
   @After
@@ -58,8 +65,9 @@ public class PublisherTest {
       String tmpDir = System.getProperty("java.io.tmpdir", ".");
       CatchupTestModule module = new CatchupTestModule();
       Injector injector = Guice.createInjector(module);
-      PublisherFactory publisherFactory = injector.getInstance(PublisherFactory.class);
-      publisherFactory.createPublisher(null, tmpDir);
+        when(props.getString("fileName")).thenReturn(null);
+        when(props.getString("STV")).thenReturn(tmpDir);
+        SageTvPublisher sageTvPublisher = injector.getInstance(SageTvPublisher.class);
     } catch (com.google.inject.ProvisionException e) {
       thrown = true;
     }
@@ -72,8 +80,9 @@ public class PublisherTest {
     try {
       CatchupTestModule module = new CatchupTestModule();
       Injector injector = Guice.createInjector(module);
-      PublisherFactory publisherFactory = injector.getInstance(PublisherFactory.class);
-      publisherFactory.createPublisher("test", null);
+        when(props.getString("fileName")).thenReturn("test");
+        when(props.getString("STV")).thenReturn(null);
+      SageTvPublisher sageTvPublisher = injector.getInstance(SageTvPublisher.class);
     } catch (com.google.inject.ProvisionException e) {
       thrown = true;
     }
@@ -89,13 +98,13 @@ public class PublisherTest {
    */
   @Test
   public void testUnpublish() throws Exception {
-    Method method = Publisher.class.getDeclaredMethod("getLinkFile", String.class);
+    Method method = SageTvPublisher.class.getDeclaredMethod("getLinkFile", String.class);
     method.setAccessible(true);
-    String linkFileName = (String) method.invoke(publisher, "test");
+    String linkFileName = (String) method.invoke(sageTvPublisher, "test");
 
-    method = Publisher.class.getDeclaredMethod("getLabelFile", String.class);
+    method = SageTvPublisher.class.getDeclaredMethod("getLabelFile", String.class);
     method.setAccessible(true);
-    String labelFileName = (String) method.invoke(publisher, "test");
+    String labelFileName = (String) method.invoke(sageTvPublisher, "test");
 
     File linkFile = new File(linkFileName);
     File labelFile = new File(labelFileName);
@@ -106,14 +115,14 @@ public class PublisherTest {
     assertTrue("Link file should exist before test", linkFile.exists());
     assertTrue("Label file should exist before test", labelFile.exists());
 
-    publisher.unpublish();
+    sageTvPublisher.unpublish();
 
     assertFalse("Link file not should exist after test", linkFile.exists());
     assertFalse("Label file not should exist after test", labelFile.exists());
 
     // Should also work if there is nothing to do
 
-    publisher.unpublish();
+    sageTvPublisher.unpublish();
 
     assertFalse("Link file not should exist after test", linkFile.exists());
     assertFalse("Label file not should exist after test", labelFile.exists());
@@ -176,16 +185,16 @@ public class PublisherTest {
                                   "airDate", "airTime", "channel", Sets.newHashSet("category"));
     programme.addEpisode(episode);
 
-    publisher.publish(catalog);
+    sageTvPublisher.publish(catalog);
 
-    Method method = Publisher.class.getDeclaredMethod("getLinkFile", String.class);
+    Method method = SageTvPublisher.class.getDeclaredMethod("getLinkFile", String.class);
     method.setAccessible(true);
-    String linkFileName = (String) method.invoke(publisher, "test");
+    String linkFileName = (String) method.invoke(sageTvPublisher, "test");
     PropertiesFile linkPropsFile = new PropertiesFile(linkFileName, true);
 
-    method = Publisher.class.getDeclaredMethod("getLabelFile", String.class);
+    method = SageTvPublisher.class.getDeclaredMethod("getLabelFile", String.class);
     method.setAccessible(true);
-    String labelFileName = (String) method.invoke(publisher, "test");
+    String labelFileName = (String) method.invoke(sageTvPublisher, "test");
     PropertiesFile labelPropsFile = new PropertiesFile(labelFileName, true);
 
     TreeMap<Object,Object> linkProps = new  TreeMap<Object,Object>(new LinksPropertyLayout().getComparator(linkPropsFile));
@@ -293,12 +302,12 @@ public class PublisherTest {
    */
   @Test
   public void testGetLinkFile() throws Exception {
-    Method method = Publisher.class.getDeclaredMethod("getLinkFile", String.class);
+    Method method = SageTvPublisher.class.getDeclaredMethod("getLinkFile", String.class);
     method.setAccessible(true);
-    Object result = method.invoke(publisher, "test");
+    Object result = method.invoke(sageTvPublisher, "test");
     assertEquals("getLinkFile()", "/tmp/OnlineVideos/CustomOnlineVideoLinks_test.properties", result);
 
-    result =method.invoke(publisher, "");
+    result =method.invoke(sageTvPublisher, "");
     assertEquals("getLinkFile()", "/tmp/OnlineVideos/CustomOnlineVideoLinks.properties", result);
 
   }
@@ -308,12 +317,12 @@ public class PublisherTest {
    */
   @Test
   public void testGetLabelFile() throws Exception {
-    Method method = Publisher.class.getDeclaredMethod("getLabelFile", String.class);
+    Method method = SageTvPublisher.class.getDeclaredMethod("getLabelFile", String.class);
     method.setAccessible(true);
-    Object result = method.invoke(publisher, "test");
+    Object result = method.invoke(sageTvPublisher, "test");
     assertEquals("getLabelFile()", "/tmp/OnlineVideos/CustomOnlineVideoUIText_test.properties", result);
 
-    result = method.invoke(publisher, "");
+    result = method.invoke(sageTvPublisher, "");
     assertEquals("getLabelFile()", "/tmp/OnlineVideos/CustomOnlineVideoUIText.properties", result);
 
   }
@@ -323,9 +332,9 @@ public class PublisherTest {
    */
   @Test
   public void testGetRoot() throws Exception {
-    Method method = publisher.getClass().getDeclaredMethod("getRoot");
+    Method method = sageTvPublisher.getClass().getDeclaredMethod("getRoot");
     method.setAccessible(true);
-    Object result = method.invoke(publisher);
+    Object result = method.invoke(sageTvPublisher);
     assertNotNull("getRoot should return a value", result);
     assertTrue("getRoot should return a String", (result instanceof String));
     assertEquals("getRoot", "/tmp/OnlineVideos", result);
@@ -337,7 +346,7 @@ public class PublisherTest {
    */
   @Test
   public void testAddProgramme() throws Exception {
-    Method method = Publisher.class.getDeclaredMethod("addProgramme", Programme.class,
+    Method method = SageTvPublisher.class.getDeclaredMethod("addProgramme", Programme.class,
                                                       PropertiesFile.class,
                                                       PropertiesFile.class);
     method.setAccessible(true);
@@ -353,8 +362,8 @@ public class PublisherTest {
     programme2.setPodcastUrl("podcastUrl2");
     programme2.addOtherParentId("subcat2");
 
-    method.invoke(publisher, programme, linksFile, labelsFile);
-    method.invoke(publisher, programme2, linksFile, labelsFile);
+    method.invoke(sageTvPublisher, programme, linksFile, labelsFile);
+    method.invoke(sageTvPublisher, programme2, linksFile, labelsFile);
 
     assertEquals("Property count", 2, linksFile.entrySet().size());
 
@@ -398,7 +407,7 @@ public class PublisherTest {
 
     Method
         method =
-        Publisher.class.getDeclaredMethod("addSource", Source.class,
+        SageTvPublisher.class.getDeclaredMethod("addSource", Source.class,
                                           PropertiesFile.class, PropertiesFile.class);
     method.setAccessible(true);
     PropertiesFile links = new PropertiesFile();
@@ -408,9 +417,9 @@ public class PublisherTest {
     Source source2 = new Source("category2", "name2", "description2", "serviceUrl2", "iconUrl2");
     Source dupe = new Source("category", "name", "description", "serviceUrl", "iconUrl");
 
-    method.invoke(publisher, source, links, labels);
-    method.invoke(publisher, source2, links, labels);
-    method.invoke(publisher, dupe, links, labels);
+    method.invoke(sageTvPublisher, source, links, labels);
+    method.invoke(sageTvPublisher, source2, links, labels);
+    method.invoke(sageTvPublisher, dupe, links, labels);
 
     assertEquals("Links Property count", 1, links.entrySet().size());
     assertEquals("Labels count", 4, labels.entrySet().size());
@@ -443,7 +452,7 @@ public class PublisherTest {
   public void testAddSubCategory() throws Exception {
     Method
         method =
-        Publisher.class
+        SageTvPublisher.class
             .getDeclaredMethod("addSubCategory", SubCategory.class, PropertiesFile.class,
                                PropertiesFile.class);
     method.setAccessible(true);
@@ -452,9 +461,9 @@ public class PublisherTest {
     SubCategory subCategory = new SubCategory("sourceId", "subcatId", "subcatTitle", "subCatDescription", "serviceUrl", "iconUrl", "parentId");
     SubCategory subCategory2 = new SubCategory("sourceId", "subcatId2", "subcatTitle2", "subCatDescription2", "serviceUrl2", "", "parentId");
 
-    method.invoke(publisher, subCategory, linksFile, labelsFile);
+    method.invoke(sageTvPublisher, subCategory, linksFile, labelsFile);
 
-    method.invoke(publisher, subCategory2, linksFile, labelsFile);
+    method.invoke(sageTvPublisher, subCategory2, linksFile, labelsFile);
 
     TreeMap<Object,Object> linkProps = new  TreeMap<Object,Object>(new LinksPropertyLayout().getComparator(linksFile));
     linkProps.putAll(linksFile);

@@ -7,9 +7,11 @@ import org.slf4j.Logger;
 
 import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.sagetv.catchup.plugins.*;
+import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -25,6 +27,10 @@ public class Cataloger {
     private String podcastUrlBase;
     private String progressString = "Waiting";
     private AtomicBoolean stop = new AtomicBoolean(false);
+    private AtomicBoolean catalogRunning = new AtomicBoolean(false);
+    private ScheduledExecutorService service;
+    private ScheduledFuture<?> future;
+    private List<CatalogPublisher> publishers;
 
     @Inject
     private Cataloger(Logger logger, PropertiesInterface props, PluginManager pluginManager) {
@@ -35,7 +41,36 @@ public class Cataloger {
 
     }
 
-    public Catalog catalog() {
+    private Runnable getCatalogRunnable(final List<CatalogPublisher> publishers) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                Catalog catalog = null;
+                try {
+                    catalogRunning.set(true);
+                    logger.info("Refreshing catalog");
+                    catalog = catalog();
+                    if (catalog != null) {
+                        setProgress("Publishing catalog");
+                        for (CatalogPublisher publisher : publishers) {
+                            publisher.publish(catalog);
+                        }
+                        setProgress("Finished");
+                    }
+                } catch (Exception e) {
+                    if (catalog != null) {
+                        catalog.addError("Failed to publish to SageTV " + e.getMessage());
+                    }
+                    logger.error("Failed to refresh catalog", e);
+                    setProgress("Failed");
+                } finally {
+                    catalogRunning.set(false);
+                }
+            }
+        };
+    }
+
+    private Catalog catalog() {
 
         progressString = "Started";
 
@@ -304,14 +339,71 @@ public class Cataloger {
     }
 
     public String getProgress() {
-        return progressString;
+        String progress = progressString;
+
+        if ("Finished".equals(progress) || "Failed".equals(progress) || "Waiting".equals(progress)) {
+            long delay = future.getDelay(TimeUnit.MINUTES);
+            progress += " - next attempt " + (delay / 60) + "hrs " + (delay % 60) + "mins";
+        }
+        return progress;
     }
 
     public void setProgress(String progress) {
         progressString = progress;
     }
 
-    public void stop() {
-        stop.set(true);
+    public void init(final List<CatalogPublisher> publishers) {
+        service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r, "catchup-scheduler");
+            }
+        });
+
+        this.publishers = publishers;
+
+        Runnable runnable = getCatalogRunnable(publishers);
+
+        long refreshRate = props.getInt("refreshRateHours");
+
+        future = service.scheduleAtFixedRate(runnable, 0, refreshRate, TimeUnit.HOURS);
+
+    }
+
+    public void shutdown() {
+        service.shutdownNow();
+    }
+
+    public boolean isRunning() {
+        return catalogRunning.get();
+    }
+
+    public String start() {
+        try {
+            if (isRunning()) {
+                return "Already running";
+            } else {
+                service.schedule(getCatalogRunnable(publishers), 0, TimeUnit.SECONDS);
+                return "Started catalog";
+            }
+        } catch (Exception e) {
+            logger.error("Failed to start cataloging", e);
+            return "Failed to start catalog";
+        }
+
+    }
+
+    public String stop() {
+        try {
+            if (!isRunning()) {
+                return "Already stopped";
+            } else {
+                stop.set(true);
+                return "Stopping catalog";
+            }
+        } catch (Exception e) {
+            logger.error("Failed to stop cataloging", e);
+            return "Failed to stop catalog";
+        }
     }
 }
