@@ -371,6 +371,7 @@ public class Cataloger {
     }
 
     public void shutdown() {
+        stop.set(true);
         service.shutdownNow();
     }
 

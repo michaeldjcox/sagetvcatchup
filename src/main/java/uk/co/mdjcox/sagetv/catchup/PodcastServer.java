@@ -549,10 +549,16 @@ public class PodcastServer implements CatalogPublisher {
         htmlBuilder.addParagraph("Recording progress:");
         htmlBuilder.boldOff();
         htmlBuilder.addParagraph(String.valueOf(recorder.getRecordingCount()));
+        htmlBuilder.boldOn();
+        htmlBuilder.addParagraph("Recording processes:");
+        htmlBuilder.boldOff();
+        htmlBuilder.addParagraph(String.valueOf(recorder.getProcessCount()));
+        htmlBuilder.addBreak();
         htmlBuilder.addLink("Catalog Errors", "/errors");
         htmlBuilder.addBreak();
         htmlBuilder.addLink("Recordings", "/recordings");
         htmlBuilder.addBreak();
+
         htmlBuilder.addLink("Logs", "/logs");
         htmlBuilder.addHeading2("Controls");
         htmlBuilder.addLink("Stop all recording", "/stopall");

@@ -264,4 +264,10 @@ public class Recorder {
             }
         }
     }
+
+    public int getProcessCount() {
+        int count = osUtils.findProcessesMatching(".*get_iplayer.*").size();
+        count += osUtils.findProcessesMatching(".*rtmpdump.*").size();
+        return count;
+    }
 }

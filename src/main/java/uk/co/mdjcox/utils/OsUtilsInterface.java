@@ -2,6 +2,7 @@ package uk.co.mdjcox.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,11 +22,16 @@ public interface OsUtilsInterface {
 
     void killProcessesContaining(String expression);
 
-    void waitFor(long millis);
+    Map<String, String> findProcessesContaining(String token);
+
+    Map<String, String> findProcessesMatching(String regex);
 
     void killProcessesMatching(String regex);
 
     boolean isWindows();
 
     boolean isUnix();
+
+    void waitFor(long millis);
+
 }

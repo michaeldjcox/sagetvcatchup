@@ -33,14 +33,10 @@ import java.util.Map;
 // In priority order...
 
 // TODO - TEST - plugin config - how many recorders? stop all
-// TODO - TEST - on start up existing online files get deleted - need to make this happen on uninstall only
-
-// TODO - make the stop and play rock solid
-// TODO - home page
+// TODO - TEST - make the stop and play rock solid
+// TODO - TEST - home page
 
 // TODO - why does desktop PC not always see laptop by name mintpad
-
-
 
 // TODO - can resume be made to work
 // TODO - is there any way I can incrementally update the catalog?
@@ -64,6 +60,8 @@ public class CatchupPlugin implements SageTVPlugin {
     private static final String STOP_CATALOG = "stopCatalog";
 
     private static final String RECORDINGS_IN_PROGRESS = "recordingProgress";
+
+    private static final String RECORDINGS_PROCESSES = "recordingProcesses";
 
     private static final String STOP_RECORDING = "stopRecording";
 
@@ -157,10 +155,13 @@ public class CatchupPlugin implements SageTVPlugin {
         }
     }
 
-
     @Override
     public void stop() {
         logger.info("Stopping catchup plugin");
+
+        if (recorder != null) {
+            recorder.requestStopAll();
+        }
 
         if (cataloger != null) {
             cataloger.shutdown();
@@ -181,18 +182,6 @@ public class CatchupPlugin implements SageTVPlugin {
         } catch (Exception e) {
             logger.error("Failed to stop podcast", e);
         }
-
-        try {
-            boolean enabled = getSageTVProperty(
-                    "sagetv_core_plugins/sagetvcatchup/enabled", "false").equals("true");
-
-            if (!enabled) {
-                uninstall();
-            }
-        } catch (Exception e) {
-            logger.error("Failed to check for uninstall", e);
-        }
-
     }
 
     private static String getSageTVProperty(String property, String defaultValue) throws Exception {
@@ -208,11 +197,61 @@ public class CatchupPlugin implements SageTVPlugin {
         } catch (Exception e) {
             logger.error("Failed to remove online video properties", e);
         }
+
+
+        String rootDir = System.getProperty("user.dir");
+        if (!rootDir.endsWith(File.separator)) {
+            rootDir += File.separator;
+        }
+
+        File htdocs = new File(rootDir + "sagetvcatchup" + File.separator + "htdocs");
+        File staging = new File(rootDir + "sagetvcatchup" + File.separator + "staging");
+        File recordings = new File(rootDir + "sagetvcatchup" + File.separator + "recordings");
+        File logs = new File(rootDir + "sagetvcatchup" + File.separator + "logs");
+
+        deleteFileOrDir(htdocs, true);
+        deleteFileOrDir(staging, true);
+        deleteFileOrDir(recordings, true);
+        deleteFileOrDir(logs, true);
+    }
+
+    private boolean deleteFileOrDir(File fileOrDir, boolean deleteRoot) {
+        if (fileOrDir.isDirectory()) {
+            String[] children = fileOrDir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteFileOrDir(new File(fileOrDir, children[i]), true);
+                if (!success) {
+                    logger.info("FAILED deleting " + fileOrDir);
+                    return false;
+                } else {
+                    logger.info("Deleted " + fileOrDir);
+                }
+            }
+        }
+
+        if (deleteRoot) {
+            return fileOrDir.delete();
+        } else {
+            return false;
+        }
     }
 
     @Override
     public void destroy() {
         logger.info("Destroying catchup plugin");
+
+        try {
+            String enabled = getSageTVProperty("sagetv_core_plugins/sagetvcatchup/enabled", "blah");
+            logger.info("Destroying catchup plugin enabled = " + enabled);
+
+            // This will occur if its an upgrade or an uninstall
+            // Theres no way to tell the difference
+            if (enabled.equalsIgnoreCase("false")) {
+                uninstall();
+            }
+        } catch (Exception e) {
+            logger.error("Failed to check for uninstall", e);
+        }
     }
 
     private void init() {
@@ -241,6 +280,10 @@ public class CatchupPlugin implements SageTVPlugin {
         types.put(RECORDINGS_IN_PROGRESS, CONFIG_TEXT);
         labels.put(RECORDINGS_IN_PROGRESS, "Recordings in progress");
         help.put(RECORDINGS_IN_PROGRESS,"Show number of recordings progress");
+
+        types.put(RECORDINGS_PROCESSES, CONFIG_TEXT);
+        labels.put(RECORDINGS_PROCESSES, "Recording processes");
+        help.put(RECORDINGS_PROCESSES,"Show number of recording processes");
 
         types.put(STOP_RECORDING, CONFIG_BUTTON);
         labels.put(STOP_RECORDING, "Stop recording");
@@ -280,6 +323,10 @@ public class CatchupPlugin implements SageTVPlugin {
 
         if (property.equals(RECORDINGS_IN_PROGRESS)) {
             return String.valueOf(recorder.getRecordingCount());
+        }
+
+        if (property.equals(RECORDINGS_PROCESSES)) {
+            return String.valueOf(recorder.getProcessCount());
         }
 
         if (pluginManager != null) {
@@ -458,6 +505,8 @@ public class CatchupPlugin implements SageTVPlugin {
 
     @Override
     public void sageEvent(String s, Map map) {
+
+        logger.info("SageEvent: " + s);
 
         if (s.equals("PlaybackStarted")) {
            logger.info("Playback started of " + map);

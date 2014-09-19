@@ -282,6 +282,30 @@ public abstract class OsUtils implements OsUtilsInterface {
 
   }
 
+    public Map<String, String> findProcessesContaining(String token) {
+        HashMap<String, String> matching = new HashMap<String, String>();
+        HashMap<String, String> processes = getProcesses();
+        for (String process : processes.keySet()) {
+            String pid = processes.get(process);
+            if (process.contains(token)) {
+                matching.put(pid, process);
+            }
+        }
+        return matching;
+    }
+
+    public Map<String, String> findProcessesMatching(String regex) {
+        HashMap<String, String> matching = new HashMap<String, String>();
+        HashMap<String, String> processes = getProcesses();
+        for (String process : processes.keySet()) {
+            String pid = processes.get(process);
+            if (process.matches(regex)) {
+                matching.put(pid, process);
+            }
+        }
+        return matching;
+    }
+
   public void killProcessesContaining(String token) {
         HashMap<String, String> processes = getProcesses();
         Set<String> kills = new HashSet<String>();
