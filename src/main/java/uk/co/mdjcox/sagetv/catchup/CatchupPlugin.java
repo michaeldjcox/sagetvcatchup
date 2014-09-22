@@ -32,21 +32,26 @@ import java.util.Map;
 
 // In priority order...
 
+// TESTING
+
 // TODO - TEST - plugin config - how many recorders? stop all
 // TODO - TEST - make the stop and play rock solid
 // TODO - TEST - home page
 
+// ENV
 // TODO - why does desktop PC not always see laptop by name mintpad
 
-// TODO - can resume be made to work
-// TODO - is there any way I can incrementally update the catalog?
-
+// FEATURES
 // TODO - check video from other providers
 // TODO - Can I place fully download videos directly in recordings for later?
 // TODO - Can I implement my own record button and loose podcast recorder
-// TODO - Can request such downloads from the existing EPG?
 // TODO - Can we use Sage Favourites to establish a favourites category?
+// TODO - Can "watched" status extend from recordings to Online
 
+// WISHLIST
+// TODO - can resume be made to work?
+// TODO - is there any way I can incrementally update the catalog?
+// TODO - Can request such downloads from the existing EPG?
 
 
 public class CatchupPlugin implements SageTVPlugin {
