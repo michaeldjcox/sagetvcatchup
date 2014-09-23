@@ -494,7 +494,7 @@ public class PodcastServer implements CatalogPublisher {
 
           }
 
-          if (cat instanceof Programme) {
+          if (cat.isProgrammeCategory() && cat.getParentId().isEmpty()) {
             for (Episode ep : ((Programme)cat).getEpisodes().values()) {
               String detailStr2 = buildDetailsFor(ep);
                 writeToStaging("episode-" + ep.getId() + ".html", detailStr2);

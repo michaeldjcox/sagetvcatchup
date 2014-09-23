@@ -377,29 +377,63 @@ public class Episode implements ErrorRecorder {
    * @return a title for this episode of the programme
    */
   public final String getPodcastTitle() {
-    String title = episodeTitle;
+    String programmePart = programmeTitle == null ? "" : programmeTitle;
+
+    String seriesPart = seriesTitle == null ? "" : seriesTitle;
+    if (seriesPart.equals(programmePart)) {
+        seriesPart = "";
+    }
+
+    if (seriesPart.isEmpty()) {
+        if (!series.isEmpty()) {
+            if (series.startsWith("Series") || series.startsWith("series") || !Character
+                    .isDigit(series.charAt(0))) {
+                seriesPart = series;
+            } else {
+                seriesPart = "Series " + series;
+            }
+        }
+    }
+
+    String episodePart = episodeTitle == null ? "" : episodeTitle;
+    if (episodePart.equals(programmePart) || episodePart.equals(seriesPart)) {
+          episodePart = "";
+    }
+    if (episodePart.isEmpty()) {
+        if (!episode.isEmpty()) {
+
+            if (episode.startsWith("Episode") || episode.startsWith("episode") || !Character
+                    .isDigit(episode.charAt(0))) {
+                episodePart = episode;
+            } else {
+                episodePart = "Episode " + episode;
+
+            }
+        }
+    }
+
+    String title = programmePart;
     if (title.isEmpty()) {
-      title = programmeTitle;
+        title = seriesPart;
+    } else {
+        if (!seriesPart.isEmpty()) {
+           title = title + " - " + seriesPart;
+        }
     }
-    if (!series.isEmpty()) {
-      if (series.startsWith("Series") || series.startsWith("series") || !Character
-          .isDigit(series.charAt(0))) {
-        title += " - " + series;
-      } else {
-        title += " - Series " + series;
-      }
-    }
-    if (!episode.isEmpty()) {
 
-      if (episode.startsWith("Episode") || episode.startsWith("episode") || !Character
-          .isDigit(episode.charAt(0))) {
-        title += " - " + episode;
-      } else {
-        title += " - Episode " + episode;
-
-      }
+    if (title.isEmpty()) {
+        title = episodePart;
+    } else {
+        if (!episodePart.isEmpty()) {
+            title = title + " - " + episodePart;
+        }
     }
-    return title;
+
+    if (title.isEmpty()) {
+        return serviceUrl;
+    } else {
+        return title;
+    }
   }
 
   /**

@@ -690,62 +690,37 @@ public void testSetEpisode() throws Exception {
 */ 
 @Test
 public void testGetPodcastTitle() throws Exception {
-  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
-                                "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "1",
+                                "2", "descripton", "iconUrl", "serviceUrl", "airDate",
                                 "airTime", "channel", Sets.newHashSet("category"));
-  assertEquals("getPodcastTitle", "episodeTitle - series - episode", episode.getPodcastTitle());
+  assertEquals("getPodcastTitle", "programmeTitle - seriesTitle - episodeTitle", episode.getPodcastTitle());
 
-  episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "Series",
-                        "Episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                        "airTime", "channel", Sets.newHashSet("category"));
-  assertEquals("getPodcastTitle", "episodeTitle - Series - Episode", episode.getPodcastTitle());
+    episode = new Episode("sourceId", "id", "", "seriesTitle", "episodeTitle", "1",
+            "2", "descripton", "iconUrl", "serviceUrl", "airDate",
+            "airTime", "channel", Sets.newHashSet("category"));
+    assertEquals("getPodcastTitle", "seriesTitle - episodeTitle", episode.getPodcastTitle());
 
-  episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "A",
-                        "A", "descripton", "iconUrl", "serviceUrl", "airDate",
-                        "airTime", "channel", Sets.newHashSet("category"));
-  assertEquals("getPodcastTitle", "episodeTitle - A - A", episode.getPodcastTitle());
+    episode = new Episode("sourceId", "id", "", "" , "episodeTitle", "1",
+            "2", "descripton", "iconUrl", "serviceUrl", "airDate",
+            "airTime", "channel", Sets.newHashSet("category"));
+    assertEquals("getPodcastTitle", "Series 1 - episodeTitle", episode.getPodcastTitle());
 
-  episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "1",
-                        "2", "descripton", "iconUrl", "serviceUrl", "airDate",
-                        "airTime", "channel", Sets.newHashSet("category"));
-  assertEquals("getPodcastTitle", "episodeTitle - Series 1 - Episode 2", episode.getPodcastTitle());
+    episode = new Episode("sourceId", "id", "programmeTitle", "", "episodeTitle", "1",
+            "2", "descripton", "iconUrl", "serviceUrl", "airDate",
+            "airTime", "channel", Sets.newHashSet("category"));
+    assertEquals("getPodcastTitle", "programmeTitle - Series 1 - episodeTitle", episode.getPodcastTitle());
 
-  episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "", "",
-                        "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                        "airTime", "channel", Sets.newHashSet("category"));
-  assertEquals("getPodcastTitle", "programmeTitle - episode", episode.getPodcastTitle());
+    episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "", "1",
+            "2", "descripton", "iconUrl", "serviceUrl", "airDate",
+            "airTime", "channel", Sets.newHashSet("category"));
+    assertEquals("getPodcastTitle", "programmeTitle - seriesTitle - Episode 2", episode.getPodcastTitle());
 
+    episode = new Episode("sourceId", "id", "programmeTitle", "", "", "",
+            "", "descripton", "iconUrl", "serviceUrl", "airDate",
+            "airTime", "channel", Sets.newHashSet("category"));
+    assertEquals("getPodcastTitle", "programmeTitle", episode.getPodcastTitle());
 
-  episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "",
-                        "", "descripton", "iconUrl", "serviceUrl", "airDate",
-                        "airTime", "channel", Sets.newHashSet("category"));
-  assertEquals("getPodcastTitle", "episodeTitle", episode.getPodcastTitle());
-
-  episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "", "series",
-                        "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                        "airTime", "channel", Sets.newHashSet("category"));
-  assertEquals("getPodcastTitle", "programmeTitle - series - episode", episode.getPodcastTitle());
-
-  episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "",
-                        "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                        "airTime", "channel", Sets.newHashSet("category"));
-  assertEquals("getPodcastTitle", "episodeTitle - episode", episode.getPodcastTitle());
-
-  episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
-                        "", "descripton", "iconUrl", "serviceUrl", "airDate",
-                        "airTime", "channel", Sets.newHashSet("category"));
-  assertEquals("getPodcastTitle", "episodeTitle - series", episode.getPodcastTitle());
-
-  episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "",
-                        "", "descripton", "iconUrl", "serviceUrl", "airDate",
-                        "airTime", "channel", Sets.newHashSet("category"));
-  assertEquals("getPodcastTitle", "episodeTitle", episode.getPodcastTitle());
-
-  episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "", "",
-                        "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                        "airTime", "channel", Sets.newHashSet("category"));
-  assertEquals("getPodcastTitle", "programmeTitle - episode", episode.getPodcastTitle());
-}
+ }
 
 /** 
 * 

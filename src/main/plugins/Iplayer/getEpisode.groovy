@@ -41,13 +41,6 @@ if (title != null) {
     LOG_ERROR(episode, "Episode title not found");
 }
 
-// ID
-if (title != null) {
-    episode.setId(MAKE_ID(programme.getShortName() + "_" +  title))
-} else {
-    episode.setId(MAKE_ID(url));
-}
-
 // SERIES TITLE
 
 details = MOVE_TO("<programme type=\"series\">", metadetails);
@@ -254,5 +247,7 @@ if (details == null || !details.startsWith("/>")) {
     }
 
 }
+
+episode.setId(MAKE_ID(episode.getPodcastTitle()))
 
 return episode;
