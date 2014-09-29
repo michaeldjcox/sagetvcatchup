@@ -10,6 +10,7 @@ LOG_INFO("Recording to " + filename);
 
 File file = WAIT_FOR_FILE_OF_SIZE(filename, 1024000, 10000)
 
-recording.setFile(file);
+recording.setPartialFile(file);
 
+// TODO set the complete file
 

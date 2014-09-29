@@ -1,8 +1,8 @@
 package Test
 
-source.setSourceId("Iplayer");
-source.setId("Iplayer");
-source.setShortName("BBC Iplayer");
-source.setLongName("BBC Iplayer");
-source.setIconUrl("http://static.bbci.co.uk/tviplayer/1.24.0/img/navigation/iplayer_pink.png");
-source.setServiceUrl("http://www.bbc.co.uk/iplayer/a-z/");
+source.setSourceId("Test");
+source.setId("Test");
+source.setShortName("Test");
+source.setLongName("Test");
+source.setIconUrl("http://localhost:" + GET_INT_PROPERTY("podcasterPort") + "/logo.png");
+source.setServiceUrl("http://localhost:" + GET_INT_PROPERTY("podcasterPort") + "/test");

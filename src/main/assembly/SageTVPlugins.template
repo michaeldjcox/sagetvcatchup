@@ -11,6 +11,10 @@ _DESCRIPTION_
 <ModificationDate>_MODDATE_</ModificationDate>
 <Version beta="true">_VERSION_</Version>
 <Desktop>false</Desktop>
+<Dependency>
+<Plugin>sagex-api</Plugin>
+<MinVersion>7.0.15.0</MinVersion>
+</Dependency>
 <ServerOnly>true</ServerOnly>
 <ResourcePath>_PATH_</ResourcePath>
 <Webpage title="_NAME_">_WEBPAGE_</Webpage>

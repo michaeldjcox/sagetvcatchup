@@ -14,7 +14,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/target/archive-tmp" />
-      <excludeFolder url="file://$MODULE_DIR$/target/checkout" />
       <excludeFolder url="file://$MODULE_DIR$/target/classes" />
       <excludeFolder url="file://$MODULE_DIR$/target/maven-archiver" />
       <excludeFolder url="file://$MODULE_DIR$/target/maven-status" />
@@ -24,6 +23,15 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar:///opt/sagetv/server/JARs/sagex-api.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntry type="library" name="Maven: com.google.inject:guice:3.0" level="project" />
     <orderEntry type="library" name="Maven: javax.inject:javax.inject:1" level="project" />
     <orderEntry type="library" name="Maven: aopalliance:aopalliance:1.0" level="project" />
@@ -50,6 +58,15 @@
       <library name="Maven: com.sagetv:sagetv:7.0">
         <CLASSES>
           <root url="jar:///opt/sagetv/server/Sage.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Maven: sagex.api:api:7.0.15.0">
+        <CLASSES>
+          <root url="jar:///opt/sagetv/server/JARs/sagex-api.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

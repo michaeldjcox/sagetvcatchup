@@ -5,9 +5,12 @@ import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
+import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.utils.OsUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesInterface;
+import uk.co.mdjcox.utils.SageUtils;
+import uk.co.mdjcox.utils.SageUtilsInterface;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,7 +19,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,35 +33,48 @@ public class Recorder {
 
     private final Logger logger;
     private final OsUtilsInterface osUtils;
+    private final SageUtilsInterface sageUtils;
     private PluginManager pluginManager;
     private ConcurrentHashMap<String, Recording> currentRecordings = new ConcurrentHashMap<String, Recording>();
     private final String recordingDir;
+    private ScheduledExecutorService service;
 
     @Inject
-    private Recorder(Logger theLogger, PluginManager pluginManager, PropertiesInterface props, OsUtilsInterface osUtils) {
+    private Recorder(Logger theLogger, PluginManager pluginManager, PropertiesInterface props,
+                     OsUtilsInterface osUtils, SageUtilsInterface sageUtils) {
         this.logger = theLogger;
         this.pluginManager = pluginManager;
         this.osUtils = osUtils;
+        this.sageUtils = sageUtils;
         this.recordingDir = props.getProperty("recordingDir", "/opt/sagetv/server/sagetvcatchup/plugins");
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                for (Recording recording : currentRecordings.values()) {
-                    try {
-                        logger.info("Shutting down - stopping " + recording);
-
-                        stop(recording);
-                    } catch (Exception e) {
-                        logger.info("Failed to stop " + recording);
-                    }
-                }
+                shutdown();
             }
         }));
+
+        service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r, "catchup-recorder");
+            }
+        });
+
     }
 
-    private File start(String sourceId, String id, String name, String url) throws Exception {
+    private File watch(Episode episode) throws Exception {
+        Recording recording = checkForExistingRecording(episode.getId());
+        if (recording != null) {
+            return recording.getPartialFile();
+        } else {
+            recording = createNewRecording(episode, true);
+            return download(recording);
+        }
+    }
 
+    private Recording checkForExistingRecording(String id) throws Exception {
         File dir = new File(recordingDir);
         if (!dir.exists()) {
             Files.createDirectories(dir.toPath());
@@ -71,31 +87,36 @@ public class Recorder {
         }
         if ((recording != null) && recording.isInProgress()) {
             logger.info("Recording in progress for " + id);
-            if (recording.getFile() == null) {
+            if (recording.getPartialFile() == null) {
                 synchronized (recording) {
                     recording.wait();
                 }
             }
-            logger.info("Returning file " + recording.getFile() + " for " + id);
-            return recording.getFile();
+            logger.info("Returning file " + recording.getPartialFile() + " for " + id);
+            return recording;
         }
 
-        logger.info("Starting recording of " + url);
+        return null;
+    }
 
+    private Recording createNewRecording(Episode episode, boolean watchOnly) throws Exception {
+        logger.info("Starting new recording of " + episode.getId());
+        Recording recording = new Recording(episode, recordingDir, watchOnly);
+        currentRecordings.put(episode.getId(), recording);
+        return recording;
+    }
 
-        recording = new Recording(sourceId, id, name, url, recordingDir);
-        currentRecordings.put(id, recording);
-
-        Plugin plugin = pluginManager.getPlugin(sourceId);
+    private File download(Recording recording) throws Exception {
+        Plugin plugin = pluginManager.getPlugin(recording.getSourceId());
         plugin.playEpisode(recording);
 
         synchronized (recording) {
             recording.notifyAll();
         }
 
-        logger.info("Returning file " + recording.getFile() + " for " + url);
+        logger.info("Returning file " + recording.getPartialFile() + " for " + recording.getUrl());
 
-        File file = recording.getFile();
+        File file = recording.getPartialFile();
 
         if (file == null) {
             throw new Exception("No recording file found");
@@ -110,61 +131,71 @@ public class Recorder {
         } else {
             ArrayList<Recording> recordings = new ArrayList<Recording>(currentRecordings.values());
             for (Recording recording : recordings) {
-                recording.setStopped();
+                stop(recording);
             }
             return "All recordings stopping";
         }
     }
 
-    public String requestStop(String id) {
-        Recording recording = currentRecordings.get(id);
-        if (recording != null) {
-            if (!recording.isStopped()) {
-                recording.setStopped();
-                return "Recording " + id + " stopping";
-            }
-        }
-        return "Recording " + id + " already stopped";
+    public void shutdown() {
+        logger.info("Shutting down recording");
+        requestStopAll();
+        service.shutdownNow();
+        logger.info("Shutdown recording");
     }
 
-    public void stop(String id) {
-        Recording recording = currentRecordings.get(id);
+    public String requestStop(String id) {
+        return stop(id);
+    }
+
+    private String stop(String id) {
+        final Recording recording = currentRecordings.get(id);
 
         if (recording != null) {
             logger.info("Going to stop playback of " + id);
 
             stop(recording);
+
+            return "Recording " + id + " stopping";
+
         } else {
             logger.info("Cannot find recording of " + id);
-
+            return "Recording " + id + " already stopped";
         }
     }
 
     private void stop(final Recording recording) {
-
-        if (recording != null) {
-            logger.info("Stopping recording of " + recording.getId());
-            recording.setStopped();
-            Plugin plugin = pluginManager.getPlugin(recording.getSourceId());
-            plugin.stopEpisode(recording);
-            // TODO If resume would work
-            recording.getFile().delete();
-            // Block sage form replaying for a bit
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        // Ignore
-                    } finally {
-                        currentRecordings.remove(recording.getId());
-                    }
-                }
-            }).start();
-
+        logger.info("Stopping recording of " + recording.getId());
+        recording.setStopped();
+        Plugin plugin = pluginManager.getPlugin(recording.getSourceId());
+        plugin.stopEpisode(recording);
+        // TODO If resume would work - do not delete
+        File partialFile = recording.getPartialFile();
+        if (partialFile != null && partialFile.exists()) {
+            partialFile.delete();
         }
+
+        if (recording.isWatchOnly()) {
+            File completedFile = recording.getCompletedFile();
+            if (completedFile != null && completedFile.exists()) {
+                completedFile.delete();
+            }
+        }
+        // Block sage form replaying for a bit
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    // Ignore
+                } finally {
+                    currentRecordings.remove(recording.getId());
+                }
+            }
+        }).start();
     }
+
 
     public boolean isRecording(String id) {
         Recording recording = currentRecordings.get(id);
@@ -200,12 +231,79 @@ public class Recorder {
         }
     }
 
-    public void record(OutputStream out, String sourceId, final String id, String name, String url) throws Exception {
+    public void record(final Episode episode) {
+
+        try {
+            Recording existingRecording = checkForExistingRecording(episode.getId());
+
+            if (existingRecording == null) {
+
+                final  Recording newRecording = createNewRecording(episode, false);
+
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            File partialFile = download(newRecording);
+
+                            File completedFile = newRecording.getCompletedFile();
+                            while (partialFile.exists() && !(newRecording.isStopped() || newRecording.isComplete())) {
+                                osUtils.waitFor(1000);
+                                logger.info("File " + partialFile.getAbsolutePath() + " exists size=" + partialFile.length());
+                            }
+
+                            osUtils.waitFor(1000);
+
+                            System.err.println("File " + completedFile + " exists=" + completedFile.exists());
+
+                            if (completedFile.exists()) {
+
+                                File[] recordingDirs = sageUtils.getRecordingDirectories();
+
+                                String recDir = recordingDir;
+
+                                if (recordingDirs.length > 0) {
+                                    recDir = recordingDirs[0].getAbsolutePath();
+                                }
+
+                                File savedFile = new File(recDir, episode.getId() + ".mp4");
+
+                                Files.move(completedFile.toPath(), savedFile.toPath());
+
+                                newRecording.setSavedFile(savedFile);
+
+                                sageUtils.addAiringToSageTV(newRecording);
+                            } else {
+                                logger.error("No recording file found for " + episode);
+                            }
+                        } catch (Exception e) {
+                            logger.warn("Recording of " + episode.getId() + " stopped due to exception ", e);
+                        } finally {
+                            try {
+                                stop(episode.getId());
+                            } catch (Exception e1) {
+                                logger.error("Failed to stop recording in the recorder", e1);
+                            }
+                        }
+
+                    }
+                };
+                service.schedule(runnable, 0, TimeUnit.SECONDS);
+
+            }
+        } catch (Exception e) {
+            logger.error("Failed to start recording", e);
+        }
+
+    }
+
+        public void watch(final OutputStream out, final Episode episode) throws Exception {
         FileInputStream in = null;
+        String id = episode.getId();
 
         try {
 
-            File file = start(sourceId, id, name, url);
+            File file = watch(episode);
 
             logger.info("Streaming " + file + " exists=" + file.exists());
 
@@ -221,8 +319,9 @@ public class Recorder {
             long lastServed = System.currentTimeMillis();
 
             try {
-                while (isRecording(id) && !isStopped(id)) {
-                    while ((count = in.read(buf)) >= 0 && !isStopped(id)) {
+                logger.info("isRecording=" + isRecording(id) + " isStopped=" + isStopped(id));
+                while (isRecording(id) && !(isStopped(id) && !isCompleted(id))) {
+                    while ((count = in.read(buf)) >= 0 && !(isStopped(id) && !isCompleted(id))) {
                         out.write(buf, 0, count);
                         served += count;
                         out.flush();
@@ -262,6 +361,15 @@ public class Recorder {
             } catch (Exception e) {
                 logger.error("Failed to stop recording in the recorder", e);
             }
+        }
+    }
+
+    private boolean isCompleted(String id) {
+        Recording recording = currentRecordings.get(id);
+        if (recording == null) {
+            return true;
+        } else {
+            return recording.isComplete();
         }
     }
 

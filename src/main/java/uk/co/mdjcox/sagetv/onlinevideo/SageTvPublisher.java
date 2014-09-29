@@ -9,26 +9,16 @@ package uk.co.mdjcox.sagetv.onlinevideo;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.assistedinject.Assisted;
-
 import org.slf4j.Logger;
-
 import uk.co.mdjcox.sagetv.catchup.CatalogPublisher;
-import uk.co.mdjcox.sagetv.model.Catalog;
-import uk.co.mdjcox.sagetv.model.Category;
-import uk.co.mdjcox.sagetv.model.Programme;
-import uk.co.mdjcox.sagetv.model.SubCategory;
-import uk.co.mdjcox.sagetv.model.Source;
+import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesFile;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -51,8 +41,10 @@ public class SageTvPublisher implements CatalogPublisher {
   private String qualifier;
   /** The SageTV STV directory */
   private String STV;
+  /** Indicates if we are generating control podcasts */
+  private boolean withControl = true;
 
-  /**
+    /**
    * Creates a new instance which can be used to create new online video property files.
    *
    * @param logger The logger to be used for debug output
@@ -68,6 +60,7 @@ public class SageTvPublisher implements CatalogPublisher {
       checkNotNull(STV);
       this.logger = logger;
       this.htmlUtils = htmlUtils;
+      withControl = props.getBoolean("withControlPodcasts", true);
   }
 
   /**
@@ -171,10 +164,22 @@ public class SageTvPublisher implements CatalogPublisher {
               addSource((Source)category, links, labels);
             } else if (category.isProgrammeCategory()) {
               logger.info("Online adding programme " + category.getId());
-              addProgramme((Programme) category, links, labels);
+              if (withControl) {
+                  Programme programme = (Programme)category;
+
+                  addProgrammeSubCategory(programme, links, labels);
+
+                  for (Episode episode : programme.getEpisodes().values()) {
+                     addEpisode(programme, episode, links, labels);
+                  }
+
+              } else {
+                  // The programme is the leaf
+                  addProgramme((Programme) category, links, labels);
+              }
             } else if (category.isSubCategory()) {
               logger.info("Online adding subcategory " + category.getId());
-              addSubCategory((SubCategory)category, links, labels);
+              addSubCategory(category, links, labels);
             } else {
               logger.error(category.getId() + " was not handled");
             }
@@ -190,7 +195,7 @@ public class SageTvPublisher implements CatalogPublisher {
   }
 
   /**
-   * Adds a final subcategory aka programme categorycontaining the podcast link which will sageTV
+   * Adds a final subcategory aka programme category containing the podcast link which will sageTV
    * will expand to a list of videos.
    *
    * @param programme the TV programme which this podcast will provide episodes for
@@ -237,6 +242,67 @@ public class SageTvPublisher implements CatalogPublisher {
 
     links.setProperty("xFeedPodcastCustom/" + id, result);
   }
+    /**
+     * Adds a final subcategory aka programme category containing the podcast link which will sageTV
+     * will expand to a list of videos.
+     *
+     * @param programme the programme which this podcast will provide controls for
+     * @param episode the episode which this podcast will provide controls for
+     * @param links the custom online video property file containing the podcast URL
+     * @param labels the custom online video property file containing associated UI text
+     */
+    private void addEpisode(Programme programme, Episode episode, PropertiesFile links, PropertiesFile labels) {
+        String id = episode.getId();
+        String parentId = programme.getId();
+
+        logger.info("ADDING " + id + " podcast to " + parentId);
+
+        String name = episode.getPodcastTitle();
+        String description = episode.getPodcastTitle();
+        String iconUrl = episode.getIconUrl();
+        String url = episode.getPodcastUrl();
+        Set<String> otherParentIds = new HashSet<String>();
+
+        id = htmlUtils.makeIdSafe(id);
+        parentId = htmlUtils.makeIdSafe(parentId);
+
+        if ((iconUrl != null) && (!iconUrl.isEmpty())) {
+            labels.setProperty("Category/" + id + "/ThumbURL", iconUrl);
+            labels.setProperty("Source/" + "xPodcast" + id + "/ThumbURL", iconUrl);
+        }
+        if ((description != null) && (!description.isEmpty())) {
+            labels.setProperty("Category/" + id + "/LongName", description);
+            labels.setProperty("Source/" + "xPodcast" + id + "/LongName", description);
+        }
+        if ((name != null) && (!name.isEmpty())) {
+            labels.setProperty("Category/" + id + "/ShortName", name);
+            labels.setProperty("Source/" + "xPodcast" + id + "/ShortName", name);
+        }
+
+        String result = "";
+        if (!parentId.isEmpty()) {
+            result += "xPodcast" + parentId;
+        }
+
+        for (String other : otherParentIds) {
+            if (!result.isEmpty()) {
+                result += ",";
+            }
+            result += "xPodcast" + htmlUtils.makeIdSafe(other);
+        }
+        result += ";" + url;
+
+        String existing = links.getProperty("xFeedPodcastCustom/" + id);
+
+        if (existing != null) {
+            System.err.println("Found " + links.getProperty("xFeedPodcastCustom/" + id));
+            id = id + "," + existing;
+        }
+
+        links.setProperty("xFeedPodcastCustom/" + id, result);
+    }
+
+
 
   /**
    * Adds a top level online video source the custom online video property files.
@@ -275,7 +341,7 @@ public class SageTvPublisher implements CatalogPublisher {
    * @param links the custom online video property file containing the podcast URL
    * @param labels the custom online video property file containing associated UI text
    */
-  private void addSubCategory(SubCategory category, PropertiesFile links, PropertiesFile labels) {
+  private void addSubCategory(Category category, PropertiesFile links, PropertiesFile labels) {
     String parentId = category.getParentId();
     String id = category.getId();
     String name = category.getShortName();
@@ -298,6 +364,46 @@ public class SageTvPublisher implements CatalogPublisher {
     labels.setProperty("Source/" + "xPodcast" + id + "/ShortName", name);
     labels.setProperty("Source/" + "xPodcast" + id + "/LongName", description);
   }
+
+    private void addProgrammeSubCategory(Programme category, PropertiesFile links, PropertiesFile labels) {
+        String parentId = category.getParentId();
+        String id = category.getId();
+        String name = category.getShortName();
+        String description = category.getLongName();
+        String iconUrl = category.getIconUrl();
+
+        parentId = htmlUtils.makeIdSafe(parentId);
+        id = htmlUtils.makeIdSafe(id);
+
+        String result = "";
+        if (!parentId.isEmpty()) {
+            result += "xPodcast" + parentId;
+        }
+
+        Set<String> otherParentIds = category.getOtherParentIds();
+
+        for (String other : otherParentIds) {
+            if (!result.isEmpty()) {
+                result += ",";
+            }
+            result += "xPodcast" + htmlUtils.makeIdSafe(other);
+        }
+        result += ";xURLNone";
+
+
+        links.setProperty("xFeedPodcastCustom/" + id, result);
+        links.setProperty(id + "/IsCategory", "true");
+        links.setProperty(id + "/CategoryName", "xPodcast" + id);
+
+        labels.setProperty("Category/" + id + "/ShortName", name);
+        labels.setProperty("Category/" + id + "/LongName", description);
+        if (iconUrl != null && !iconUrl.isEmpty()) {
+            labels.setProperty("Category/" + id + "/ThumbURL", iconUrl);
+            labels.setProperty("Source/" + "xPodcast" + id + "/ThumbURL", iconUrl);
+        }
+        labels.setProperty("Source/" + "xPodcast" + id + "/ShortName", name);
+        labels.setProperty("Source/" + "xPodcast" + id + "/LongName", description);
+    }
 
 }
 

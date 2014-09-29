@@ -1,5 +1,6 @@
 package uk.co.mdjcox.sagetv.model;
 
+import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.junit.Before; 
 import org.junit.After;
@@ -30,7 +31,7 @@ public void after() throws Exception {
 @Test
 public void testCreate() {
   try {
-    Recording recording = new Recording(null, null, null, null, null);
+    new Recording(null, null, true);
   } catch (NullPointerException e) {
     return;
   }
@@ -39,11 +40,14 @@ public void testCreate() {
 }
 
   @Test
-  public void testSetFile() {
+  public void testSetPartialFile() {
     try {
-      Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
+      Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
+                                    "series", "episode", "description", "iconUrl", "serviceUrl",
+                                    "airDate","airTime", "channel", Sets.newHashSet("category"));
+      Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
 
-      recording.setFile(null);
+      recording.setPartialFile(null);
     } catch (NullPointerException e) {
       return;
     }
@@ -53,24 +57,27 @@ public void testCreate() {
 
 /** 
 * 
-* Method: getFile() 
+* Method: getPartialFile()
 * 
 */ 
 @Test
-public void testSetGetFile() throws Exception {
+public void testSetGetPartialFile() throws Exception {
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
+                                "series", "episode", "description", "iconUrl", "serviceUrl",
+                                "airDate","airTime", "channel", Sets.newHashSet("category"));
   File file = new File("filename");
 
-  Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
+  Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
 
-  File file3 = recording.getFile();
+  File file3 = recording.getPartialFile();
 
-  assertEquals("getFile intially null", null, file3);
+  assertEquals("getPartialFile intially null", null, file3);
 
-  recording.setFile(file);
+  recording.setPartialFile(file);
 
-  File file2 = recording.getFile();
+  File file2 = recording.getPartialFile();
 
-  assertEquals("getFile", file, file2);
+  assertEquals("getPartialFile", file, file2);
 }
 
 
@@ -81,7 +88,10 @@ public void testSetGetFile() throws Exception {
 */ 
 @Test
 public void testGetSourceId() throws Exception {
-  Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
+                                "series", "episode", "description", "iconUrl", "serviceUrl",
+                                "airDate","airTime", "channel", Sets.newHashSet("category"));
+  Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
 
   assertEquals("getSourceId", "sourceId", recording.getSourceId());
 }
@@ -93,10 +103,13 @@ public void testGetSourceId() throws Exception {
 */ 
 @Test
 public void testGetUrl() throws Exception {
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
+                                "series", "episode", "description", "iconUrl", "serviceUrl",
+                                "airDate","airTime", "channel", Sets.newHashSet("category"));
 
-  Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
+  Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
 
-  assertEquals("getUrl", "url", recording.getUrl());
+  assertEquals("getUrl", "serviceUrl", recording.getUrl());
 } 
 
 /** 
@@ -106,35 +119,62 @@ public void testGetUrl() throws Exception {
 */ 
 @Test
 public void testGetId() throws Exception {
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
+                                "series", "episode", "description", "iconUrl", "serviceUrl",
+                                "airDate","airTime", "channel", Sets.newHashSet("category"));
 
-  Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
+  Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
 
   assertEquals("getId", "id", recording.getId());
 }
 
 /** 
 * 
-* Method: getFilename() 
+* Method: getName()
+*
+*/
+@Test
+public void testGetName() throws Exception {
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
+                                "series", "episode", "description", "iconUrl", "serviceUrl",
+                                "airDate","airTime", "channel", Sets.newHashSet("category"));
+
+  Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
+
+  assertEquals("getName", episode.getPodcastTitle(), recording.getName());
+}
+
+/**
+*
+* Method: getPartialFilename()
 * 
 */ 
 @Test
-public void testGetFilename() throws Exception {
+public void testGetPartialFilename() throws Exception {
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
+                                "series", "episode", "description", "iconUrl", "serviceUrl",
+                                "airDate","airTime", "channel", Sets.newHashSet("category"));
 
-  Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
+
+  Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
 
   File file = new File("filename");
 
-  recording.setFile(file);
+  recording.setPartialFile(file);
 
-  assertEquals("getFileName", System.getProperty("user.dir") + File.separator + "filename", recording.getFilename());
+  assertEquals("getPartialFileName", System.getProperty("user.dir") + File.separator + "filename", recording.getPartialFilename());
 }
 
   @Test
-  public void testGetFilenameNoFile() throws Exception {
+  public void testGetPartialFilenameNoFile() throws Exception {
+    Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
+                                  "series", "episode", "description", "iconUrl", "serviceUrl",
+                                  "airDate","airTime", "channel", Sets.newHashSet("category"));
 
-    Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
 
-    assertEquals("getFileName", "", recording.getFilename());
+    Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
+
+    assertEquals("getPartialFileName", "", recording.getPartialFilename());
   }
 
 /** 
@@ -144,10 +184,14 @@ public void testGetFilename() throws Exception {
 */ 
 @Test
 public void testToString() throws Exception {
+  Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
+                                "series", "episode", "description", "iconUrl", "serviceUrl",
+                                "airDate","airTime", "channel", Sets.newHashSet("category"));
 
-  Recording recording = new Recording("sourceId", "id", "name", "url", System.getProperty("user.dir"));
 
-  assertEquals("toString", "id", recording.toString());
+  Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
+
+  assertEquals("toString", episode.toString(), recording.toString());
 
 }
 

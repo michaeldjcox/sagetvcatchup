@@ -5,14 +5,15 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import org.slf4j.Logger;
-import sage.SageTV;
 import sage.SageTVPlugin;
 import sage.SageTVPluginRegistry;
+import sagex.plugin.SageEvents;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesInterface;
+import uk.co.mdjcox.utils.SageUtilsInterface;
 
 import java.io.File;
 import java.net.URL;
@@ -32,19 +33,11 @@ import java.util.Map;
 
 // In priority order...
 
-// TESTING
 
-// TODO - TEST - plugin config - how many recorders? stop all
-// TODO - TEST - make the stop and play rock solid
-// TODO - TEST - home page
-
-// ENV
-// TODO - why does desktop PC not always see laptop by name mintpad
-
-// FEATURES
-// TODO - check video from other providers
 // TODO - Can I place fully download videos directly in recordings for later?
-// TODO - Can I implement my own record button and loose podcast recorder
+
+// TODO - Can I implement a "New" category
+// TODO - check video from other providers
 // TODO - Can we use Sage Favourites to establish a favourites category?
 // TODO - Can "watched" status extend from recordings to Online
 
@@ -70,6 +63,8 @@ public class CatchupPlugin implements SageTVPlugin {
 
     private static final String STOP_RECORDING = "stopRecording";
 
+    private static final String SEARCH_TITLES = "searchTitles";
+
     public static Logger logger;
     public static Injector injector;
 
@@ -83,6 +78,7 @@ public class CatchupPlugin implements SageTVPlugin {
     private SageTvPublisher sagetvPublisher;
 
     private DownloadUtilsInterface downloadUtils;
+    private SageUtilsInterface sageUtils;
     private String pullUpgradeValue="Click here";
     private String startCatalogValue="Click here";
     private String stopCatalogValue="Click here";
@@ -92,6 +88,7 @@ public class CatchupPlugin implements SageTVPlugin {
     private Cataloger cataloger;
     private PluginManager pluginManager;
     private Recorder recorder;
+    private String searchString="";
 
     @Inject
   public CatchupPlugin(sage.SageTVPluginRegistry registry) {
@@ -124,11 +121,14 @@ public class CatchupPlugin implements SageTVPlugin {
 
             this.downloadUtils = injector.getInstance(DownloadUtilsInterface.class);
 
+            this.sageUtils = injector.getInstance(SageUtilsInterface.class);
 
             if (registry != null) {
-                registry.eventSubscribe(this, "PlaybackStopped");
-                registry.eventSubscribe(this, "PlaybackStarted");
-                registry.eventSubscribe(this, "PlaybackFinished");
+                registry.eventSubscribe(this, SageEvents.PlaybackStarted);
+                registry.eventSubscribe(this, SageEvents.PlaybackStopped);
+                registry.eventSubscribe(this, SageEvents.PlaybackFinished);
+                registry.eventSubscribe(this, SageEvents.MediaFileImported);
+                registry.eventSubscribe(this, SageEvents.MediaFileRemoved);
             }
 
 
@@ -165,7 +165,7 @@ public class CatchupPlugin implements SageTVPlugin {
         logger.info("Stopping catchup plugin");
 
         if (recorder != null) {
-            recorder.requestStopAll();
+            recorder.shutdown();
         }
 
         if (cataloger != null) {
@@ -173,24 +173,22 @@ public class CatchupPlugin implements SageTVPlugin {
         }
 
         try {
-            registry.eventUnsubscribe(this, "PlaybackStopped");
-            registry.eventUnsubscribe(this, "PlaybackStarted");
-            registry.eventUnsubscribe(this, "PlaybackFinished");
+            registry.eventUnsubscribe(this, SageEvents.PlaybackStarted);
+            registry.eventUnsubscribe(this, SageEvents.PlaybackStopped);
+            registry.eventUnsubscribe(this, SageEvents.PlaybackFinished);
+            registry.eventUnsubscribe(this, SageEvents.MediaFileImported);
+            registry.eventUnsubscribe(this, SageEvents.MediaFileRemoved);
         } catch (Exception e) {
             logger.error("Failed to unsubscribe from events", e);
         }
 
         try {
             if (server != null) {
-                server.stop();
+                server.shutdown();
             }
         } catch (Exception e) {
             logger.error("Failed to stop podcast", e);
         }
-    }
-
-    private static String getSageTVProperty(String property, String defaultValue) throws Exception {
-        return (String) SageTV.api("GetServerProperty", new Object[]{property, defaultValue});
     }
 
     private void uninstall() {
@@ -246,7 +244,7 @@ public class CatchupPlugin implements SageTVPlugin {
         logger.info("Destroying catchup plugin");
 
         try {
-            String enabled = getSageTVProperty("sagetv_core_plugins/sagetvcatchup/enabled", "blah");
+            String enabled = sageUtils.getSageTVProperty("sagetv_core_plugins/sagetvcatchup/enabled", "blah");
             logger.info("Destroying catchup plugin enabled = " + enabled);
 
             // This will occur if its an upgrade or an uninstall
@@ -297,6 +295,10 @@ public class CatchupPlugin implements SageTVPlugin {
         types.put(PULL_UPGRADE, CONFIG_BUTTON);
         labels.put(PULL_UPGRADE, "Check for upgrade");
         help.put(PULL_UPGRADE,"Get SageTV to pull a new dev version");
+
+        types.put(SEARCH_TITLES, CONFIG_TEXT);
+        labels.put(SEARCH_TITLES, "Search for regex");
+        help.put(SEARCH_TITLES,"Search sage for show titles");
     }
 
     @Override
@@ -332,6 +334,10 @@ public class CatchupPlugin implements SageTVPlugin {
 
         if (property.equals(RECORDINGS_PROCESSES)) {
             return String.valueOf(recorder.getProcessCount());
+        }
+
+        if (property.equals(SEARCH_TITLES)) {
+            return searchString;
         }
 
         if (pluginManager != null) {
@@ -396,6 +402,24 @@ public class CatchupPlugin implements SageTVPlugin {
 
         if (property.equals(STOP_RECORDING)) {
             forceStopRecording();
+        }
+
+        if (property.equals(SEARCH_TITLES)) {
+            searchString = value;
+            String[] titles = sageUtils.findTitlesWithName(".*" + searchString + ".*");
+            logger.info(titles.length + " shows find matching title " + searchString);
+            for (String title : titles) {
+                logger.info(title + "matches title " + searchString);
+
+                Object[] results =   sageUtils.findAiringsByText(title);
+                logger.info(results.length + " airings find matching title " + searchString);
+                for (Object result : results) {
+                    logger.info("AIRING " + sageUtils.printAiring(result));
+                    Object show = sageUtils.findShowForAiring(result);
+                    logger.info("SHOW   " + sageUtils.printShow(show));
+                }
+            }
+
         }
 
         if (pluginManager != null) {

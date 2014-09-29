@@ -393,6 +393,13 @@
             <scope>system</scope>
             <systemPath>${sagedir}/Sage.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>sagex.api</groupId>
+            <artifactId>api</artifactId>
+            <version>7.0.15.0</version>
+            <scope>system</scope>
+            <systemPath>${sagedir}/JARs/sagex-api.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <distributionManagement>

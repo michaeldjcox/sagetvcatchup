@@ -69,4 +69,10 @@ public class CatchupTestModule extends AbstractModule {
         return DownloadUtils.instance();
     }
 
+    @Provides
+    @Singleton
+    public SageUtilsInterface providesSageUtils() throws Exception {
+        return SageUtils.instance(providesLogger());
+    }
+
 }

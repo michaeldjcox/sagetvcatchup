@@ -21,33 +21,34 @@ public class Recording {
      * The directory where the recording will be kept
      */
     private final String recordingDir;
+    private final boolean watchOnly;
     /**
      * The disk file containing the recording
      */
-    private File file;
+    private File partialFile;
+    private File completedFile;
+    private File savedFile;
     /**
      * The process doing the recording
      */
     private Process process;
-    private String sourceId;
-    private String serviceUrl;
-    private String id;
-    private String name;
+    private Episode episode;
     private AtomicBoolean stopFlag = new AtomicBoolean(false);
+    private boolean isC;
 
     /**
-     * Constructor of the recordin gobject which details a recording in progress
-     *  @param sourceId     the top level source id of the recording
-     * @param id           the id of the episode being recorded
-     * @param serviceUrl   the service URL of the recording
+     * Constructor of the recording object which details a recording in progress
+     * @param episode   the episode to record
      * @param recordingDir the directory where the recording will be kept
      */
-    public Recording(String sourceId, String id, String name, String serviceUrl, String recordingDir) {
+    public Recording(Episode episode, String recordingDir, boolean watchOnly) {
         this.recordingDir = checkNotNull(recordingDir);
-        this.id = checkNotNull(id);
-        this.serviceUrl = checkNotNull(serviceUrl);
-        this.sourceId = checkNotNull(sourceId);
-        this.name = checkNotNull(name);
+        this.episode = checkNotNull(episode);
+        this.watchOnly = watchOnly;
+    }
+
+    public boolean isWatchOnly() {
+        return watchOnly;
     }
 
     /**
@@ -55,7 +56,7 @@ public class Recording {
      * @return the name of the episode
      */
     public String getName() {
-        return name;
+        return episode.getPodcastTitle();
     }
 
     /**
@@ -63,8 +64,8 @@ public class Recording {
      *
      * @return the file containing the recording
      */
-    public final File getFile() {
-        return file;
+    public final File getPartialFile() {
+        return partialFile;
     }
 
     /**
@@ -73,8 +74,25 @@ public class Recording {
      * @param file the file containing the recording
      * @throws NullPointerException if a <code>null</code> file is provided
      */
-    public final void setFile(File file) {
-        this.file = checkNotNull(file);
+    public final void setPartialFile(File file) {
+        this.partialFile = checkNotNull(file);
+    }
+
+
+    public File getCompletedFile() {
+        return completedFile;
+    }
+
+    public void setCompletedFile(File completedFile) {
+        this.completedFile = checkNotNull(completedFile);
+    }
+
+    public File getSavedFile() {
+        return savedFile;
+    }
+
+    public void setSavedFile(File savedFile) {
+        this.savedFile = checkNotNull(savedFile);
     }
 
     /**
@@ -92,7 +110,7 @@ public class Recording {
      * @return the id of the media source
      */
     public final String getSourceId() {
-        return sourceId;
+        return episode.getSourceId();
     }
 
     /**
@@ -101,7 +119,7 @@ public class Recording {
      * @return the URL of the media file
      */
     public final String getUrl() {
-        return serviceUrl;
+        return episode.getServiceUrl();
     }
 
     /**
@@ -110,7 +128,7 @@ public class Recording {
      * @return the unique id of this episode
      */
     public final String getId() {
-        return id;
+        return episode.getId();
     }
 
     /**
@@ -118,9 +136,9 @@ public class Recording {
      *
      * @return the path of the recording file on disk or empty string if not yet known
      */
-    public final String getFilename() {
-        if (file != null) {
-            return file.getAbsolutePath();
+    public final String getPartialFilename() {
+        if (partialFile != null) {
+            return partialFile.getAbsolutePath();
         }
         return "";
     }
@@ -148,7 +166,12 @@ public class Recording {
         } catch (IllegalThreadStateException e) {
             return true;
         }
-        return false;
+        return !isComplete();
+    }
+
+    public boolean isComplete() {
+        System.err.println("compltedFile=" + completedFile + " exists=" + (completedFile == null ? false : completedFile.exists()));
+        return completedFile != null && completedFile.exists();
     }
 
     /**
@@ -158,7 +181,7 @@ public class Recording {
      */
     @Override
     public final String toString() {
-        return id;
+        return episode.getId();
     }
 
     public boolean isStopped() {
@@ -172,4 +195,9 @@ public class Recording {
     public AtomicBoolean getStopFlag() {
         return stopFlag;
     }
+
+    public Episode getEpisode() {
+        return episode;
+    }
+
 }

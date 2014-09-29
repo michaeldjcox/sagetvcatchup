@@ -1,39 +1,38 @@
 package Test
 
-String iplayerDir = GET_STRING_PROPERTY("Iplayer.scriptDir");
-String iplayerCmd = GET_STRING_PROPERTY("Iplayer.command");
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
-String command = iplayerCmd + " " + recording.getUrl() + " --attempts 0 --force -o " + recording.getRecordingDir() + File.separator;
-
-if (IS_WINDOWS()) {
-    String relative = GET_RELATIVE_PATH(iplayerDir, recording.getRecordingDir());
-    command = "cmd.exe /c \"" + "cd " + iplayerDir + " && "+ iplayerCmd + " " + recording.getUrl() + " --attempts 0 --force -o " + relative + File.separator + "\"";
-}
-
-ArrayList<String> output = new ArrayList<String>();
-Process proc = EXECUTE(command, "record", output, null);
-
-long TIMEOUT = 30000;
-
-String prefix = "INFO: File name prefix = "
-String filename = WAIT_FOR_OUTPUT(prefix, output, TIMEOUT, recording.getStopFlag())
-
-if (filename == null || filename.trim().isEmpty()) {
-    throw new Exception("get_iplayer returned no file after " + TIMEOUT);
-}
-
-filename = recording.getRecordingDir() + File.separator + filename.substring(prefix.length()).trim() + ".partial.mp4.flv";
-
-LOG_INFO("Recording to " + filename);
-
-File file = WAIT_FOR_FILE_OF_SIZE(filename, 1024000, 10000, recording.getStopFlag())
-
+String filename = recording.getRecordingDir() + File.separator + recording.getId() + ".partial.mp4.flv";
+File file = new File(filename);
 recording.setPartialFile(file);
 
-String completedName = filename.replace("default.partial.mp4.flv", "default.mp4");
+String pluginsDir = GET_STRING_PROPERTY("pluginDir") + "/Test";
+
+File sourcePath = new File(pluginsDir, recording.getId() + ".mp4");
+
+Files.copy(sourcePath.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+String completedName = recording.getRecordingDir() + File.separator + recording.getId() + ".mp4";
 File completedFile = new File(completedName);
 recording.setCompletedFile(completedFile);
 
-recording.setProcess(proc);
+Thread thread = new Thread(new Runnable() {
+    @Override
+    void run() {
+        try {
+            Thread.sleep(10000);
+        } catch (Exception ex) {
+        }
+
+        LOG_INFO("TEST RECORDING IS COMPLETE");
+
+        Files.copy(file.toPath(), completedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
+}).start();
+
+
+
+//recording.setProcess(proc);
 
 

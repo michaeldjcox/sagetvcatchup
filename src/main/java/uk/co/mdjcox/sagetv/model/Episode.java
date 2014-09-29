@@ -48,6 +48,8 @@ public class Episode implements ErrorRecorder {
   private List<ParseError> errors = new ArrayList<ParseError>();
   /** The metadata URLs used to populate this item */
   private final Set<String> metaUrls = new HashSet<String>();
+  /** The "control" podcast URL */
+  private String podcastUrl;
 
   /**
    * Constructor for the episode meta data.
@@ -484,14 +486,30 @@ public class Episode implements ErrorRecorder {
     return !errors.isEmpty();
   }
 
-  /**
+    /**
+     * Gets the URL of the podcast used to control the episode playback
+     * @return the control podcast URL
+     */
+    public String getPodcastUrl() {
+        return podcastUrl;
+    }
+
+    /**
+     * Sets the URL of the podcast used to control the episode playback
+     * @param podcastUrl the control podcast URL
+     */
+    public void setPodcastUrl(String podcastUrl) {
+        this.podcastUrl = podcastUrl;
+    }
+
+    /**
    * Returns a string representation of the episode - its title.
    *
    * @return the string representation of the episode
    */
   @Override
   public final String toString() {
-    return episodeTitle;
+    return id;
   }
 
 }

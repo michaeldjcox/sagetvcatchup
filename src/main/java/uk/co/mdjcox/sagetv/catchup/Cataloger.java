@@ -136,6 +136,8 @@ public class Cataloger {
                         checkForStop();
 
                         plugin.getEpisode(sourceCat, programme, episode);
+
+                        episode.setPodcastUrl(podcastUrlBase + "control?id=" + episode.getId());
                     }
 
                     if (programme.getEpisodes().size() == 0) {

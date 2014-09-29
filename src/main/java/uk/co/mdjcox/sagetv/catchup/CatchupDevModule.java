@@ -4,12 +4,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.ScriptFactory;
+import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.utils.*;
 
 import java.io.File;
@@ -84,6 +83,54 @@ public class CatchupDevModule extends AbstractModule {
     @Singleton
     public DownloadUtilsInterface providesDownloadUtils() throws Exception {
         return DownloadUtils.instance();
+    }
+
+    @Provides
+    @Singleton
+    public SageUtilsInterface providesSageUtils() throws Exception {
+        return new SageUtilsInterface() {
+            @Override
+            public String getSageTVProperty(String property, String defaultValue) throws Exception {
+                return "";
+            }
+
+            @Override
+            public String[] findTitlesWithName(String regex) {
+                return new String[0];
+            }
+
+            @Override
+            public Object[] findAiringsByText(String name) {
+                return new Object[0];
+            }
+
+            @Override
+            public String printAiring(Object airing) {
+                return "";
+            }
+
+            @Override
+            public Object findShowForAiring(Object airing) {
+                return null;
+            }
+
+            @Override
+            public String printShow(Object show) {
+                return "";
+            }
+
+            @Override
+            public Object addAiringToSageTV(Recording recording) {
+                return null;
+            }
+
+            @Override
+            public File[] getRecordingDirectories() {
+                return new File[0];
+            }
+        };
+
+
     }
 
 }

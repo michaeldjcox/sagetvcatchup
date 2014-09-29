@@ -28,7 +28,11 @@ LOG_INFO("Recording to " + filename);
 
 File file = WAIT_FOR_FILE_OF_SIZE(filename, 1024000, 10000, recording.getStopFlag())
 
-recording.setFile(file);
+recording.setPartialFile(file);
+
+String completedName = filename.replace("default.partial.mp4.flv", "default.mp4");
+File completedFile = new File(completedName);
+recording.setCompletedFile(completedFile);
 
 recording.setProcess(proc);
 

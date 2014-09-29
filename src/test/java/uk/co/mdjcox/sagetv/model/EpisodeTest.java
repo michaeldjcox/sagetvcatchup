@@ -732,7 +732,7 @@ public void testToString() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
                                 "airTime", "channel", Sets.newHashSet("category"));
-  assertEquals("toString", "episodeTitle", episode.toString());
+  assertEquals("toString", "id", episode.toString());
 } 
 
 

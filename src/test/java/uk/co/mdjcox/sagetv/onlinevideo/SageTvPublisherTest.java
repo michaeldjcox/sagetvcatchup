@@ -453,7 +453,7 @@ public class SageTvPublisherTest {
     Method
         method =
         SageTvPublisher.class
-            .getDeclaredMethod("addSubCategory", SubCategory.class, PropertiesFile.class,
+            .getDeclaredMethod("addSubCategory", Category.class, PropertiesFile.class,
                                PropertiesFile.class);
     method.setAccessible(true);
     PropertiesFile linksFile = new PropertiesFile();
