@@ -94,6 +94,13 @@ public class SageUtils implements SageUtilsInterface {
         return Configuration.GetVideoDirectories();
     }
 
+
+    @Override
+    public void setClientProperty(String property, String value) {
+        Configuration.SetProperty(property, value);
+
+    }
+
     /**
      * Imports recording into the Sage database as an Airing.
      * <p>

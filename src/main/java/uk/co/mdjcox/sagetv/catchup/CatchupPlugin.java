@@ -34,8 +34,6 @@ import java.util.Map;
 // In priority order...
 
 
-// TODO - Can I place fully download videos directly in recordings for later?
-
 // TODO - Can I implement a "New" category
 // TODO - check video from other providers
 // TODO - Can we use Sage Favourites to establish a favourites category?
@@ -258,6 +256,9 @@ public class CatchupPlugin implements SageTVPlugin {
     }
 
     private void init() {
+
+        sageUtils.setClientProperty("online_video/cache_time_limit", "10000") ;
+
         types.put(CATALOG_IN_PROGRESS, CONFIG_TEXT);
         labels.put(CATALOG_IN_PROGRESS, "Catalog progress");
         help.put(CATALOG_IN_PROGRESS,"Show catalog progress");

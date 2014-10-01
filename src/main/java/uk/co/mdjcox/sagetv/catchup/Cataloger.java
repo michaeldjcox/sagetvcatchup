@@ -83,6 +83,10 @@ public class Cataloger {
                             "http://localhost:" + props.getInt("podcasterPort", 8081) + "/logo.png");
             newCategories.put(root.getId(), root);
 
+            Source statusSource = new Source("CatchupStatus", "Catchup Status", "Catchup Status", podcastUrlBase + "status", "");
+            newCategories.put(statusSource.getId(), statusSource);
+            root.addSubCategory(statusSource);
+
             for (Plugin plugin : pluginManager.getPlugins()) {
                 checkForStop();
 
@@ -103,6 +107,9 @@ public class Cataloger {
                 Map<String, Episode> newEpisodes = new LinkedHashMap<String, Episode>();
 
                 root.addSubCategory(sourceCat);
+
+                sourceCat.setPodcastUrl(podcastUrlBase + sourceCat.getId());
+
 
                 logger.info("Getting programmes found on: " + sourceCat);
                 int programmeCount = 0;

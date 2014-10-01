@@ -170,7 +170,7 @@ public class Recording {
     }
 
     public boolean isComplete() {
-        System.err.println("compltedFile=" + completedFile + " exists=" + (completedFile == null ? false : completedFile.exists()));
+        System.err.println("completedFile=" + completedFile + " exists=" + (completedFile == null ? false : completedFile.exists()));
         return completedFile != null && completedFile.exists();
     }
 

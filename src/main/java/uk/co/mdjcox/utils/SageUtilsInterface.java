@@ -25,4 +25,5 @@ public interface SageUtilsInterface {
 
     File[] getRecordingDirectories();
 
-    }
+    void setClientProperty(String name, String value);
+}

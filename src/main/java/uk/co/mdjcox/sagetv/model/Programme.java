@@ -23,8 +23,6 @@ public class Programme extends SubCategory {
    * A map containing all episodes of this programme keyed by id
    */
   private Map<String, Episode> episodes = new HashMap<String, Episode>();
-  /** The URL of the podcast listing these episodes */
-  private String podcastUrl;
 
   /**
    * Constructor for the programme meta data.
@@ -83,25 +81,5 @@ public class Programme extends SubCategory {
    */
   public final boolean hasEpisodes() {
     return !episodes.isEmpty();
-  }
-
-  /**
-   * Gets the podcast URL that will return this list of episodes.
-   *
-   * @return the podcast URL
-   */
-  public String getPodcastUrl() {
-    return podcastUrl;
-  }
-
-  /**
-   * Sets the podcast URL that will return the list of episodes
-   *
-   * @param podcastUrl the podcast URL
-   *
-   * @throws NullPointerException if the podcastUrl is <code>null</code>
-   */
-  public void setPodcastUrl(String podcastUrl) {
-    this.podcastUrl = checkNotNull(podcastUrl);
   }
 }

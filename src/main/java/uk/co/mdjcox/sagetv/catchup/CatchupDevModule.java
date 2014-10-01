@@ -128,6 +128,11 @@ public class CatchupDevModule extends AbstractModule {
             public File[] getRecordingDirectories() {
                 return new File[0];
             }
+
+            @Override
+            public void setClientProperty(String name, String value) {
+
+            }
         };
 
 
