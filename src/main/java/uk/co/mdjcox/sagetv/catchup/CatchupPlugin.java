@@ -33,6 +33,10 @@ import java.util.Map;
 
 // In priority order...
 
+// TODO - BUG - force refresh on online caching (set client property!)
+
+// TODO - BBC original air date (I have) but last aired date (I don't have)
+// TODO - No channel is set on TV recordings
 
 // TODO - Can I implement a "New" category
 // TODO - check video from other providers

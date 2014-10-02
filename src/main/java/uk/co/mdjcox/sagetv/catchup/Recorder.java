@@ -254,7 +254,7 @@ public class Recorder {
 
                             osUtils.waitFor(1000);
 
-                            System.err.println("File " + completedFile + " exists=" + completedFile.exists());
+                            System.err.println("Done recording. File " + completedFile + " exists=" + completedFile.exists());
 
                             if (completedFile.exists()) {
 

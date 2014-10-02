@@ -62,7 +62,7 @@ public class Catalog {
   }
 
     public void addError(String error) {
-        Category cat = categories.get("ALL");
+        Category cat = categories.get("Catchup");
         if (cat != null) {
             cat.addError("FATAL", error);
         }

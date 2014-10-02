@@ -33,7 +33,7 @@ public class SourceScript extends Script {
     }
 
     public Source getSource() {
-        Source source = new Source("", "", "", "", "");
+        Source source = new Source("", "", "", "", "", "");
         try {
             getLogger().info("Getting details of source " + sourceId);
             call("source", source);

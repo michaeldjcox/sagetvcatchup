@@ -41,8 +41,6 @@ public class SageTvPublisher implements CatalogPublisher {
     private String qualifier;
     /** The SageTV STV directory */
     private String STV;
-    /** Indicates if we are generating control podcasts */
-    private boolean withControl = true;
 
     /**
      * Creates a new instance which can be used to create new online video property files.
@@ -60,7 +58,6 @@ public class SageTvPublisher implements CatalogPublisher {
         checkNotNull(STV);
         this.logger = logger;
         this.htmlUtils = htmlUtils;
-        withControl = props.getBoolean("withControlPodcasts", true);
     }
 
     /**
@@ -202,7 +199,7 @@ public class SageTvPublisher implements CatalogPublisher {
         if (!parentId.isEmpty()) {
             result += "xPodcast" + parentId;
         } else {
-            result += "xPodcastALL";
+            result += "xPodcast" + id;
         }
 
         result += ";" + url;

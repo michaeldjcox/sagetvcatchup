@@ -79,11 +79,12 @@ public class Cataloger {
         try {
             Map<String, Category> newCategories = new LinkedHashMap<String, Category>();
 
-            Root root = new Root("Catchup", "UK Catchup TV for SageTV", "http://localhost:8081",
+            Root root = new Root("Catchup", "Catchup TV", "Catchup TV", "http://localhost:8081",
                             "http://localhost:" + props.getInt("podcasterPort", 8081) + "/logo.png");
             newCategories.put(root.getId(), root);
 
-            Source statusSource = new Source("CatchupStatus", "Catchup Status", "Catchup Status", podcastUrlBase + "status", "");
+            Source statusSource = new Source(root.getId(), "CatchupStatus", "Catchup Status", "Catchup Status", "", "");
+            statusSource.setPodcastUrl(podcastUrlBase + "status");
             newCategories.put(statusSource.getId(), statusSource);
             root.addSubCategory(statusSource);
 
@@ -107,6 +108,7 @@ public class Cataloger {
                 Map<String, Episode> newEpisodes = new LinkedHashMap<String, Episode>();
 
                 root.addSubCategory(sourceCat);
+                sourceCat.setParentId(root.getId());
 
                 sourceCat.setPodcastUrl(podcastUrlBase + sourceCat.getId());
 

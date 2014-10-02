@@ -23,8 +23,8 @@ public class Source extends SubCategory {
    * @param serviceUrl The URL of the host web site for this category
    * @param iconUrl The URL of an icon associated with this category
    */
-    public Source(String id, String shortName, String longName,
+    public Source(String parentId, String id, String shortName, String longName,
                   String serviceUrl, String iconUrl) {
-        super(id, id, shortName, longName, serviceUrl, iconUrl, "");
+        super(id, id, shortName, longName, serviceUrl, iconUrl, parentId);
     }
 }

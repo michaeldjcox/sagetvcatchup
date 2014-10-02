@@ -150,10 +150,11 @@ public class SageTvPublisherTest {
   public void testPublish() throws Exception {
 
     Catalog catalog = new Catalog();
-    Root root = new Root("rootShortName", "rootLongName", "rootServiceUrl", "rootIconUrl");
+    Root root = new Root("RootId", "rootShortName", "rootLongName", "rootServiceUrl", "rootIconUrl");
     catalog.addCategory(root);
-    Source source = new Source("sourceId", "sourceSourceName", "sourceLongName",
+    Source source = new Source("RootId", "sourceId", "sourceSourceName", "sourceLongName",
                                "sourceServiceUrl", "sourceIconUrl");
+      source.setPodcastUrl("podcastUrl");
     catalog.addCategory(source);
     SubCategory subcat = new SubCategory("sourceId", "subcatId", "subcatShortName", "subcatLongName",
                                          "subcatServiceUrl", "subcatIconUrl", "sourceId");
@@ -203,96 +204,96 @@ public class SageTvPublisherTest {
     TreeMap<Object,Object> labelProps = new  TreeMap<Object,Object>(new LabelsPropertyLayout().getComparator(labelPropsFile));
     labelProps.putAll(labelPropsFile);
 
-    assertEquals("Link property count", 8, linkProps.size());
-    assertEquals("Label property count", 20, labelProps.size());
+    assertEquals("Link property count", 2, linkProps.size());
+    assertEquals("Label property count", 8, labelProps.size());
 
     Iterator<Map.Entry<Object, Object>> itr = linkProps.entrySet().iterator();
     Map.Entry<Object, Object> next = itr.next();
     assertEquals("Property 1 key","CustomSources",next.getKey());
-    assertEquals("Property 1 val","xPodcastsourceId",next.getValue());
+    assertEquals("Property 1 val","xPodcastRootId",next.getValue());
     next = itr.next();
-    assertEquals("Property 2 key","xFeedPodcastCustom/subcatId",next.getKey());
-    assertEquals("Property 2 val","xPodcastsourceId;xURLNone",next.getValue());
-    next = itr.next();
-    assertEquals("Property 3 key","subcatId/IsCategory",next.getKey());
-    assertEquals("Property 3 val","true",next.getValue());
-    next = itr.next();
-    assertEquals("Property 4 key","subcatId/CategoryName",next.getKey());
-    assertEquals("Property 4 val","xPodcastsubcatId",next.getValue());
-    next = itr.next();
-    assertEquals("Property 5 key","xFeedPodcastCustom/subcatId2",next.getKey());
-    assertEquals("Property 5 val","xPodcastsourceId;xURLNone",next.getValue());
-    next = itr.next();
-    assertEquals("Property 6 key","subcatId2/IsCategory",next.getKey());
-    assertEquals("Property 6 val","true",next.getValue());
-    next = itr.next();
-    assertEquals("Property 7 key","subcatId2/CategoryName",next.getKey());
-    assertEquals("Property 7 val","xPodcastsubcatId2",next.getValue());
-    next = itr.next();
-    assertEquals("Property 8 key","xFeedPodcastCustom/programmeId",next.getKey());
-    assertEquals("Property 8 val","xPodcastsubcatId,xPodcastsubcatId2;podcastUrl",next.getValue());
-
-    itr = labelProps.entrySet().iterator();
-    next = itr.next();
-    assertEquals("Property 1 key","Source/xPodcastprogrammeId/LongName",next.getKey());
-    assertEquals("Property 1 val","programmeLongName",next.getValue());
-    next = itr.next();
-    assertEquals("Property 2 key","Source/xPodcastprogrammeId/ShortName",next.getKey());
-    assertEquals("Property 2 val","programmeShortName",next.getValue());
-    next = itr.next();
-    assertEquals("Property 3 key","Source/xPodcastprogrammeId/ThumbURL",next.getKey());
-    assertEquals("Property 3 val","programmeIconUdl",next.getValue());
-    next = itr.next();
-    assertEquals("Property 4 key","Source/xPodcastsourceId/LongName",next.getKey());
-    assertEquals("Property 4 val","sourceLongName",next.getValue());
-    next = itr.next();
-    assertEquals("Property 5 key","Source/xPodcastsourceId/ShortName",next.getKey());
-    assertEquals("Property 5 val","sourceSourceName",next.getValue());
-    next = itr.next();
-    assertEquals("Property 6 key","Source/xPodcastsubcatId/LongName",next.getKey());
-    assertEquals("Property 6 val","subcatLongName",next.getValue());
-    next = itr.next();
-    assertEquals("Property 7 key","Source/xPodcastsubcatId/ShortName",next.getKey());
-    assertEquals("Property 7 val","subcatShortName",next.getValue());
-    next = itr.next();
-    assertEquals("Property 8 key","Source/xPodcastsubcatId/ThumbURL",next.getKey());
-    assertEquals("Property 8 val","subcatIconUrl",next.getValue());
-    next = itr.next();
-    assertEquals("Property 9 key","Source/xPodcastsubcatId2/LongName",next.getKey());
-    assertEquals("Property 9 val","subcatLongName2",next.getValue());
-    next = itr.next();
-    assertEquals("Property 10 key","Source/xPodcastsubcatId2/ShortName",next.getKey());
-    assertEquals("Property 10 val","subcatShortName2",next.getValue());
-    next = itr.next();
-    assertEquals("Property 11 key","Source/xPodcastsubcatId2/ThumbURL",next.getKey());
-    assertEquals("Property 11 val","subcatIconUrl2",next.getValue());
-    next = itr.next();
-    assertEquals("Property 12 key","Category/programmeId/LongName",next.getKey());
-    assertEquals("Property 12 val","programmeLongName",next.getValue());
-    next = itr.next();
-    assertEquals("Property 13 key","Category/programmeId/ShortName",next.getKey());
-    assertEquals("Property 13 val","programmeShortName",next.getValue());
-    next = itr.next();
-    assertEquals("Property 14 key","Category/programmeId/ThumbURL",next.getKey());
-    assertEquals("Property 14 val","programmeIconUdl",next.getValue());
-    next = itr.next();
-    assertEquals("Property 15 key","Category/subcatId/LongName",next.getKey());
-    assertEquals("Property 15 val","subcatLongName",next.getValue());
-    next = itr.next();
-    assertEquals("Property 16 key","Category/subcatId/ShortName",next.getKey());
-    assertEquals("Property 16 val","subcatShortName",next.getValue());
-    next = itr.next();
-    assertEquals("Property 17 key","Category/subcatId/ThumbURL",next.getKey());
-    assertEquals("Property 17 val","subcatIconUrl",next.getValue());
-    next = itr.next();
-    assertEquals("Property 18 key","Category/subcatId2/LongName",next.getKey());
-    assertEquals("Property 18 val","subcatLongName2",next.getValue());
-    next = itr.next();
-    assertEquals("Property 19 key","Category/subcatId2/ShortName",next.getKey());
-    assertEquals("Property 19 val","subcatShortName2",next.getValue());
-    next = itr.next();
-    assertEquals("Property 20 key","Category/subcatId2/ThumbURL",next.getKey());
-    assertEquals("Property 20 val","subcatIconUrl2",next.getValue());
+    assertEquals("Property 2 key","xFeedPodcastCustom/sourceId",next.getKey());
+    assertEquals("Property 2 val","xPodcastRootId;podcastUrl",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 3 key","subcatId/IsCategory",next.getKey());
+//    assertEquals("Property 3 val","true",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 4 key","subcatId/CategoryName",next.getKey());
+//    assertEquals("Property 4 val","xPodcastsubcatId",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 5 key","xFeedPodcastCustom/subcatId2",next.getKey());
+//    assertEquals("Property 5 val","xPodcastsourceId;xURLNone",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 6 key","subcatId2/IsCategory",next.getKey());
+//    assertEquals("Property 6 val","true",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 7 key","subcatId2/CategoryName",next.getKey());
+//    assertEquals("Property 7 val","xPodcastsubcatId2",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 8 key","xFeedPodcastCustom/programmeId",next.getKey());
+//    assertEquals("Property 8 val","xPodcastsubcatId,xPodcastsubcatId2;podcastUrl",next.getValue());
+//
+//    itr = labelProps.entrySet().iterator();
+//    next = itr.next();
+//    assertEquals("Property 1 key","Source/xPodcastprogrammeId/LongName",next.getKey());
+//    assertEquals("Property 1 val","programmeLongName",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 2 key","Source/xPodcastprogrammeId/ShortName",next.getKey());
+//    assertEquals("Property 2 val","programmeShortName",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 3 key","Source/xPodcastprogrammeId/ThumbURL",next.getKey());
+//    assertEquals("Property 3 val","programmeIconUdl",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 4 key","Source/xPodcastsourceId/LongName",next.getKey());
+//    assertEquals("Property 4 val","sourceLongName",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 5 key","Source/xPodcastsourceId/ShortName",next.getKey());
+//    assertEquals("Property 5 val","sourceSourceName",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 6 key","Source/xPodcastsubcatId/LongName",next.getKey());
+//    assertEquals("Property 6 val","subcatLongName",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 7 key","Source/xPodcastsubcatId/ShortName",next.getKey());
+//    assertEquals("Property 7 val","subcatShortName",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 8 key","Source/xPodcastsubcatId/ThumbURL",next.getKey());
+//    assertEquals("Property 8 val","subcatIconUrl",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 9 key","Source/xPodcastsubcatId2/LongName",next.getKey());
+//    assertEquals("Property 9 val","subcatLongName2",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 10 key","Source/xPodcastsubcatId2/ShortName",next.getKey());
+//    assertEquals("Property 10 val","subcatShortName2",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 11 key","Source/xPodcastsubcatId2/ThumbURL",next.getKey());
+//    assertEquals("Property 11 val","subcatIconUrl2",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 12 key","Category/programmeId/LongName",next.getKey());
+//    assertEquals("Property 12 val","programmeLongName",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 13 key","Category/programmeId/ShortName",next.getKey());
+//    assertEquals("Property 13 val","programmeShortName",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 14 key","Category/programmeId/ThumbURL",next.getKey());
+//    assertEquals("Property 14 val","programmeIconUdl",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 15 key","Category/subcatId/LongName",next.getKey());
+//    assertEquals("Property 15 val","subcatLongName",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 16 key","Category/subcatId/ShortName",next.getKey());
+//    assertEquals("Property 16 val","subcatShortName",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 17 key","Category/subcatId/ThumbURL",next.getKey());
+//    assertEquals("Property 17 val","subcatIconUrl",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 18 key","Category/subcatId2/LongName",next.getKey());
+//    assertEquals("Property 18 val","subcatLongName2",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 19 key","Category/subcatId2/ShortName",next.getKey());
+//    assertEquals("Property 19 val","subcatShortName2",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 20 key","Category/subcatId2/ThumbURL",next.getKey());
+//    assertEquals("Property 20 val","subcatIconUrl2",next.getValue());
 
   }
 
@@ -407,36 +408,39 @@ public class SageTvPublisherTest {
 
     Method
         method =
-        SageTvPublisher.class.getDeclaredMethod("addSource", Source.class,
+        SageTvPublisher.class.getDeclaredMethod("addSource", Root.class,
                                           PropertiesFile.class, PropertiesFile.class);
     method.setAccessible(true);
     PropertiesFile links = new PropertiesFile();
     PropertiesFile labels = new PropertiesFile();
 
-    Source source = new Source("category", "name", "description", "serviceUrl", "iconUrl");
-    Source source2 = new Source("category2", "name2", "description2", "serviceUrl2", "iconUrl2");
-    Source dupe = new Source("category", "name", "description", "serviceUrl", "iconUrl");
+      Root root = new Root("category", "name", "description", "serviceUrl", "iconUrl");
+//      Source source = new Source("category", "name", "description", "serviceUrl", "iconUrl");
+//    Source source2 = new Source("category2", "name2", "description2", "serviceUrl2", "iconUrl2");
+//    Source dupe = new Source("category", "name", "description", "serviceUrl", "iconUrl");
 
-    method.invoke(sageTvPublisher, source, links, labels);
-    method.invoke(sageTvPublisher, source2, links, labels);
-    method.invoke(sageTvPublisher, dupe, links, labels);
+      method.invoke(sageTvPublisher, root, links, labels);
+
+//      method.invoke(sageTvPublisher, source, links, labels);
+//    method.invoke(sageTvPublisher, source2, links, labels);
+//    method.invoke(sageTvPublisher, dupe, links, labels);
 
     assertEquals("Links Property count", 1, links.entrySet().size());
-    assertEquals("Labels count", 4, labels.entrySet().size());
+    assertEquals("Labels count", 2, labels.entrySet().size());
 
     Iterator<Map.Entry<Object, Object>> itr = links.entrySet().iterator();
     Map.Entry<Object, Object> entry = itr.next();
     assertEquals("Property name", "CustomSources", entry.getKey());
-    assertEquals("Property value", "xPodcastcategory,xPodcastcategory2", entry.getValue());
+    assertEquals("Property value", "xPodcastcategory", entry.getValue());
 
     itr = labels.entrySet().iterator();
     entry = itr.next();
-    assertEquals("Property name", "Source/xPodcastcategory2/LongName", entry.getKey());
-    assertEquals("Property value", "description2", entry.getValue());
-    entry = itr.next();
-    assertEquals("Property name", "Source/xPodcastcategory2/ShortName", entry.getKey());
-    assertEquals("Property value", "name2", entry.getValue());
-    entry = itr.next();
+//    assertEquals("Property name", "Source/xPodcastcategory2/LongName", entry.getKey());
+//    assertEquals("Property value", "description2", entry.getValue());
+//    entry = itr.next();
+//    assertEquals("Property name", "Source/xPodcastcategory2/ShortName", entry.getKey());
+//    assertEquals("Property value", "name2", entry.getValue());
+//    entry = itr.next();
     assertEquals("Property name", "Source/xPodcastcategory/ShortName", entry.getKey());
     assertEquals("Property value", "name", entry.getValue());
     entry = itr.next();

@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.HtmlBuilder;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
-import uk.co.mdjcox.utils.OsUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesInterface;
+import uk.co.mdjcox.utils.RssBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -30,8 +30,6 @@ import java.util.*;
 @Singleton
 public class PodcastServer implements CatalogPublisher {
 
-
-    private static final String CRLF = System.getProperty("line.separator");
     private final Cataloger cataloger;
     private Logger logger;
     private Server server;
@@ -42,7 +40,6 @@ public class PodcastServer implements CatalogPublisher {
     private final String htdocsDir;
     private final String logDir;
     private final String stagingDir;
-    private boolean withControl = true;
     private String errorSummary="";
 
     @Inject
@@ -73,7 +70,6 @@ public class PodcastServer implements CatalogPublisher {
         file = new File(stagingDir);
         Files.createDirectories(file.toPath());
         logDir = props.getString("logDir");
-        withControl = props.getBoolean("withControlPodcasts", true);
     }
 
     public void start() throws Exception {
@@ -96,17 +92,31 @@ public class PodcastServer implements CatalogPublisher {
 
         logger.info("Got http request: " + request);
 
+
+        String agent = request.getHeader("User-Agent");
+        boolean fromSage = agent != null && agent.contains("Java");
+
         if (target.equals("/logo.png")) {
             getLogoResponse(response);
-        } else if (target.startsWith("/play")) {
+        } else if (target.startsWith("/watch")) {
             String id = request.getParameter("id");
             Episode episode = getEpisodeFromCache(id);
             getVideoResponse(response, episode);
+        } else if (target.startsWith("/recordings")) {
+            if (fromSage) {
+               getRecordingsPodcastResponse(response);
+            } else {
+                getRecordingsHtmlResponse(response);
+            }
         } else if (target.startsWith("/record")) {
             String id = request.getParameter("id");
             Episode episode = getEpisodeFromCache(id);
             recorder.record(episode);
-            getControlPodcastResponse(response, episode, !recorder.isStopped(id));
+            if (fromSage) {
+                getMessagePodcastResponse(response, "RECORDING", "Recording " + episode.getPodcastTitle(), "");
+            } else {
+                getMessageHtmlResponse(response, "Recording " + episode.getPodcastTitle());
+            }
         } else if (target.startsWith("/control")) {
             String id = request.getParameter("id");
             Episode episode = getEpisodeFromCache(id);
@@ -114,26 +124,42 @@ public class PodcastServer implements CatalogPublisher {
         } else if (target.startsWith("/status")) {
             getStatusPodcastResponse(response);
         } else if (target.startsWith("/stopcat")) {
-            stopCataloging(response);
+            String result = cataloger.stop();
+            if (fromSage) {
+                getMessagePodcastResponse(response, "CATALOGING", result, "");
+            } else {
+                getMessageHtmlResponse(response, result);
+            }
         } else if (target.startsWith("/startcat")) {
-            startCataloging(response);
+            String result = cataloger.start();
+            if (fromSage) {
+                getMessagePodcastResponse(response, "CATALOGING", result, "");
+            } else {
+                getMessageHtmlResponse(response, result);
+            }
         } else if (target.startsWith("/stopall")) {
-            stopAllRecording(response);
+            String result = recorder.requestStopAll();
+            if (fromSage) {
+                getMessagePodcastResponse(response, "RECORDING", result, "");
+            } else {
+                getMessageHtmlResponse(response, result);
+            }
         } else if (target.startsWith("/stop")) {
             String id = request.getParameter("id");
-            Episode episode = getEpisodeFromCache(id);
-            if (withControl) {
-                recorder.requestStop(id);
-                getControlPodcastResponse(response, episode, !recorder.isStopped(id));
+            String message = recorder.requestStop(id);
+            if (fromSage) {
+                getMessagePodcastResponse(response, "STOPPING", message, "");
             } else {
-                stopVideoResponse(response, id);
+                getMessageHtmlResponse(response, message);
             }
         } else if (target.startsWith("/log")) {
             getLogFileResponse(response, "sagetvcatchup.log");
-        } else if (target.startsWith("/recordings")) {
-            getRecordingsResponse(response);
         } else if (target.startsWith("/errors")) {
-            getCachedHtmlResponse(response, "errors");
+            if (fromSage) {
+                getCachedPodcastResponse(response, "errors");
+            } else {
+                getCachedHtmlResponse(response, "errors");
+            }
         } else if (target.startsWith("/programmes")) {
             getCachedHtmlResponse(response, "programmes");
         } else if (target.startsWith("/episodes")) {
@@ -158,40 +184,8 @@ public class PodcastServer implements CatalogPublisher {
           ((Request) request).setHandled(true);
     }
 
-    private void stopCataloging(HttpServletResponse response) throws ServletException, IOException {
-        String result = cataloger.stop();
-        getMessageResponse(response, result);
-    }
-
-    private void startCataloging(HttpServletResponse response) throws ServletException, IOException {
-        String result = cataloger.start();
-        getMessageResponse(response, result);
-    }
-
     private Episode getEpisodeFromCache(String id) throws ServletException {
         try {
-
-//            SourceId	Iplayer
-//            Type	Episode
-//            Id	TheAdventuresofAbneyandTealSeries1TheTrain
-//            Channel	CBeebies
-//            ProgrammeTitle	The Adventures of Abney and Teal
-//            SeriesTitle	Series 1
-//            EpisodeTitle	The Train
-//            Description	Animated adventures of two friends who live on an island in the middle of the big city. They share their home with a group of friendly and hilarious characters. Everybody is bored. Abney builds a train so they can go on a tour. Then Teal has an idea - why don't they tour the whole island? It is a fantastic tour until something gets in the way.
-//            Series	1
-//            Episode	11
-//            Genres
-//            Children's
-//            Entertainment and Comedy
-//                    Learning
-//            Pre-School
-//            Date	2011-10-10
-//            Time	17:50:00
-//            PodcastTitle	The Adventures of Abney and Teal - Series 1 - The Train
-//            IconUrl	http://ichef.bbci.co.uk/images/ic/272x153/p01h709f.jpg
-//            ServiceUrl
-
             String message = getFromCache(htdocsDir, "episode-" + id + ".html");
             message = htmlUtils.moveTo("<td>SourceId", message);
             message = htmlUtils.moveTo("<td>", message);
@@ -260,7 +254,36 @@ public class PodcastServer implements CatalogPublisher {
 
     }
 
-    private void getRecordingsResponse(HttpServletResponse response)  throws ServletException, IOException {
+    private void getRecordingsPodcastResponse(HttpServletResponse response)  throws ServletException, IOException {
+
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/xhtml+xml");
+
+        String recordingsUrl = "http://localhost:" + port + "/recordings";
+        String title = "RECORDING NOW";
+        String desc = "Recordings in progress";
+
+        RssBuilder builder = new RssBuilder();
+        builder.startDocument(title, desc, recordingsUrl);
+
+        Collection<Recording> recordings = recorder.getCurrentRecordings();
+        for (Recording recording : recordings) {
+            final Episode episode = recording.getEpisode();
+            final String episodeTitle = htmlUtils.makeContentSafe(episode.getPodcastTitle());
+            final String episodeDesc = htmlUtils.makeContentSafe(episode.getDescription());
+            final String episodeIconUrl = episode.getIconUrl();
+            final String controlUrl="http://localhost:" + port + "/control?id=" + episode.getId();
+
+            builder.addCategoryItem(episodeTitle, episodeDesc, controlUrl, episodeIconUrl );
+        }
+
+        builder.stopDocument();
+
+        String resultStr = builder.toString();
+        response.getWriter().println(resultStr);
+     }
+
+    private void getRecordingsHtmlResponse(HttpServletResponse response)  throws ServletException, IOException {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html");
         HtmlBuilder htmlBuilder = new HtmlBuilder();
@@ -289,20 +312,6 @@ public class PodcastServer implements CatalogPublisher {
         response.getWriter().println(htmlBuilder.toString());
     }
 
-    private void stopAllRecording(HttpServletResponse response) throws ServletException, IOException {
-        String result = recorder.requestStopAll();
-        getMessageResponse(response, result);
-    }
-
-    private void stopVideoResponse(HttpServletResponse response,String id) throws ServletException, IOException {
-        logger.info("Stop Streaming " + id);
-
-        if (id != null && !id.isEmpty()) {
-            String message = recorder.requestStop(id);
-            getMessageResponse(response, message);
-        }
-    }
-
     private void getVideoResponse(HttpServletResponse response, Episode episode) throws ServletException, IOException {
          OutputStream out = null;
 
@@ -329,7 +338,7 @@ public class PodcastServer implements CatalogPublisher {
         }
     }
 
-    private void getMessageResponse(HttpServletResponse response, String message)
+    private void getMessageHtmlResponse(HttpServletResponse response, String message)
             throws IOException {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html");
@@ -438,205 +447,96 @@ public class PodcastServer implements CatalogPublisher {
     }
 
     private String buildPodcastFor(Category service) throws Exception {
-        String resultStr = "";
-        resultStr += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + CRLF;
-        resultStr += "<rss xmlns:media=\"http://search.yahoo.com/mrss/\" xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\" version=\"2.0\">" + CRLF;
-        resultStr += "<channel>" + CRLF;
-        resultStr += "<title>" + htmlUtils.makeContentSafe(service.getShortName()) + "</title>" + CRLF;
-        resultStr += "<description>" + htmlUtils.makeContentSafe(service.getLongName()) + "</description>" + CRLF;
-        resultStr += "<link>" + service.getServiceUrl() + "</link>" + CRLF;
-        resultStr += "<language>en-gb</language>" + CRLF;
-        resultStr += "<image>" + CRLF;
-        resultStr += "<url>" + service.getIconUrl() + "</url> " + CRLF;
-        resultStr += "<title>" + htmlUtils.makeContentSafe(service.getShortName()) + "</title>" + CRLF;
-        resultStr += "<link>" + service.getServiceUrl() + "</link>" + CRLF;
-        resultStr += "</image>" + CRLF;
 
+        final String shortName = htmlUtils.makeContentSafe(service.getShortName());
+        final String longName = htmlUtils.makeContentSafe(service.getLongName());
+        final String url = service.getServiceUrl();
+        final String iconUrl = service.getIconUrl();
+
+        RssBuilder builder = new RssBuilder();
+        builder.startDocument(shortName, longName, url);
+        builder.addImage(iconUrl, shortName, url);
         if (service.isProgrammeCategory()) {
             Programme programme = (Programme) service;
             Map<String, Episode> episodes = programme.getEpisodes();
             for (Episode episode : episodes.values()) {
-                resultStr += buildEpisodeItem(episode);
+                final String title = htmlUtils.makeContentSafe(episode.getPodcastTitle());
+                final String desc = htmlUtils.makeContentSafe(episode.getDescription());
+                final String episodeIconUrl = episode.getIconUrl();
+                final String controlUrl="http://localhost:" + port + "/control?id=" + episode.getId();
+                builder.addCategoryItem(title, desc, controlUrl, episodeIconUrl);
             }
         } else if (service.isSubCategory()) {
             Map<String, Category> subCats = ((SubCategory) service).getSubCategories();
             for (Category subCat : subCats.values()) {
-                    resultStr += buildDynamicCategoryItem(subCat);
+                final String categoryUrl = "http://localhost:" + port + "/" + subCat.getId();
+                builder.addCategoryItem(subCat.getShortName(), subCat.getLongName(), categoryUrl);
             }
         }
-        resultStr += "</channel>" + CRLF;
-        resultStr += "</rss>";
-        return resultStr;
-    }
-
-    private String buildDynamicCategoryItem(Category subCat) {
-        String resultStr = "";
-
-        resultStr += "<item>" + CRLF;
-        resultStr += "<title>" + subCat.getShortName() + "</title>" + CRLF;
-        resultStr += "<description>" + subCat.getLongName()+ "</description>" + CRLF;
-        String url = "http://localhost:" + port + "/" + subCat.getId();
-        resultStr += "<link>" + url + "</link>" + CRLF;
-        resultStr += "<pubDate></pubDate>" + CRLF;
-//            resultStr += "<itunes: subtitle ><![CDATA[STOP]]></itunes: subtitle > <itunes: duration ></itunes: duration >";
-        resultStr += "<enclosure url=\"" + url + "\" length=\"\" type=\"sagetv/subcategory\"/>" + CRLF;
-        resultStr += "<media:content duration=\"\" medium=\"video\" fileSize=\"\" url =\"" + url + "\" type=\"sagetv/subcategory\">" + CRLF;
-        resultStr += "<media:title>" + subCat.getShortName()+ "</media:title>" + CRLF;
-        resultStr += "<media:description>" + subCat.getLongName()+ "</media:description>" + CRLF;
-        resultStr += "<media:thumbnail url=\"\"/>" + CRLF;
-        resultStr += "</media:content>" + CRLF;
-        resultStr += "</item>" + CRLF;
-        return resultStr;
+        builder.stopDocument();
+        return builder.toString();
     }
 
     private void getStatusPodcastResponse(HttpServletResponse response) throws IOException {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/xhtml+xml");
 
-        String resultStr = "";
-        resultStr += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + CRLF;
-        resultStr += "<rss xmlns:media=\"http://search.yahoo.com/mrss/\" xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\" version=\"2.0\">" + CRLF;
-        resultStr += "<channel>" + CRLF;
-        resultStr += "<title>Catchup Status</title>" + CRLF;
-        resultStr += "<description>Catchup Status</description>" + CRLF;
-        resultStr += "<link>http://localhost:" + port +"/status" +  "</link>" + CRLF;
-        resultStr += "<language>en-gb</language>" + CRLF;
-//        resultStr += "<image>" + CRLF;
-//        resultStr += "<url>" + episode.getIconUrl() + "</url> " + CRLF;
-//        resultStr += "<title>" + htmlUtils.makeContentSafe(episode.getPodcastTitle()) + "</title>" + CRLF;
-//        resultStr += "<link>" + episode.getServiceUrl() + "</link>" + CRLF;
-//        resultStr += "</image>" + CRLF;
-
-
-            resultStr += "<item>" + CRLF;
-            resultStr += "<title>RECORDING</title>" + CRLF;
-            resultStr += "<description>Currently Recording: " + recorder.getRecordingCount()+ "</description>" + CRLF;
+        String errorsUrl = "http://localhost:" + port + "/errors";
+        String recordingsUrl = "http://localhost:" + port + "/recordings";
         String statusUrl = "http://localhost:" + port + "/status";
-        resultStr += "<link>" + statusUrl + "</link>" + CRLF;
-            resultStr += "<pubDate></pubDate>" + CRLF;
-//            resultStr += "<itunes: subtitle ><![CDATA[STOP]]></itunes: subtitle > <itunes: duration ></itunes: duration >";
-            resultStr += "<enclosure url=\"" + statusUrl + "\" length=\"\" type=\"sagetv/textonly\"/>" + CRLF;
-            resultStr += "<media:content duration=\"\" medium=\"video\" fileSize=\"\" url =\"" + statusUrl + "\" type=\"sagetv/textonly\">" + CRLF;
-            resultStr += "<media:title>RECORDING</media:title>" + CRLF;
-            resultStr += "<media:description>Currently recording: " + recorder.getRecordingCount()+ "</media:description>" + CRLF;
-            resultStr += "<media:thumbnail url=\"\"/>" + CRLF;
-            resultStr += "</media:content>" + CRLF;
-            resultStr += "</item>" + CRLF;
+        String stopUrl = "http://localhost:" + port + "/stopall";
+        String startCatUrl = "http://localhost:" + port + "/startcat";
+        String stopCatUrl = "http://localhost:" + port + "/stopcat";
+        String title = "Status";
+        String desc = "Catchup TV status";
 
-        resultStr += "<item>" + CRLF;
-        resultStr += "<title>CATALOGING</title>" + CRLF;
-        resultStr += "<description>" + cataloger.getProgress()+ "</description>" + CRLF;
-        statusUrl = "http://localhost:" + port + "/status";
-        resultStr += "<link>" + statusUrl + "</link>" + CRLF;
-        resultStr += "<pubDate></pubDate>" + CRLF;
-//            resultStr += "<itunes: subtitle ><![CDATA[STOP]]></itunes: subtitle > <itunes: duration ></itunes: duration >";
-        resultStr += "<enclosure url=\"" + statusUrl + "\" length=\"\" type=\"sagetv/textonly\"/>" + CRLF;
-        resultStr += "<media:content duration=\"\" medium=\"video\" fileSize=\"\" url =\"" + statusUrl + "\" type=\"sagetv/textonly\">" + CRLF;
-        resultStr += "<media:title>RECORDING</media:title>" + CRLF;
-        resultStr += "<media:description>" + cataloger.getProgress()+ "</media:description>" + CRLF;
-        resultStr += "<media:thumbnail url=\"\"/>" + CRLF;
-        resultStr += "</media:content>" + CRLF;
-        resultStr += "</item>" + CRLF;
-        resultStr += "</channel>" + CRLF;
-        resultStr += "</rss>";
+        RssBuilder builder = new RssBuilder();
+        builder.startDocument(title, desc, statusUrl);
+        builder.addCategoryItem("RECORDING NOW", String.valueOf(recorder.getRecordingCount()), recordingsUrl);
+        builder.addTextItem("RECORDING PROCESSES", String.valueOf(recorder.getProcessCount()), statusUrl);
+        builder.addTextItem("CATALOGING PROGRESS", cataloger.getProgress(), statusUrl);
+        builder.addCategoryItem("CATALOGING ERRORS", errorSummary, errorsUrl);
+        builder.addCategoryItem("STOP ALL RECORDING", "Abandon all recording", stopUrl);
+        builder.addCategoryItem("START CATALOGING", "Start cataloging", startCatUrl);
+        builder.addCategoryItem("STOP CATALOGING", "Stop cataloging", stopCatUrl);
+        builder.stopDocument();
+
+        String resultStr = builder.toString();
         response.getWriter().println(resultStr);
     }
 
+    private void getMessagePodcastResponse(HttpServletResponse response, String title, String message, String url) throws IOException {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/xhtml+xml");
+        RssBuilder builder = new RssBuilder();
+        builder.startDocument(title, message, url);
+        builder.addTextItem(title, message, url);
+        builder.stopDocument();
+        String resultStr = builder.toString();
+        response.getWriter().println(resultStr);
+    }
 
     private void getControlPodcastResponse(HttpServletResponse response, Episode episode, boolean isRecording) throws IOException {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/xhtml+xml");
+        final String title = htmlUtils.makeContentSafe(episode.getPodcastTitle());
+        final String desc = htmlUtils.makeContentSafe(episode.getDescription());
+        final String url = episode.getServiceUrl();
+        final String stopUrl = "http://localhost:" + port + "/stop?id=" + episode.getId();
+        final String watchUrl = "http://localhost:" + port + "/watch?id=" + episode.getId();
+        final String recordUrl = "http://localhost:" + port + "/record?id=" + episode.getId();
 
-        String resultStr = "";
-        resultStr += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + CRLF;
-        resultStr += "<rss xmlns:media=\"http://search.yahoo.com/mrss/\" xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\" version=\"2.0\">" + CRLF;
-        resultStr += "<channel>" + CRLF;
-        resultStr += "<title>" + htmlUtils.makeContentSafe(episode.getPodcastTitle()) + "</title>" + CRLF;
-        resultStr += "<description>" + htmlUtils.makeContentSafe(episode.getDescription()) + "</description>" + CRLF;
-        resultStr += "<link>" + episode.getServiceUrl() + "</link>" + CRLF;
-        resultStr += "<language>en-gb</language>" + CRLF;
-//        resultStr += "<image>" + CRLF;
-//        resultStr += "<url>" + episode.getIconUrl() + "</url> " + CRLF;
-//        resultStr += "<title>" + htmlUtils.makeContentSafe(episode.getPodcastTitle()) + "</title>" + CRLF;
-//        resultStr += "<link>" + episode.getServiceUrl() + "</link>" + CRLF;
-//        resultStr += "</image>" + CRLF;
-
+        RssBuilder builder = new RssBuilder();
+        builder.startDocument(title, desc, url);
         if (isRecording) {
-
-            resultStr += "<item>" + CRLF;
-
-            resultStr += "<title>STOP</title>" + CRLF;
-//            resultStr += "<description>STOP</description>" + CRLF;
-            resultStr += "<link>" + "http://localhost:"+port+"/stop?id=" + episode.getId() + "</link>" + CRLF;
-            resultStr += "<pubDate></pubDate>" + CRLF;
-//            resultStr += "<itunes: subtitle ><![CDATA[STOP]]></itunes: subtitle > <itunes: duration ></itunes: duration >";
-            resultStr += "<enclosure url=\"" + "http://localhost:" + port + "/stop?id=" + episode.getId() + "\" length=\"\" type=\"sagetv/subcategory\"/>" + CRLF;
-            resultStr += "<media:content duration = \"\" medium = \"video\" fileSize = \"\" url =\"" + "http://localhost:" + port + "/stop?id=" + episode.getId() + "\" type = \"sagetv/subcategory\">" + CRLF;
-            resultStr += "<media:title >STOP</media:title>" + CRLF;
-            resultStr += "<media:description >STOP</media:description>" + CRLF;
-            resultStr += "<media:thumbnail url=\"\"/>" + CRLF;
-            resultStr += "</media:content>" + CRLF;
-            resultStr += "</item>" + CRLF;
-
+            builder.addCategoryItem("STOP", "Stop recording", stopUrl);
         } else {
-            resultStr += "<item>" + CRLF;
-            resultStr += "<title>WATCH</title>" + CRLF;
-            resultStr += "<link>" + "http://localhost:"+port+"/play?id=" + episode.getId() + "</link>" + CRLF;
-//            resultStr += "<guid>" + "http://localhost:"+port+"/play?id=" + episode.getId() + "</guid>" + CRLF;
-//            resultStr += "<description>Watch it now</description>" + CRLF;
-//        resultStr += "<itunes:image href=\"" + subCat.getIconUrl() + "\"/>" + CRLF;
-//        resultStr += "<media:thumbnail url=\"" + subCat.getIconUrl() + "\"/>" + CRLF;
-        resultStr += "<enclosure url=\"" + "http://localhost:"+port+"/play?id=" + episode.getId() + "\" length=\"9999999\" type=\"video/mp4\"/>" + CRLF;
-            resultStr += "</item>" + CRLF;
-        resultStr += "<item>" + CRLF;
-
-        resultStr += "<title>RECORD</title>" + CRLF;
-//        resultStr += "<description>RECORD</description>" + CRLF;
-            resultStr += "<link>" + "http://localhost:"+port+"/record?id=" + episode.getId() + "</link>" + CRLF;
-        resultStr += "<pubDate></pubDate>" + CRLF;
-//            resultStr += "<itunes: subtitle ><![CDATA[STOP]]></itunes: subtitle > <itunes: duration ></itunes: duration >";
-        resultStr += "<enclosure url=\"" + "http://localhost:" + port + "/record?id=" + episode.getId() + "\" length=\"\" type=\"sagetv/subcategory\"/>" + CRLF;
-        resultStr += "<media:content duration = \"\" medium = \"video\" fileSize = \"\" url =\"" + "http://localhost:" + port + "/record?id=" + episode.getId() + "\" type = \"sagetv/subcategory\">" + CRLF;
-        resultStr += "<media:title>RECORD</media:title>" + CRLF;
-        resultStr += "<media:description >RECORD</media:description>" + CRLF;
-        resultStr += "<media:thumbnail url=\"\"/>" + CRLF;
-        resultStr += "</media:content>" + CRLF;
-        resultStr += "</item>" + CRLF;
+            builder.addVideoItem("WATCH", "Watch now", watchUrl, "");
+            builder.addCategoryItem("RECORD", "Record for later", recordUrl);
         }
-
-        resultStr += "</channel>" + CRLF;
-        resultStr += "</rss>";
+        builder.stopDocument();
+        String resultStr = builder.toString();
         response.getWriter().println(resultStr);
-    }
-
-    private String buildEpisodeItem(Episode episode) {
-        String resultStr = "" ;
-        resultStr += "<item>" + CRLF;
-        resultStr += "<title>" + htmlUtils.makeContentSafe(episode.getPodcastTitle()) + "</title>" + CRLF;
-        if (withControl) {
-            resultStr += "<link>" + "http://localhost:"+port+"/control?id=" + episode.getId() + "</link>" + CRLF;
-        } else {
-            resultStr += "<link>" + episode.getServiceUrl() + "</link>" + CRLF;
-        }
-
-        resultStr += "<description>" + htmlUtils.makeContentSafe(episode.getDescription()) + "</description>" + CRLF;
-        resultStr += "<itunes:image href=\"" + episode.getIconUrl() + "\"/>" + CRLF;
-
-//                if (!episode.getGenres().isEmpty()) {
-//                    for (String genre : episode.getGenres()) {
-//                        resultStr += " <itunes:category text=\""+genre+"\">";
-//                    }
-//                    resultStr +="</itunes:category>";
-//                }
-
-        resultStr += "<media:thumbnail url=\"" + episode.getIconUrl() + "\"/>" + CRLF;
-        if (!withControl) {
-            resultStr += "<enclosure url=\"" + "http://localhost:"+port+"/play?id=" + episode.getId() + "\" length=\"9999999\" type=\"video/mp4\"/>" + CRLF;
-        } else {
-            resultStr += "<enclosure url=\"" + "http://localhost:"+port+"/control?id=" + episode.getId() + "\" length=\"9999999\" type=\"sagetv/subcategory\"/>" + CRLF;
-        }
-        resultStr += "</item>" + CRLF;
-        return resultStr;
     }
 
     private int findResourceLength(InputStream in) {
@@ -662,7 +562,8 @@ public class PodcastServer implements CatalogPublisher {
             catalog.addError("Failed to publish to html server " + e.getMessage());
             logger.error("Failed to publish catalog to html server", e);
         } finally {
-            errorSummary = buildErrorResponse(catalog);
+            errorSummary = buildErrorHtmlResponse(catalog);
+            buildErrorPodcastResponse(catalog);
             pushContent();
         }
     }
@@ -818,7 +719,7 @@ public class PodcastServer implements CatalogPublisher {
         htmlBuilder.addBreak();
 
         htmlBuilder.addHeading2("Catalog");
-        htmlBuilder.addLink("Podcasts", "/ALL");
+        htmlBuilder.addLink("Podcasts", "/Catchup");
         htmlBuilder.addBreak();
         htmlBuilder.addLink("Categories", "/categories");
         htmlBuilder.addBreak();
@@ -1109,8 +1010,53 @@ public class PodcastServer implements CatalogPublisher {
     return htmlBuilder.toString();
   }
 
+    private void buildErrorPodcastResponse(Catalog catalog) {
+        TreeSet<ParseError> errorList = new TreeSet<ParseError>();
+        for (Category cat : catalog.getCategories()) {
+            if (cat.isSource() || cat.isRoot()) {
+                if (cat.hasErrors()) {
+                    errorList.addAll(cat.getErrors());
+                }
+            }
+            if (cat.isProgrammeCategory()) {
+                if (cat.hasErrors()) {
+                    errorList.addAll(cat.getErrors());
+                }
+                Programme prog  = (Programme)cat;
+                if (prog.hasEpisodes()) {
+                    for (Episode episode : prog.getEpisodes().values()) {
+                        if (episode.hasErrors()) {
+                            errorList.addAll(episode.getErrors());
+                        }
+                    }
+                }
+            }
 
-  private String buildErrorResponse(Catalog catalog) {
+        }
+
+        String recordingsUrl = "http://localhost:" + port + "/errors";
+        String title = "ERRORS";
+        String desc = "Cataloging errors";
+
+        RssBuilder builder = new RssBuilder();
+        builder.startDocument(title, desc, recordingsUrl);
+
+        for (ParseError error : errorList) {
+            builder.addTextItem(error.getLevel(), error.getSource() + " " + error.getType() + " " + error.getId() + " " +  error.getMessage(), "");
+        }
+
+        builder.stopDocument();
+
+        String errorResponse = builder.toString();
+        try {
+            writeToStaging("errors.xml", errorResponse);
+        } catch (Exception e) {
+            logger.error("Failed to build errors page", e);
+        }
+    }
+
+
+  private String buildErrorHtmlResponse(Catalog catalog) {
     TreeSet<ParseError> errorList = new TreeSet<ParseError>();
     for (Category cat : catalog.getCategories()) {
       if (cat.isSource() || cat.isRoot()) {
