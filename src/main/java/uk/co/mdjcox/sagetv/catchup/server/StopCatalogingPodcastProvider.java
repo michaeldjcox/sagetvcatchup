@@ -1,22 +1,24 @@
-package uk.co.mdjcox.sagetv.catchup;
+package uk.co.mdjcox.sagetv.catchup.server;
 
+import uk.co.mdjcox.sagetv.catchup.Cataloger;
+import uk.co.mdjcox.sagetv.catchup.server.PodcastPageProvider;
 import uk.co.mdjcox.utils.RssBuilder;
 
 /**
  * Created by michael on 07/10/14.
  */
-public class StartCatalogingPodcastProvider extends PodcastPageProvider {
+public class StopCatalogingPodcastProvider extends PodcastPageProvider {
 
     private Cataloger cataloger;
 
-    public StartCatalogingPodcastProvider(String podcastUrl, Cataloger cataloger) {
+    public StopCatalogingPodcastProvider(String podcastUrl, Cataloger cataloger) {
         super(podcastUrl);
         this.cataloger = cataloger;
     }
 
     @Override
     public String getUri() {
-        return "/startcat?type=xml";
+        return "/stopcat?type=xml";
     }
 
     @Override
@@ -26,7 +28,7 @@ public class StartCatalogingPodcastProvider extends PodcastPageProvider {
 
     @Override
     public String buildPage() {
-        String message = cataloger.start();
+        String message = cataloger.stop();
         RssBuilder builder = new RssBuilder();
         final String url = getPodcastBaseUrl() + getUri();
         final String title = "CATALOGING";

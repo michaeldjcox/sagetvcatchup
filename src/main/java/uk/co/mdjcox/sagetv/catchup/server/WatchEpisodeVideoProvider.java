@@ -1,8 +1,9 @@
-package uk.co.mdjcox.sagetv.catchup;
+package uk.co.mdjcox.sagetv.catchup.server;
 
 import org.slf4j.Logger;
+import uk.co.mdjcox.sagetv.catchup.Recorder;
+import uk.co.mdjcox.sagetv.catchup.server.ContentProvider;
 import uk.co.mdjcox.sagetv.model.Episode;
-import uk.co.mdjcox.utils.HtmlBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;

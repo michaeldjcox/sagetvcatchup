@@ -1,7 +1,8 @@
-package uk.co.mdjcox.sagetv.catchup;
+package uk.co.mdjcox.sagetv.catchup.server;
 
+import uk.co.mdjcox.sagetv.catchup.Cataloger;
+import uk.co.mdjcox.sagetv.catchup.server.HtmlPageProvider;
 import uk.co.mdjcox.utils.HtmlBuilder;
-import uk.co.mdjcox.utils.RssBuilder;
 
 /**
  * Created by michael on 07/10/14.

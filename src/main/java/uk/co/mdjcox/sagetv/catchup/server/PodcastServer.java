@@ -1,4 +1,4 @@
-package uk.co.mdjcox.sagetv.catchup;
+package uk.co.mdjcox.sagetv.catchup.server;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -9,6 +9,7 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.slf4j.Logger;
+import uk.co.mdjcox.sagetv.catchup.*;
 import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.model.Category;
 import uk.co.mdjcox.sagetv.model.Episode;

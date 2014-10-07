@@ -1,9 +1,10 @@
-package uk.co.mdjcox.sagetv.catchup;
+package uk.co.mdjcox.sagetv.catchup.server;
 
 import com.thoughtworks.xstream.XStream;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
+import uk.co.mdjcox.sagetv.catchup.server.HtmlPageProvider;
 import uk.co.mdjcox.utils.HtmlBuilder;
 
 import javax.xml.parsers.DocumentBuilder;

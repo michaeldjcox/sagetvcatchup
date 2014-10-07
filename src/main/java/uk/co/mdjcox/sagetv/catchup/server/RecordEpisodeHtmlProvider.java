@@ -1,21 +1,26 @@
-package uk.co.mdjcox.sagetv.catchup;
+package uk.co.mdjcox.sagetv.catchup.server;
 
+import uk.co.mdjcox.sagetv.catchup.Recorder;
+import uk.co.mdjcox.sagetv.catchup.server.HtmlPageProvider;
+import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.utils.HtmlBuilder;
 
 /**
  * Created by michael on 07/10/14.
  */
-public class StopAllRecordingHtmlProvider extends HtmlPageProvider {
+public class RecordEpisodeHtmlProvider extends HtmlPageProvider {
 
+    private final Episode episode;
     private Recorder recorder;
 
-    public StopAllRecordingHtmlProvider(Recorder recorder) {
+    public RecordEpisodeHtmlProvider(Episode episode, Recorder recorder) {
+        this.episode = episode;
         this.recorder = recorder;
     }
 
     @Override
     public String getUri() {
-        return "/stopall?type=html";
+        return "/record?id="+episode.getId()+"&type=html";
     }
 
     @Override
@@ -25,7 +30,8 @@ public class StopAllRecordingHtmlProvider extends HtmlPageProvider {
 
     @Override
     public String buildPage() {
-        String message = recorder.requestStopAll();
+        recorder.record(episode);
+        String message = "Recording " + episode.getPodcastTitle();
         HtmlBuilder builder = new HtmlBuilder();
         builder.startDocument();
         builder.addPageHeader("Recording");

@@ -1,14 +1,8 @@
-package uk.co.mdjcox.sagetv.catchup;
+package uk.co.mdjcox.sagetv.catchup.server;
 
-import ch.qos.logback.classic.Logger;
 import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.HtmlBuilder;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeSet;
 
 /**
