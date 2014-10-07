@@ -10,7 +10,7 @@ import sage.SageTVPluginRegistry;
 import sagex.plugin.SageEvents;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
-import uk.co.mdjcox.sagetv.catchup.server.PodcastServer;
+import uk.co.mdjcox.sagetv.catchup.server.Server;
 import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
@@ -89,7 +89,7 @@ public class CatchupPlugin implements SageTVPlugin {
     private LinkedHashMap<String, String> help = new LinkedHashMap<String, String>();
 
     private SageTVPluginRegistry registry;
-    private PodcastServer server;
+    private Server server;
 
     private SageTvPublisher sagetvPublisher;
 
@@ -149,7 +149,7 @@ public class CatchupPlugin implements SageTVPlugin {
 
 
             pluginManager = injector.getInstance(PluginManager.class);
-            server = injector.getInstance(PodcastServer.class);
+            server = injector.getInstance(Server.class);
             cataloger = injector.getInstance(Cataloger.class);
             sagetvPublisher = injector.getInstance(SageTvPublisher.class);
             recorder = injector.getInstance(Recorder.class);

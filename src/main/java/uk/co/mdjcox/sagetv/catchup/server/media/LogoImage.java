@@ -1,7 +1,7 @@
 package uk.co.mdjcox.sagetv.catchup.server.media;
 
 import uk.co.mdjcox.sagetv.catchup.server.ContentProvider;
-import uk.co.mdjcox.sagetv.catchup.server.PodcastServer;
+import uk.co.mdjcox.sagetv.catchup.server.Server;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -56,7 +56,7 @@ public class LogoImage implements ContentProvider {
 
     @Override
     public void serve(HttpServletResponse response) throws ServletException, IOException {
-        final ClassLoader cl = PodcastServer.class.getClassLoader();
+        final ClassLoader cl = Server.class.getClassLoader();
         InputStream in = cl.getResourceAsStream("logo.png");
         int fileSize = findResourceLength(in);
 

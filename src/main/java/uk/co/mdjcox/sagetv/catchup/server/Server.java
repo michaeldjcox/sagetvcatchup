@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.slf4j.Logger;
@@ -34,13 +33,13 @@ import java.util.Map;
  * This holds no state whatsoever
  */
 @Singleton
-public class PodcastServer implements CatalogPublisher {
+public class Server implements CatalogPublisher {
 
     private final Cataloger cataloger;
     private final CatalogPersister persister;
     private final String baseUrl;
     private Logger logger;
-    private Server server;
+    private org.mortbay.jetty.Server server;
     private int port;
     private Recorder recorder;
     private HtmlUtilsInterface htmlUtils;
@@ -49,8 +48,8 @@ public class PodcastServer implements CatalogPublisher {
     private Map<String, ContentProvider> staticContent = new HashMap<String, ContentProvider>();
 
     @Inject
-    private PodcastServer(Logger logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils,
-                          Cataloger cataloger, Recorder recorder, CatalogPersister persister) throws Exception {
+    private Server(Logger logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils,
+                   Cataloger cataloger, Recorder recorder, CatalogPersister persister) throws Exception {
         this.logger = logger;
         this.htmlUtils = htmlUtils;
         this.persister = persister;
@@ -60,10 +59,10 @@ public class PodcastServer implements CatalogPublisher {
                                HttpServletRequest request,
                                HttpServletResponse response,
                                int dispatch) throws IOException, ServletException {
-                PodcastServer.this.handle(target, request, response, dispatch);
+                Server.this.handle(target, request, response, dispatch);
             }
         };
-        server = new Server();
+        server = new org.mortbay.jetty.Server();
         Connector connector = new SocketConnector();
         port = props.getInt("port", props.getInt("podcasterPort"));
         connector.setPort(port);
