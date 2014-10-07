@@ -8,13 +8,13 @@ import uk.co.mdjcox.utils.RssBuilder;
 /**
  * Created by michael on 07/10/14.
  */
-public class ControlPodcastProvider extends PodcastPageProvider {
+public class ControlPodcast extends AbstractPodcast {
 
     private final HtmlUtilsInterface htmlUtils;
     private final Recorder recorder;
     private Episode episode;
 
-    public ControlPodcastProvider(String baseUrl, Recorder recorder, Episode episode, HtmlUtilsInterface htmlUtils) {
+    public ControlPodcast(String baseUrl, Recorder recorder, Episode episode, HtmlUtilsInterface htmlUtils) {
         super(baseUrl);
         this.episode = episode;
         this.htmlUtils = htmlUtils;

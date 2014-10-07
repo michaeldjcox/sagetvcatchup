@@ -10,8 +10,8 @@ import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.slf4j.Logger;
 import uk.co.mdjcox.sagetv.catchup.*;
-import uk.co.mdjcox.sagetv.catchup.server.media.LogoImageProvider;
-import uk.co.mdjcox.sagetv.catchup.server.media.WatchEpisodeVideoProvider;
+import uk.co.mdjcox.sagetv.catchup.server.media.LogoImage;
+import uk.co.mdjcox.sagetv.catchup.server.media.WatchEpisode;
 import uk.co.mdjcox.sagetv.catchup.server.pages.*;
 import uk.co.mdjcox.sagetv.catchup.server.podcasts.*;
 import uk.co.mdjcox.sagetv.model.Catalog;
@@ -79,40 +79,40 @@ public class PodcastServer implements CatalogPublisher {
     }
 
     private void init(HtmlUtilsInterface htmlUtils, Cataloger cataloger, Recorder recorder, String logDir) {
-        RecordingsHtmlProvider recProvider = new RecordingsHtmlProvider(recorder);
+        RecordingsPage recProvider = new RecordingsPage(recorder);
         addStaticContent(recProvider);
 
-        RecordingsPodcastProvider recordingsPodcastProvider = new RecordingsPodcastProvider(htmlUtils, baseUrl, recorder);
+        RecordingsPodcast recordingsPodcastProvider = new RecordingsPodcast(htmlUtils, baseUrl, recorder);
         addStaticContent(recordingsPodcastProvider);
 
-        LogsHtmlProvider logsProvider = new LogsHtmlProvider(logDir + File.separator + "sagetvcatchup.log");
+        LogsPage logsProvider = new LogsPage(logDir + File.separator + "sagetvcatchup.log");
         addStaticContent(logsProvider);
 
-        LogoImageProvider logoProvider = new LogoImageProvider();
+        LogoImage logoProvider = new LogoImage();
         addStaticContent(logoProvider);
 
-        StatusPodcastProvider statusProvider = new StatusPodcastProvider(baseUrl, recorder, cataloger);
+        StatusPodcast statusProvider = new StatusPodcast(baseUrl, recorder, cataloger);
         addStaticContent(statusProvider);
 
-        HomeHtmlProvider homeProvider = new HomeHtmlProvider(cataloger, recorder);
+        HomePage homeProvider = new HomePage(cataloger, recorder);
         addStaticContent(homeProvider);
 
-        StartCatalogingHtmlProvider startCatalogingHtmlProvider = new StartCatalogingHtmlProvider(cataloger);
+        StartCatalogingPage startCatalogingHtmlProvider = new StartCatalogingPage(cataloger);
         addStaticContent(startCatalogingHtmlProvider);
 
-        StopCatalogingHtmlProvider stopCatalogingHtmlProvider = new StopCatalogingHtmlProvider(cataloger);
+        StopCatalogingPage stopCatalogingHtmlProvider = new StopCatalogingPage(cataloger);
         addStaticContent(stopCatalogingHtmlProvider);
 
-        StartCatalogingPodcastProvider startCatalogingPodcastProvider = new StartCatalogingPodcastProvider(baseUrl, cataloger);
+        StartCatalogingPodcast startCatalogingPodcastProvider = new StartCatalogingPodcast(baseUrl, cataloger);
         addStaticContent(startCatalogingPodcastProvider);
 
-        StopCatalogingPodcastProvider stopCatalogingPodcastProvider = new StopCatalogingPodcastProvider(baseUrl, cataloger);
+        StopCatalogingPodcast stopCatalogingPodcastProvider = new StopCatalogingPodcast(baseUrl, cataloger);
         addStaticContent(stopCatalogingPodcastProvider);
 
-        StopAllRecordingHtmlProvider stopAllRecordingHtmlProvider = new StopAllRecordingHtmlProvider(recorder);
+        StopAllRecordingPage stopAllRecordingHtmlProvider = new StopAllRecordingPage(recorder);
         addStaticContent(stopAllRecordingHtmlProvider);
 
-        StopAllRecordingPodcastProvider stopAllRecordingPodcastProvider = new StopAllRecordingPodcastProvider(baseUrl, recorder);
+        StopAllRecordingPodcast stopAllRecordingPodcastProvider = new StopAllRecordingPodcast(baseUrl, recorder);
         addStaticContent(stopAllRecordingPodcastProvider);
     }
 
@@ -167,9 +167,9 @@ public class PodcastServer implements CatalogPublisher {
             publishedContent.get(key).serve(response);
         } else {
             if (type.equals("html")) {
-                new MessageHtmlProvider("Page not found " + target).serve(response);
+                new MessagePage("Page not found " + target).serve(response);
             } else {
-                new MessagePodcastProvider(baseUrl, "Podcast not found " + target).serve(response);
+                new MessagePodcast(baseUrl, "Podcast not found " + target).serve(response);
 
             }
         }
@@ -181,46 +181,46 @@ public class PodcastServer implements CatalogPublisher {
         try {
             Map<String, ContentProvider> publishedContent = new HashMap<String, ContentProvider>();
 
-            ErrorHtmlProvider errors = new ErrorHtmlProvider(catalog);
+            ErrorsPage errors = new ErrorsPage(catalog);
             addPublishedContent(publishedContent, errors);
 
-            StyledPageProvider programmes = new StyledPageProvider(logger, "Programmes", "programmes.html", null, catalog);
+            StyledPage programmes = new StyledPage(logger, "Programmes", "programmes.html", null, catalog);
             addPublishedContent(publishedContent, programmes);
 
-            StyledPageProvider categories = new StyledPageProvider(logger, "Categories", "categories.html", null, catalog);
+            StyledPage categories = new StyledPage(logger, "Categories", "categories.html", null, catalog);
             addPublishedContent(publishedContent, categories);
 
-            StyledPageProvider episodes = new StyledPageProvider(logger, "Episodes", "episodes.html", null, catalog);
+            StyledPage episodes = new StyledPage(logger, "Episodes", "episodes.html", null, catalog);
             addPublishedContent(publishedContent, episodes);
 
             for (Category cat : catalog.getCategories()) {
                 boolean isProgramme =cat.isProgrammeCategory() && cat.getParentId().isEmpty();
                 String title=isProgramme ? "Programme" : "Category";
                 String webpage= isProgramme ? "programme.html" : "category.html";
-                StyledPageProvider provider = new StyledPageProvider(logger, title, webpage, cat.getId(), cat);
+                StyledPage provider = new StyledPage(logger, title, webpage, cat.getId(), cat);
                 addPublishedContent(publishedContent, provider);
-                CategoryPodcastProvider catProvider = new CategoryPodcastProvider(baseUrl, catalog, cat, htmlUtils);
+                CategoryPodcast catProvider = new CategoryPodcast(baseUrl, catalog, cat, htmlUtils);
                 addPublishedContent(publishedContent, catProvider);
             }
 
             for (Episode episode : catalog.getEpisodes()) {
-                StyledPageProvider provider = new StyledPageProvider(logger, "Episode", "episode.html", episode.getId(), episode);
+                StyledPage provider = new StyledPage(logger, "Episode", "episode.html", episode.getId(), episode);
                 addPublishedContent(publishedContent, provider);
 
-                ControlPodcastProvider controlPodcastProvider = new ControlPodcastProvider(baseUrl, recorder, episode, htmlUtils);
+                ControlPodcast controlPodcastProvider = new ControlPodcast(baseUrl, recorder, episode, htmlUtils);
                 addPublishedContent(publishedContent, controlPodcastProvider);
 
-                StopEpisodeHtmlProvider stopEpisodeRecordingHtmlProvider = new StopEpisodeHtmlProvider(episode.getId(), recorder);
+                StopEpisodePage stopEpisodeRecordingHtmlProvider = new StopEpisodePage(episode.getId(), recorder);
                 addPublishedContent(publishedContent, stopEpisodeRecordingHtmlProvider);
-                StopEpisodePodcastProvider stopEpisodeRecordingPodcastProvider = new StopEpisodePodcastProvider(baseUrl, episode.getId(), recorder);
+                StopEpisodePodcast stopEpisodeRecordingPodcastProvider = new StopEpisodePodcast(baseUrl, episode.getId(), recorder);
                 addPublishedContent(publishedContent, stopEpisodeRecordingPodcastProvider);
 
-                RecordEpisodeHtmlProvider recordEpisodeRecordingHtmlProvider = new RecordEpisodeHtmlProvider(episode, recorder);
+                RecordEpisodePage recordEpisodeRecordingHtmlProvider = new RecordEpisodePage(episode, recorder);
                 addPublishedContent(publishedContent, recordEpisodeRecordingHtmlProvider);
-                RecordEpisodePodcastProvider recordEpisodeRecordingPodcastProvider = new RecordEpisodePodcastProvider(baseUrl, episode, recorder);
+                RecordEpisodePodcast recordEpisodeRecordingPodcastProvider = new RecordEpisodePodcast(baseUrl, episode, recorder);
                 addPublishedContent(publishedContent, recordEpisodeRecordingPodcastProvider);
 
-                WatchEpisodeVideoProvider watchEpisodeVideoProvider = new WatchEpisodeVideoProvider(logger, episode, recorder);
+                WatchEpisode watchEpisodeVideoProvider = new WatchEpisode(logger, episode, recorder);
                 addPublishedContent(publishedContent, watchEpisodeVideoProvider);
 
             }
@@ -230,9 +230,9 @@ public class PodcastServer implements CatalogPublisher {
             catalog.addError("FATAL", "Failed to publish to html server " + e.getMessage());
             logger.error("Failed to publish catalog to html server", e);
         } finally {
-            ErrorHtmlProvider provider = new ErrorHtmlProvider(catalog);
+            ErrorsPage provider = new ErrorsPage(catalog);
             addPublishedContent(publishedContent, provider);
-            ErrorPodcastProvider errProvider = new ErrorPodcastProvider(baseUrl, catalog);
+            ErrorsPodcast errProvider = new ErrorsPodcast(baseUrl, catalog);
             addPublishedContent(publishedContent, errProvider);
         }
     }

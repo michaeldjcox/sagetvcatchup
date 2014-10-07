@@ -1,17 +1,16 @@
 package uk.co.mdjcox.sagetv.catchup.server.pages;
 
 import uk.co.mdjcox.sagetv.catchup.Cataloger;
-import uk.co.mdjcox.sagetv.catchup.server.pages.HtmlPageProvider;
 import uk.co.mdjcox.utils.HtmlBuilder;
 
 /**
  * Created by michael on 07/10/14.
  */
-public class StopCatalogingHtmlProvider extends HtmlPageProvider {
+public class StopCatalogingPage extends AbstractHtmlPage {
 
     private Cataloger cataloger;
 
-    public StopCatalogingHtmlProvider(Cataloger cataloger) {
+    public StopCatalogingPage(Cataloger cataloger) {
         this.cataloger = cataloger;
     }
 

@@ -1,23 +1,25 @@
 package uk.co.mdjcox.sagetv.catchup.server.pages;
 
-import uk.co.mdjcox.sagetv.catchup.Cataloger;
-import uk.co.mdjcox.sagetv.catchup.server.pages.HtmlPageProvider;
+import uk.co.mdjcox.sagetv.catchup.Recorder;
+import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.utils.HtmlBuilder;
 
 /**
  * Created by michael on 07/10/14.
  */
-public class StartCatalogingHtmlProvider extends HtmlPageProvider {
+public class RecordEpisodePage extends AbstractHtmlPage {
 
-    private Cataloger cataloger;
+    private final Episode episode;
+    private Recorder recorder;
 
-    public StartCatalogingHtmlProvider(Cataloger cataloger) {
-        this.cataloger = cataloger;
+    public RecordEpisodePage(Episode episode, Recorder recorder) {
+        this.episode = episode;
+        this.recorder = recorder;
     }
 
     @Override
     public String getUri() {
-        return "/startcat?type=html";
+        return "/record?id="+episode.getId()+"&type=html";
     }
 
     @Override
@@ -27,10 +29,11 @@ public class StartCatalogingHtmlProvider extends HtmlPageProvider {
 
     @Override
     public String buildPage() {
-        String message = cataloger.start();
+        recorder.record(episode);
+        String message = "Recording " + episode.getPodcastTitle();
         HtmlBuilder builder = new HtmlBuilder();
         builder.startDocument();
-        builder.addPageHeader("Cataloging");
+        builder.addPageHeader("Recording");
         builder.startBody();
         builder.addHeading1(message);
         builder.stopBody();

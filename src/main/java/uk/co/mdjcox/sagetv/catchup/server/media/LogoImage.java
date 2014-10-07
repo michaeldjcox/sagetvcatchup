@@ -12,7 +12,7 @@ import java.io.OutputStream;
 /**
  * Created by michael on 07/10/14.
  */
-public class LogoImageProvider implements ContentProvider {
+public class LogoImage implements ContentProvider {
     @Override
     public String getUri() {
         return "/logo.png";

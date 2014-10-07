@@ -1,7 +1,6 @@
 package uk.co.mdjcox.sagetv.catchup.server.pages;
 
 import uk.co.mdjcox.sagetv.catchup.Recorder;
-import uk.co.mdjcox.sagetv.catchup.server.pages.HtmlPageProvider;
 import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.utils.HtmlBuilder;
 
@@ -10,11 +9,11 @@ import java.util.Collection;
 /**
  * Created by michael on 07/10/14.
  */
-public class RecordingsHtmlProvider extends HtmlPageProvider {
+public class RecordingsPage extends AbstractHtmlPage {
 
     private final Recorder recorder;
 
-    public RecordingsHtmlProvider(Recorder recorder) {
+    public RecordingsPage(Recorder recorder) {
         this.recorder = recorder;
     }
 

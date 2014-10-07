@@ -8,12 +8,12 @@ import java.util.TreeSet;
 /**
  * Created by michael on 07/10/14.
  */
-public class ErrorPodcastProvider extends PodcastPageProvider {
+public class ErrorsPodcast extends AbstractPodcast {
 
     private final Catalog catalog;
     private String page;
 
-    public ErrorPodcastProvider(String baseUrl, Catalog catalog) {
+    public ErrorsPodcast(String baseUrl, Catalog catalog) {
         super(baseUrl);
         this.catalog = catalog;
         this.page = buildPage();

@@ -4,7 +4,6 @@ import com.thoughtworks.xstream.XStream;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-import uk.co.mdjcox.sagetv.catchup.server.pages.HtmlPageProvider;
 import uk.co.mdjcox.utils.HtmlBuilder;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -22,7 +21,7 @@ import java.io.StringWriter;
 /**
  * Created by michael on 06/10/14.
  */
-public class StyledPageProvider extends HtmlPageProvider {
+public class StyledPage extends AbstractHtmlPage {
 
     private final Logger logger;
     private final XStream xstream;
@@ -32,7 +31,7 @@ public class StyledPageProvider extends HtmlPageProvider {
     private final String id;
     private final String page;
 
-    public StyledPageProvider(Logger logger, String title, String stylesheet, String id, Object object) {
+    public StyledPage(Logger logger, String title, String stylesheet, String id, Object object) {
         this.logger = logger;
         this.title = title;
         this.stylesheet = stylesheet;

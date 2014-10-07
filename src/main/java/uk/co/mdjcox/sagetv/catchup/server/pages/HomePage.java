@@ -7,12 +7,12 @@ import uk.co.mdjcox.utils.HtmlBuilder;
 /**
  * Created by michael on 07/10/14.
  */
-public class HomeHtmlProvider extends HtmlPageProvider {
+public class HomePage extends AbstractHtmlPage {
 
     private final Cataloger cataloger;
     private final Recorder recorder;
 
-    public HomeHtmlProvider(Cataloger cataloger, Recorder recorder) {
+    public HomePage(Cataloger cataloger, Recorder recorder) {
         this.cataloger = cataloger;
         this.recorder = recorder;
     }

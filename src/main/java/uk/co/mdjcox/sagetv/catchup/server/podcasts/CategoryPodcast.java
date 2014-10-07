@@ -9,14 +9,14 @@ import java.util.Set;
 /**
  * Created by michael on 07/10/14.
  */
-public class CategoryPodcastProvider extends PodcastPageProvider {
+public class CategoryPodcast extends AbstractPodcast {
 
     private final HtmlUtilsInterface htmlUtils;
     private final Category service;
     private final Catalog catalog;
     private String page;
 
-    public CategoryPodcastProvider(String baseUrl, Catalog catalog, Category category, HtmlUtilsInterface htmlUtils) {
+    public CategoryPodcast(String baseUrl, Catalog catalog, Category category, HtmlUtilsInterface htmlUtils) {
         super(baseUrl);
         this.htmlUtils = htmlUtils;
         this.catalog = catalog;

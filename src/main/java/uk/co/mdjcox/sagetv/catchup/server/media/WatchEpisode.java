@@ -13,13 +13,13 @@ import java.io.OutputStream;
 /**
  * Created by michael on 07/10/14.
  */
-public class WatchEpisodeVideoProvider implements ContentProvider {
+public class WatchEpisode implements ContentProvider {
 
     private final Episode episode;
     private final Logger logger;
     private Recorder recorder;
 
-    public WatchEpisodeVideoProvider(Logger logger,Episode episode, Recorder recorder) {
+    public WatchEpisode(Logger logger, Episode episode, Recorder recorder) {
         this.episode = episode;
         this.recorder = recorder;
         this.logger = logger;

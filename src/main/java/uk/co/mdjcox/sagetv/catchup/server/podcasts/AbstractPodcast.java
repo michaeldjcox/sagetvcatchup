@@ -10,11 +10,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public abstract class PodcastPageProvider implements ContentProvider {
+public abstract class AbstractPodcast implements ContentProvider {
 
     private String podcastBaseUrl;
 
-    protected PodcastPageProvider(String podcastUrl) {
+    protected AbstractPodcast(String podcastUrl) {
         this.podcastBaseUrl = podcastUrl;
     }
 

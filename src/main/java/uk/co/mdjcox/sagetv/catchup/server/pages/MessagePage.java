@@ -1,16 +1,15 @@
 package uk.co.mdjcox.sagetv.catchup.server.pages;
 
-import uk.co.mdjcox.sagetv.catchup.server.pages.HtmlPageProvider;
 import uk.co.mdjcox.utils.HtmlBuilder;
 
 /**
  * Created by michael on 07/10/14.
  */
-public class MessageHtmlProvider extends HtmlPageProvider {
+public class MessagePage extends AbstractHtmlPage {
 
     private String message;
 
-    public MessageHtmlProvider(String message) {
+    public MessagePage(String message) {
         this.message = message;
     }
 

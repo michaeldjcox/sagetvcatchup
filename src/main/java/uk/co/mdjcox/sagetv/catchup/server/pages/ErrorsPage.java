@@ -8,13 +8,13 @@ import java.util.TreeSet;
 /**
  * Created by michael on 06/10/14.
  */
-public class ErrorHtmlProvider extends HtmlPageProvider {
+public class ErrorsPage extends AbstractHtmlPage {
 
     private final Catalog catalog;
     private String errorSummary="";
     private String page;
 
-    public ErrorHtmlProvider(Catalog catalog) {
+    public ErrorsPage(Catalog catalog) {
         this.catalog = catalog;
         this.page = buildPage();
     }

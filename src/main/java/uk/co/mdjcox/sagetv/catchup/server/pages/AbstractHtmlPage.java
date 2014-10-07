@@ -10,7 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public abstract class HtmlPageProvider implements ContentProvider {
+public abstract class AbstractHtmlPage implements ContentProvider {
 
     @Override
     public void serve(HttpServletResponse response) throws ServletException, IOException {

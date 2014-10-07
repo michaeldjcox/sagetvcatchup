@@ -1,7 +1,5 @@
 package uk.co.mdjcox.sagetv.catchup.server.pages;
 
-import uk.co.mdjcox.sagetv.catchup.server.pages.HtmlPageProvider;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
@@ -12,11 +10,11 @@ import java.io.IOException;
 /**
  * Created by michael on 07/10/14.
  */
-public class LogsHtmlProvider extends HtmlPageProvider {
+public class LogsPage extends AbstractHtmlPage {
 
     private final String logfileName;
 
-    public LogsHtmlProvider(String logfileName) {
+    public LogsPage(String logfileName) {
         this.logfileName = logfileName;
     }
 

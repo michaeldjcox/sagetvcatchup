@@ -2,18 +2,17 @@ package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
 import uk.co.mdjcox.sagetv.catchup.Cataloger;
 import uk.co.mdjcox.sagetv.catchup.Recorder;
-import uk.co.mdjcox.sagetv.catchup.server.podcasts.PodcastPageProvider;
 import uk.co.mdjcox.utils.RssBuilder;
 
 /**
  * Created by michael on 07/10/14.
  */
-public class StatusPodcastProvider extends PodcastPageProvider {
+public class StatusPodcast extends AbstractPodcast {
 
     private final Recorder recorder;
     private final Cataloger cataloger;
 
-    public StatusPodcastProvider(String baseUrl, Recorder recorder, Cataloger cataloger) {
+    public StatusPodcast(String baseUrl, Recorder recorder, Cataloger cataloger) {
         super(baseUrl);
         this.recorder = recorder;
         this.cataloger = cataloger;

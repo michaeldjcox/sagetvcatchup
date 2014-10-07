@@ -1,7 +1,6 @@
 package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
 import uk.co.mdjcox.sagetv.catchup.Recorder;
-import uk.co.mdjcox.sagetv.catchup.server.podcasts.PodcastPageProvider;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
@@ -12,12 +11,12 @@ import java.util.Collection;
 /**
  * Created by michael on 07/10/14.
  */
-public class RecordingsPodcastProvider extends PodcastPageProvider {
+public class RecordingsPodcast extends AbstractPodcast {
 
     private final Recorder recorder;
     private final HtmlUtilsInterface htmlUtils;
 
-    public RecordingsPodcastProvider(HtmlUtilsInterface htmlUtils, String baseUrl, Recorder recorder) {
+    public RecordingsPodcast(HtmlUtilsInterface htmlUtils, String baseUrl, Recorder recorder) {
         super(baseUrl);
         this.recorder = recorder;
         this.htmlUtils = htmlUtils;
