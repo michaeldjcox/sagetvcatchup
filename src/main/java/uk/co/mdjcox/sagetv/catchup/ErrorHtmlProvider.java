@@ -1,0 +1,132 @@
+package uk.co.mdjcox.sagetv.catchup;
+
+import ch.qos.logback.classic.Logger;
+import uk.co.mdjcox.sagetv.model.*;
+import uk.co.mdjcox.utils.HtmlBuilder;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
+
+/**
+ * Created by michael on 06/10/14.
+ */
+public class ErrorHtmlProvider extends HtmlPageProvider {
+
+    private final Catalog catalog;
+    private String errorSummary="";
+    private String page;
+
+    public ErrorHtmlProvider(Catalog catalog) {
+        this.catalog = catalog;
+        this.page = buildPage();
+    }
+
+    private String buildPage() {
+        TreeSet<ParseError> errorList = new TreeSet<ParseError>();
+        for (Category cat : catalog.getCategories()) {
+            if (cat.isSource() || cat.isRoot()) {
+                if (cat.hasErrors()) {
+                    errorList.addAll(cat.getErrors());
+                }
+            }
+            if (cat.isProgrammeCategory()) {
+                if (cat.hasErrors()) {
+                    errorList.addAll(cat.getErrors());
+                }
+                Programme prog  = (Programme)cat;
+                if (prog.hasEpisodes()) {
+                    for (String episodeId : ((Programme)cat).getEpisodes()) {
+                        Episode episode = catalog.getEpisode(episodeId);
+                        if (episode.hasErrors()) {
+                            errorList.addAll(episode.getErrors());
+                        }
+                    }
+                }
+            }
+
+        }
+        HtmlBuilder htmlBuilder = new HtmlBuilder();
+        htmlBuilder.startDocument();
+        htmlBuilder.addPageHeader("Errors page");
+        htmlBuilder.startBody();
+        htmlBuilder.addHeading1("Cataloging errors");
+        htmlBuilder.startTable();
+        htmlBuilder.addTableHeader("Source", "Level", "Programme", "Episode", "Error", "URL");
+        for (ParseError error : errorList) {
+            HtmlBuilder listBuilder = new HtmlBuilder();
+            listBuilder.startList();
+            for (String sourceUrl : error.getSourceUrl()) {
+                HtmlBuilder linkBuilder = new HtmlBuilder();
+                linkBuilder.addLink(sourceUrl, sourceUrl);
+                listBuilder.addListItem(linkBuilder.toString());
+            }
+
+            String link = error.getId();
+            HtmlBuilder linkBuilder = new HtmlBuilder();
+            if (error.getType().equals(Programme.class.getSimpleName())) {
+                linkBuilder.addLink(error.getId(), "/programme=" + error.getId());
+                link = linkBuilder.toString();
+            } else
+            if (error.getType().equals(Episode.class.getSimpleName())) {
+                linkBuilder.addLink(error.getId(), "/episode=" + error.getId());
+                link = linkBuilder.toString();
+            } else {
+                linkBuilder.addLink(error.getId(), "/category=" + error.getId());
+                link = linkBuilder.toString();
+            }
+
+            htmlBuilder.addTableRow(error.getSource(), error.getLevel(), error.getType(),
+                    link, error.getMessage(), listBuilder.toString());
+        }
+        htmlBuilder.stopTable();
+        htmlBuilder.stopBody();
+        htmlBuilder.stopDocument();
+
+        buildErrorSummary(errorList);
+
+        return htmlBuilder.toString();
+
+    }
+
+    private void buildErrorSummary(TreeSet<ParseError> errorList) {
+        HashMap<String, Integer> errorSum = new HashMap<String, Integer>();
+        for (ParseError error : errorList) {
+            Integer count = errorSum.get(error.getLevel());
+            if (count == null) {
+                errorSum.put(error.getLevel(), 1);
+            } else {
+                errorSum.put(error.getLevel(), count + 1);
+            }
+        }
+
+        errorSummary = "( ";
+        for (Map.Entry<String, Integer> entry : errorSum.entrySet()) {
+            errorSummary += entry.getKey()+ " " + entry.getValue()+ " ";
+        }
+        errorSummary+=")";
+
+        if (errorSummary.equals("()")) {
+            errorSummary = "";
+        }
+    }
+
+    @Override
+    public String getUri() {
+        return "/errors?type=html";
+    }
+
+    @Override
+    public String getPage() {
+        return page;
+        }
+
+    public String getErrorSummary() {
+        return errorSummary;
+    }
+
+
+}
