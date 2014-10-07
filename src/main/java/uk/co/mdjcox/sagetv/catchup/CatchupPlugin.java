@@ -10,6 +10,7 @@ import sage.SageTVPluginRegistry;
 import sagex.plugin.SageEvents;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
+import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesInterface;
@@ -33,10 +34,23 @@ import java.util.Map;
 
 // In priority order...
 
+// TODO checkin
+// TODO - Podcast Server rename
+// TODO - Podcast stylesheets?
+// TODO - CSS separate style file
+// TODO - Cataloger being called twice
+// TODO - URIs defined in one place
+// TODO - Generalise SageTV Publisher into utils
+// TODO - Programmes/Episodes/Categories - do I need to convert whole catalog to XML (3 times!)
+// TODO - fake programme categories are model breaking
+// TODO - Test!
+
 // TODO - BUG - force refresh on online caching (set client property!)
 
 // TODO - BBC original air date (I have) but last aired date (I don't have)
 // TODO - No channel is set on TV recordings
+
+// TODO - Build on the fly
 
 // TODO - Can I implement a "New" category
 // TODO - check video from other providers
@@ -139,6 +153,7 @@ public class CatchupPlugin implements SageTVPlugin {
             cataloger = injector.getInstance(Cataloger.class);
             sagetvPublisher = injector.getInstance(SageTvPublisher.class);
             recorder = injector.getInstance(Recorder.class);
+            CatalogPersister persister = injector.getInstance(CatalogPersister.class);
 
             Recorder recorder = injector.getInstance(Recorder.class);
 
@@ -148,8 +163,11 @@ public class CatchupPlugin implements SageTVPlugin {
             List<CatalogPublisher> publishers = new ArrayList<CatalogPublisher>();
             publishers.add(sagetvPublisher);
             publishers.add(server);
+            publishers.add(persister);
 
-            cataloger.init(publishers);
+            Catalog initial = persister.load();
+
+            cataloger.init(publishers, initial);
 
             init();
         } catch (Exception e) {

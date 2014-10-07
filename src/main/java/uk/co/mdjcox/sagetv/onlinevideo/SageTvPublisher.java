@@ -165,7 +165,7 @@ public class SageTvPublisher implements CatalogPublisher {
             links.commit(linkFile, new LinksPropertyLayout());
             labels.commit(labelFile, new LabelsPropertyLayout());
         } catch (Exception e) {
-            catalog.addError("Failed to publish to SageTV " + e.getMessage());
+            catalog.addError("FATAL", "Failed to publish to SageTV " + e.getMessage());
             logger.error("Failed to publish to SageTV", e);
         }
 

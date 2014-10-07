@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
+import java.util.Set;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -72,7 +73,7 @@ public void testAddEpisode() throws Exception {
   public void testGetEpisodesImmutabilityTest() throws Exception {
     Programme subcat = new Programme("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
-    Map<String, Episode> episodes = subcat.getEpisodes();
+    Set<String> episodes = subcat.getEpisodes();
 
     assertEquals("Episodes should number 0", 0, episodes.size());
 
@@ -81,7 +82,7 @@ public void testAddEpisode() throws Exception {
                                   "airTime2", "channel2", Sets.newHashSet("category2"));
 
     try {
-      episodes.put("id2", episode2);
+      episodes.add("id2");
     } catch (UnsupportedOperationException e) {
       return;
     }
@@ -136,12 +137,9 @@ public void testGetEpisodes() throws Exception {
 
   assertEquals("Episodes should number 1", 1, subcat.getEpisodes().size());
 
-  Map<String, Episode> episodes = subcat.getEpisodes();
+  Set<String> episodes = subcat.getEpisodes();
 
-  assertEquals("Episode found should match that entered", episode,
-               episodes.entrySet().iterator().next().getValue());
-
-  assertEquals("Episode key should the episode id", episode.getServiceUrl(), episodes.entrySet().iterator().next().getKey());
+  assertEquals("Episode key should the episode id", episode.getId(), episodes.iterator().next());
 
 }
 

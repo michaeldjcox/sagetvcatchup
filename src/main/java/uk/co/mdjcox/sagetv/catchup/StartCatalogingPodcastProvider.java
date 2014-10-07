@@ -16,7 +16,7 @@ public class StartCatalogingPodcastProvider extends PodcastPageProvider {
 
     @Override
     public String getUri() {
-        return "/stopcat?type=xml";
+        return "/startcat?type=xml";
     }
 
     @Override
@@ -26,7 +26,7 @@ public class StartCatalogingPodcastProvider extends PodcastPageProvider {
 
     @Override
     public String buildPage() {
-        String message = cataloger.stop();
+        String message = cataloger.start();
         RssBuilder builder = new RssBuilder();
         final String url = getPodcastBaseUrl() + getUri();
         final String title = "CATALOGING";

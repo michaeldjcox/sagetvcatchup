@@ -52,7 +52,7 @@ while (str != null) {
             new HashSet(), // genre
     );
 
-    category.addEpisode(subCat);
+    episodes.add(subCat);
 }
 
 

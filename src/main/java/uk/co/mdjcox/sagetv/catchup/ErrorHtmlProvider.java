@@ -25,7 +25,7 @@ public class ErrorHtmlProvider extends HtmlPageProvider {
         this.page = buildPage();
     }
 
-    private String buildPage() {
+    public String buildPage() {
         TreeSet<ParseError> errorList = new TreeSet<ParseError>();
         for (Category cat : catalog.getCategories()) {
             if (cat.isSource() || cat.isRoot()) {
@@ -86,34 +86,9 @@ public class ErrorHtmlProvider extends HtmlPageProvider {
         htmlBuilder.stopBody();
         htmlBuilder.stopDocument();
 
-        buildErrorSummary(errorList);
-
         return htmlBuilder.toString();
 
     }
-
-    private void buildErrorSummary(TreeSet<ParseError> errorList) {
-        HashMap<String, Integer> errorSum = new HashMap<String, Integer>();
-        for (ParseError error : errorList) {
-            Integer count = errorSum.get(error.getLevel());
-            if (count == null) {
-                errorSum.put(error.getLevel(), 1);
-            } else {
-                errorSum.put(error.getLevel(), count + 1);
-            }
-        }
-
-        errorSummary = "( ";
-        for (Map.Entry<String, Integer> entry : errorSum.entrySet()) {
-            errorSummary += entry.getKey()+ " " + entry.getValue()+ " ";
-        }
-        errorSummary+=")";
-
-        if (errorSummary.equals("()")) {
-            errorSummary = "";
-        }
-    }
-
     @Override
     public String getUri() {
         return "/errors?type=html";
@@ -123,10 +98,4 @@ public class ErrorHtmlProvider extends HtmlPageProvider {
     public String getPage() {
         return page;
         }
-
-    public String getErrorSummary() {
-        return errorSummary;
-    }
-
-
 }

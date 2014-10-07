@@ -5,6 +5,7 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import org.slf4j.Logger;
 
+import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Programme;
 import uk.co.mdjcox.sagetv.model.Source;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
@@ -13,6 +14,8 @@ import uk.co.mdjcox.utils.OsUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,10 +33,12 @@ public class EpisodesScript extends Script {
         super(logger, base + File.separator + "getEpisodes.groovy", htmlUtils, downloadUtils, osUtils, properties);
     }
 
-    public void getEpisodes(Source source, Programme category) {
+    public Collection<Episode> getEpisodes(Source source, Programme category) {
+        ArrayList<Episode> episodes = new ArrayList<Episode>();
         try {
             getLogger().info("Getting episodes for " + category);
-            call("source", source, "url", category.getServiceUrl(), "category", category);
+            call("source", source, "url", category.getServiceUrl(), "category", category, "episodes", episodes);
+
         } catch (Throwable e) {
             category.addError("ERROR", "Unable to get episodes: " + e.getMessage());
             getLogger().error("Unable to get episodes for: " + category, e);
@@ -43,6 +48,7 @@ public class EpisodesScript extends Script {
           }
           getLogger().info(category + " has " + category.getEpisodes().size() + " episodes");
         }
+        return episodes;
     }
 
 }

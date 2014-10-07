@@ -38,7 +38,9 @@ public abstract class Category implements ErrorRecorder {
     /** The metadata URLs used to populate this item */
     private final Set<String> metaUrls = new HashSet<String>();
     /** The URL of the podcast listing these episodes */
-    private String podcastUrl;
+    private String podcastUrl="";
+    /** The type of category */
+    private final String type;
 
 
     /**
@@ -63,6 +65,7 @@ public abstract class Category implements ErrorRecorder {
         this.serviceUrl = checkNotNull(serviceUrl);
         this.iconUrl = checkNotNull(iconUrl);
         this.parentId = checkNotNull(parentId);
+        this.type = getClass().getSimpleName();
     }
 
     /**
@@ -315,5 +318,45 @@ public abstract class Category implements ErrorRecorder {
     @Override
     public final String toString() {
         return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Category category = (Category) o;
+
+        if (errors != null ? !errors.equals(category.errors) : category.errors != null) return false;
+        if (iconUrl != null ? !iconUrl.equals(category.iconUrl) : category.iconUrl != null) return false;
+        if (id != null ? !id.equals(category.id) : category.id != null) return false;
+        if (longName != null ? !longName.equals(category.longName) : category.longName != null) return false;
+        if (metaUrls != null ? !metaUrls.equals(category.metaUrls) : category.metaUrls != null) return false;
+        if (parentId != null ? !parentId.equals(category.parentId) : category.parentId != null) return false;
+        if (podcastUrl != null ? !podcastUrl.equals(category.podcastUrl) : category.podcastUrl != null) return false;
+        if (serviceUrl != null ? !serviceUrl.equals(category.serviceUrl) : category.serviceUrl != null) return false;
+        if (shortName != null ? !shortName.equals(category.shortName) : category.shortName != null) return false;
+        if (sourceId != null ? !sourceId.equals(category.sourceId) : category.sourceId != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = sourceId != null ? sourceId.hashCode() : 0;
+        result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (shortName != null ? shortName.hashCode() : 0);
+        result = 31 * result + (longName != null ? longName.hashCode() : 0);
+        result = 31 * result + (serviceUrl != null ? serviceUrl.hashCode() : 0);
+        result = 31 * result + (iconUrl != null ? iconUrl.hashCode() : 0);
+        result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
+        result = 31 * result + (errors != null ? errors.hashCode() : 0);
+        result = 31 * result + (metaUrls != null ? metaUrls.hashCode() : 0);
+        result = 31 * result + (podcastUrl != null ? podcastUrl.hashCode() : 0);
+        return result;
+    }
+
+    public String getType() {
+        return type;
     }
 }

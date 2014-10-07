@@ -4,7 +4,7 @@
     <xsl:template match="/">
         <html>
             <head>
-                <title>Programmes</title>
+                <title>Categories</title>
                 <style>
 table, th, td {
 border: 1px solid black;
@@ -46,12 +46,14 @@ font.error { color: darkred; font: bold; }
 </style>
             </head>
             <body>
-                <h1>Programmes</h1>
+                <h1>Categories</h1>
                 <table>
                     <tr>
                         <th>SourceId</th>
                         <xsl:text>&#10;</xsl:text>
                         <th>ParentId</th>
+                        <xsl:text>&#10;</xsl:text>
+                        <th>Type</th>
                         <xsl:text>&#10;</xsl:text>
                         <th>Id</th>
                         <xsl:text>&#10;</xsl:text>
@@ -62,11 +64,9 @@ font.error { color: darkred; font: bold; }
                         <th>ServiceUrl</th>
                         <xsl:text>&#10;</xsl:text>
                         <th>IconUrl</th>
-                        <xsl:text>&#10;</xsl:text>
-                        <th>PodcastUrl</th>
                     </tr>
                     <xsl:for-each
-                            select="uk.co.mdjcox.sagetv.model.Catalog/categories/entry/uk.co.mdjcox.sagetv.model.Programme">
+                            select="uk.co.mdjcox.sagetv.model.Catalog/categories/entry/uk.co.mdjcox.sagetv.model.Root|uk.co.mdjcox.sagetv.model.Catalog/categories/entry/uk.co.mdjcox.sagetv.model.Source|uk.co.mdjcox.sagetv.model.Catalog/categories/entry/uk.co.mdjcox.sagetv.model.SubCategory">
                         <tr>
                             <td>
                                 <xsl:value-of select="sourceId"/>
@@ -77,7 +77,11 @@ font.error { color: darkred; font: bold; }
                             </td>
                             <xsl:text>&#10;</xsl:text>
                             <td>
-                                <a href="/programme={id}">
+                                <xsl:value-of select="type"/>
+                            </td>
+                            <xsl:text>&#10;</xsl:text>
+                            <td>
+                                <a href="/category={id}">
                                     <xsl:value-of select="id"/>
                                 </a>
                             </td>
@@ -99,12 +103,6 @@ font.error { color: darkred; font: bold; }
                             <td>
                                 <a href="{iconUrl}">
                                     <xsl:value-of select="iconUrl"/>
-                                </a>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <a href="/{id}">
-                                   <xsl:value-of select="id"/>
                                 </a>
                             </td>
                         </tr>

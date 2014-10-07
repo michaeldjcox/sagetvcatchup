@@ -185,6 +185,7 @@ public class SageTvPublisherTest {
                                   "series", "episode", "description", "iconUrl", "serviceUrl",
                                   "airDate", "airTime", "channel", Sets.newHashSet("category"));
     programme.addEpisode(episode);
+    catalog.addEpisode(episode);
 
     sageTvPublisher.publish(catalog);
 

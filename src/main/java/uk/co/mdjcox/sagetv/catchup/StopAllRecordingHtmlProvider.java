@@ -15,7 +15,7 @@ public class StopAllRecordingHtmlProvider extends HtmlPageProvider {
 
     @Override
     public String getUri() {
-        return "/stopcat?type=html";
+        return "/stopall?type=html";
     }
 
     @Override
@@ -25,10 +25,10 @@ public class StopAllRecordingHtmlProvider extends HtmlPageProvider {
 
     @Override
     public String buildPage() {
-        String message = cataloger.stop();
+        String message = recorder.requestStopAll();
         HtmlBuilder builder = new HtmlBuilder();
         builder.startDocument();
-        builder.addPageHeader("Cataloging");
+        builder.addPageHeader("Recording");
         builder.startBody();
         builder.addHeading1(message);
         builder.stopBody();

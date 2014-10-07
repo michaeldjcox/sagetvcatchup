@@ -56,8 +56,8 @@ public class Plugin {
         return programmesScript.getProgrammes(source);
     }
 
-    public void getEpisodes(Source source, Programme programme) {
-        episodesScript.getEpisodes(source, programme);
+    public Collection<Episode> getEpisodes(Source source, Programme programme) {
+        return episodesScript.getEpisodes(source, programme);
     }
 
     public void getEpisode(Source source, Programme programme, Episode episode) {

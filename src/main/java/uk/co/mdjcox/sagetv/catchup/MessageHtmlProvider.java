@@ -7,15 +7,15 @@ import uk.co.mdjcox.utils.HtmlBuilder;
  */
 public class MessageHtmlProvider extends HtmlPageProvider {
 
-    private Recorder recorder;
+    private String message;
 
-    public MessageHtmlProvider(Recorder recorder) {
-        this.recorder = recorder;
+    public MessageHtmlProvider(String message) {
+        this.message = message;
     }
 
     @Override
     public String getUri() {
-        return "/stopall?type=html";
+        return "/error?type=html";
     }
 
     @Override
@@ -25,10 +25,9 @@ public class MessageHtmlProvider extends HtmlPageProvider {
 
     @Override
     public String buildPage() {
-        String message = recorder.requestStopAll();
         HtmlBuilder builder = new HtmlBuilder();
         builder.startDocument();
-        builder.addPageHeader("Recording");
+        builder.addPageHeader("Error");
         builder.startBody();
         builder.addHeading1(message);
         builder.stopBody();

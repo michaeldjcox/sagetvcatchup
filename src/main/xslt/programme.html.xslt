@@ -2,11 +2,11 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:template match="/">
-        <xsl:for-each select="uk.co.mdjcox.sagetv.model.Episode">
+        <xsl:for-each select="uk.co.mdjcox.sagetv.model.Programme">
 
         <html>
             <head>
-                <title>Details page for <xsl:value-of select="programmeTitle"/> - <xsl:value-of select="seriesTitle"/> - <xsl:value-of select="episodeTitle"/></title>
+                <title>Details page for <xsl:value-of select="longName"/></title>
                 <style>
 table, th, td {
 border: 1px solid black;
@@ -48,7 +48,7 @@ font.error { color: darkred; font: bold; }
 </style>
             </head>
             <body>
-                <h1><xsl:value-of select="programmeTitle"/> - <xsl:value-of select="seriesTitle"/> - <xsl:value-of select="episodeTitle"/></h1>
+                <h1><xsl:value-of select="shortName"/></h1>
                 <h2>Details</h2>
                 <table>
                     <tr>
@@ -64,7 +64,7 @@ font.error { color: darkred; font: bold; }
                     <tr>
                         <td>Type</td>
                         <xsl:text>&#10;</xsl:text>
-                        <td>Episode</td>
+                        <td><xsl:value-of select="type"/></td>
                     </tr>
                     <tr>
                         <td>Id</td>
@@ -72,63 +72,19 @@ font.error { color: darkred; font: bold; }
                         <td><xsl:value-of select="id"/></td>
                     </tr>
                     <tr>
-                        <td>Channel</td>
+                        <td>ParentId</td>
                         <xsl:text>&#10;</xsl:text>
-                        <td><xsl:value-of select="channel"/></td>
+                        <td><xsl:value-of select="parentId"/></td>
                     </tr>
                     <tr>
-                        <td>ProgrammeTitle</td>
+                        <td>ShortName</td>
                         <xsl:text>&#10;</xsl:text>
-                        <td><xsl:value-of select="programmeTitle"/></td>
+                        <td><xsl:value-of select="shortName"/></td>
                     </tr>
                     <tr>
-                        <td>SeriesTitle</td>
+                        <td>LongName</td>
                         <xsl:text>&#10;</xsl:text>
-                        <td><xsl:value-of select="seriesTitle"/></td>
-                    </tr>
-                    <tr>
-                        <td>EpisodeTitle</td>
-                        <xsl:text>&#10;</xsl:text>
-                        <td><xsl:value-of select="episodeTitle"/></td>
-                    </tr>
-                    <tr>
-                        <td>Description</td>
-                        <xsl:text>&#10;</xsl:text>
-                        <td><xsl:value-of select="description"/></td>
-                    </tr>
-                    <tr>
-                        <td>Series</td>
-                        <xsl:text>&#10;</xsl:text>
-                        <td><xsl:value-of select="series"/></td>
-                    </tr>
-                    <tr>
-                        <td>Episode</td>
-                        <xsl:text>&#10;</xsl:text>
-                        <td><xsl:value-of select="episode"/></td>
-                    </tr>
-                    <tr>
-                        <td>Genres</td>
-                        <xsl:text>&#10;</xsl:text>
-                        <td><ul>
-                            <xsl:for-each select="genres/string">
-                            <li><xsl:value-of select="."/></li>
-                            </xsl:for-each>
-                        </ul></td>
-                    </tr>
-                    <tr>
-                        <td>Date</td>
-                        <xsl:text>&#10;</xsl:text>
-                        <td><xsl:value-of select="airDate"/></td>
-                    </tr>
-                    <tr>
-                        <td>Time</td>
-                        <xsl:text>&#10;</xsl:text>
-                        <td><xsl:value-of select="airTime"/></td>
-                    </tr>
-                    <tr>
-                        <td>PodcastTitle</td>
-                        <xsl:text>&#10;</xsl:text>
-                        <td><xsl:value-of select="programmeTitle"/> - <xsl:value-of select="seriesTitle"/> - <xsl:value-of select="episodeTitle"/></td>
+                        <td><xsl:value-of select="longName"/></td>
                     </tr>
                     <tr>
                         <td>IconUrl</td>
@@ -141,11 +97,30 @@ font.error { color: darkred; font: bold; }
                         <td><a href="{serviceUrl}"><xsl:value-of select="serviceUrl"/></a></td>
                     </tr>
                     <tr>
+                        <td>PodcastUrl</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <xsl:if test="podcastUrl=''">
+                            <td></td>
+                        </xsl:if>
+                        <xsl:if test="podcastUrl!=''">
+                            <td><a href="{podcastUrl}"><xsl:value-of select="podcastUrl"/></a></td>
+                        </xsl:if>
+                    </tr>
+                    <tr>
                         <td>MetaUrls</td>
                         <xsl:text>&#10;</xsl:text>
                         <td><ul>
                             <xsl:for-each select="metaUrls/string">
                                 <li><a href="{.}"><xsl:value-of select="."/></a></li>
+                            </xsl:for-each>
+                        </ul></td>
+                    </tr>
+                    <tr>
+                        <td>Episodes</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><ul>
+                            <xsl:for-each select="episodes/string">
+                                <li><a href="/episode={.}"><xsl:value-of select="."/></a></li>
                             </xsl:for-each>
                         </ul></td>
                     </tr>

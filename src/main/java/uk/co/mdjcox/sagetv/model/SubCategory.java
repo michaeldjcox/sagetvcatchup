@@ -25,8 +25,8 @@ public class SubCategory extends Category {
 
   /** List of {@link Category} ids that are parents of this category. */
   private Set<String> otherParentIds = new LinkedHashSet<String>();
-  /** Map of child {@link Category} indexed by their ids. */
-  private Map<String, Category> subCategories = new TreeMap<String, Category>();
+  /** Set of child {@link Category} ids. */
+  private Set<String> subCategories = new TreeSet<String>();
 
   /**
    * Constructs a subcategory.
@@ -51,7 +51,7 @@ public class SubCategory extends Category {
    * @param subCategory The child subcategory to add
    */
   public final void addSubCategory(Category subCategory) {
-    subCategories.put(subCategory.getId(), checkNotNull(subCategory));
+    subCategories.add(subCategory.getId());
   }
 
   /**
@@ -59,8 +59,8 @@ public class SubCategory extends Category {
    *
    * @return map of child subcategories
    */
-  public final Map<String, Category> getSubCategories() {
-    return ImmutableMap.copyOf(subCategories);
+  public final Set<String> getSubCategories() {
+    return ImmutableSet.copyOf(subCategories);
   }
 
   /**
@@ -96,4 +96,28 @@ public class SubCategory extends Category {
   public final boolean hasSubCategories() {
     return !subCategories.isEmpty();
   }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        SubCategory that = (SubCategory) o;
+
+        if (otherParentIds != null ? !otherParentIds.equals(that.otherParentIds) : that.otherParentIds != null)
+            return false;
+        if (subCategories != null ? !subCategories.equals(that.subCategories) : that.subCategories != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (otherParentIds != null ? otherParentIds.hashCode() : 0);
+        result = 31 * result + (subCategories != null ? subCategories.hashCode() : 0);
+        return result;
+    }
 }

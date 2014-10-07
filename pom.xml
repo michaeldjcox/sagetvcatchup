@@ -387,6 +387,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+        <dependency>
             <groupId>com.sagetv</groupId>
             <artifactId>sagetv</artifactId>
             <version>7.0</version>

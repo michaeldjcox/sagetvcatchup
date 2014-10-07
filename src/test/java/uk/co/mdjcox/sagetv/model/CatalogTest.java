@@ -63,7 +63,11 @@ public class CatalogTest {
     Map<String, Category> input = new HashMap<String, Category>();
     input.put(cat.getId(), cat);
 
-    catalog.setCategories(input);
+      Root root = new Root("rootId", "shortName", "longName", "serviceUrl", "iconUrl");
+
+      Map<String, Episode> episodes= new HashMap<String, Episode>();
+
+      catalog.setCategories(root, input, episodes);
 
     List<Category> results = catalog.getCategories();
     assertEquals("Results contain one entry", 1, results.size());
@@ -81,7 +85,11 @@ public class CatalogTest {
     Map<String, Category> input = new HashMap<String, Category>();
     input.put(cat.getId(), cat);
 
-    catalog.setCategories(input);
+      Root root = new Root("rootId", "shortName", "longName", "serviceUrl", "iconUrl");
+
+      Map<String, Episode> episodes= new HashMap<String, Episode>();
+
+      catalog.setCategories(root, input, episodes);
 
     List<Category> results = catalog.getCategories();
     assertEquals("Results contain one entry", 1, results.size());
@@ -97,7 +105,7 @@ public class CatalogTest {
         new SubCategory("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
     try {
-      catalog.setCategories(null);
+      catalog.setCategories(null, null, null);
     } catch (NullPointerException e) {
       return;
     }
@@ -117,7 +125,11 @@ public class CatalogTest {
     Map<String, Category> input = new HashMap<String, Category>();
     input.put(cat.getId(), cat);
 
-    catalog.setCategories(input);
+      Root root = new Root("rootId", "shortName", "longName", "serviceUrl", "iconUrl");
+
+      Map<String, Episode> episodes= new HashMap<String, Episode>();
+
+      catalog.setCategories(root, input, episodes);
 
     List<Category> results = catalog.getCategories();
     assertEquals("Results contain one entry", 1, results.size());

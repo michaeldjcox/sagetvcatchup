@@ -7,16 +7,16 @@ import uk.co.mdjcox.utils.RssBuilder;
  */
 public class StopAllRecordingPodcastProvider extends PodcastPageProvider {
 
-    private Cataloger cataloger;
+    private Recorder recorder;
 
-    public StopAllRecordingPodcastProvider(String podcastUrl, Cataloger cataloger) {
-        super(podcastUrl);
-        this.cataloger = cataloger;
+    public StopAllRecordingPodcastProvider(String baseUrl, Recorder recorder) {
+        super(baseUrl);
+        this.recorder = recorder;
     }
 
     @Override
     public String getUri() {
-        return "/stopcat?type=xml";
+        return "/stopall?type=xml";
     }
 
     @Override
@@ -26,10 +26,10 @@ public class StopAllRecordingPodcastProvider extends PodcastPageProvider {
 
     @Override
     public String buildPage() {
-        String message = cataloger.stop();
+        String message = recorder.requestStopAll();
         RssBuilder builder = new RssBuilder();
         final String url = getPodcastBaseUrl() + getUri();
-        final String title = "CATALOGING";
+        final String title = "RECORDING";
         builder.startDocument(title, message, url);
         builder.addTextItem(title, message, url);
         builder.stopDocument();

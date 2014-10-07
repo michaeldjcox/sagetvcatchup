@@ -131,9 +131,7 @@ public class SubCategoryTest {
     assertEquals("parentId", "parentId", subcat.getParentId());
     assertArrayEquals("otherParentIds", new String[]{}, subcat.getOtherParentIds().toArray());
     assertArrayEquals("subCategories keys", new String[]{},
-                      subcat.getSubCategories().keySet().toArray());
-    assertArrayEquals("subCategories values", new String[]{},
-                      subcat.getSubCategories().values().toArray());
+                      subcat.getSubCategories().toArray());
   }
 
   /**
@@ -147,10 +145,9 @@ public class SubCategoryTest {
         new SubCategory("sourceId", "subCatId", "subShortName", "subLongName", "subServiceUrl", "subIconUrl",
                         "id");
     subcat.addSubCategory(subsubcat);
-    Map<String, Category> result = subcat.getSubCategories();
+    Set<String> result = subcat.getSubCategories();
     assertEquals("Number of subcategories", 1, result.size());
-    assertArrayEquals("Subcategory key set", new String[]{"subCatId"}, result.keySet().toArray());
-    assertArrayEquals("Subcategory values", new Category[]{subsubcat}, result.values().toArray());
+    assertArrayEquals("Subcategory key set", new String[]{"subCatId"}, result.toArray());
 
     try {
       subcat.addSubCategory(null);
@@ -169,10 +166,9 @@ public class SubCategoryTest {
         new SubCategory("sourceId", "subCatId", "subShortName", "subLongName", "subServiceUrl", "subIconUrl",
                         "id");
     subcat.addSubCategory(subsubcat);
-    Map<String, Category> result = subcat.getSubCategories();
+    Set<String> result = subcat.getSubCategories();
     assertEquals("Number of subcategories", 1, result.size());
-    assertArrayEquals("Subcategory key set", new String[]{"subCatId"}, result.keySet().toArray());
-    assertArrayEquals("Subcategory values", new Category[]{subsubcat}, result.values().toArray());
+    assertArrayEquals("Subcategory key set", new String[]{"subCatId"}, result.toArray());
 
     SubCategory
         subsubcat2 =
@@ -180,7 +176,7 @@ public class SubCategoryTest {
                         "id2");
 
     try {
-      result.put("test", subsubcat2);
+      result.add("test");
     } catch (UnsupportedOperationException e) {
       return;
     }

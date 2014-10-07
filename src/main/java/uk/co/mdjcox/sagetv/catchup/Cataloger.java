@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 
 import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.sagetv.catchup.plugins.*;
-import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
 import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.util.*;
@@ -31,6 +30,7 @@ public class Cataloger {
     private ScheduledExecutorService service;
     private ScheduledFuture<?> future;
     private List<CatalogPublisher> publishers;
+    private String errorSummary = "";
 
     @Inject
     private Cataloger(Logger logger, PropertiesInterface props, PluginManager pluginManager) {
@@ -52,22 +52,52 @@ public class Cataloger {
                     catalog = catalog();
                     if (catalog != null) {
                         setProgress("Publishing catalog");
-                        for (CatalogPublisher publisher : publishers) {
-                            publisher.publish(catalog);
-                        }
+                        publish(catalog, publishers);
                         setProgress("Finished");
                     }
                 } catch (Exception e) {
                     if (catalog != null) {
-                        catalog.addError("Failed to publish to SageTV " + e.getMessage());
+                        catalog.addError("FATAL", "Failed to publish to SageTV " + e.getMessage());
                     }
                     logger.error("Failed to refresh catalog", e);
                     setProgress("Failed");
                 } finally {
+                    if (catalog != null) {
+                        errorSummary = buildErrorSummary(catalog.getErrors());
+                    }
                     catalogRunning.set(false);
                 }
             }
         };
+    }
+
+    private void publish(Catalog catalog, List<CatalogPublisher> publishers) {
+        for (CatalogPublisher publisher : publishers) {
+            publisher.publish(catalog);
+        }
+    }
+
+    private String buildErrorSummary(Collection<ParseError> errorList) {
+        HashMap<String, Integer> errorSum = new HashMap<String, Integer>();
+        for (ParseError error : errorList) {
+            Integer count = errorSum.get(error.getLevel());
+            if (count == null) {
+                errorSum.put(error.getLevel(), 1);
+            } else {
+                errorSum.put(error.getLevel(), count + 1);
+            }
+        }
+
+        String errorSummary = "( ";
+        for (Map.Entry<String, Integer> entry : errorSum.entrySet()) {
+            errorSummary += entry.getKey()+ " " + entry.getValue()+ " ";
+        }
+        errorSummary+=")";
+
+        if (errorSummary.equals("()")) {
+            errorSummary = "";
+        }
+        return errorSummary;
     }
 
     private Catalog catalog() {
@@ -78,12 +108,13 @@ public class Cataloger {
 
         try {
             Map<String, Category> newCategories = new LinkedHashMap<String, Category>();
+            Map<String, Episode> newEpisodes = new LinkedHashMap<String, Episode>();
 
             Root root = new Root("Catchup", "Catchup TV", "Catchup TV", "http://localhost:8081",
                             "http://localhost:" + props.getInt("podcasterPort", 8081) + "/logo.png");
             newCategories.put(root.getId(), root);
 
-            Source statusSource = new Source(root.getId(), "CatchupStatus", "Catchup Status", "Catchup Status", "", "");
+            Source statusSource = new Source(root.getId(), "status", "Catchup Status", "Catchup Status", "", "");
             statusSource.setPodcastUrl(podcastUrlBase + "status");
             newCategories.put(statusSource.getId(), statusSource);
             root.addSubCategory(statusSource);
@@ -104,8 +135,6 @@ public class Cataloger {
                 logger.info("Found source: " + sourceCat);
 
                 Map<String, Programme> newProgCategories = new LinkedHashMap<String, Programme>();
-
-                Map<String, Episode> newEpisodes = new LinkedHashMap<String, Episode>();
 
                 root.addSubCategory(sourceCat);
                 sourceCat.setParentId(root.getId());
@@ -139,14 +168,18 @@ public class Cataloger {
 
                     programme.setPodcastUrl(podcastUrlBase + programmeId);
 
-                    plugin.getEpisodes(sourceCat, programme);
+                    Collection<Episode> episodes = plugin.getEpisodes(sourceCat, programme);
 
-                    for (Episode episode : programme.getEpisodes().values()) {
+                    for (Episode episode : episodes) {
                         checkForStop();
 
                         plugin.getEpisode(sourceCat, programme, episode);
 
                         episode.setPodcastUrl(podcastUrlBase + "control?id=" + episode.getId());
+
+                        newEpisodes.put(episode.getId(), episode);
+
+                        programme.addEpisode(episode);
                     }
 
                     if (programme.getEpisodes().size() == 0) {
@@ -154,7 +187,6 @@ public class Cataloger {
                     }
 
                     newProgCategories.put(programmeId, programme);
-                    newEpisodes.putAll(programme.getEpisodes());
                 }
 
                 checkForStop();
@@ -176,7 +208,11 @@ public class Cataloger {
                     doAtoZcategorisation(sourceCat, programmeCat, newSubCategories);
 
                     boolean doneGenre = false;
-                    for (Episode episode : programmeCat.getEpisodes().values()) {
+                    for (String episodeId : programmeCat.getEpisodes()) {
+                        Episode episode = newEpisodes.get(episodeId);
+                        if ((episode == null) || episodeId.isEmpty()) {
+                            continue;
+                        }
                         if (!doneGenre) {
                             // Genre
                             doGenreCategorisation(sourceCat, programmeCat, episode, newSubCategories);
@@ -195,7 +231,7 @@ public class Cataloger {
 
             }
 
-            catalog.setCategories(newCategories);
+            catalog.setCategories(root, newCategories, newEpisodes);
 
             progressString = "Finished cataloging";
 
@@ -352,6 +388,12 @@ public class Cataloger {
     public String getProgress() {
         String progress = progressString;
 
+           if (future == null) {
+               return "Not run / Not Scheduled";
+           } else {
+               progress = "Waiting";
+           }
+
         if ("Finished".equals(progress) || "Failed".equals(progress) || "Waiting".equals(progress)) {
             long delay = future.getDelay(TimeUnit.MINUTES);
             progress += " - next attempt " + (delay / 60) + "hrs " + (delay % 60) + "mins";
@@ -359,11 +401,15 @@ public class Cataloger {
         return progress;
     }
 
+    public String getErrorSummary() {
+        return errorSummary;
+    }
+
     public void setProgress(String progress) {
         progressString = progress;
     }
 
-    public void init(final List<CatalogPublisher> publishers) {
+    public void init(final List<CatalogPublisher> publishers, Catalog initial) {
         service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
@@ -373,12 +419,13 @@ public class Cataloger {
 
         this.publishers = publishers;
 
+        publish(initial, publishers);
+
         Runnable runnable = getCatalogRunnable(publishers);
 
         long refreshRate = props.getInt("refreshRateHours");
 
         future = service.scheduleAtFixedRate(runnable, 0, refreshRate, TimeUnit.HOURS);
-
     }
 
     public void shutdown() {

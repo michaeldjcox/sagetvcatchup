@@ -28,6 +28,10 @@
             <outputDirectory>sagetvcatchup/plugins</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>${basedir}/src/main/xslt</directory>
+            <outputDirectory>sagetvcatchup/xslt</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>${basedir}/src/main/recordings</directory>
             <outputDirectory>sagetvcatchup/recordings</outputDirectory>
         </fileSet>

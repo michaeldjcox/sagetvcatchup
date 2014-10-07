@@ -67,6 +67,7 @@ font.error { color: darkred; font: bold; }
                     </tr>
                     <xsl:for-each
                             select="uk.co.mdjcox.sagetv.model.Catalog/categories/entry/uk.co.mdjcox.sagetv.model.Programme">
+                        <xsl:if test="parentId=''">
                         <tr>
                             <td>
                                 <xsl:value-of select="sourceId"/>
@@ -74,6 +75,10 @@ font.error { color: darkred; font: bold; }
                             <xsl:text>&#10;</xsl:text>
                             <td>
                                 <xsl:value-of select="parentId"/>
+                            </td>
+                            <xsl:text>&#10;</xsl:text>
+                            <td>
+                                <xsl:value-of select="type"/>
                             </td>
                             <xsl:text>&#10;</xsl:text>
                             <td>
@@ -103,11 +108,12 @@ font.error { color: darkred; font: bold; }
                             </td>
                             <xsl:text>&#10;</xsl:text>
                             <td>
-                                <a href="/{id}">
-                                   <xsl:value-of select="id"/>
+                                <a href="{podcastUrl}">
+                                    <xsl:value-of select="podcastUrl"/>
                                 </a>
                             </td>
                         </tr>
+                        </xsl:if>
                     </xsl:for-each>
                 </table>
             </body>

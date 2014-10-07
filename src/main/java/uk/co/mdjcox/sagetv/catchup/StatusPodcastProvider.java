@@ -12,12 +12,11 @@ import java.util.TreeSet;
  */
 public class StatusPodcastProvider extends PodcastPageProvider {
 
-    private final String podcastbaseUrl;
     private final Recorder recorder;
     private final Cataloger cataloger;
 
     public StatusPodcastProvider(String baseUrl, Recorder recorder, Cataloger cataloger) {
-        this.podcastbaseUrl = baseUrl;
+        super(baseUrl);
         this.recorder = recorder;
         this.cataloger = cataloger;
     }
@@ -34,12 +33,12 @@ public class StatusPodcastProvider extends PodcastPageProvider {
 
     @Override
     public String buildPage() {
-        String errorsUrl = podcastbaseUrl + "/errors?type=xml";
-        String recordingsUrl = podcastbaseUrl + "/recordings?type=xml";
-        String statusUrl = podcastbaseUrl + "/status?type=xml";
-        String stopUrl = podcastbaseUrl + "/stopall?type=xml";
-        String startCatUrl = podcastbaseUrl + "/startcat?type=xml";
-        String stopCatUrl = podcastbaseUrl + "/stopcat?type=xml";
+        String errorsUrl = getPodcastBaseUrl() + "/errors?type=xml";
+        String recordingsUrl = getPodcastBaseUrl() + "/recordings?type=xml";
+        String statusUrl = getPodcastBaseUrl() + "/status?type=xml";
+        String stopUrl = getPodcastBaseUrl() + "/stopall?type=xml";
+        String startCatUrl = getPodcastBaseUrl() + "/startcat?type=xml";
+        String stopCatUrl = getPodcastBaseUrl() + "/stopcat?type=xml";
         String title = "Status";
         String desc = "Catchup TV status";
 

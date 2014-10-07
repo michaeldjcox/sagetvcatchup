@@ -26,7 +26,7 @@ public class HtmlBuilder  {
       html.append("<style>\n");
       html.append("table, th, td {\n");
       html.append("border: 1px solid black;\n");
-      html.append("  border-collapse: collapse;\n");
+      html.append("border-collapse: collapse;\n");
       html.append("}\n");
       html.append("th, td {\n");
       html.append("padding: 5px;\n");
@@ -104,7 +104,7 @@ public class HtmlBuilder  {
   }
 
   public void stopTable() {
-    html.append("</table>");
+    html.append("</table>\n");
   }
 
   @Override
@@ -113,11 +113,14 @@ public class HtmlBuilder  {
   }
 
   public void startList() {
-    html.append("<ul>");
+    html.append("\n<ul>\n");
   }
 
   public void stopList() {
-    html.append("</ul>");
+    if (html.substring(html.length()-5).equals("<ul>\n")) {
+        html.deleteCharAt(html.length()-1);
+    }
+    html.append("</ul>\n");
   }
 
   public void addListItem(String item) {
@@ -131,25 +134,25 @@ public class HtmlBuilder  {
     html.append(link);
     html.append("\">");
     html.append(name);
-    html.append("</a>\n");
+    html.append("</a>");
   }
 
   public void addHeading1(String title) {
     html.append("<h1>");
     html.append(title);
-    html.append("</h1>");
+    html.append("</h1>\n");
   }
 
   public void addHeading2(String title) {
     html.append("<h2>");
     html.append(title);
-    html.append("</h2>");
+    html.append("</h2>\n");
   }
 
     public void addHeading3(String title) {
         html.append("<h3>");
         html.append(title);
-        html.append("</h3>");
+        html.append("</h3>\n");
     }
     public void addBreak() {
         html.append("<br/>");
@@ -168,5 +171,9 @@ public class HtmlBuilder  {
 
     public void boldOff() {
         html.append("</b>");
+    }
+
+    public void addLineFeed() {
+        html.append("\n");
     }
 }

@@ -21,7 +21,7 @@ String link = "http://localhost:" + GET_INT_PROPERTY("podcasterPort") + "/testEp
             new HashSet(), // genre
     );
 
-    category.addEpisode(subCat);
+    episodes.add(subCat);
 
 
 

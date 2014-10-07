@@ -7,10 +7,10 @@
  */
 package uk.co.mdjcox.sagetv.model;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -20,9 +20,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Programme extends SubCategory {
 
   /**
-   * A map containing all episodes of this programme keyed by id
+   * A set containing all episodes of this programme keyed by id
    */
-  private Map<String, Episode> episodes = new HashMap<String, Episode>();
+  private Set<String> episodes = new HashSet<String>();
 
   /**
    * Constructor for the programme meta data.
@@ -50,7 +50,7 @@ public class Programme extends SubCategory {
    */
   public final void addEpisode(Episode episode) {
     checkNotNull(episode);
-    episodes.put(episode.getServiceUrl(), episode);
+    episodes.add(episode.getId());
   }
 
   /**
@@ -62,7 +62,7 @@ public class Programme extends SubCategory {
    */
   public final void removeEpisode(Episode episode) {
     checkNotNull(episode);
-    episodes.remove(episode.getServiceUrl());
+    episodes.remove(episode.getId());
   }
 
   /**
@@ -70,8 +70,8 @@ public class Programme extends SubCategory {
    *
    * @return an immutable list of the episodes of the programme
    */
-  public final Map<String, Episode> getEpisodes() {
-    return ImmutableMap.copyOf(episodes);
+  public final Set<String> getEpisodes() {
+    return ImmutableSet.copyOf(episodes);
   }
 
   /**
@@ -82,4 +82,23 @@ public class Programme extends SubCategory {
   public final boolean hasEpisodes() {
     return !episodes.isEmpty();
   }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Programme programme = (Programme) o;
+
+        return !(episodes != null ? !episodes.equals(programme.episodes) : programme.episodes != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (episodes != null ? episodes.hashCode() : 0);
+        return result;
+    }
 }

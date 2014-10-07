@@ -512,4 +512,57 @@ public class Episode implements ErrorRecorder {
     return id;
   }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Episode episode1 = (Episode) o;
+
+        if (airDate != null ? !airDate.equals(episode1.airDate) : episode1.airDate != null) return false;
+        if (airTime != null ? !airTime.equals(episode1.airTime) : episode1.airTime != null) return false;
+        if (channel != null ? !channel.equals(episode1.channel) : episode1.channel != null) return false;
+        if (description != null ? !description.equals(episode1.description) : episode1.description != null)
+            return false;
+        if (episode != null ? !episode.equals(episode1.episode) : episode1.episode != null) return false;
+        if (episodeTitle != null ? !episodeTitle.equals(episode1.episodeTitle) : episode1.episodeTitle != null)
+            return false;
+        if (errors != null ? !errors.equals(episode1.errors) : episode1.errors != null) return false;
+        if (genres != null ? !genres.equals(episode1.genres) : episode1.genres != null) return false;
+        if (iconUrl != null ? !iconUrl.equals(episode1.iconUrl) : episode1.iconUrl != null) return false;
+        if (id != null ? !id.equals(episode1.id) : episode1.id != null) return false;
+        if (metaUrls != null ? !metaUrls.equals(episode1.metaUrls) : episode1.metaUrls != null) return false;
+        if (podcastUrl != null ? !podcastUrl.equals(episode1.podcastUrl) : episode1.podcastUrl != null) return false;
+        if (programmeTitle != null ? !programmeTitle.equals(episode1.programmeTitle) : episode1.programmeTitle != null)
+            return false;
+        if (series != null ? !series.equals(episode1.series) : episode1.series != null) return false;
+        if (seriesTitle != null ? !seriesTitle.equals(episode1.seriesTitle) : episode1.seriesTitle != null)
+            return false;
+        if (serviceUrl != null ? !serviceUrl.equals(episode1.serviceUrl) : episode1.serviceUrl != null) return false;
+        if (sourceId != null ? !sourceId.equals(episode1.sourceId) : episode1.sourceId != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = sourceId != null ? sourceId.hashCode() : 0;
+        result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (programmeTitle != null ? programmeTitle.hashCode() : 0);
+        result = 31 * result + (seriesTitle != null ? seriesTitle.hashCode() : 0);
+        result = 31 * result + (episodeTitle != null ? episodeTitle.hashCode() : 0);
+        result = 31 * result + (series != null ? series.hashCode() : 0);
+        result = 31 * result + (episode != null ? episode.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (iconUrl != null ? iconUrl.hashCode() : 0);
+        result = 31 * result + (serviceUrl != null ? serviceUrl.hashCode() : 0);
+        result = 31 * result + (airDate != null ? airDate.hashCode() : 0);
+        result = 31 * result + (airTime != null ? airTime.hashCode() : 0);
+        result = 31 * result + (channel != null ? channel.hashCode() : 0);
+        result = 31 * result + (genres != null ? genres.hashCode() : 0);
+        result = 31 * result + (errors != null ? errors.hashCode() : 0);
+        result = 31 * result + (metaUrls != null ? metaUrls.hashCode() : 0);
+        result = 31 * result + (podcastUrl != null ? podcastUrl.hashCode() : 0);
+        return result;
+    }
 }

@@ -2,9 +2,11 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:template match="/">
+        <xsl:for-each select="uk.co.mdjcox.sagetv.model.Episode">
+
         <html>
             <head>
-                <title>Episodes</title>
+                <title>Details page for <xsl:value-of select="programmeTitle"/> - <xsl:value-of select="seriesTitle"/> - <xsl:value-of select="episodeTitle"/></title>
                 <style>
 table, th, td {
 border: 1px solid black;
@@ -46,105 +48,125 @@ font.error { color: darkred; font: bold; }
 </style>
             </head>
             <body>
-                <h1>Episodes</h1>
+                <h1><xsl:value-of select="programmeTitle"/> - <xsl:value-of select="seriesTitle"/> - <xsl:value-of select="episodeTitle"/></h1>
+                <h2>Details</h2>
                 <table>
                     <tr>
-                        <th>SourceId</th>
+                        <th>Field</th>
                         <xsl:text>&#10;</xsl:text>
-                        <th>Id</th>
-                        <xsl:text>&#10;</xsl:text>
-                        <th>Channel</th>
-                        <xsl:text>&#10;</xsl:text>
-                        <th>ProgrammeTitle</th>
-                        <xsl:text>&#10;</xsl:text>
-                        <th>Series</th>
-                        <xsl:text>&#10;</xsl:text>
-                        <th>SeriesTitle</th>
-                        <xsl:text>&#10;</xsl:text>
-                        <th>Episode</th>
-                        <xsl:text>&#10;</xsl:text>
-                        <th>EpisodeTitle</th>
-                        <xsl:text>&#10;</xsl:text>
-                        <th>Description</th>
-                        <xsl:text>&#10;</xsl:text>
-                        <th>PodcastTitle</th>
-                        <xsl:text>&#10;</xsl:text>
-                        <th>AirDate</th>
-                        <xsl:text>&#10;</xsl:text>
-                        <th>AirTime</th>
-                        <xsl:text>&#10;</xsl:text>
-                        <th>ServiceUrl</th>
-                        <xsl:text>&#10;</xsl:text>
-                        <th>IconUrl</th>
+                        <th>Value</th>
                     </tr>
-                    <xsl:for-each
-                            select="uk.co.mdjcox.sagetv.model.Catalog/episodes/entry/uk.co.mdjcox.sagetv.model.Episode">
-                        <tr>
-                            <td>
-                                <xsl:value-of select="sourceId"/>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <a href="/episode={id}">
-                                    <xsl:value-of select="id"/>
-                                </a>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <xsl:value-of select="channel"/>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <xsl:value-of select="programmeTitle"/>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <xsl:value-of select="series"/>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <xsl:value-of select="seriesTitle"/>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <xsl:value-of select="episode"/>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <xsl:value-of select="episodeTitle"/>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <xsl:value-of select="description"/>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <xsl:value-of select="programmeTitle"/> - <xsl:value-of select="seriesTitle"/> - <xsl:value-of select="episodeTitle"/>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <xsl:value-of select="airDate"/>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <xsl:value-of select="airTime"/>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <a href="{serviceUrl}">
-                                    <xsl:value-of select="serviceUrl"/>
-                                </a>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <a href="{iconUrl}">
-                                    <xsl:value-of select="iconUrl"/>
-                                </a>
-                            </td>
-                        </tr>
-                    </xsl:for-each>
+                    <tr>
+                        <td>SourceId</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="sourceId"/></td>
+                    </tr>
+                    <tr>
+                        <td>Type</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td>Episode</td>
+                    </tr>
+                    <tr>
+                        <td>Id</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="id"/></td>
+                    </tr>
+                    <tr>
+                        <td>Channel</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="channel"/></td>
+                    </tr>
+                    <tr>
+                        <td>ProgrammeTitle</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="programmeTitle"/></td>
+                    </tr>
+                    <tr>
+                        <td>SeriesTitle</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="seriesTitle"/></td>
+                    </tr>
+                    <tr>
+                        <td>EpisodeTitle</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="episodeTitle"/></td>
+                    </tr>
+                    <tr>
+                        <td>Description</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="description"/></td>
+                    </tr>
+                    <tr>
+                        <td>Series</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="series"/></td>
+                    </tr>
+                    <tr>
+                        <td>Episode</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="episode"/></td>
+                    </tr>
+                    <tr>
+                        <td>Genres</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><ul>
+                            <xsl:for-each select="genres/string">
+                            <li><xsl:value-of select="."/></li>
+                            </xsl:for-each>
+                        </ul></td>
+                    </tr>
+                    <tr>
+                        <td>Date</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="airDate"/></td>
+                    </tr>
+                    <tr>
+                        <td>Time</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="airTime"/></td>
+                    </tr>
+                    <tr>
+                        <td>PodcastTitle</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="programmeTitle"/> - <xsl:value-of select="seriesTitle"/> - <xsl:value-of select="episodeTitle"/></td>
+                    </tr>
+                    <tr>
+                        <td>IconUrl</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><a href="{iconUrl}"><xsl:value-of select="iconUrl"/></a></td>
+                    </tr>
+                    <tr>
+                        <td>ServiceUrl</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><a href="{serviceUrl}"><xsl:value-of select="serviceUrl"/></a></td>
+                    </tr>
+                    <tr>
+                        <td>MetaUrls</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><ul>
+                            <xsl:for-each select="metaUrls/string">
+                                <li><a href="{.}"><xsl:value-of select="."/></a></li>
+                            </xsl:for-each>
+                        </ul></td>
+                    </tr>
                 </table>
+            <h2>Errors</h2>
+            <table>
+                <tr>
+                    <th>Level</th>
+                    <xsl:text>&#10;</xsl:text>
+                    <th>Error</th>
+                </tr>
+                <xsl:for-each select="errors/uk.co.mdjcox.sagetv.model.ParseError">
+                <tr>
+                    <td><xsl:value-of select="level"/></td>
+                    <xsl:text>&#10;</xsl:text>
+                    <td><xsl:value-of select="message"/></td>
+                </tr>
+                </xsl:for-each>
+            </table>
             </body>
         </html>
+        </xsl:for-each>
     </xsl:template>
 </xsl:stylesheet>
