@@ -1,22 +1,23 @@
-package uk.co.mdjcox.sagetv.catchup.server;
+package uk.co.mdjcox.sagetv.catchup.server.pages;
 
-import uk.co.mdjcox.sagetv.catchup.server.HtmlPageProvider;
+import uk.co.mdjcox.sagetv.catchup.Cataloger;
+import uk.co.mdjcox.sagetv.catchup.server.pages.HtmlPageProvider;
 import uk.co.mdjcox.utils.HtmlBuilder;
 
 /**
  * Created by michael on 07/10/14.
  */
-public class MessageHtmlProvider extends HtmlPageProvider {
+public class StartCatalogingHtmlProvider extends HtmlPageProvider {
 
-    private String message;
+    private Cataloger cataloger;
 
-    public MessageHtmlProvider(String message) {
-        this.message = message;
+    public StartCatalogingHtmlProvider(Cataloger cataloger) {
+        this.cataloger = cataloger;
     }
 
     @Override
     public String getUri() {
-        return "/error?type=html";
+        return "/startcat?type=html";
     }
 
     @Override
@@ -26,9 +27,10 @@ public class MessageHtmlProvider extends HtmlPageProvider {
 
     @Override
     public String buildPage() {
+        String message = cataloger.start();
         HtmlBuilder builder = new HtmlBuilder();
         builder.startDocument();
-        builder.addPageHeader("Error");
+        builder.addPageHeader("Cataloging");
         builder.startBody();
         builder.addHeading1(message);
         builder.stopBody();

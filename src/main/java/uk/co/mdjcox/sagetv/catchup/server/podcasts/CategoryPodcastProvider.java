@@ -1,4 +1,4 @@
-package uk.co.mdjcox.sagetv.catchup.server;
+package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
 import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;

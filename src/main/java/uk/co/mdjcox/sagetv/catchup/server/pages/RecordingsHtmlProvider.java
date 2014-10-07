@@ -1,7 +1,7 @@
-package uk.co.mdjcox.sagetv.catchup.server;
+package uk.co.mdjcox.sagetv.catchup.server.pages;
 
 import uk.co.mdjcox.sagetv.catchup.Recorder;
-import uk.co.mdjcox.sagetv.catchup.server.HtmlPageProvider;
+import uk.co.mdjcox.sagetv.catchup.server.pages.HtmlPageProvider;
 import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.utils.HtmlBuilder;
 

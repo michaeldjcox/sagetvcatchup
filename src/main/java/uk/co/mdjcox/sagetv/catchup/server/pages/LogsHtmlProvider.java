@@ -1,6 +1,6 @@
-package uk.co.mdjcox.sagetv.catchup.server;
+package uk.co.mdjcox.sagetv.catchup.server.pages;
 
-import uk.co.mdjcox.sagetv.catchup.server.HtmlPageProvider;
+import uk.co.mdjcox.sagetv.catchup.server.pages.HtmlPageProvider;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;

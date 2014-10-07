@@ -1,4 +1,7 @@
-package uk.co.mdjcox.sagetv.catchup.server;
+package uk.co.mdjcox.sagetv.catchup.server.media;
+
+import uk.co.mdjcox.sagetv.catchup.server.ContentProvider;
+import uk.co.mdjcox.sagetv.catchup.server.PodcastServer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;

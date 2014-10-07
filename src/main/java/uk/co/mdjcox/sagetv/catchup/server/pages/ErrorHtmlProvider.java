@@ -1,4 +1,4 @@
-package uk.co.mdjcox.sagetv.catchup.server;
+package uk.co.mdjcox.sagetv.catchup.server.pages;
 
 import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.HtmlBuilder;

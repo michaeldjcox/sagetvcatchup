@@ -1,24 +1,26 @@
-package uk.co.mdjcox.sagetv.catchup.server;
+package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
 import uk.co.mdjcox.sagetv.catchup.Recorder;
-import uk.co.mdjcox.sagetv.catchup.server.PodcastPageProvider;
+import uk.co.mdjcox.sagetv.catchup.server.podcasts.PodcastPageProvider;
 import uk.co.mdjcox.utils.RssBuilder;
 
 /**
  * Created by michael on 07/10/14.
  */
-public class StopAllRecordingPodcastProvider extends PodcastPageProvider {
+public class StopEpisodePodcastProvider extends PodcastPageProvider {
 
+    private final String id;
     private Recorder recorder;
 
-    public StopAllRecordingPodcastProvider(String baseUrl, Recorder recorder) {
+    public StopEpisodePodcastProvider(String baseUrl, String episodeId, Recorder recorder) {
         super(baseUrl);
         this.recorder = recorder;
+        this.id = episodeId;
     }
 
     @Override
     public String getUri() {
-        return "/stopall?type=xml";
+        return "/stop?id=" + id + "&type=xml";
     }
 
     @Override
@@ -28,7 +30,7 @@ public class StopAllRecordingPodcastProvider extends PodcastPageProvider {
 
     @Override
     public String buildPage() {
-        String message = recorder.requestStopAll();
+        String message = recorder.requestStop(id);
         RssBuilder builder = new RssBuilder();
         final String url = getPodcastBaseUrl() + getUri();
         final String title = "RECORDING";

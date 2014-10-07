@@ -1,8 +1,8 @@
-package uk.co.mdjcox.sagetv.catchup.server;
+package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
 import uk.co.mdjcox.sagetv.catchup.Cataloger;
 import uk.co.mdjcox.sagetv.catchup.Recorder;
-import uk.co.mdjcox.sagetv.catchup.server.PodcastPageProvider;
+import uk.co.mdjcox.sagetv.catchup.server.podcasts.PodcastPageProvider;
 import uk.co.mdjcox.utils.RssBuilder;
 
 /**

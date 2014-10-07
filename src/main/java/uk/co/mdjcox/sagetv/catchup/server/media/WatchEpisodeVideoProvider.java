@@ -1,4 +1,4 @@
-package uk.co.mdjcox.sagetv.catchup.server;
+package uk.co.mdjcox.sagetv.catchup.server.media;
 
 import org.slf4j.Logger;
 import uk.co.mdjcox.sagetv.catchup.Recorder;

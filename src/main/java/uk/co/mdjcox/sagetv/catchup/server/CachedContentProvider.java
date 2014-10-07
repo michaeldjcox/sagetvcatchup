@@ -9,7 +9,7 @@ import java.io.*;
 /**
  * Created by michael on 07/10/14.
  */
-public class CachedPageProvider implements ContentProvider {
+public class CachedContentProvider implements ContentProvider {
     // TODO some form of staging and cleanup
 
     private final String htdocsDir;
@@ -19,7 +19,7 @@ public class CachedPageProvider implements ContentProvider {
     private String uri;
     private String fileName;
 
-    public CachedPageProvider(Logger logger, String htdocsDir, ContentProvider provider) {
+    public CachedContentProvider(Logger logger, String htdocsDir, ContentProvider provider) {
         type = provider.getType();
         uri = provider.getUri();
         this.logger = logger;

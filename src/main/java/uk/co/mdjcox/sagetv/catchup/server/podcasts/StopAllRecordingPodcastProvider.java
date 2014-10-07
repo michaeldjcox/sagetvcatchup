@@ -1,24 +1,24 @@
-package uk.co.mdjcox.sagetv.catchup.server;
+package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
-import uk.co.mdjcox.sagetv.catchup.Cataloger;
-import uk.co.mdjcox.sagetv.catchup.server.PodcastPageProvider;
+import uk.co.mdjcox.sagetv.catchup.Recorder;
+import uk.co.mdjcox.sagetv.catchup.server.podcasts.PodcastPageProvider;
 import uk.co.mdjcox.utils.RssBuilder;
 
 /**
  * Created by michael on 07/10/14.
  */
-public class StartCatalogingPodcastProvider extends PodcastPageProvider {
+public class StopAllRecordingPodcastProvider extends PodcastPageProvider {
 
-    private Cataloger cataloger;
+    private Recorder recorder;
 
-    public StartCatalogingPodcastProvider(String podcastUrl, Cataloger cataloger) {
-        super(podcastUrl);
-        this.cataloger = cataloger;
+    public StopAllRecordingPodcastProvider(String baseUrl, Recorder recorder) {
+        super(baseUrl);
+        this.recorder = recorder;
     }
 
     @Override
     public String getUri() {
-        return "/startcat?type=xml";
+        return "/stopall?type=xml";
     }
 
     @Override
@@ -28,10 +28,10 @@ public class StartCatalogingPodcastProvider extends PodcastPageProvider {
 
     @Override
     public String buildPage() {
-        String message = cataloger.start();
+        String message = recorder.requestStopAll();
         RssBuilder builder = new RssBuilder();
         final String url = getPodcastBaseUrl() + getUri();
-        final String title = "CATALOGING";
+        final String title = "RECORDING";
         builder.startDocument(title, message, url);
         builder.addTextItem(title, message, url);
         builder.stopDocument();

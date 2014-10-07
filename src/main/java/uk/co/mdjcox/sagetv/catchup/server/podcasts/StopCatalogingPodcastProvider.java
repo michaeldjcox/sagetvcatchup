@@ -1,22 +1,24 @@
-package uk.co.mdjcox.sagetv.catchup.server;
+package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
+import uk.co.mdjcox.sagetv.catchup.Cataloger;
+import uk.co.mdjcox.sagetv.catchup.server.podcasts.PodcastPageProvider;
 import uk.co.mdjcox.utils.RssBuilder;
 
 /**
  * Created by michael on 07/10/14.
  */
-public class MessagePodcastProvider extends PodcastPageProvider {
+public class StopCatalogingPodcastProvider extends PodcastPageProvider {
 
-    private String message;
+    private Cataloger cataloger;
 
-    public MessagePodcastProvider(String baseUrl, String message) {
-        super(baseUrl);
-        this.message = message;
+    public StopCatalogingPodcastProvider(String podcastUrl, Cataloger cataloger) {
+        super(podcastUrl);
+        this.cataloger = cataloger;
     }
 
     @Override
     public String getUri() {
-        return "/error?type=xml";
+        return "/stopcat?type=xml";
     }
 
     @Override
@@ -26,9 +28,10 @@ public class MessagePodcastProvider extends PodcastPageProvider {
 
     @Override
     public String buildPage() {
+        String message = cataloger.stop();
         RssBuilder builder = new RssBuilder();
         final String url = getPodcastBaseUrl() + getUri();
-        final String title = "ERROR";
+        final String title = "CATALOGING";
         builder.startDocument(title, message, url);
         builder.addTextItem(title, message, url);
         builder.stopDocument();
