@@ -46,7 +46,7 @@ public class RecordingsPodcast extends AbstractPodcast {
             final String episodeTitle = htmlUtils.makeContentSafe(episode.getPodcastTitle());
             final String episodeDesc = htmlUtils.makeContentSafe(episode.getDescription());
             final String episodeIconUrl = episode.getIconUrl();
-            final String controlUrl = getPodcastBaseUrl() + "/control?id=" + episode.getId();
+            final String controlUrl = getPodcastBaseUrl() + "/control?id=" + episode.getId() + ";type=xml";
 
             builder.addCategoryItem(episodeTitle, episodeDesc, controlUrl, episodeIconUrl);
         }

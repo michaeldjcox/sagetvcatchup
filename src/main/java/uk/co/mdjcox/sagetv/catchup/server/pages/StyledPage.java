@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import uk.co.mdjcox.utils.HtmlBuilder;
+import uk.co.mdjcox.utils.PropertiesInterface;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,14 +31,16 @@ public class StyledPage extends AbstractHtmlPage {
     private final Object object;
     private final String id;
     private final String page;
+    private final String xsltDir;
 
-    public StyledPage(Logger logger, String title, String stylesheet, String id, Object object) {
+    public StyledPage(String xsltDir, Logger logger, String title, String stylesheet, String id, Object object) {
         this.logger = logger;
         this.title = title;
         this.stylesheet = stylesheet;
         this.object = object;
         this.id = id;
         xstream = new XStream();
+        this.xsltDir = xsltDir;
         page = buildPage();
     }
 
@@ -78,9 +81,9 @@ public class StyledPage extends AbstractHtmlPage {
     @Override
     public String getUri() {
         if (id != null) {
-            return "/" + stylesheet.replace(".html", "=") + id;
+            return "/" + stylesheet.replace(".html", "?id=") + id + ";type=html";
         } else {
-            return "/" + stylesheet.replace(".html", "");
+            return "/" + stylesheet.replace(".html", "") + "?type=html";
         }
     }
 

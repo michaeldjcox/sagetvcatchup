@@ -9,14 +9,14 @@ import java.util.Set;
 /**
  * Created by michael on 07/10/14.
  */
-public class CategoryPodcast extends AbstractPodcast {
+public class ProgrammePodcast extends AbstractPodcast {
 
     private final HtmlUtilsInterface htmlUtils;
-    private final Category service;
+    private final Programme service;
     private final Catalog catalog;
     private String page;
 
-    public CategoryPodcast(String baseUrl, Catalog catalog, Category category, HtmlUtilsInterface htmlUtils) {
+    public ProgrammePodcast(String baseUrl, Catalog catalog, Programme category, HtmlUtilsInterface htmlUtils) {
         super(baseUrl);
         this.htmlUtils = htmlUtils;
         this.catalog = catalog;
@@ -34,17 +34,15 @@ public class CategoryPodcast extends AbstractPodcast {
         RssBuilder builder = new RssBuilder();
         builder.startDocument(shortName, longName, url);
         builder.addImage(iconUrl, shortName, url);
-
-        Set<String> subCats = ((SubCategory) service).getSubCategories();
-        for (String subCatId : subCats) {
-            SubCategory subCat = (SubCategory)catalog.getCategory(subCatId);
-            if (subCat.isProgrammeCategory()) {
-                final String categoryUrl = getPodcastBaseUrl() + "/programme?id=" + subCat.getId() + ";type=xml";
-                builder.addCategoryItem(subCat.getShortName(), subCat.getLongName(), categoryUrl);
-            } else {
-                final String categoryUrl = getPodcastBaseUrl() + "/category?id=" + subCat.getId() + ";type=xml";
-                builder.addCategoryItem(subCat.getShortName(), subCat.getLongName(), categoryUrl);
-            }
+        Programme programme = (Programme) service;
+        Set<String> episodes = programme.getEpisodes();
+        for (String episodeId : episodes) {
+            Episode episode = catalog.getEpisode(episodeId);
+            final String title = htmlUtils.makeContentSafe(episode.getPodcastTitle());
+            final String desc = htmlUtils.makeContentSafe(episode.getDescription());
+            final String episodeIconUrl = episode.getIconUrl();
+            final String controlUrl=getPodcastBaseUrl() +  "/control?id=" + episode.getId() + ";type=xml";
+            builder.addCategoryItem(title, desc, controlUrl, episodeIconUrl);
         }
         builder.stopDocument();
         return builder.toString();
@@ -52,7 +50,7 @@ public class CategoryPodcast extends AbstractPodcast {
 
     @Override
     public String getUri() {
-        return "/category?id=" + service.getId() + ";type=xml";
+        return "/programme?id=" + service.getId() + ";type=xml";
     }
 
     @Override

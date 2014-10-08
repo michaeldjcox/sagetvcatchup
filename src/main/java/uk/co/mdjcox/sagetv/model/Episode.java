@@ -26,6 +26,8 @@ public class Episode implements ErrorRecorder {
   private String seriesTitle = "";
   /** The title of the episode of the programme */
   private String episodeTitle = "";
+  /** The title of the episode of the programme */
+  private String podcastTitle = "";
   /** The series this episode belongs to */
   private String series = "";
   /** The episode number within the series */
@@ -89,6 +91,7 @@ public class Episode implements ErrorRecorder {
     this.airTime = checkNotNull(airTime);
     this.channel = checkNotNull(channel);
     this.genres.addAll(checkNotNull(genres));
+    podcastTitle = buildPodcastTitle();
   }
 
   /**
@@ -189,6 +192,7 @@ public class Episode implements ErrorRecorder {
    */
   public final void setProgrammeTitle(String programmeTitle) {
     this.programmeTitle = checkNotNull(programmeTitle);
+    this.podcastTitle = buildPodcastTitle();
   }
 
   /**
@@ -209,6 +213,7 @@ public class Episode implements ErrorRecorder {
    */
   public void setSeriesTitle(String seriesTitle) {
     this.seriesTitle = seriesTitle;
+      this.podcastTitle = buildPodcastTitle();
   }
 
   /**
@@ -220,6 +225,7 @@ public class Episode implements ErrorRecorder {
    */
   public final void setEpisodeTitle(String episodeTitle) {
     this.episodeTitle = checkNotNull(episodeTitle);
+      this.podcastTitle = buildPodcastTitle();
   }
 
   /**
@@ -253,6 +259,7 @@ public class Episode implements ErrorRecorder {
    */
   public final void setServiceUrl(String serviceUrl) {
     this.serviceUrl = checkNotNull(serviceUrl);
+      this.podcastTitle = buildPodcastTitle();
   }
 
   /**
@@ -350,6 +357,7 @@ public class Episode implements ErrorRecorder {
    */
   public final void setSeries(String series) {
     this.series = checkNotNull(series);
+      this.podcastTitle = buildPodcastTitle();
   }
 
   /**
@@ -370,15 +378,27 @@ public class Episode implements ErrorRecorder {
    */
   public final void setEpisode(String episode) {
     this.episode = checkNotNull(episode);
+      this.podcastTitle = buildPodcastTitle();
   }
 
-  /**
-   * Gets a title for the podcast which can include programme title, episode title,
+
+    /**
+     * Builds a title for the podcast which can include programme title, episode title,
+     * series and episode identifiers depending on whats available
+     *
+     * @return a title for this episode of the programme
+     */
+    public String getPodcastTitle() {
+        return podcastTitle;
+    }
+
+    /**
+   * Builds a title for the podcast which can include programme title, episode title,
    * series and episode identifiers depending on whats available
    *
    * @return a title for this episode of the programme
    */
-  public final String getPodcastTitle() {
+  private final String buildPodcastTitle() {
     String programmePart = programmeTitle == null ? "" : programmeTitle;
 
     String seriesPart = seriesTitle == null ? "" : seriesTitle;

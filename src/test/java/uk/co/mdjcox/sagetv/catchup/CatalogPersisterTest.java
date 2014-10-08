@@ -107,7 +107,7 @@ public class CatalogPersisterTest {
         Programme programme = new Programme("sourceId", "programmeId", "programmeShortName",
                 "programmeLongname", "programmeServiceUrl", "programmeIconUrl", "");
 
-        programme.setPodcastUrl("/programmeId");
+        programme.setPodcastUrl("/programme?id=programmeId;type=xml");
         programme.addMetaUrl("metaUrl1");
         programme.addMetaUrl("metaUrl2");
 

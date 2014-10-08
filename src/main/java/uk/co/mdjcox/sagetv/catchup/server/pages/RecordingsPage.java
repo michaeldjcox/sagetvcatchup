@@ -28,14 +28,14 @@ public class RecordingsPage extends AbstractHtmlPage {
         htmlBuilder.addTableHeader("Source", "Episode", "In progress", "Stop");
         for (Recording recording : recordings) {
             HtmlBuilder linkBuilder = new HtmlBuilder();
-            String stopLink = "/stop?id=" + recording.getId();
+            String stopLink = "/stop?id=" + recording.getId()+";type=html";
             linkBuilder.addLink("stop", stopLink);
             htmlBuilder.addTableRow(recording.getSourceId(), recording.getId(), String.valueOf(recording.isInProgress()), linkBuilder.toString());
         }
         htmlBuilder.stopTable();
 
         htmlBuilder.addBreak();
-        String stopLink = "/stopall";
+        String stopLink = "/stopall?type=html";
         htmlBuilder.addLink("Stop all recordings", stopLink);
 
 

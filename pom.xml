@@ -126,7 +126,7 @@
                         </replacement>
                         <replacement>
                             <token>_DESCRIPTION_</token>
-                            <value><![CDATA[sagetvcatchup description]]></value>
+                            <value><![CDATA[Plugin to integrate catchup TV sources into SageTV]]></value>
                         </replacement>
                         <replacement>
                             <token>_ID_</token>
@@ -154,7 +154,7 @@
                         </replacement>
                         <replacement>
                             <token>_RELEASENOTES_</token>
-                            <value><![CDATA[_VERSION_ - Initial version.]]></value>
+                            <value><![CDATA[_VERSION_]] - beta release]]></value>
                         </replacement>
                         <replacement>
                             <token>_AUTHOR_</token>

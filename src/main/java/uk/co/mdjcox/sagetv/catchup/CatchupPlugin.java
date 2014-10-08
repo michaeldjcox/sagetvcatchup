@@ -35,11 +35,7 @@ import java.util.Map;
 
 // In priority order...
 
-// TODO - Podcast Server rename
 // TODO - Podcast stylesheets?
-// TODO - CSS separate style file
-// TODO - Cataloger being called twice
-// TODO - URIs defined in one place
 // TODO - Generalise SageTV Publisher into utils
 // TODO - Programmes/Episodes/Categories - do I need to convert whole catalog to XML (3 times!)
 // TODO - fake programme categories are model breaking

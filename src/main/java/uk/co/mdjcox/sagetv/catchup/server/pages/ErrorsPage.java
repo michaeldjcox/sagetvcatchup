@@ -62,14 +62,14 @@ public class ErrorsPage extends AbstractHtmlPage {
             String link = error.getId();
             HtmlBuilder linkBuilder = new HtmlBuilder();
             if (error.getType().equals(Programme.class.getSimpleName())) {
-                linkBuilder.addLink(error.getId(), "/programme=" + error.getId());
+                linkBuilder.addLink(error.getId(), "/programme?id=" + error.getId() + ";type=html");
                 link = linkBuilder.toString();
             } else
             if (error.getType().equals(Episode.class.getSimpleName())) {
-                linkBuilder.addLink(error.getId(), "/episode=" + error.getId());
+                linkBuilder.addLink(error.getId(), "/episode?id=" + error.getId() + ";type=html");
                 link = linkBuilder.toString();
             } else {
-                linkBuilder.addLink(error.getId(), "/category=" + error.getId());
+                linkBuilder.addLink(error.getId(), "/category?id=" + error.getId() + ";type=html");
                 link = linkBuilder.toString();
             }
 

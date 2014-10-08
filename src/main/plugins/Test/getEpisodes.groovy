@@ -2,7 +2,7 @@ package Test
 
 import uk.co.mdjcox.sagetv.model.Episode
 
-String link = "http://localhost:" + GET_INT_PROPERTY("podcasterPort") + "/testEpisode"
+String link = "http://localhost:" + GET_INT_PROPERTY("podcasterPort") + "/episode?id=testEpisode;type=html"
 
     Episode subCat = new Episode(
             source.getId(),

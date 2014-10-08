@@ -19,7 +19,7 @@ public class RecordEpisodePage extends AbstractHtmlPage {
 
     @Override
     public String getUri() {
-        return "/record?id="+episode.getId()+"&type=html";
+        return "/record?id="+episode.getId()+";type=html";
     }
 
     @Override

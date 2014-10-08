@@ -20,7 +20,7 @@ public class StatusPodcast extends AbstractPodcast {
 
     @Override
     public String getUri() {
-        return "/status?type=xml";
+        return "/category?id=status;type=xml";
     }
 
     @Override
@@ -32,7 +32,7 @@ public class StatusPodcast extends AbstractPodcast {
     public String buildPage() {
         String errorsUrl = getPodcastBaseUrl() + "/errors?type=xml";
         String recordingsUrl = getPodcastBaseUrl() + "/recordings?type=xml";
-        String statusUrl = getPodcastBaseUrl() + "/status?type=xml";
+        String statusUrl = getPodcastBaseUrl() + "/category?id=status;type=xml";
         String stopUrl = getPodcastBaseUrl() + "/stopall?type=xml";
         String startCatUrl = getPodcastBaseUrl() + "/startcat?type=xml";
         String stopCatUrl = getPodcastBaseUrl() + "/stopcat?type=xml";

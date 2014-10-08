@@ -47,29 +47,29 @@ public class HomePage extends AbstractHtmlPage {
         htmlBuilder.addParagraph("Recording processes:");
         htmlBuilder.boldOff();
         htmlBuilder.addParagraph(String.valueOf(recorder.getProcessCount()));
-        htmlBuilder.addLink("Recordings", "/recordings");
+        htmlBuilder.addLink("Recordings", "/recordings?type=html");
         htmlBuilder.addBreak();
 
-        htmlBuilder.addLink("Logs", "/logs");
+        htmlBuilder.addLink("Logs", "/logs?type=html");
         htmlBuilder.addBreak();
-        htmlBuilder.addLink("Catalog Errors", "/errors");
+        htmlBuilder.addLink("Catalog Errors", "/errors?type=html");
         htmlBuilder.addParagraph(cataloger.getErrorSummary());
         htmlBuilder.addHeading2("Controls");
-        htmlBuilder.addLink("Stop all recording", "/stopall");
+        htmlBuilder.addLink("Stop all recording", "/stopall?type=html");
         htmlBuilder.addBreak();
-        htmlBuilder.addLink("Start cataloging", "/startcat");
+        htmlBuilder.addLink("Start cataloging", "/startcat?type=html");
         htmlBuilder.addBreak();
-        htmlBuilder.addLink("Stop cataloging", "/stopcat");
+        htmlBuilder.addLink("Stop cataloging", "/stopcat?type=html");
         htmlBuilder.addBreak();
 
         htmlBuilder.addHeading2("Catalog");
-        htmlBuilder.addLink("Podcasts", "/Catchup");
+        htmlBuilder.addLink("Podcasts", "/category?id=Catchup;type=xml");
         htmlBuilder.addBreak();
-        htmlBuilder.addLink("Categories", "/categories");
+        htmlBuilder.addLink("Categories", "/categories?type=html");
         htmlBuilder.addBreak();
-        htmlBuilder.addLink("Programmes", "/programmes");
+        htmlBuilder.addLink("Programmes", "/programmes?type=html");
         htmlBuilder.addBreak();
-        htmlBuilder.addLink("Episodes", "/episodes");
+        htmlBuilder.addLink("Episodes", "/episodes?type=html");
         htmlBuilder.stopBody();
         htmlBuilder.stopDocument();
 

@@ -58,8 +58,8 @@ public class CatchupDevModule extends AbstractModule {
         if (properties == null) {
             properties =  new PropertiesFile(base, true);
             properties.setProperty("recordingDir", workingDir + "/recordings");
-            properties.setProperty("htdocsDir", workingDir + "/htdocs");
-            properties.setProperty("stagingDir", workingDir + "/staging");
+            properties.setProperty("cssDir", workingDir + "/src/main/css");
+            properties.setProperty("xsltDir", workingDir + "/src/main/xslt");
             properties.setProperty("logDir", workingDir + "/logs");
             properties.setProperty("pluginDir", workingDir + "/src/main/plugins");
             properties.setProperty("podcasterPort", "8082");

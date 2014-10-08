@@ -1,0 +1,188 @@
+table,th,td {
+border:1px solid #000;
+border-collapse:collapse;
+}
+
+th,td {
+text-align:left;
+padding:5px;
+}
+
+table.names th {
+background-color:#c1c1c1;
+}
+
+BODY {
+color:#000;
+background-color:#FFF;
+font-family:Verdana;
+margin-left:10px;
+margin-top:0;
+}
+
+#content {
+margin-left:10px;
+font-size:.70em;
+padding-bottom:2em;
+}
+
+A:visited {
+color:#69c;
+font-weight:700;
+text-decoration:underline;
+margin-left:-10px;
+padding-left:15px;
+}
+
+A:hover {
+color:cc3300;
+font-weight:700;
+text-decoration:underline;
+margin-left:-10px;
+padding-left:15px;
+}
+
+P {
+color:#000;
+margin-top:0;
+margin-bottom:12px;
+margin-left:-10px;
+font-family:Verdana;
+padding-left:15px;
+}
+
+pre {
+background-color:#e5e5cc;
+font-family:Courier New;
+font-size:x-small;
+margin-top:-5px;
+border:1px #f0f0e0 solid;
+padding:5px;
+}
+
+td {
+color:#000;
+font-family:Verdana;
+font-size:.7em;
+}
+
+h1 {
+color:#fff;
+font-family:Tahoma;
+font-size:26px;
+font-weight:400;
+background-color:#036;
+margin-top:0;
+margin-bottom:0;
+margin-left:-10px;
+padding-top:10px;
+padding-bottom:3px;
+padding-left:15px;
+width:105%;
+}
+
+h2 {
+font-size:1.5em;
+font-weight:700;
+margin-top:25px;
+margin-bottom:10px;
+border-top:1px solid #036;
+margin-left:-10px;
+padding-left:15px;
+color:#036;
+}
+
+h3 {
+font-size:1.1em;
+color:#000;
+margin-left:-10px;
+margin-top:10px;
+margin-bottom:10px;
+padding-left:15px;
+}
+
+li {
+margin-top:10px;
+color:#000;
+}
+
+font.value {
+color:#00008B;
+font:bold;
+}
+
+font.key {
+color:#006400;
+font:bold;
+}
+
+font.error {
+color:#8B0000;
+font:bold;
+}
+
+.heading1 {
+color:#fff;
+font-family:Tahoma;
+font-size:26px;
+font-weight:400;
+background-color:#036;
+margin-top:0;
+margin-bottom:0;
+margin-left:10px;
+padding-top:10px;
+padding-bottom:3px;
+padding-left:15px;
+width:105%;
+}
+
+.button {
+background-color:#dcdcdc;
+font-family:Verdana;
+font-size:1em;
+border-top:#ccc 1px solid;
+border-bottom:#666 1px solid;
+border-left:#ccc 1px solid;
+border-right:#666 1px solid;
+}
+
+.frmheader {
+color:#000;
+background:#dcdcdc;
+font-family:Verdana;
+font-size:.7em;
+font-weight:400;
+border-bottom:1px solid #dcdcdc;
+padding-top:2px;
+padding-bottom:2px;
+}
+
+.frmtext {
+font-family:Verdana;
+font-size:.7em;
+margin-top:8px;
+margin-bottom:0;
+margin-left:10px;
+}
+
+.frmInput {
+font-family:Verdana;
+font-size:1em;
+}
+
+.intro {
+margin-left:10px;
+}
+
+A:link,A:active {
+color:#369;
+font-weight:700;
+text-decoration:underline;
+margin-left:-10px;
+padding-left:15px;
+}
+
+ul,ol {
+margin-top:10px;
+margin-left:20px;
+}

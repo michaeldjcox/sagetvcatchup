@@ -23,7 +23,7 @@ public class ControlPodcast extends AbstractPodcast {
 
     @Override
     public String getUri() {
-        return "/control?id=" + episode.getId();
+        return "/control?id=" + episode.getId() + ";type=xml";
     }
 
     @Override
@@ -36,9 +36,9 @@ public class ControlPodcast extends AbstractPodcast {
         final String title = htmlUtils.makeContentSafe(episode.getPodcastTitle());
         final String desc = htmlUtils.makeContentSafe(episode.getDescription());
         final String url = episode.getServiceUrl();
-        final String stopUrl = getPodcastBaseUrl() + "/stop?id=" + episode.getId();
-        final String watchUrl = getPodcastBaseUrl() + "/watch?id=" + episode.getId();
-        final String recordUrl = getPodcastBaseUrl() + "/record?id=" + episode.getId();
+        final String stopUrl = getPodcastBaseUrl() + "/stop?id=" + episode.getId() + ";type=xml";
+        final String watchUrl = getPodcastBaseUrl() + "/watch?id=" + episode.getId() + ";type=xml";
+        final String recordUrl = getPodcastBaseUrl() + "/record?id=" + episode.getId() + ";type=xml";
 
         boolean isRecording = false;
 

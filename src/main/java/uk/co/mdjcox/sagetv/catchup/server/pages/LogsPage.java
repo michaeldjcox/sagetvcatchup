@@ -20,7 +20,7 @@ public class LogsPage extends AbstractHtmlPage {
 
     @Override
     public String getUri() {
-        return "/logs";
+        return "/logs?type=html";
     }
 
     @Override

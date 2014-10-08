@@ -2,7 +2,7 @@ package Test
 
 import uk.co.mdjcox.sagetv.model.Programme
 
-String link = "http://localhost:" + GET_INT_PROPERTY("podcasterPort") + "/testProgramme"
+String link = "http://localhost:" + GET_INT_PROPERTY("podcasterPort") + "/programme?id=testProgramme;type=html"
 Programme programme = new Programme(
         source.getId(),
         "testProgramme",
