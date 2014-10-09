@@ -42,6 +42,10 @@ public class Episode implements ErrorRecorder {
   private String airDate = "";
   /** The time at which the media file last aired */
   private String airTime = "";
+  /** The date on which the media file originally aired */
+  private String origAirDate = "";
+  /** The time at which the media file originally aired */
+  private String origAirTime = "";
   /** The TV channel on which the media file last aired */
   private String channel = "";
   /** The category of programme this media file falls into */
@@ -68,6 +72,8 @@ public class Episode implements ErrorRecorder {
    * @param serviceUrl The URL of the media file
    * @param airDate The date on which the media file last aired
    * @param airTime The time at which the media file last aired
+   * @param origAirDate The date on which the media file first aired
+   * @param origAirTime The time at which the media file first aired
    * @param channel The TV channel on which the media file last aired
    * @param genres The genres of programme this media file falls into
    *
@@ -75,7 +81,8 @@ public class Episode implements ErrorRecorder {
    */
   public Episode(String sourceId, String id, String programmeTitle, String seriesTitle, String episodeTitle,
                  String series, String episode, String description, String iconUrl,
-                 String serviceUrl, String airDate, String airTime, String channel,
+                 String serviceUrl, String airDate, String airTime,
+                 String origAirDate, String origAirTime, String channel,
                  Set genres) {
     this.sourceId = checkNotNull(sourceId);
     this.id = checkNotNull(id);
@@ -89,6 +96,8 @@ public class Episode implements ErrorRecorder {
     this.serviceUrl = checkNotNull(serviceUrl);
     this.airDate = checkNotNull(airDate);
     this.airTime = checkNotNull(airTime);
+    this.origAirDate = checkNotNull(origAirDate);
+    this.origAirTime = checkNotNull(origAirTime);
     this.channel = checkNotNull(channel);
     this.genres.addAll(checkNotNull(genres));
     podcastTitle = buildPodcastTitle();
@@ -172,6 +181,46 @@ public class Episode implements ErrorRecorder {
    */
   public final void setAirTime(String airTime) {
     this.airTime = checkNotNull(airTime);
+  }
+
+  /**
+   * Gets the original air date of this episode of the programme.
+   *
+   * @return the last air date of this episode of the programme
+   */
+  public String getOrigAirDate() {
+    return origAirDate;
+  }
+
+  /**
+   * Sets the original air date string of this media file
+   *
+   * @param origAirDate The air date string of the media file
+   *
+   * @throws NullPointerException if a <code>null</code> value is provided
+   */
+  public void setOrigAirDate(String origAirDate) {
+    this.origAirDate = origAirDate;
+  }
+
+  /**
+   * Gets the original air time of this episode of the programme.
+   *
+   * @return the last air time of this episode of the programme
+   */
+  public String getOrigAirTime() {
+    return origAirTime;
+  }
+
+  /**
+   * Sets the original air time string of this media file
+   *
+   * @param origAirTime The air time string of the media file
+   *
+   * @throws NullPointerException if a <code>null</code> value is provided
+   */
+  public void setOrigAirTime(String origAirTime) {
+    this.origAirTime = origAirTime;
   }
 
   /**
@@ -541,6 +590,8 @@ public class Episode implements ErrorRecorder {
 
         if (airDate != null ? !airDate.equals(episode1.airDate) : episode1.airDate != null) return false;
         if (airTime != null ? !airTime.equals(episode1.airTime) : episode1.airTime != null) return false;
+        if (origAirDate != null ? !origAirDate.equals(episode1.origAirDate) : episode1.origAirDate != null) return false;
+        if (origAirTime != null ? !origAirTime.equals(episode1.origAirTime) : episode1.origAirTime != null) return false;
         if (channel != null ? !channel.equals(episode1.channel) : episode1.channel != null) return false;
         if (description != null ? !description.equals(episode1.description) : episode1.description != null)
             return false;
@@ -578,6 +629,8 @@ public class Episode implements ErrorRecorder {
         result = 31 * result + (serviceUrl != null ? serviceUrl.hashCode() : 0);
         result = 31 * result + (airDate != null ? airDate.hashCode() : 0);
         result = 31 * result + (airTime != null ? airTime.hashCode() : 0);
+        result = 31 * result + (origAirDate != null ? origAirDate.hashCode() : 0);
+        result = 31 * result + (origAirTime != null ? origAirTime.hashCode() : 0);
         result = 31 * result + (channel != null ? channel.hashCode() : 0);
         result = 31 * result + (genres != null ? genres.hashCode() : 0);
         result = 31 * result + (errors != null ? errors.hashCode() : 0);

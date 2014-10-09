@@ -11,8 +11,12 @@ import uk.co.mdjcox.utils.PropertiesInterface;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -271,4 +275,34 @@ public abstract class GroovyScript extends groovy.lang.Script {
         File finish = new File(absoluteFinish);
         return start.toPath().relativize(finish.toPath()).toString();
     }
+
+    public String FIX_DATE(String sourceFormat, String date) {
+      SimpleDateFormat sourceFormatter = new SimpleDateFormat(sourceFormat);
+      SimpleDateFormat catchupFormatter = new SimpleDateFormat("dd-MM-yyyy");
+      sourceFormatter.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+      catchupFormatter.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+
+      try {
+        Date parseDate = sourceFormatter.parse(date);
+        return catchupFormatter.format(parseDate);
+      } catch (ParseException e) {
+        return null;
+      }
+
+    }
+
+  public String FIX_TIME(String sourceFormat, String time) {
+    SimpleDateFormat sourceFormatter = new SimpleDateFormat(sourceFormat);
+    SimpleDateFormat catchupFormatter = new SimpleDateFormat("HH:mm:ss");
+    sourceFormatter.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    catchupFormatter.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+
+    try {
+      Date parseTime = sourceFormatter.parse(time);
+      return catchupFormatter.format(parseTime);
+    } catch (ParseException e) {
+      return null;
+    }
+
+  }
 }

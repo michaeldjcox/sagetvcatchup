@@ -45,6 +45,8 @@ while (str != null) {
             link,
             "", // airDate
             "", // airTime
+            "", // origAirDate
+            "", // origAirTime
             "", // channel
             new HashSet(), // genre
     );

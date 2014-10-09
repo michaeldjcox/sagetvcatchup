@@ -18,7 +18,9 @@ import uk.co.mdjcox.utils.PropertiesInterface;
 import uk.co.mdjcox.utils.SageUtilsInterface;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -311,13 +313,20 @@ public class CatchupPlugin implements SageTVPlugin {
         labels.put(STOP_RECORDING, "Stop recording");
         help.put(STOP_RECORDING,"Force all recording to stop immediately");
 
-        types.put(PULL_UPGRADE, CONFIG_BUTTON);
-        labels.put(PULL_UPGRADE, "Check for upgrade");
-        help.put(PULL_UPGRADE,"Get SageTV to pull a new dev version");
+        try {
+            String hostname = (InetAddress.getLocalHost().getHostName());
+            if (hostname.contains("antibes") || hostname.contains("mintpad")) {
+                types.put(PULL_UPGRADE, CONFIG_BUTTON);
+                labels.put(PULL_UPGRADE, "Check for upgrade");
+                help.put(PULL_UPGRADE, "Get SageTV to pull a new dev version");
 
-        types.put(SEARCH_TITLES, CONFIG_TEXT);
-        labels.put(SEARCH_TITLES, "Search for regex");
-        help.put(SEARCH_TITLES,"Search sage for show titles");
+                types.put(SEARCH_TITLES, CONFIG_TEXT);
+                labels.put(SEARCH_TITLES, "Search for regex");
+                help.put(SEARCH_TITLES, "Search sage for show titles");
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to setup developer config controls", e);
+        }
     }
 
     @Override

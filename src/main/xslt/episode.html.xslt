@@ -78,14 +78,24 @@
                         </ul></td>
                     </tr>
                     <tr>
-                        <td>Date</td>
+                        <td>AirDate</td>
                         <xsl:text>&#10;</xsl:text>
                         <td><xsl:value-of select="airDate"/></td>
                     </tr>
                     <tr>
-                        <td>Time</td>
+                        <td>AirTime</td>
                         <xsl:text>&#10;</xsl:text>
                         <td><xsl:value-of select="airTime"/></td>
+                    </tr>
+                    <tr>
+                        <td>OrigAirDate</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="origAirDate"/></td>
+                    </tr>
+                    <tr>
+                        <td>OrigAirTime</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="origAirTime"/></td>
                     </tr>
                     <tr>
                         <td>PodcastTitle</td>

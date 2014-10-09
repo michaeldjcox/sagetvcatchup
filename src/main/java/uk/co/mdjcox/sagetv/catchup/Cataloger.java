@@ -394,19 +394,15 @@ public class Cataloger {
     }
 
     public String getProgress() {
-        String progress = progressString;
-
-           if (future == null) {
-               return "Not run / Not Scheduled";
-           } else {
-               progress = "Waiting";
-           }
-
-        if ("Finished".equals(progress) || "Failed".equals(progress) || "Waiting".equals(progress)) {
-            long delay = future.getDelay(TimeUnit.MINUTES);
-            progress += " - next attempt " + (delay / 60) + "hrs " + (delay % 60) + "mins";
+        if ("Finished".equals(progressString) || "Failed".equals(progressString) || "Waiting".equals(progressString)) {
+            if (future == null) {
+              progressString += " - no next attempt scheduled";
+            } else {
+              long delay = future.getDelay(TimeUnit.MINUTES);
+              progressString += " - next attempt " + (delay / 60) + "hrs " + (delay % 60) + "mins";
+            }
         }
-        return progress;
+        return progressString;
     }
 
     public String getErrorSummary() {

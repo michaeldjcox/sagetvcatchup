@@ -137,7 +137,7 @@
                                 </replacement>
                                 <replacement>
                                     <token>_WEBPAGE_</token>
-                                    <value><![CDATA[http://localhost/sagetvcatchup]]></value>
+                                    <value></value>
                                 </replacement>
                                 <replacement>
                                     <token>_MAINCLASS_</token>
@@ -145,11 +145,11 @@
                                 </replacement>
                                 <replacement>
                                     <token>_SCREENSHOTNAME_</token>
-                                    <value>Screenshot</value>
+                                    <value></value>
                                 </replacement>
                                 <replacement>
                                     <token>_SCREENSHOTLINK_</token>
-                                    <value><![CDATA[http://localhost/sagetvcatchup/logo.png]]></value>
+                                    <value></value>
                                 </replacement>
                                 <replacement>
                                     <token>_RELEASENOTES_</token>
@@ -217,7 +217,7 @@
                                 </replacement>
                                 <replacement>
                                     <token>_WEBPAGE_</token>
-                                    <value><![CDATA[http://localhost/sagetvcatchup]]></value>
+                                    <value></value>
                                 </replacement>
                                 <replacement>
                                     <token>_MAINCLASS_</token>
@@ -225,11 +225,11 @@
                                 </replacement>
                                 <replacement>
                                     <token>_SCREENSHOTNAME_</token>
-                                    <value>Screenshot</value>
+                                    <value></value>
                                 </replacement>
                                 <replacement>
                                     <token>_SCREENSHOTLINK_</token>
-                                    <value><![CDATA[http://localhost/sagetvcatchup/logo.png]]></value>
+                                    <value></value>
                                 </replacement>
                                 <replacement>
                                     <token>_RELEASENOTES_</token>

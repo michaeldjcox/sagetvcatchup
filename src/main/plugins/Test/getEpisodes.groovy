@@ -17,6 +17,8 @@ String link = "http://localhost:" + GET_INT_PROPERTY("podcasterPort") + "/episod
             link,
             "", // airDate
             "", // airTime
+            "", // origAirDate
+            "", // origAirTime
             "", // channel
             new HashSet(), // genre
     );

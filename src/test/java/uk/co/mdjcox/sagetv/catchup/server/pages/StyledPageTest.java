@@ -252,7 +252,7 @@ public class StyledPageTest {
         episodesBuilder.startBody();
         episodesBuilder.addHeading1("Episodes");
         episodesBuilder.startTable();
-        episodesBuilder.addTableHeader("SourceId", "Id", "Channel", "ProgrammeTitle", "Series", "SeriesTitle", "Episode", "EpisodeTitle", "Description", "PodcastTitle", "AirDate", "AirTime", "ServiceUrl", "IconUrl" );
+        episodesBuilder.addTableHeader("SourceId", "Id", "Channel", "ProgrammeTitle", "Series", "SeriesTitle", "Episode", "EpisodeTitle", "Description", "PodcastTitle", "AirDate", "AirTime", "OrigAirDate", "OrigAirTime", "ServiceUrl", "IconUrl" );
 
 
         for (Category cat : catalog.getCategories()) {
@@ -300,7 +300,7 @@ public class StyledPageTest {
                     String link = "/episode?id=" + ep.getId() + ";type=html";
                     linkBuilder4.addLink(ep.getId(), link);
 
-                    episodesBuilder.addTableRow(ep.getSourceId(), linkBuilder4.toString(), ep.getChannel(), ep.getProgrammeTitle(), ep.getSeries(), ep.getSeriesTitle(), ep.getEpisode(), ep.getEpisodeTitle(), ep.getDescription(), ep.getPodcastTitle(), ep.getAirDate(), ep.getAirTime(), linkBuilder1.toString(), linkBuilder2.toString() );
+                    episodesBuilder.addTableRow(ep.getSourceId(), linkBuilder4.toString(), ep.getChannel(), ep.getProgrammeTitle(), ep.getSeries(), ep.getSeriesTitle(), ep.getEpisode(), ep.getEpisodeTitle(), ep.getDescription(), ep.getPodcastTitle(), ep.getAirDate(), ep.getAirTime(), ep.getOrigAirDate(), ep.getOrigAirTime(), linkBuilder1.toString(), linkBuilder2.toString() );
                 }
             }
         }
@@ -361,8 +361,10 @@ public class StyledPageTest {
         }
         listBuilder.stopList();
         data.put("Genres", listBuilder.toString());
-        data.put("Date", cat.getAirDate());
-        data.put("Time", cat.getAirTime());
+        data.put("AirDate", cat.getAirDate());
+        data.put("AirTime", cat.getAirTime());
+        data.put("OrigAirDate", cat.getOrigAirDate());
+        data.put("OrigAirTime", cat.getOrigAirTime());
         data.put("PodcastTitle", cat.getPodcastTitle());
         HtmlBuilder linkBuilder1 = new HtmlBuilder();
         linkBuilder1.addLink(cat.getIconUrl(), cat.getIconUrl());

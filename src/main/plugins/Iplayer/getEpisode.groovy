@@ -231,17 +231,33 @@ if (details == null || !details.startsWith("/>")) {
         time = REMOVE_HTML_TAGS(time2);
     }
 
+
     if (date != null) {
         LOG_INFO("Date: " + date)
-        episode.setAirDate(date)
+
+        String newDate = FIX_DATE("yyyy-MM-dd", date);
+        if (newDate == null) {
+            LOG_ERROR(episode, "Failed to parse air date " + date);
+            newDate = date;
+        }
+
+        episode.setAirDate(newDate)
+        episode.setOrigAirDate(newDate); //TODO
     } else {
         LOG_WARNING(episode, "Original air date not found");
     }
 
-
     if (time != null) {
         LOG_INFO("Time: " + time)
-        episode.setAirTime(time);
+
+        String newTime = FIX_TIME("HH:mm:ss", time);
+        if (newTime == null) {
+            LOG_ERROR(episode, "Failed to parse air time " + time);
+            newTime = time;
+        }
+
+        episode.setAirTime(newTime);
+        episode.setOrigAirTime(newTime); // TODO
     } else {
         LOG_WARNING(episode, "Original air time not found");
     }

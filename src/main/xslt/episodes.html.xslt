@@ -35,6 +35,10 @@
                         <xsl:text>&#10;</xsl:text>
                         <th>AirTime</th>
                         <xsl:text>&#10;</xsl:text>
+                        <th>OrigAirDate</th>
+                        <xsl:text>&#10;</xsl:text>
+                        <th>OrigAirTime</th>
+                        <xsl:text>&#10;</xsl:text>
                         <th>ServiceUrl</th>
                         <xsl:text>&#10;</xsl:text>
                         <th>IconUrl</th>
@@ -90,6 +94,14 @@
                             <xsl:text>&#10;</xsl:text>
                             <td>
                                 <xsl:value-of select="airTime"/>
+                            </td>
+                            <xsl:text>&#10;</xsl:text>
+                            <td>
+                                <xsl:value-of select="origAirDate"/>
+                            </td>
+                            <xsl:text>&#10;</xsl:text>
+                            <td>
+                                <xsl:value-of select="origAirTime"/>
                             </td>
                             <xsl:text>&#10;</xsl:text>
                             <td>

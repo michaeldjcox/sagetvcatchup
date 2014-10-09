@@ -33,7 +33,7 @@ public void after() throws Exception {
     try {
       new Episode(null, "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                     "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                    "airTime", "channel", Sets.newHashSet("category"));
+                                    "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     } catch (NullPointerException e) {
       return;
     }
@@ -47,7 +47,7 @@ public void after() throws Exception {
     try {
       new Episode("sourceId", null, "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                     "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                    "airTime", "channel", Sets.newHashSet("category"));
+                                    "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     } catch (NullPointerException e) {
       return;
     }
@@ -61,7 +61,7 @@ public void after() throws Exception {
     try {
       new Episode("sourceId", "id", null, "seriesTitle", "episodeTitle", "series",
                                     "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                    "airTime", "channel", Sets.newHashSet("category"));
+                                    "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     } catch (NullPointerException e) {
       return;
     }
@@ -76,7 +76,7 @@ public void after() throws Exception {
     try {
        new Episode("sourceId", "id", "programmeTitle", "seriesTitle", null, "series",
                                     "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                    "airTime", "channel", Sets.newHashSet("category"));
+                                    "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     } catch (NullPointerException e) {
       return;
     }
@@ -90,7 +90,7 @@ public void after() throws Exception {
     try {
       new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", null,
                                     "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                    "airTime", "channel", Sets.newHashSet("category"));
+                                    "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     } catch (NullPointerException e) {
       return;
     }
@@ -104,7 +104,7 @@ public void after() throws Exception {
     try {
       new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                     null, "descripton", "iconUrl", "serviceUrl", "airDate",
-                                    "airTime", "channel", Sets.newHashSet("category"));
+                                    "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     } catch (NullPointerException e) {
       return;
     }
@@ -118,7 +118,7 @@ public void after() throws Exception {
     try {
       new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                     "episode", null, "iconUrl", "serviceUrl", "airDate",
-                                    "airTime", "channel", Sets.newHashSet("category"));
+                                    "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     } catch (NullPointerException e) {
       return;
     }
@@ -132,7 +132,7 @@ public void after() throws Exception {
     try {
       new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                     "episode", "descripton", null, "serviceUrl", "airDate",
-                                    "airTime", "channel", Sets.newHashSet("category"));
+                                    "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     } catch (NullPointerException e) {
       return;
     }
@@ -146,7 +146,7 @@ public void after() throws Exception {
     try {
       new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                     "episode", "descripton", "iconUrl", null, "airDate",
-                                    "airTime", "channel", Sets.newHashSet("category"));
+                                    "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     } catch (NullPointerException e) {
       return;
     }
@@ -160,7 +160,7 @@ public void after() throws Exception {
     try {
       new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                     "episode", "descripton", "iconUrl", "serviceUrl", null,
-                                    "airTime", "channel", Sets.newHashSet("category"));
+                                    "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     } catch (NullPointerException e) {
       return;
     }
@@ -174,7 +174,7 @@ public void after() throws Exception {
     try {
        new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                     "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                    null, "channel", Sets.newHashSet("category"));
+                                    null, "origAirDate", "origAirTime", "channel", Sets.newHashSet("category"));
     } catch (NullPointerException e) {
       return;
     }
@@ -188,7 +188,7 @@ public void after() throws Exception {
     try {
       new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                     "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                    "airTime", null, Sets.newHashSet("category"));
+                                    "airTime", "origAirDate", "origAirTime",  null, Sets.newHashSet("category"));
     } catch (NullPointerException e) {
       return;
     }
@@ -202,7 +202,7 @@ public void after() throws Exception {
     try {
       new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                     "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                    "airTime", "channel", null);
+                                    "airTime", "origAirDate", "origAirTime",  "channel", null);
     } catch (NullPointerException e) {
       return;
     }
@@ -215,7 +215,7 @@ public void after() throws Exception {
   public void testCreate() throws Exception {
     Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                   "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                  "airTime", "channel", Sets.newHashSet("category"));
+                                  "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     assertEquals("getSourceId", "sourceId", episode.getSourceId());
     assertEquals("getId", "id", episode.getId());
     assertEquals("getProgrammeTitle", "programmeTitle", episode.getProgrammeTitle());
@@ -228,6 +228,8 @@ public void after() throws Exception {
     assertEquals("getServiceUrl", "serviceUrl", episode.getServiceUrl());
     assertEquals("getAirDate", "airDate", episode.getAirDate());
     assertEquals("getAirTime", "airTime", episode.getAirTime());
+    assertEquals("getOrigAirDate", "origAirDate", episode.getOrigAirDate());
+    assertEquals("getOrigAirTime", "origAirTime", episode.getOrigAirTime());
     assertEquals("getChannel", "channel", episode.getChannel());
     assertEquals("getCategory", "category", episode.getGenres().iterator().next());
   }
@@ -241,7 +243,7 @@ public void after() throws Exception {
 public void testGetSourceId() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     assertEquals("getSourceId", "sourceId", episode.getSourceId());
 
 }
@@ -255,7 +257,7 @@ public void testGetSourceId() throws Exception {
 public void testSetSourceId() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   episode.setSourceId("sourceId2");
   assertEquals("setSourceId", "sourceId2", episode.getSourceId());
 
@@ -277,7 +279,7 @@ public void testSetSourceId() throws Exception {
 public void testGetId() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   assertEquals("getId", "id", episode.getId());
 } 
 
@@ -290,7 +292,7 @@ public void testGetId() throws Exception {
 public void testSetId() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   episode.setId("id2");
   assertEquals("setId", "id2", episode.getId());
 
@@ -312,7 +314,7 @@ public void testSetId() throws Exception {
 public void testGetAirDate() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   assertEquals("getAirDate", "airDate", episode.getAirDate());
 }
 
@@ -325,7 +327,7 @@ public void testGetAirDate() throws Exception {
 public void testSetAirDate() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   episode.setAirDate("airDate2");
   assertEquals("setAirDate", "airDate2", episode.getAirDate());
 
@@ -347,8 +349,8 @@ public void testSetAirDate() throws Exception {
 public void testGetAirTime() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
-  assertEquals("getAirTime", "airTime", episode.getAirTime());
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
+  assertEquals("getAirTime", "airTime",  episode.getAirTime());
 } 
 
 /** 
@@ -359,8 +361,8 @@ public void testGetAirTime() throws Exception {
 @Test
 public void testSetAirTime() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
-                                "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "episode", "description", "iconUrl", "serviceUrl", "airDate",
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   episode.setAirTime("airTime2");
   assertEquals("setAirTime", "airTime2", episode.getAirTime());
 
@@ -382,7 +384,7 @@ public void testSetAirTime() throws Exception {
 public void testGetProgrammeTitle() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   assertEquals("getProgrammeTitle", "programmeTitle", episode.getProgrammeTitle());
 } 
 
@@ -395,7 +397,7 @@ public void testGetProgrammeTitle() throws Exception {
 public void testSetProgrammeTitle() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   episode.setProgrammeTitle("programmeTitle2");
   assertEquals("testSetProgrammeTitle", "programmeTitle2", episode.getProgrammeTitle());
 
@@ -417,7 +419,7 @@ public void testSetProgrammeTitle() throws Exception {
 public void testSetEpisodeTitle() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   episode.setEpisodeTitle("episodeTitle2");
   assertEquals("setEpisodeTitle", "episodeTitle2", episode.getEpisodeTitle());
 
@@ -439,7 +441,7 @@ public void testSetEpisodeTitle() throws Exception {
 public void testSetDescription() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   episode.setDescription("descripton2");
   assertEquals("setDescription", "descripton2", episode.getDescription());
 
@@ -461,7 +463,7 @@ public void testSetDescription() throws Exception {
 public void testSetIconUrl() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   episode.setIconUrl("iconUrl2");
   assertEquals("setIconUrl", "iconUrl2", episode.getIconUrl());
 
@@ -483,7 +485,7 @@ public void testSetIconUrl() throws Exception {
 public void testSetServiceUrl() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   episode.setServiceUrl("serviceUrl2");
   assertEquals("setServiceUrl", "serviceUrl2", episode.getServiceUrl());
 
@@ -505,7 +507,7 @@ public void testSetServiceUrl() throws Exception {
 public void testGetIconUrl() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   assertEquals("getIconUrl", "iconUrl", episode.getIconUrl());
 } 
 
@@ -518,7 +520,7 @@ public void testGetIconUrl() throws Exception {
 public void testGetEpisodeTitle() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   assertEquals("getEpisodeTitle", "episodeTitle", episode.getEpisodeTitle());
 } 
 
@@ -531,7 +533,7 @@ public void testGetEpisodeTitle() throws Exception {
 public void testGetServiceUrl() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   assertEquals("getServiceUrl", "serviceUrl", episode.getServiceUrl());
 } 
 
@@ -544,7 +546,7 @@ public void testGetServiceUrl() throws Exception {
 public void testGetDescription() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   assertEquals("getDescription", "descripton", episode.getDescription());
 } 
 
@@ -557,7 +559,7 @@ public void testGetDescription() throws Exception {
 public void testGetChannel() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   assertEquals("getChannel", "channel", episode.getChannel());
 } 
 
@@ -570,7 +572,7 @@ public void testGetChannel() throws Exception {
 public void testSetChannel() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   episode.setChannel("channel2");
   assertEquals("setChannel", "channel2", episode.getChannel());
 
@@ -592,7 +594,7 @@ public void testSetChannel() throws Exception {
 public void testGetCategory() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   assertEquals("getCategory", "category", episode.getGenres().iterator().next());
 } 
 
@@ -605,7 +607,7 @@ public void testGetCategory() throws Exception {
 public void testSetCategory() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   episode.addGenre("category2");
     Iterator<String> genres = episode.getGenres().iterator();
     assertEquals("addCategory", "category", genres.next());
@@ -622,7 +624,7 @@ public void testSetCategory() throws Exception {
 public void testGetSeries() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   assertEquals("getSeries", "series", episode.getSeries());
 } 
 
@@ -635,7 +637,7 @@ public void testGetSeries() throws Exception {
 public void testSetSeries() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   episode.setSeries("series2");
   assertEquals("setSeries", "series2", episode.getSeries());
 
@@ -657,7 +659,7 @@ public void testSetSeries() throws Exception {
 public void testGetEpisode() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   assertEquals("getEpisode", "episode", episode.getEpisode());
 } 
 
@@ -670,7 +672,7 @@ public void testGetEpisode() throws Exception {
 public void testSetEpisode() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   episode.setEpisode("episode2");
   assertEquals("setEpisode", "episode2", episode.getEpisode());
 
@@ -692,32 +694,32 @@ public void testSetEpisode() throws Exception {
 public void testGetPodcastTitle() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "1",
                                 "2", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   assertEquals("getPodcastTitle", "programmeTitle - seriesTitle - episodeTitle", episode.getPodcastTitle());
 
     episode = new Episode("sourceId", "id", "", "seriesTitle", "episodeTitle", "1",
             "2", "descripton", "iconUrl", "serviceUrl", "airDate",
-            "airTime", "channel", Sets.newHashSet("category"));
+            "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     assertEquals("getPodcastTitle", "seriesTitle - episodeTitle", episode.getPodcastTitle());
 
     episode = new Episode("sourceId", "id", "", "" , "episodeTitle", "1",
             "2", "descripton", "iconUrl", "serviceUrl", "airDate",
-            "airTime", "channel", Sets.newHashSet("category"));
+            "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     assertEquals("getPodcastTitle", "Series 1 - episodeTitle", episode.getPodcastTitle());
 
     episode = new Episode("sourceId", "id", "programmeTitle", "", "episodeTitle", "1",
             "2", "descripton", "iconUrl", "serviceUrl", "airDate",
-            "airTime", "channel", Sets.newHashSet("category"));
+            "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     assertEquals("getPodcastTitle", "programmeTitle - Series 1 - episodeTitle", episode.getPodcastTitle());
 
     episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "", "1",
             "2", "descripton", "iconUrl", "serviceUrl", "airDate",
-            "airTime", "channel", Sets.newHashSet("category"));
+            "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     assertEquals("getPodcastTitle", "programmeTitle - seriesTitle - Episode 2", episode.getPodcastTitle());
 
     episode = new Episode("sourceId", "id", "programmeTitle", "", "", "",
             "", "descripton", "iconUrl", "serviceUrl", "airDate",
-            "airTime", "channel", Sets.newHashSet("category"));
+            "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
     assertEquals("getPodcastTitle", "programmeTitle", episode.getPodcastTitle());
 
  }
@@ -731,7 +733,7 @@ public void testGetPodcastTitle() throws Exception {
 public void testToString() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle", "series",
                                 "episode", "descripton", "iconUrl", "serviceUrl", "airDate",
-                                "airTime", "channel", Sets.newHashSet("category"));
+                                "airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   assertEquals("toString", "id", episode.toString());
 } 
 

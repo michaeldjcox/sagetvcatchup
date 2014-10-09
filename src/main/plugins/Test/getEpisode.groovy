@@ -12,7 +12,9 @@ episode.addGenre("Factual");
 episode.addGenre("News")
 episode.setSeries("1");
 episode.setEpisode("1");
-episode.setAirDate("2014-09-01")
-episode.setAirTime("10:00");
+episode.setAirDate("01-09-2014")
+episode.setAirTime("10:00:00");
+episode.setOrigAirDate("01-10-2014")
+episode.setOrigAirTime("12:00:00");
 episode.setId("TestEpisode")
 return episode;

@@ -183,7 +183,7 @@ public class SageTvPublisherTest {
 
     Episode episode = new Episode("sourceId", "episodeId", "programmeTitle", "seriesTitle", "episodeTitle",
                                   "series", "episode", "description", "iconUrl", "serviceUrl",
-                                  "airDate", "airTime", "channel", Sets.newHashSet("category"));
+                                  "airDate", "airTime", "origAirDate", "origAirTime", "channel", Sets.newHashSet("category"));
     programme.addEpisode(episode);
     catalog.addEpisode(episode);
 

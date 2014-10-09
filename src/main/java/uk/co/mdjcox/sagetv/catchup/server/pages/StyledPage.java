@@ -61,7 +61,7 @@ public class StyledPage extends AbstractHtmlPage {
             HtmlBuilder html = new HtmlBuilder();
             html.addPageHeader(title);
 
-            final String fileName = "src"+ File.separator + "main"+File.separator + "xslt"+File.separator + webpage + ".xslt";
+            final String fileName = xsltDir +File.separator + webpage + ".xslt";
             StreamSource stylesource = new StreamSource(new FileReader(fileName));
 
             TransformerFactory tFactory = TransformerFactory.newInstance();

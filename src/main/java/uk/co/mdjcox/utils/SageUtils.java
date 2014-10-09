@@ -8,7 +8,11 @@ import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 /**
@@ -128,13 +132,12 @@ public class SageUtils implements SageUtilsInterface {
         String title = episode.getProgrammeTitle();
         String episodeTitle = episode.getEpisodeTitle();
         String description = episode.getDescription();
-        long duration = 1000; // TODO
+        long duration = 1000; // TODO but sageTV seems to work it out anyway
         String[] category = episode.getGenres().toArray(new String[episode.getGenres().size()]);
         String peopleList[] = {};
         String rolesList[] = {};
         String rated = null;
         String expandedRatedList[] = null;
-        String year = "2014"; //episode.getAirDate();
         String parentalRating = null;
         String miscList[] = new String[0];
         Long now = Utility.Time();
@@ -142,8 +145,52 @@ public class SageUtils implements SageUtilsInterface {
         String externalID = "ONL" + nowString;
         String airingExternalID = "EP" + nowString;
         String language = "English";
-        long originalAirDate = Utility.Time(); // TODO
-        boolean isFirstRun = true; // TODO
+
+        String origAirDate = episode.getOrigAirDate();
+        String origAirTime = episode.getOrigAirTime();
+
+      long originalAirDate = now;
+
+      if ((origAirDate != null) && (origAirTime != null)) {
+        try {
+          String dateTime = origAirDate + " " + origAirTime;
+          SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+          format.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+          Date date = format.parse(dateTime);
+
+          originalAirDate = date.getTime();
+
+          logger.info("Uploading episode " + episode + " sageTV " + date + " from " + dateTime);
+
+        } catch (ParseException e) {
+          logger.warn("Failed to parse original air date " + origAirDate + " " + origAirTime + " into long time");
+        }
+      }
+
+      SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+      yearFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+      String year = yearFormat.format(new Date(originalAirDate));
+
+        boolean isFirstRun = true;
+
+
+      String airDate = episode.getAirDate() ;
+      String airTime = episode.getAirTime();
+
+      if ((airDate != null) && (airTime != null)) {
+        try {
+          String dateTime = airDate + " " + airDate;
+          SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+          format.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+          Date date = format.parse(dateTime);
+
+          isFirstRun = date.getTime() == originalAirDate;
+
+        } catch (ParseException e) {
+          logger.warn("Failed to parse air date " + airDate + " " + airTime + " into long time");
+        }
+      }
+
         int seriesNumber = 0;
         int episodeNumber = 0;
         if (!episode.getSeries().isEmpty()) {
