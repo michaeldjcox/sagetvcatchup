@@ -22,9 +22,6 @@ String start = "<li class=\"list-item episode\"";
 while (str != null) {
     str = MOVE_TO(start, str)
     if (str == null) {
-        if (!category.hasEpisodes()) {
-            LOG_ERROR(category, "Cannot list episodes - no episodes block found");
-        }
         break;
     }
     String programmeBlock = EXTRACT_TO(end, str)
@@ -53,6 +50,10 @@ while (str != null) {
     );
 
     episodes.add(subCat);
+}
+
+if (episodes.isEmpty()) {
+    LOG_ERROR(category, "No episodes found for this programme");
 }
 
 
