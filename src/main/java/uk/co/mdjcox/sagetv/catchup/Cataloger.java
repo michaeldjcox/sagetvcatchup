@@ -114,7 +114,7 @@ public class Cataloger {
                             "http://localhost:" + props.getInt("podcasterPort", 8081) + "/logo.png");
             newCategories.put(root.getId(), root);
 
-            Source statusSource = new Source(root.getId(), "status", "Catchup Status", "Catchup Status", "", "");
+            Source statusSource = new Source(root.getId(), "status", "Catchup Status", "Catchup Status", "", "http://localhost:" + props.getInt("podcasterPort", 8081) + "/logo.png");
             statusSource.setPodcastUrl(podcastUrlBase + "category?id=status;type=xml");
             newCategories.put(statusSource.getId(), statusSource);
             root.addSubCategory(statusSource);

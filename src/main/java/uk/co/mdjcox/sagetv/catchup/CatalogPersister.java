@@ -18,13 +18,17 @@ public class CatalogPersister implements CatalogPublisher {
     private final XStream xstream;
     private Logger logger;
     private String fileName;
+    private String emptyFileName;
 
     @Inject
     private CatalogPersister(Logger logger, PropertiesInterface props) {
         this.logger = logger;
         String defaultFileName = System.getProperty("java.io.tmpdir", ".") + File.separator + "sagetvcatchup.xml";
         fileName = props.getString("catalogFileName", defaultFileName);
-        xstream = new XStream();
+      String configDir = props.getString("configDir", System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator + "config" );
+      emptyFileName = configDir + File.separator + "default.xml";
+
+      xstream = new XStream();
     }
 
     @Override
@@ -61,11 +65,19 @@ public class CatalogPersister implements CatalogPublisher {
 
     public Catalog load() {
         try {
-            String xml = readCatalog();
+            String xml = readCatalog(fileName);
             return parseXMLIntoCatalog(xml);
         } catch (Exception e) {
-            logger.error("Failed to load catalog", e);
+            logger.warn("Failed to load previous catalog", e);
         }
+
+      try {
+        String xml = readCatalog(emptyFileName);
+        return parseXMLIntoCatalog(xml);
+      } catch (Exception e) {
+        logger.error("Failed to load default catalog", e);
+      }
+
         return new Catalog();
     }
 
@@ -73,7 +85,7 @@ public class CatalogPersister implements CatalogPublisher {
         return (Catalog)xstream.fromXML(xml);
     }
 
-    String readCatalog() throws Exception {
+    String readCatalog(String fileName) throws Exception {
         File file = new File(fileName);
         FileReader reader = null;
         BufferedReader breader = null;

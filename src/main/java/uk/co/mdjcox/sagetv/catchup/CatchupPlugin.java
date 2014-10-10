@@ -153,8 +153,6 @@ public class CatchupPlugin implements SageTVPlugin {
             recorder = injector.getInstance(Recorder.class);
             CatalogPersister persister = injector.getInstance(CatalogPersister.class);
 
-            Recorder recorder = injector.getInstance(Recorder.class);
-
             pluginManager.load();
             server.start();
 

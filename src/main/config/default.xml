@@ -1,0 +1,338 @@
+<uk.co.mdjcox.sagetv.model.Catalog>
+  <episodes class="linked-hash-map">
+    <entry>
+      <string>TestEpisode</string>
+      <uk.co.mdjcox.sagetv.model.Episode>
+        <sourceId>Test</sourceId>
+        <id>TestEpisode</id>
+        <programmeTitle>Test Programme</programmeTitle>
+        <seriesTitle>Test Series</seriesTitle>
+        <episodeTitle>Test Episode</episodeTitle>
+        <podcastTitle>Test Programme - Test Series - Test Episode</podcastTitle>
+        <series>1</series>
+        <episode>1</episode>
+        <description>Test Episode Description</description>
+        <iconUrl>http://localhost:8082/logo.png</iconUrl>
+        <serviceUrl>http://localhost:8082/watch?id=TestEpisode;type=mpeg4</serviceUrl>
+        <airDate>01-09-2014</airDate>
+        <airTime>10:00:00</airTime>
+        <origAirDate>01-10-2014</origAirDate>
+        <origAirTime>12:00:00</origAirTime>
+        <channel>Test</channel>
+        <genres class="sorted-set">
+          <string>Factual</string>
+          <string>News</string>
+        </genres>
+        <errors/>
+        <metaUrls>
+          <string>http://localhost:8082/episode?id=TestEpisode;type=html</string>
+        </metaUrls>
+        <podcastUrl>http://localhost:8082/control?id=TestEpisode;type=xml</podcastUrl>
+      </uk.co.mdjcox.sagetv.model.Episode>
+    </entry>
+  </episodes>
+  <categories class="linked-hash-map">
+    <entry>
+      <string>Catchup</string>
+      <uk.co.mdjcox.sagetv.model.Root>
+        <sourceId></sourceId>
+        <id>Catchup</id>
+        <shortName>Catchup TV</shortName>
+        <longName>Catchup TV</longName>
+        <serviceUrl>http://localhost:8081</serviceUrl>
+        <iconUrl>http://localhost:8082/logo.png</iconUrl>
+        <parentId></parentId>
+        <errors>
+          <uk.co.mdjcox.sagetv.model.ParseError>
+            <item class="uk.co.mdjcox.sagetv.model.Root" reference="../../.."/>
+            <level>FATAL</level>
+            <message>Failed to publish to SageTV /opt/sagetv/server/STVs/SageTV7/OnlineVideos/CustomOnlineVideoLinks_sagetvcatchup.properties (Permission denied)</message>
+          </uk.co.mdjcox.sagetv.model.ParseError>
+        </errors>
+        <metaUrls/>
+        <podcastUrl></podcastUrl>
+        <type>Root</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set">
+          <string>Iplayer</string>
+          <string>Test</string>
+          <string>status</string>
+        </subCategories>
+      </uk.co.mdjcox.sagetv.model.Root>
+    </entry>
+    <entry>
+      <string>status</string>
+      <uk.co.mdjcox.sagetv.model.Source>
+        <sourceId>status</sourceId>
+        <id>status</id>
+        <shortName>Catchup Status</shortName>
+        <longName>Catchup Status</longName>
+        <serviceUrl></serviceUrl>
+        <iconUrl></iconUrl>
+        <parentId>Catchup</parentId>
+        <errors/>
+        <metaUrls/>
+        <podcastUrl>http://localhost:8082/category?id=status;type=xml</podcastUrl>
+        <type>Source</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set"/>
+      </uk.co.mdjcox.sagetv.model.Source>
+    </entry>
+    <entry>
+      <string>Test</string>
+      <uk.co.mdjcox.sagetv.model.Source>
+        <sourceId>Test</sourceId>
+        <id>Test</id>
+        <shortName>Test</shortName>
+        <longName>Test</longName>
+        <serviceUrl>http://localhost:8082/category?id=test;type=html</serviceUrl>
+        <iconUrl>http://localhost:8082/logo.png</iconUrl>
+        <parentId>Catchup</parentId>
+        <errors/>
+        <metaUrls>
+          <string>http://localhost:8082/category?id=test;type=html</string>
+        </metaUrls>
+        <podcastUrl>http://localhost:8082//category?id=Test;type=xml</podcastUrl>
+        <type>Source</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set">
+          <string>Test/AirDate</string>
+          <string>Test/AtoZ</string>
+          <string>Test/Channel</string>
+          <string>Test/Genre</string>
+        </subCategories>
+      </uk.co.mdjcox.sagetv.model.Source>
+    </entry>
+    <entry>
+      <string>testProgramme</string>
+      <uk.co.mdjcox.sagetv.model.Programme>
+        <sourceId>Test</sourceId>
+        <id>testProgramme</id>
+        <shortName>Test Programme</shortName>
+        <longName>Test Programme</longName>
+        <serviceUrl>http://localhost:8082/programme?id=testProgramme;type=html</serviceUrl>
+        <iconUrl>http://localhost:8082/logo.png</iconUrl>
+        <parentId></parentId>
+        <errors/>
+        <metaUrls>
+          <string>http://localhost:8082/programme?id=testProgramme;type=html</string>
+        </metaUrls>
+        <podcastUrl>http://localhost:8082/programme?id=testProgramme;type=xml</podcastUrl>
+        <type>Programme</type>
+        <otherParentIds class="linked-hash-set">
+          <string>Test/AtoZ/T</string>
+          <string>Test/Genre/Factual</string>
+          <string>Test/Genre/News</string>
+          <string>Test/Channel/Test</string>
+        </otherParentIds>
+        <subCategories class="sorted-set"/>
+        <episodes>
+          <string>TestEpisode</string>
+        </episodes>
+      </uk.co.mdjcox.sagetv.model.Programme>
+    </entry>
+    <entry>
+      <string>Test/AtoZ</string>
+      <uk.co.mdjcox.sagetv.model.SubCategory>
+        <sourceId>Test</sourceId>
+        <id>Test/AtoZ</id>
+        <shortName>A to Z</shortName>
+        <longName>A to Z</longName>
+        <serviceUrl>http://localhost:8082/category?id=test;type=html</serviceUrl>
+        <iconUrl>http://localhost:8082/logo.png</iconUrl>
+        <parentId>Test</parentId>
+        <errors/>
+        <metaUrls/>
+        <podcastUrl>http://localhost:8082//category?id=Test/AtoZ;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set">
+          <string>Test/AtoZ/T</string>
+        </subCategories>
+      </uk.co.mdjcox.sagetv.model.SubCategory>
+    </entry>
+    <entry>
+      <string>Test/AtoZ/T</string>
+      <uk.co.mdjcox.sagetv.model.SubCategory>
+        <sourceId>Test</sourceId>
+        <id>Test/AtoZ/T</id>
+        <shortName>T</shortName>
+        <longName>T</longName>
+        <serviceUrl>http://localhost:8082/category?id=test;type=html</serviceUrl>
+        <iconUrl>http://localhost:8082/logo.png</iconUrl>
+        <parentId>Test/AtoZ</parentId>
+        <errors/>
+        <metaUrls/>
+        <podcastUrl>http://localhost:8082//category?id=Test/AtoZ/T;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set">
+          <string>testProgramme</string>
+        </subCategories>
+      </uk.co.mdjcox.sagetv.model.SubCategory>
+    </entry>
+    <entry>
+      <string>Test/Genre</string>
+      <uk.co.mdjcox.sagetv.model.SubCategory>
+        <sourceId>Test</sourceId>
+        <id>Test/Genre</id>
+        <shortName>Genre</shortName>
+        <longName>Genre</longName>
+        <serviceUrl>http://localhost:8082/category?id=test;type=html</serviceUrl>
+        <iconUrl>http://localhost:8082/logo.png</iconUrl>
+        <parentId>Test</parentId>
+        <errors/>
+        <metaUrls/>
+        <podcastUrl>http://localhost:8082//category?id=Test/Genre;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set">
+          <string>Test/Genre/Factual</string>
+          <string>Test/Genre/News</string>
+        </subCategories>
+      </uk.co.mdjcox.sagetv.model.SubCategory>
+    </entry>
+    <entry>
+      <string>Test/Genre/Factual</string>
+      <uk.co.mdjcox.sagetv.model.SubCategory>
+        <sourceId>Test</sourceId>
+        <id>Test/Genre/Factual</id>
+        <shortName>Factual</shortName>
+        <longName>Factual</longName>
+        <serviceUrl>http://localhost:8082/category?id=test;type=html</serviceUrl>
+        <iconUrl>http://localhost:8082/logo.png</iconUrl>
+        <parentId>Test/Genre</parentId>
+        <errors/>
+        <metaUrls/>
+        <podcastUrl>http://localhost:8082//category?id=Test/Genre/Factual;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set">
+          <string>testProgramme</string>
+        </subCategories>
+      </uk.co.mdjcox.sagetv.model.SubCategory>
+    </entry>
+    <entry>
+      <string>Test/Genre/News</string>
+      <uk.co.mdjcox.sagetv.model.SubCategory>
+        <sourceId>Test</sourceId>
+        <id>Test/Genre/News</id>
+        <shortName>News</shortName>
+        <longName>News</longName>
+        <serviceUrl>http://localhost:8082/category?id=test;type=html</serviceUrl>
+        <iconUrl>http://localhost:8082/logo.png</iconUrl>
+        <parentId>Test/Genre</parentId>
+        <errors/>
+        <metaUrls/>
+        <podcastUrl>http://localhost:8082//category?id=Test/Genre/News;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set">
+          <string>testProgramme</string>
+        </subCategories>
+      </uk.co.mdjcox.sagetv.model.SubCategory>
+    </entry>
+    <entry>
+      <string>Test/Channel</string>
+      <uk.co.mdjcox.sagetv.model.SubCategory>
+        <sourceId>Test</sourceId>
+        <id>Test/Channel</id>
+        <shortName>Channel</shortName>
+        <longName>Channel</longName>
+        <serviceUrl>http://localhost:8082/category?id=test;type=html</serviceUrl>
+        <iconUrl>http://localhost:8082/logo.png</iconUrl>
+        <parentId>Test</parentId>
+        <errors/>
+        <metaUrls/>
+        <podcastUrl>http://localhost:8082//category?id=Test/Channel;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set">
+          <string>Test/Channel/Test</string>
+        </subCategories>
+      </uk.co.mdjcox.sagetv.model.SubCategory>
+    </entry>
+    <entry>
+      <string>Test/Channel/Test</string>
+      <uk.co.mdjcox.sagetv.model.SubCategory>
+        <sourceId>Test</sourceId>
+        <id>Test/Channel/Test</id>
+        <shortName>Test</shortName>
+        <longName>Test</longName>
+        <serviceUrl>http://localhost:8082/category?id=test;type=html</serviceUrl>
+        <iconUrl>http://localhost:8082/logo.png</iconUrl>
+        <parentId>Test/Channel</parentId>
+        <errors/>
+        <metaUrls/>
+        <podcastUrl>http://localhost:8082//category?id=Test/Channel/Test;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set">
+          <string>testProgramme</string>
+        </subCategories>
+      </uk.co.mdjcox.sagetv.model.SubCategory>
+    </entry>
+    <entry>
+      <string>Test/AirDate</string>
+      <uk.co.mdjcox.sagetv.model.SubCategory>
+        <sourceId>Test</sourceId>
+        <id>Test/AirDate</id>
+        <shortName>Air Date</shortName>
+        <longName>Air Date</longName>
+        <serviceUrl>http://localhost:8082/category?id=test;type=html</serviceUrl>
+        <iconUrl>http://localhost:8082/logo.png</iconUrl>
+        <parentId>Test</parentId>
+        <errors/>
+        <metaUrls/>
+        <podcastUrl>http://localhost:8082/category?id=Test/AirDate;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set">
+          <string>Test/AirDate/01-09-2014</string>
+        </subCategories>
+      </uk.co.mdjcox.sagetv.model.SubCategory>
+    </entry>
+    <entry>
+      <string>Test/AirDate/01-09-2014</string>
+      <uk.co.mdjcox.sagetv.model.Programme>
+        <sourceId>Test</sourceId>
+        <id>Test/AirDate/01-09-2014</id>
+        <shortName>01-09-2014</shortName>
+        <longName>01-09-2014</longName>
+        <serviceUrl>http://localhost:8082/category?id=test;type=html</serviceUrl>
+        <iconUrl>http://localhost:8082/logo.png</iconUrl>
+        <parentId>Test/AirDate</parentId>
+        <errors/>
+        <metaUrls/>
+        <podcastUrl>http://localhost:8082/category?id=Test/AirDate/01-09-2014;type=xml</podcastUrl>
+        <type>Programme</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set"/>
+        <episodes>
+          <string>TestEpisode</string>
+        </episodes>
+      </uk.co.mdjcox.sagetv.model.Programme>
+    </entry>
+    <entry>
+      <string>Iplayer</string>
+      <uk.co.mdjcox.sagetv.model.Source>
+        <sourceId>Iplayer</sourceId>
+        <id>Iplayer</id>
+        <shortName>BBC Iplayer</shortName>
+        <longName>BBC Iplayer</longName>
+        <serviceUrl>http://www.bbc.co.uk/iplayer/a-z/</serviceUrl>
+        <iconUrl>http://static.bbci.co.uk/tviplayer/1.24.0/img/navigation/iplayer_pink.png</iconUrl>
+        <parentId>Catchup</parentId>
+        <errors/>
+        <metaUrls>
+          <string>http://www.bbc.co.uk/iplayer/a-z/</string>
+        </metaUrls>
+        <podcastUrl>http://localhost:8082//category?id=Iplayer;type=xml</podcastUrl>
+        <type>Source</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set"/>
+      </uk.co.mdjcox.sagetv.model.Source>
+    </entry>
+  </categories>
+  <root reference="../categories/entry/uk.co.mdjcox.sagetv.model.Root"/>
+</uk.co.mdjcox.sagetv.model.Catalog>
