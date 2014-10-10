@@ -1,0 +1,4 @@
+<![CDATA[
+0.2.6 - First beta release. Contains Iplayer catalog, watch and record to TV recordings
+]]>
+

@@ -1,0 +1,5 @@
+<![CDATA[
+Plugin to integrate UK catchup TV sources into SageTV for UK users.
+
+Requires separate installation of get_iplayer.
+]]>

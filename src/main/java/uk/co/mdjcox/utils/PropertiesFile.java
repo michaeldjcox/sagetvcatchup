@@ -37,7 +37,7 @@ public class PropertiesFile extends CommentedProperties implements PropertiesInt
 
     @Override
     public synchronized Object setProperty(String key, String value) {
-        return super.setProperty(key, value);    //To change body of overridden methods use File | Settings | File Templates.
+        return super.setProperty(key, value);
     }
 
     @Override

@@ -40,4 +40,6 @@ public interface PropertiesInterface {
     void refresh(boolean throwError) throws Exception;
 
     String getProperty(String s, String s1);
-}
+
+    void commit(String fileName, PropertiesFileLayout layout) throws Exception ;
+  }

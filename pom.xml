@@ -125,7 +125,7 @@
                                 </replacement>
                                 <replacement>
                                     <token>_DESCRIPTION_</token>
-                                    <value><![CDATA[Plugin to integrate UK catchup TV sources into SageTV for UK users]]></value>
+                                    <valueFile>releasenotes/description.txt</valueFile>
                                 </replacement>
                                 <replacement>
                                     <token>_ID_</token>
@@ -153,7 +153,7 @@
                                 </replacement>
                                 <replacement>
                                     <token>_RELEASENOTES_</token>
-                                    <value><![CDATA[_VERSION_ - beta release]]></value>
+                                    <valueFile>releasenotes/releasenotes.txt</valueFile>
                                 </replacement>
                                 <replacement>
                                     <token>_AUTHOR_</token>
@@ -205,7 +205,7 @@
                                 </replacement>
                                 <replacement>
                                     <token>_DESCRIPTION_</token>
-                                    <value><![CDATA[Plugin to integrate UK catchup TV sources into SageTV for UK users]]></value>
+                                    <valueFile>releasenotes/description.txt</valueFile>
                                 </replacement>
                                 <replacement>
                                     <token>_ID_</token>
@@ -233,7 +233,7 @@
                                 </replacement>
                                 <replacement>
                                     <token>_RELEASENOTES_</token>
-                                    <value><![CDATA[_VERSION_ - beta release]]></value>
+                                    <valueFile>releasenotes/releasenotes.txt</valueFile>
                                 </replacement>
                                 <replacement>
                                     <token>_AUTHOR_</token>

@@ -1,5 +1,6 @@
 package uk.co.mdjcox.sagetv.catchup;
 
+import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -14,6 +15,7 @@ import uk.co.mdjcox.sagetv.catchup.server.Server;
 import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
+import uk.co.mdjcox.utils.PropertiesFileLayout;
 import uk.co.mdjcox.utils.PropertiesInterface;
 import uk.co.mdjcox.utils.SageUtilsInterface;
 
@@ -21,10 +23,8 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.charset.Charset;
+import java.util.*;
 
 
 /**
@@ -77,8 +77,6 @@ public class CatchupPlugin implements SageTVPlugin {
 
     private static final String STOP_RECORDING = "stopRecording";
 
-    private static final String SEARCH_TITLES = "searchTitles";
-
     public static Logger logger;
     public static Injector injector;
 
@@ -102,7 +100,6 @@ public class CatchupPlugin implements SageTVPlugin {
     private Cataloger cataloger;
     private PluginManager pluginManager;
     private Recorder recorder;
-    private String searchString="";
 
     @Inject
   public CatchupPlugin(sage.SageTVPluginRegistry registry) {
@@ -133,7 +130,7 @@ public class CatchupPlugin implements SageTVPlugin {
             props = injector.getInstance(PropertiesInterface.class);
             logger.info(props.toString());
 
-            this.downloadUtils = injector.getInstance(DownloadUtilsInterface.class);
+          this.downloadUtils = injector.getInstance(DownloadUtilsInterface.class);
 
             this.sageUtils = injector.getInstance(SageUtilsInterface.class);
 
@@ -176,7 +173,7 @@ public class CatchupPlugin implements SageTVPlugin {
         }
     }
 
-    @Override
+  @Override
     public void stop() {
         logger.info("Stopping catchup plugin");
 
@@ -312,16 +309,27 @@ public class CatchupPlugin implements SageTVPlugin {
         help.put(STOP_RECORDING,"Force all recording to stop immediately");
 
         try {
-            String hostname = (InetAddress.getLocalHost().getHostName());
-            if (hostname.contains("antibes") || hostname.contains("mintpad")) {
-                types.put(PULL_UPGRADE, CONFIG_BUTTON);
-                labels.put(PULL_UPGRADE, "Check for upgrade");
-                help.put(PULL_UPGRADE, "Get SageTV to pull a new dev version");
+            String sageTvDir = System.getProperty("user.dir");
 
-                types.put(SEARCH_TITLES, CONFIG_TEXT);
-                labels.put(SEARCH_TITLES, "Search for regex");
-                help.put(SEARCH_TITLES, "Search sage for show titles");
+            File sageTvDevPlugins = new File(sageTvDir, "SageTVPluginsDev.xml");
+
+          if (sageTvDevPlugins.exists()) {
+            List<String> lines = Files.readLines(sageTvDevPlugins, Charset.defaultCharset());
+            boolean isDevSite = false;
+            for (String line : lines) {
+              if (line.contains("sagetvcatchup")) {
+                isDevSite = true;
+              }
             }
+            if (isDevSite) {
+              logger.info("This is a sagetv developer site");
+              types.put(PULL_UPGRADE, CONFIG_BUTTON);
+              labels.put(PULL_UPGRADE, "Check for upgrade");
+              help.put(PULL_UPGRADE, "Get SageTV to pull a new dev version");
+            } else {
+              logger.info("This is not a sagetv developer site");
+            }
+          }
         } catch (Exception e) {
             logger.warn("Failed to setup developer config controls", e);
         }
@@ -360,10 +368,6 @@ public class CatchupPlugin implements SageTVPlugin {
 
         if (property.equals(RECORDINGS_PROCESSES)) {
             return String.valueOf(recorder.getProcessCount());
-        }
-
-        if (property.equals(SEARCH_TITLES)) {
-            return searchString;
         }
 
         if (pluginManager != null) {
@@ -428,24 +432,6 @@ public class CatchupPlugin implements SageTVPlugin {
 
         if (property.equals(STOP_RECORDING)) {
             forceStopRecording();
-        }
-
-        if (property.equals(SEARCH_TITLES)) {
-            searchString = value;
-            String[] titles = sageUtils.findTitlesWithName(".*" + searchString + ".*");
-            logger.info(titles.length + " shows find matching title " + searchString);
-            for (String title : titles) {
-                logger.info(title + "matches title " + searchString);
-
-                Object[] results =   sageUtils.findAiringsByText(title);
-                logger.info(results.length + " airings find matching title " + searchString);
-                for (Object result : results) {
-                    logger.info("AIRING " + sageUtils.printAiring(result));
-                    Object show = sageUtils.findShowForAiring(result);
-                    logger.info("SHOW   " + sageUtils.printShow(show));
-                }
-            }
-
         }
 
         if (pluginManager != null) {
