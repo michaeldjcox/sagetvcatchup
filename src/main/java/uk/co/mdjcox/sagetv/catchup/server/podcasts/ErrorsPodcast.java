@@ -62,7 +62,7 @@ public class ErrorsPodcast extends AbstractPodcast {
 
     @Override
     public String getUri() {
-        return "/errors?type=xml";
+        return "errors?type=xml";
     }
 
     @Override

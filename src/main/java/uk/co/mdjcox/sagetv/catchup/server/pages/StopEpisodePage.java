@@ -18,7 +18,7 @@ public class StopEpisodePage extends AbstractHtmlPage {
 
     @Override
     public String getUri() {
-        return "/stop?id="+id+";type=html";
+        return "stop?id="+id+";type=html";
     }
 
     @Override

@@ -8,8 +8,6 @@ import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.utils.OsUtilsInterface;
-import uk.co.mdjcox.utils.PropertiesInterface;
-import uk.co.mdjcox.utils.SageUtils;
 import uk.co.mdjcox.utils.SageUtilsInterface;
 
 import java.io.File;
@@ -40,20 +38,13 @@ public class Recorder {
     private ScheduledExecutorService service;
 
     @Inject
-    private Recorder(Logger theLogger, PluginManager pluginManager, PropertiesInterface props,
+    private Recorder(Logger theLogger, PluginManager pluginManager, CatchupContextInterface context,
                      OsUtilsInterface osUtils, SageUtilsInterface sageUtils) {
         this.logger = theLogger;
         this.pluginManager = pluginManager;
         this.osUtils = osUtils;
         this.sageUtils = sageUtils;
-        this.recordingDir = props.getProperty("recordingDir", "/opt/sagetv/server/sagetvcatchup/plugins");
-
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                shutdown();
-            }
-        }));
+        this.recordingDir = context.getRecordingDir();
 
         service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
             @Override
@@ -243,6 +234,7 @@ public class Recorder {
                 Runnable runnable = new Runnable() {
                     @Override
                     public void run() {
+                      try {
                         try {
                             File partialFile = download(newRecording);
 
@@ -276,7 +268,7 @@ public class Recorder {
                             } else {
                                 logger.error("No recording file found for " + episode);
                             }
-                        } catch (Exception e) {
+                        } catch (Throwable e) {
                             logger.warn("Recording of " + episode.getId() + " stopped due to exception ", e);
                         } finally {
                             try {
@@ -285,6 +277,9 @@ public class Recorder {
                                 logger.error("Failed to stop recording in the recorder", e1);
                             }
                         }
+                      } catch (Throwable e) {
+                        logger.error("Recording of " + episode.getId() + " threw exception on stop", e);
+                      }
 
                     }
                 };

@@ -6,10 +6,10 @@ import com.google.inject.Injector;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.catchup.CatchupTestModule;
 import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.PropertiesFile;
-import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -19,7 +19,6 @@ import java.util.TreeMap;
 
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
 
 /**
  * Publisher Tester.
@@ -31,26 +30,22 @@ import static org.mockito.Mockito.when;
 public class SageTvPublisherTest {
 
   private SageTvPublisher sageTvPublisher;
-    private PropertiesInterface props;
+    private CatchupContextInterface context;
 
     @Before
   public void before() throws Exception {
-    String tmpDir = System.getProperty("java.io.tmpdir", ".");
-    File tmpDirFle = new File(tmpDir + File.separator + "OnlineVideos");
-    if (tmpDirFle.exists()) {
-      tmpDirFle.delete();
-    }
-
-    tmpDirFle.mkdir();
-
     CatchupTestModule module = new CatchupTestModule();
     Injector injector = Guice.createInjector(module);
 
-      props = injector.getInstance(PropertiesInterface.class);
+    File dir = new File(context.getOnlineVideoPropertiesDir());
 
-      when(props.getString("fileName")).thenReturn("test");
-      when(props.getString("STV")).thenReturn(tmpDir);
+      if (dir.exists()) {
+        dir.delete();
+      }
 
+      dir.mkdir();
+
+      context = injector.getInstance(CatchupContextInterface.class);
       sageTvPublisher = injector.getInstance(SageTvPublisher.class);
   }
 
@@ -62,11 +57,8 @@ public class SageTvPublisherTest {
   public void testCreate() throws Exception {
     boolean thrown=false;
     try {
-      String tmpDir = System.getProperty("java.io.tmpdir", ".");
       CatchupTestModule module = new CatchupTestModule();
       Injector injector = Guice.createInjector(module);
-        when(props.getString("fileName")).thenReturn(null);
-        when(props.getString("STV")).thenReturn(tmpDir);
         SageTvPublisher sageTvPublisher = injector.getInstance(SageTvPublisher.class);
     } catch (com.google.inject.ProvisionException e) {
       thrown = true;
@@ -80,8 +72,6 @@ public class SageTvPublisherTest {
     try {
       CatchupTestModule module = new CatchupTestModule();
       Injector injector = Guice.createInjector(module);
-        when(props.getString("fileName")).thenReturn("test");
-        when(props.getString("STV")).thenReturn(null);
       SageTvPublisher sageTvPublisher = injector.getInstance(SageTvPublisher.class);
     } catch (com.google.inject.ProvisionException e) {
       thrown = true;

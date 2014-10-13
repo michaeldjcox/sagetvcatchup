@@ -17,7 +17,7 @@ public class StopCatalogingPodcast extends AbstractPodcast {
 
     @Override
     public String getUri() {
-        return "/stopcat?type=xml";
+        return "stopcat?type=xml";
     }
 
     @Override

@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import uk.co.mdjcox.utils.HtmlBuilder;
-import uk.co.mdjcox.utils.PropertiesInterface;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -81,9 +80,9 @@ public class StyledPage extends AbstractHtmlPage {
     @Override
     public String getUri() {
         if (id != null) {
-            return "/" + stylesheet.replace(".html", "?id=") + id + ";type=html";
+            return stylesheet.replace(".html", "?id=") + id + ";type=html";
         } else {
-            return "/" + stylesheet.replace(".html", "") + "?type=html";
+            return stylesheet.replace(".html", "") + "?type=html";
         }
     }
 

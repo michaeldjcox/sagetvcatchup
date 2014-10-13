@@ -85,7 +85,7 @@ public class ErrorsPage extends AbstractHtmlPage {
     }
     @Override
     public String getUri() {
-        return "/errors?type=html";
+        return "errors?type=html";
     }
 
     @Override

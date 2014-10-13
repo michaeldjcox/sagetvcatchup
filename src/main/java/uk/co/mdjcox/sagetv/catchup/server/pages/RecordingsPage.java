@@ -46,7 +46,7 @@ public class RecordingsPage extends AbstractHtmlPage {
 
     @Override
     public String getUri() {
-        return "/recordings?type=html";
+        return "recordings?type=html";
     }
 
     @Override

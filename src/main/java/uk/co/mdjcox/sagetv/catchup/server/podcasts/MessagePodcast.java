@@ -16,7 +16,7 @@ public class MessagePodcast extends AbstractPodcast {
 
     @Override
     public String getUri() {
-        return "/error?type=xml";
+        return "error?type=xml";
     }
 
     @Override

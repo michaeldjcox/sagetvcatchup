@@ -1,10 +1,8 @@
 package uk.co.mdjcox.sagetv.catchup;
 
 import com.google.common.io.Files;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
+import com.google.inject.*;
+import com.google.inject.name.Names;
 import org.slf4j.Logger;
 import sage.SageTVPlugin;
 import sage.SageTVPluginRegistry;
@@ -15,16 +13,16 @@ import uk.co.mdjcox.sagetv.catchup.server.Server;
 import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
-import uk.co.mdjcox.utils.PropertiesFileLayout;
 import uk.co.mdjcox.utils.PropertiesInterface;
 import uk.co.mdjcox.utils.SageUtilsInterface;
 
 import java.io.File;
-import java.net.InetAddress;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -36,6 +34,16 @@ import java.util.*;
  */
 
 // In priority order...
+
+// TODO - test properties recovery
+// TODO - start and needs to recreate threads
+// TODO - properties backup
+// TODO - release, branch and reversion
+// TODO - log roll
+
+// TODO - stop should save completed to recording
+// TODO - size of cat, time taken, recording errors
+// TODO - SSH and GIT
 
 // TODO - Podcast stylesheets?
 // TODO - Generalise SageTV Publisher into utils
@@ -101,7 +109,11 @@ public class CatchupPlugin implements SageTVPlugin {
     private PluginManager pluginManager;
     private Recorder recorder;
 
-    @Inject
+    private String propFileName;
+    private String backupFileName;
+    private CatchupContextInterface context;
+
+  @Inject
   public CatchupPlugin(sage.SageTVPluginRegistry registry) {
         this.registry = registry;
     }
@@ -111,9 +123,7 @@ public class CatchupPlugin implements SageTVPlugin {
 
         try {
             AbstractModule module;
-            String workingDir = System.getProperty("user.dir");
-            String home = System.getProperty("user.home");
-            if (workingDir.startsWith(home) && workingDir.endsWith("sagetvcatchup")) {
+            if (CatchupContext.isRunningInSageTV()) {
                 System.err.println("Running in DEV");
                 module = new CatchupDevModule();
             } else {
@@ -125,6 +135,8 @@ public class CatchupPlugin implements SageTVPlugin {
 
             logger = injector.getInstance(Logger.class);
 
+            context = injector.getInstance(CatchupContextInterface.class);
+
             logger.info("Starting catchup plugin");
 
             props = injector.getInstance(PropertiesInterface.class);
@@ -134,7 +146,11 @@ public class CatchupPlugin implements SageTVPlugin {
 
             this.sageUtils = injector.getInstance(SageUtilsInterface.class);
 
-            if (registry != null) {
+          this.propFileName = injector.getInstance(Key.get(String.class, Names.named("PropsFile")));
+          this.backupFileName = injector.getInstance(Key.get(String.class, Names.named("BackupPropsFile")));
+
+
+          if (registry != null) {
                 registry.eventSubscribe(this, SageEvents.PlaybackStarted);
                 registry.eventSubscribe(this, SageEvents.PlaybackStopped);
                 registry.eventSubscribe(this, SageEvents.PlaybackFinished);
@@ -177,7 +193,15 @@ public class CatchupPlugin implements SageTVPlugin {
     public void stop() {
         logger.info("Stopping catchup plugin");
 
-        if (recorder != null) {
+
+    try {
+      logger.info("Backing up properties");
+      props.commit(backupFileName, new CatchupPropertiesFileLayout());
+    } catch (Exception e) {
+      logger.error("Unable to save property backup", e);
+    }
+
+    if (recorder != null) {
             recorder.shutdown();
         }
 
@@ -214,19 +238,9 @@ public class CatchupPlugin implements SageTVPlugin {
             logger.error("Failed to remove online video properties", e);
         }
 
+        File recordings = new File(context.getRecordingDir());
+        File logs = new File(context.getLogDir());
 
-        String rootDir = System.getProperty("user.dir");
-        if (!rootDir.endsWith(File.separator)) {
-            rootDir += File.separator;
-        }
-
-        File htdocs = new File(rootDir + "sagetvcatchup" + File.separator + "htdocs");
-        File staging = new File(rootDir + "sagetvcatchup" + File.separator + "staging");
-        File recordings = new File(rootDir + "sagetvcatchup" + File.separator + "recordings");
-        File logs = new File(rootDir + "sagetvcatchup" + File.separator + "logs");
-
-        deleteFileOrDir(htdocs, true);
-        deleteFileOrDir(staging, true);
         deleteFileOrDir(recordings, true);
         deleteFileOrDir(logs, true);
     }
@@ -309,10 +323,7 @@ public class CatchupPlugin implements SageTVPlugin {
         help.put(STOP_RECORDING,"Force all recording to stop immediately");
 
         try {
-            String sageTvDir = System.getProperty("user.dir");
-
-            File sageTvDevPlugins = new File(sageTvDir, "SageTVPluginsDev.xml");
-
+          File sageTvDevPlugins = context.getSageTVPluginsDevFile();
           if (sageTvDevPlugins.exists()) {
             List<String> lines = Files.readLines(sageTvDevPlugins, Charset.defaultCharset());
             boolean isDevSite = false;
@@ -399,10 +410,10 @@ public class CatchupPlugin implements SageTVPlugin {
         if (property.equals(PULL_UPGRADE)) {
             logger.info("Checking for dev upgrade");
             try {
-                String updateUrl = "http://mintpad/sagetvcatchup/download/SageTVPluginsDev.xml";
-                String downloadTo = System.getProperty("user.dir")  + File.separator+ "SageTVPluginsDev.xml";
-                downloadUtils.downloadFile(new URL(updateUrl), downloadTo);
-                logger.info("Downloaded " + downloadTo);
+                String updateUrl = context.getSageTVPluginsURL();
+                File sageTvDevPluginsFile = context.getSageTVPluginsDevFile();
+                downloadUtils.downloadFile(new URL(updateUrl), sageTvDevPluginsFile.getAbsolutePath());
+                logger.info("Downloaded " + sageTvDevPluginsFile);
                 pullUpgradeValue = "Done";
                 Thread thread = new Thread(new Runnable() {
                     @Override
@@ -439,17 +450,26 @@ public class CatchupPlugin implements SageTVPlugin {
                 String name = plugin.getSource().getId();
                 String propName = name + ".maxprogrammes";
                 if (property.equals(propName)) {
-                    props.setProperty(propName, value);
+                  setCatchupProperty(value, propName);
                 }
             }
         }
     }
 
-    private void forceStopRecording() {
+  private void setCatchupProperty(String value, String propName) {
+    props.setProperty(propName, value);
+    try {
+      props.commit(propFileName, new CatchupPropertiesFileLayout());
+    } catch (Exception e) {
+      logger.warn("Failed to persist property change", e);
+    }
+  }
+
+  private void forceStopRecording() {
         logger.info("Force recording stop");
         try {
             stopRecordingValue = recorder.requestStopAll();
-            ;
+
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {

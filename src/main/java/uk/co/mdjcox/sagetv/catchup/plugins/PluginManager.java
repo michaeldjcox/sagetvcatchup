@@ -2,10 +2,8 @@ package uk.co.mdjcox.sagetv.catchup.plugins;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
 import org.slf4j.Logger;
-
-import uk.co.mdjcox.utils.PropertiesInterface;
+import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -23,15 +21,15 @@ import java.util.LinkedHashMap;
 public class PluginManager {
 
     private Logger logger;
-    private PropertiesInterface props;
     private LinkedHashMap<String, Plugin> plugins = new  LinkedHashMap<String, Plugin>();
     @Inject
     private PluginFactory pluginFactory;
+    private CatchupContextInterface context;
 
     @Inject
-    private PluginManager(Logger logger, PropertiesInterface props) {
+    private PluginManager(Logger logger, CatchupContextInterface context) {
         this.logger = logger;
-        this.props = props;
+        this.context = context;
     }
 
     public Collection<Plugin> getPlugins() {
@@ -44,7 +42,7 @@ public class PluginManager {
 
     public void load() {
 
-        String base = props.getProperty("pluginDir", "/opt/sagetv/server/sagetvcatchup/plugins");
+        String base = context.getPluginDir();
 
         File dir = new File(base);
         if (!dir.isDirectory()) {
@@ -64,7 +62,7 @@ public class PluginManager {
 
         for (File pluginDir : pluginDirs) {
             String sourceId = pluginDir.getName();
-          if (props.getBoolean(sourceId + ".skip")) {
+          if (context.skipPlugin(sourceId)) {
             logger.info("Skipping plugin " + sourceId);
             continue;
           }

@@ -16,7 +16,7 @@ public class StopAllRecordingPage extends AbstractHtmlPage {
 
     @Override
     public String getUri() {
-        return "/stopall?type=html";
+        return "stopall?type=html";
     }
 
     @Override

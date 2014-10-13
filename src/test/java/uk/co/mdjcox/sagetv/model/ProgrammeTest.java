@@ -1,13 +1,10 @@
 package uk.co.mdjcox.sagetv.model;
 
 import com.google.common.collect.Sets;
-import junit.framework.TestCase;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Map;
 import java.util.Set;
 
 import static junit.framework.TestCase.assertEquals;

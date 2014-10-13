@@ -66,7 +66,7 @@ public class WatchEpisode implements ContentProvider {
 
     @Override
     public String getUri() {
-        return "/watch?id="+episode.getId() +";type=mpeg4";
+        return "watch?id="+episode.getId() +";type=mpeg4";
     }
 
     @Override

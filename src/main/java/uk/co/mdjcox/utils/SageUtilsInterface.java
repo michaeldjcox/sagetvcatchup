@@ -3,7 +3,6 @@ package uk.co.mdjcox.utils;
 import uk.co.mdjcox.sagetv.model.Recording;
 
 import java.io.File;
-import java.util.Set;
 
 /**
  * Created by michael on 24/09/14.

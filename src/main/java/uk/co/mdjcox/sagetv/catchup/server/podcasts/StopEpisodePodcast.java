@@ -19,7 +19,7 @@ public class StopEpisodePodcast extends AbstractPodcast {
 
     @Override
     public String getUri() {
-        return "/stop?id=" + id + ";type=xml";
+        return "stop?id=" + id + ";type=xml";
     }
 
     @Override

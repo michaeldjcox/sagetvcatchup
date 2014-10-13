@@ -1,9 +1,13 @@
 package uk.co.mdjcox.sagetv.model;
 
 import com.google.common.collect.Sets;
-import org.junit.Test;
-import org.junit.Before; 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
+import uk.co.mdjcox.sagetv.catchup.CatchupTestModule;
 
 import java.io.File;
 
@@ -17,11 +21,16 @@ import static junit.framework.TestCase.fail;
 * @since <pre>Apr 19, 2013</pre> 
 * @version 1.0 
 */ 
-public class RecordingTest { 
+public class RecordingTest {
 
-@Before
-public void before() throws Exception { 
-} 
+  private CatchupTestModule module = new CatchupTestModule();
+  private Injector injector = Guice.createInjector(module);
+  private CatchupContextInterface context;
+
+  @Before
+public void before() throws Exception {
+    context = injector.getInstance(CatchupContextInterface.class);
+  }
 
 @After
 public void after() throws Exception { 
@@ -45,7 +54,7 @@ public void testCreate() {
       Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
                                     "series", "episode", "description", "iconUrl", "serviceUrl",
                                     "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
-      Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
+      Recording recording = new Recording(episode, context.getRecordingDir(), true);
 
       recording.setPartialFile(null);
     } catch (NullPointerException e) {
@@ -67,7 +76,7 @@ public void testSetGetPartialFile() throws Exception {
                                 "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   File file = new File("filename");
 
-  Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
+  Recording recording = new Recording(episode, context.getRecordingDir(), true);
 
   File file3 = recording.getPartialFile();
 
@@ -91,7 +100,7 @@ public void testGetSourceId() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
-  Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
+  Recording recording = new Recording(episode, context.getRecordingDir(), true);
 
   assertEquals("getSourceId", "sourceId", recording.getSourceId());
 }
@@ -107,7 +116,7 @@ public void testGetUrl() throws Exception {
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
 
-  Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
+  Recording recording = new Recording(episode, context.getRecordingDir(), true);
 
   assertEquals("getUrl", "serviceUrl", recording.getUrl());
 } 
@@ -123,7 +132,7 @@ public void testGetId() throws Exception {
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
 
-  Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
+  Recording recording = new Recording(episode, context.getRecordingDir(), true);
 
   assertEquals("getId", "id", recording.getId());
 }
@@ -139,7 +148,7 @@ public void testGetName() throws Exception {
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
 
-  Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
+  Recording recording = new Recording(episode, context.getRecordingDir(), true);
 
   assertEquals("getName", episode.getPodcastTitle(), recording.getName());
 }
@@ -156,13 +165,13 @@ public void testGetPartialFilename() throws Exception {
                                 "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
 
 
-  Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
+  Recording recording = new Recording(episode, context.getRecordingDir(), true);
 
   File file = new File("filename");
 
   recording.setPartialFile(file);
 
-  assertEquals("getPartialFileName", System.getProperty("user.dir") + File.separator + "filename", recording.getPartialFilename());
+  assertEquals("getPartialFileName", context.getRecordingDir() + File.separator + "filename", recording.getPartialFilename());
 }
 
   @Test
@@ -172,7 +181,7 @@ public void testGetPartialFilename() throws Exception {
                                   "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
 
 
-    Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
+    Recording recording = new Recording(episode, context.getRecordingDir(), true);
 
     assertEquals("getPartialFileName", "", recording.getPartialFilename());
   }
@@ -189,7 +198,7 @@ public void testToString() throws Exception {
                                 "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
 
 
-  Recording recording = new Recording(episode, System.getProperty("user.dir"), true);
+  Recording recording = new Recording(episode, context.getRecordingDir(), true);
 
   assertEquals("toString", episode.toString(), recording.toString());
 

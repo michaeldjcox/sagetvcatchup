@@ -16,7 +16,7 @@ public class StopCatalogingPage extends AbstractHtmlPage {
 
     @Override
     public String getUri() {
-        return "/stopcat?type=html";
+        return "stopcat?type=html";
     }
 
     @Override

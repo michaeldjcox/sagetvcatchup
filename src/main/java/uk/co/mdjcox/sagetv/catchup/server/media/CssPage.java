@@ -2,7 +2,6 @@ package uk.co.mdjcox.sagetv.catchup.server.media;
 
 import org.slf4j.Logger;
 import uk.co.mdjcox.sagetv.catchup.server.ContentProvider;
-import uk.co.mdjcox.utils.PropertiesInterface;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +27,7 @@ public class CssPage implements ContentProvider {
 
     @Override
     public String getUri() {
-        return "/" + stylesheet;
+        return stylesheet;
     }
 
     @Override

@@ -1,6 +1,8 @@
 package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
-import uk.co.mdjcox.sagetv.model.*;
+import uk.co.mdjcox.sagetv.model.Catalog;
+import uk.co.mdjcox.sagetv.model.Episode;
+import uk.co.mdjcox.sagetv.model.Programme;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.RssBuilder;
 
@@ -41,7 +43,7 @@ public class ProgrammePodcast extends AbstractPodcast {
             final String title = htmlUtils.makeContentSafe(episode.getPodcastTitle());
             final String desc = htmlUtils.makeContentSafe(episode.getDescription());
             final String episodeIconUrl = episode.getIconUrl();
-            final String controlUrl=getPodcastBaseUrl() +  "/control?id=" + episode.getId() + ";type=xml";
+            final String controlUrl=getPodcastBaseUrl() +  "control?id=" + episode.getId() + ";type=xml";
             builder.addCategoryItem(title, desc, controlUrl, episodeIconUrl);
         }
         builder.stopDocument();
@@ -50,7 +52,7 @@ public class ProgrammePodcast extends AbstractPodcast {
 
     @Override
     public String getUri() {
-        return "/programme?id=" + service.getId() + ";type=xml";
+        return "programme?id=" + service.getId() + ";type=xml";
     }
 
     @Override

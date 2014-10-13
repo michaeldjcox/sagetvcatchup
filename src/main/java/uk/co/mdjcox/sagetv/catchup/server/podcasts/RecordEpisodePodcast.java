@@ -20,7 +20,7 @@ public class RecordEpisodePodcast extends AbstractPodcast {
 
     @Override
     public String getUri() {
-        return "/record?id="+episode.getId()+";type=xml";
+        return "record?id="+episode.getId()+";type=xml";
     }
 
     @Override

@@ -8,7 +8,6 @@ import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.sagetv.model.Source;
 
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created with IntelliJ IDEA.

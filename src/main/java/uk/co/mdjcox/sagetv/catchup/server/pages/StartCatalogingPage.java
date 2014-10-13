@@ -16,7 +16,7 @@ public class StartCatalogingPage extends AbstractHtmlPage {
 
     @Override
     public String getUri() {
-        return "/startcat?type=html";
+        return "startcat?type=html";
     }
 
     @Override

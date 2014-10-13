@@ -19,7 +19,7 @@ public class HomePage extends AbstractHtmlPage {
 
     @Override
     public String getUri() {
-        return "/";
+        return "";
     }
 
     @Override

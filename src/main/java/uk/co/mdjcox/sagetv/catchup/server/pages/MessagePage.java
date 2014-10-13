@@ -15,7 +15,7 @@ public class MessagePage extends AbstractHtmlPage {
 
     @Override
     public String getUri() {
-        return "/error?type=html";
+        return "error?type=html";
     }
 
     @Override

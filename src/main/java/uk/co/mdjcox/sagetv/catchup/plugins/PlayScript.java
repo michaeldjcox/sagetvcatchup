@@ -3,11 +3,11 @@ package uk.co.mdjcox.sagetv.catchup.plugins;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.slf4j.Logger;
+import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
-import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 
@@ -21,8 +21,9 @@ import java.io.File;
 public class PlayScript extends Script {
 
     @AssistedInject
-    public PlayScript(Logger logger, @Assisted String base, HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils, PropertiesInterface properties) {
-        super(logger, base + File.separator + "playEpisode.groovy", htmlUtils, downloadUtils, osUtils, properties);
+    public PlayScript(Logger logger, @Assisted String base, HtmlUtilsInterface htmlUtils,
+                      DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils, CatchupContextInterface context) {
+        super(logger, base + File.separator + "playEpisode.groovy", htmlUtils, downloadUtils, osUtils, context);
     }
 
     public void play(Recording recording) {

@@ -2,12 +2,10 @@ package uk.co.mdjcox.sagetv.catchup;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
 import org.slf4j.Logger;
-
+import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
+import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.*;
-import uk.co.mdjcox.sagetv.catchup.plugins.*;
-import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -21,7 +19,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Cataloger {
 
     private Logger logger;
-    private PropertiesInterface props;
     private PluginManager pluginManager;
     private String podcastUrlBase;
     private String progressString = "Waiting";
@@ -31,20 +28,23 @@ public class Cataloger {
     private ScheduledFuture<?> future;
     private List<CatalogPublisher> publishers;
     private String errorSummary = "";
+    private long refreshRate;
+    private CatchupContextInterface context;
 
-    @Inject
-    private Cataloger(Logger logger, PropertiesInterface props, PluginManager pluginManager) {
+  @Inject
+    private Cataloger(Logger logger, CatchupContextInterface context, PluginManager pluginManager) {
         this.logger = logger;
-        this.props = props;
         this.pluginManager = pluginManager;
-        this.podcastUrlBase = "http://localhost:" + props.getString("podcasterPort", "8081") + "/";
-
+        this.podcastUrlBase = context.getPodcastBase();
+        this.refreshRate = context.getRefreshRate();
+        this.context = context;
     }
 
     private Runnable getCatalogRunnable(final List<CatalogPublisher> publishers) {
         return new Runnable() {
             @Override
             public void run() {
+              try {
                 Catalog catalog = null;
                 try {
                     catalogRunning.set(true);
@@ -55,7 +55,7 @@ public class Cataloger {
                         publish(catalog, publishers);
                         setProgress("Finished");
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     if (catalog != null) {
                         catalog.addError("FATAL", "Failed to publish to SageTV " + e.getMessage());
                     }
@@ -67,6 +67,9 @@ public class Cataloger {
                     }
                     catalogRunning.set(false);
                 }
+              } catch (Throwable e) {
+                logger.error("Caught Exception during cataloging", e);
+              }
             }
         };
     }
@@ -110,11 +113,10 @@ public class Cataloger {
             Map<String, Category> newCategories = new LinkedHashMap<String, Category>();
             Map<String, Episode> newEpisodes = new LinkedHashMap<String, Episode>();
 
-            Root root = new Root("Catchup", "Catchup TV", "Catchup TV", "http://localhost:8081",
-                            "http://localhost:" + props.getInt("podcasterPort", 8081) + "/logo.png");
+            Root root = new Root("Catchup", "Catchup TV", "Catchup TV", podcastUrlBase, podcastUrlBase + "logo.png");
             newCategories.put(root.getId(), root);
 
-            Source statusSource = new Source(root.getId(), "status", "Catchup Status", "Catchup Status", "", "http://localhost:" + props.getInt("podcasterPort", 8081) + "/logo.png");
+            Source statusSource = new Source(root.getId(), "status", "Catchup Status", "Catchup Status", "", podcastUrlBase + "logo.png");
             statusSource.setPodcastUrl(podcastUrlBase + "category?id=status;type=xml");
             newCategories.put(statusSource.getId(), statusSource);
             root.addSubCategory(statusSource);
@@ -127,8 +129,8 @@ public class Cataloger {
 
                 progressString = "Doing " + pluginName;
 
-                ArrayList<String> testProgrammes = props.getPropertySequence(pluginName + ".programmes");
-                int testMaxProgrammes = props.getInt(pluginName + ".maxprogrammes", Integer.MAX_VALUE);
+                ArrayList<String> testProgrammes = context.getTestProgrammes(pluginName);
+                int testMaxProgrammes = context.getMaxProgrammes(pluginName);
 
                 newCategories.put(sourceCat.getId(), sourceCat);
 
@@ -139,7 +141,7 @@ public class Cataloger {
                 root.addSubCategory(sourceCat);
                 sourceCat.setParentId(root.getId());
 
-                sourceCat.setPodcastUrl(podcastUrlBase + "/category?id=" + sourceCat.getId() + ";type=xml");
+                sourceCat.setPodcastUrl(podcastUrlBase + "category?id=" + sourceCat.getId() + ";type=xml");
 
 
                 logger.info("Getting programmes found on: " + sourceCat);
@@ -237,7 +239,7 @@ public class Cataloger {
 
             return catalog;
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Failed to refresh properties file", e);
             if (!e.getMessage().equals("Stopped on request")) {
                 progressString = "Failed to catalog";
@@ -426,8 +428,6 @@ public class Cataloger {
         publish(initial, publishers);
 
         Runnable runnable = getCatalogRunnable(publishers);
-
-        long refreshRate = props.getInt("refreshRateHours");
 
         future = service.scheduleAtFixedRate(runnable, 0, refreshRate, TimeUnit.HOURS);
     }

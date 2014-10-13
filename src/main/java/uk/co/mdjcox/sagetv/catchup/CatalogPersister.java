@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import com.thoughtworks.xstream.XStream;
 import org.slf4j.Logger;
 import uk.co.mdjcox.sagetv.model.Catalog;
-import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.*;
 
@@ -21,17 +20,14 @@ public class CatalogPersister implements CatalogPublisher {
     private String emptyFileName;
 
     @Inject
-    private CatalogPersister(Logger logger, PropertiesInterface props) {
+    private CatalogPersister(Logger logger, CatchupContextInterface context) {
         this.logger = logger;
-        String defaultFileName = System.getProperty("java.io.tmpdir", ".") + File.separator + "sagetvcatchup.xml";
-        fileName = props.getString("catalogFileName", defaultFileName);
-      String configDir = props.getString("configDir", System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator + "config" );
-      emptyFileName = configDir + File.separator + "default.xml";
-
+      fileName = context.getCatalogFileName();
+      emptyFileName = context.getDefaultCatalogFileName();
       xstream = new XStream();
     }
 
-    @Override
+  @Override
     public void publish(Catalog catalog) {
         PrintWriter writer = null;
         try {

@@ -1,6 +1,8 @@
 package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
-import uk.co.mdjcox.sagetv.model.*;
+import uk.co.mdjcox.sagetv.model.Catalog;
+import uk.co.mdjcox.sagetv.model.Category;
+import uk.co.mdjcox.sagetv.model.SubCategory;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.RssBuilder;
 
@@ -39,10 +41,10 @@ public class CategoryPodcast extends AbstractPodcast {
         for (String subCatId : subCats) {
             SubCategory subCat = (SubCategory)catalog.getCategory(subCatId);
             if (subCat.isProgrammeCategory()) {
-                final String categoryUrl = getPodcastBaseUrl() + "/programme?id=" + subCat.getId() + ";type=xml";
+                final String categoryUrl = getPodcastBaseUrl() + "programme?id=" + subCat.getId() + ";type=xml";
                 builder.addCategoryItem(subCat.getShortName(), subCat.getLongName(), categoryUrl);
             } else {
-                final String categoryUrl = getPodcastBaseUrl() + "/category?id=" + subCat.getId() + ";type=xml";
+                final String categoryUrl = getPodcastBaseUrl() + "category?id=" + subCat.getId() + ";type=xml";
                 builder.addCategoryItem(subCat.getShortName(), subCat.getLongName(), categoryUrl);
             }
         }
@@ -52,7 +54,7 @@ public class CategoryPodcast extends AbstractPodcast {
 
     @Override
     public String getUri() {
-        return "/category?id=" + service.getId() + ";type=xml";
+        return "category?id=" + service.getId() + ";type=xml";
     }
 
     @Override

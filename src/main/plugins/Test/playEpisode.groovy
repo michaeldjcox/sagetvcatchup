@@ -7,7 +7,7 @@ String filename = recording.getRecordingDir() + File.separator + recording.getId
 File file = new File(filename);
 recording.setPartialFile(file);
 
-String pluginsDir = GET_STRING_PROPERTY("pluginDir") + "/Test";
+String pluginsDir = GET_PLUGIN_DIR() + "Test";
 
 File sourcePath = new File(pluginsDir, recording.getId() + ".mp4");
 

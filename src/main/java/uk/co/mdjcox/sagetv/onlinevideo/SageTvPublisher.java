@@ -11,10 +11,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import uk.co.mdjcox.sagetv.catchup.CatalogPublisher;
+import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.PropertiesFile;
-import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 import java.util.Collection;
@@ -40,22 +40,23 @@ public class SageTvPublisher implements CatalogPublisher {
     /** The qualifier added to the custom SageTV online video link and UIText files */
     private String qualifier;
     /** The SageTV STV directory */
-    private String STV;
+    private String onlineVideoPropertiesDir;
 
     /**
      * Creates a new instance which can be used to create new online video property files.
      *
      * @param logger The logger to be used for debug output
      * @param htmlUtils The utilities used to perform some string manipulation
-     * @param props The properties file
+     * @param context The properties and environment
      */
     @Inject
-    private SageTvPublisher(Logger logger, HtmlUtilsInterface htmlUtils, PropertiesInterface props)
+    private SageTvPublisher(Logger logger, HtmlUtilsInterface htmlUtils, CatchupContextInterface context)
     {
-        this.qualifier = props.getString("fileName");
-        this.STV = props.getString("STV");
+        this.qualifier = context.getOnlineVideoPropsSuffix();
+        this.onlineVideoPropertiesDir = context.getOnlineVideoPropertiesDir();
+
         checkNotNull(qualifier);
-        checkNotNull(STV);
+        checkNotNull(onlineVideoPropertiesDir);
         this.logger = logger;
         this.htmlUtils = htmlUtils;
     }
@@ -99,7 +100,7 @@ public class SageTvPublisher implements CatalogPublisher {
         if (!qualifier.isEmpty()) {
             qualifier = "_" + qualifier;
         }
-        return getRoot() + File.separator + "CustomOnlineVideoLinks" + qualifier + ".properties";
+        return onlineVideoPropertiesDir + File.separator + "CustomOnlineVideoLinks" + qualifier + ".properties";
     }
 
     /**
@@ -113,21 +114,9 @@ public class SageTvPublisher implements CatalogPublisher {
         if (!qualifier.isEmpty()) {
             qualifier = "_" + qualifier;
         }
-        return getRoot() + File.separator + "CustomOnlineVideoUIText" + qualifier + ".properties";
+        return onlineVideoPropertiesDir + File.separator + "CustomOnlineVideoUIText" + qualifier + ".properties";
     }
 
-    /**
-     * Returns the full path for the STV online videos directory
-     *
-     * @return full path of the online videos directory
-     */
-    private String getRoot() {
-        STV = STV.replace(File.separatorChar, '/');
-        STV = STV.replaceAll("/[^/]*.xml", "");
-        STV = STV.trim();
-        String root = STV + File.separator + "OnlineVideos";
-        return root;
-    }
 
     /**
      * Takes a catalog of online video meta data and exports its as SageTV custom online video

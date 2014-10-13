@@ -15,7 +15,7 @@ import java.io.OutputStream;
 public class LogoImage implements ContentProvider {
     @Override
     public String getUri() {
-        return "/logo.png";
+        return "logo.png";
     }
 
     @Override

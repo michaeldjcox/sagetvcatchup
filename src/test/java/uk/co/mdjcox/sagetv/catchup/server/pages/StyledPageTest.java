@@ -2,7 +2,6 @@ package uk.co.mdjcox.sagetv.catchup.server.pages;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -11,7 +10,6 @@ import uk.co.mdjcox.sagetv.catchup.CatalogPersister;
 import uk.co.mdjcox.sagetv.catchup.CatchupTestModule;
 import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.HtmlBuilder;
-import uk.co.mdjcox.utils.PropertiesInterface;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,33 +26,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 /**
  * Created by michael on 09/10/14.
  */
 public class StyledPageTest {
 
-
     private CatchupTestModule module = new CatchupTestModule();
     private Injector injector = Guice.createInjector(module);
-    private PropertiesInterface props;
 
-    @Before
-    public void before() throws Exception {
-//        String tmpDir = System.getProperty("java.io.tmpdir", ".");
-//        File catalogFileName = new File(tmpDir + File.separator + "testcatalog.xml");
-//        if (catalogFileName.exists()) {
-//            catalogFileName.delete();
-//        }
-//
-//
-//        props = injector.getInstance(PropertiesInterface.class);
-//        String defaultFileName = System.getProperty("java.io.tmpdir", ".") + File.separator + "sagetvcatchup.xml";
-//
-//        when(props.getString("catalogFileName", defaultFileName)).thenReturn(catalogFileName.getAbsolutePath());
-
-    }
 
     @Test
     public void testEpisodesTransformation() throws Exception {

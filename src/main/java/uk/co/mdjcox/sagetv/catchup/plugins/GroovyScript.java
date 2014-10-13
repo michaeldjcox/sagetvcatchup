@@ -1,12 +1,11 @@
 package uk.co.mdjcox.sagetv.catchup.plugins;
 
 import org.slf4j.Logger;
-
+import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.model.ErrorRecorder;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
-import uk.co.mdjcox.utils.PropertiesInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +31,7 @@ public abstract class GroovyScript extends groovy.lang.Script {
     private HtmlUtilsInterface htmlUtils;
     private DownloadUtilsInterface downloadUtils;
     private OsUtilsInterface osUtils;
-    private PropertiesInterface properties;
+    private CatchupContextInterface context;
 
     public void setLogger(Logger logger) {
         this.logger = logger;
@@ -50,8 +49,8 @@ public abstract class GroovyScript extends groovy.lang.Script {
         this.osUtils = osUtils;
     }
 
-    public void setProperties(PropertiesInterface properties) {
-        this.properties = properties;
+    public void setContext(CatchupContextInterface context) {
+      this.context = context;
     }
 
     /* From here on down are methods available to the plugin user */
@@ -148,27 +147,27 @@ public abstract class GroovyScript extends groovy.lang.Script {
     }
 
     public String GET_STRING_PROPERTY(String token) {
-        return properties.getString(token);
+        return context.getProperties().getString(token);
     }
 
     public String GET_STRING_PROPERTY(String token, String defaultString) {
-        return properties.getString(token, defaultString);
+        return context.getProperties().getString(token, defaultString);
     }
 
     public int GET_INT_PROPERTY(String token) {
-        return properties.getInt(token);
+        return context.getProperties().getInt(token);
     }
 
     public int GET_INT_PROPERTY(String token, int defaultValue) {
-        return properties.getInt(token, defaultValue);
+        return context.getProperties().getInt(token, defaultValue);
     }
 
     public boolean GET_BOOLEAN_PROPERTY(String token) {
-        return properties.getBoolean(token);
+        return context.getProperties().getBoolean(token);
     }
 
     public boolean GET_BOOLEAN_PROPERTY(String token, boolean defaultValue) {
-        return properties.getBoolean(token, defaultValue);
+        return context.getProperties().getBoolean(token, defaultValue);
     }
 
     public void LOG_ERROR(String msg) {
@@ -274,6 +273,14 @@ public abstract class GroovyScript extends groovy.lang.Script {
         File start = new File(absoluteStart);
         File finish = new File(absoluteFinish);
         return start.toPath().relativize(finish.toPath()).toString();
+    }
+
+    public String GET_PLUGIN_DIR() {
+      String pluginDir = context.getPluginDir();
+      if (!pluginDir.endsWith(File.separator)) {
+        pluginDir += File.separator;
+      }
+      return pluginDir;
     }
 
     public String FIX_DATE(String sourceFormat, String date) {

@@ -19,7 +19,6 @@ import uk.co.mdjcox.sagetv.model.Category;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Programme;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
-import uk.co.mdjcox.utils.PropertiesInterface;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,8 +37,6 @@ import java.util.Map;
 @Singleton
 public class Server implements CatalogPublisher {
 
-    private final Cataloger cataloger;
-    private final CatalogPersister persister;
     private final String baseUrl;
     private final String cssDir;
     private final String xsltDir;
@@ -54,11 +51,10 @@ public class Server implements CatalogPublisher {
     private Map<String, ContentProvider> staticContent = new HashMap<String, ContentProvider>();
 
     @Inject
-    private Server(Logger logger, PropertiesInterface props, HtmlUtilsInterface htmlUtils,
-                   Cataloger cataloger, Recorder recorder, CatalogPersister persister) throws Exception {
+    private Server(Logger logger, CatchupContextInterface context, HtmlUtilsInterface htmlUtils,
+                   Cataloger cataloger, Recorder recorder) throws Exception {
         this.logger = logger;
         this.htmlUtils = htmlUtils;
-        this.persister = persister;
 
         Handler handler = new AbstractHandler() {
             public void handle(String target,
@@ -70,18 +66,17 @@ public class Server implements CatalogPublisher {
         };
         server = new org.mortbay.jetty.Server();
         Connector connector = new SocketConnector();
-        port = props.getInt("port", props.getInt("podcasterPort"));
+        port = context.getPort();
         connector.setPort(port);
         server.setConnectors(new Connector[]{connector});
         server.setHandler(handler);
         this.recorder = recorder;
-        this.cataloger = cataloger;
 
-        logDir = props.getString("logDir");
-        baseUrl = "http://localhost:" + props.getString("podcasterPort", "8081");
-        cssDir = props.getProperty("cssDir", System.getProperty("user.dir") + File.separator + "css");
-        xsltDir = props.getProperty("xsltDir", System.getProperty("user.dir") + File.separator + "xslt");
+        baseUrl = context.getPodcastBase();
 
+        logDir = context.getLogDir();
+        cssDir = context.getCssDir();
+        xsltDir = context.getXsltDir();
 
         init(htmlUtils, cataloger, recorder);
     }

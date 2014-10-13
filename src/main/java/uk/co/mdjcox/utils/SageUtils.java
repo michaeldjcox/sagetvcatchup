@@ -2,7 +2,6 @@ package uk.co.mdjcox.utils;
 
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
-import sage.SageTV;
 import sagex.api.*;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
@@ -11,7 +10,6 @@ import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
