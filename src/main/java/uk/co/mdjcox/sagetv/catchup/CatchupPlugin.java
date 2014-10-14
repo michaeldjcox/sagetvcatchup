@@ -109,6 +109,7 @@ public class CatchupPlugin implements SageTVPlugin {
   private String propFileName;
   private String backupFileName;
   private CatchupContextInterface context;
+  private AbstractModule module;
 
   @Inject
   public CatchupPlugin(sage.SageTVPluginRegistry registry) {
@@ -119,7 +120,6 @@ public class CatchupPlugin implements SageTVPlugin {
   public void start() {
 
     try {
-      AbstractModule module;
       if (CatchupContext.isRunningInSageTV()) {
         System.err.println("Running in SageTV");
         module = new CatchupModule();
@@ -130,15 +130,13 @@ public class CatchupPlugin implements SageTVPlugin {
 
       injector = Guice.createInjector(module);
 
+      props = injector.getInstance(PropertiesInterface.class);
+      context = injector.getInstance(CatchupContextInterface.class);
+
       logger = injector.getInstance(Logger.class);
 
       logger.info("Starting catchup plugin");
-
-      props = injector.getInstance(PropertiesInterface.class);
       logger.info("Properties: " + props.toString());
-
-      context = injector.getInstance(CatchupContextInterface.class);
-
       logger.info("Context:    " + context.toString());
 
 
@@ -252,8 +250,15 @@ public class CatchupPlugin implements SageTVPlugin {
     File recordings = new File(context.getRecordingDir());
     File logs = new File(context.getLogDir());
 
-    deleteFileOrDir(recordings, true);
-    deleteFileOrDir(logs, true);
+    // SageTV should take care of the root
+    deleteFileOrDir(recordings, false);
+    deleteFileOrDir(logs, false);
+
+    File props = new File(propFileName);
+    if (props.exists()) {
+      deleteFileOrDir(props, true);
+    }
+
   }
 
   private boolean deleteFileOrDir(File fileOrDir, boolean deleteRoot) {
