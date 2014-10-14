@@ -241,8 +241,8 @@ if (details == null || !details.startsWith("/>")) {
             newDate = date;
         }
 
-        episode.setAirDate(newDate)
-        episode.setOrigAirDate(newDate); //TODO
+        episode.setAirDate(newDate); //TODO
+        episode.setOrigAirDate(newDate);
     } else {
         LOG_WARNING(episode, "Original air date not found");
     }
@@ -256,8 +256,8 @@ if (details == null || !details.startsWith("/>")) {
             newTime = time;
         }
 
-        episode.setAirTime(newTime);
-        episode.setOrigAirTime(newTime); // TODO
+        episode.setAirTime(newTime); //TODO
+        episode.setOrigAirTime(newTime); 
     } else {
         LOG_WARNING(episode, "Original air time not found");
     }

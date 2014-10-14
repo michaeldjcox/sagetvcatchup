@@ -5,8 +5,11 @@
         </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>sagetvcatchup/logs/sagetvcatchup.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>sagetvcatchup/logs/sagetvcatchup.%d{yyyy-MM-dd}.log</FileNamePattern>
+        </rollingPolicy>
         <append>true</append>
          <encoder>
             <Pattern>%d{dd-MMM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>

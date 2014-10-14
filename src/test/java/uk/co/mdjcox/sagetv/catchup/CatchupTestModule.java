@@ -99,21 +99,22 @@ public class CatchupTestModule extends AbstractModule {
     private PropertiesInterface properties;
 
     public TestCatchupContext() {
-      this.tmpDir = System.getProperty("java.io.tmpdir");
-      this.workingDir = System.getProperty("user.dir");
-      defaultCatalogFileName = workingDir + "src/main/seeds/default.xml";
-      catalogFileName = tmpDir + File.separator + "catalog_test.xml";
+      String homeDir = System.getProperty("user.dir") + File.separator;
+      this.workingDir = homeDir + "test" + File.separator;
+      this.tmpDir = workingDir + "tmp" + File.separator;
+      defaultCatalogFileName = homeDir + "src/main/seeds/default.xml";
+      catalogFileName = tmpDir + "catalog_test.xml";
       refreshRate = 2;
       port = 8083;
       podcastBase = "http://localhost:" + getPort() + "/";
-      pluginDir = workingDir + "/src/main/plugins";
-      cssDir = workingDir + "/src/main/css";
-      configDir = workingDir + "/src/main/config";
-      xsltDir = workingDir + "/src/main/xslt";
-      logDir = workingDir + "/logs";
-      recordingDir = workingDir + "/recordings";
+      pluginDir = homeDir + "src/main/plugins";
+      cssDir = homeDir + "src/main/css";
+      configDir = homeDir + "src/main/config";
+      xsltDir = homeDir + "src/main/xslt";
+      logDir = workingDir + "logs";
+      recordingDir = workingDir + "recordings";
       onlineVideoPropsSuffix = "testsagetvcatchup";
-      onlineVideoPropertiesDir = tmpDir + "/TestOnlineVideos";
+      onlineVideoPropertiesDir = tmpDir + "TestOnlineVideos";
       sageTvPluginsFile = new File(workingDir, "SageTVPluginsDev.xml");
       sageTVPluginsURL = "http://mintpad/sagetvcatchup/download/SageTVPluginsDev.xml";
       properties = new PropertiesFile();

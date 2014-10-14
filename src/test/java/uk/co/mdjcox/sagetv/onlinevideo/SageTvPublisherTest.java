@@ -302,10 +302,10 @@ public class SageTvPublisherTest {
     Method method = SageTvPublisher.class.getDeclaredMethod("getLinkFile", String.class);
     method.setAccessible(true);
     Object result = method.invoke(sageTvPublisher, context.getOnlineVideoPropertiesSuffix());
-    assertEquals("getLinkFile()", "/tmp/TestOnlineVideos/CustomOnlineVideoLinks_testsagetvcatchup.properties", result);
+    assertEquals("getLinkFile()", System.getProperty("user.dir") + "/test/tmp/TestOnlineVideos/CustomOnlineVideoLinks_testsagetvcatchup.properties", result);
 
     result =method.invoke(sageTvPublisher, "");
-    assertEquals("getLinkFile()", "/tmp/TestOnlineVideos/CustomOnlineVideoLinks.properties", result);
+    assertEquals("getLinkFile()", System.getProperty("user.dir") + "/test/tmp/TestOnlineVideos/CustomOnlineVideoLinks.properties", result);
 
   }
 
@@ -317,10 +317,10 @@ public class SageTvPublisherTest {
     Method method = SageTvPublisher.class.getDeclaredMethod("getLabelFile", String.class);
     method.setAccessible(true);
     Object result = method.invoke(sageTvPublisher, context.getOnlineVideoPropertiesSuffix());
-    assertEquals("getLabelFile()", "/tmp/TestOnlineVideos/CustomOnlineVideoUIText_testsagetvcatchup.properties", result);
+    assertEquals("getLabelFile()", System.getProperty("user.dir") + "/test/tmp/TestOnlineVideos/CustomOnlineVideoUIText_testsagetvcatchup.properties", result);
 
     result = method.invoke(sageTvPublisher, "");
-    assertEquals("getLabelFile()", "/tmp/TestOnlineVideos/CustomOnlineVideoUIText.properties", result);
+    assertEquals("getLabelFile()", System.getProperty("user.dir") + "/test/tmp/TestOnlineVideos/CustomOnlineVideoUIText.properties", result);
 
   }
 

@@ -1,0 +1,223 @@
+<uk.co.mdjcox.sagetv.model.Catalog>
+  <episodes class="linked-hash-map">
+    <entry>
+      <string>episodeId1</string>
+      <uk.co.mdjcox.sagetv.model.Episode>
+        <sourceId>sourceId</sourceId>
+        <id>episodeId1</id>
+        <programmeTitle>programmeTitle1</programmeTitle>
+        <seriesTitle>seriesTitle1</seriesTitle>
+        <episodeTitle>episodeTitle1</episodeTitle>
+        <podcastTitle>programmeTitle1 - seriesTitle1 - episodeTitle1</podcastTitle>
+        <series>series1</series>
+        <episode>episode1</episode>
+        <description>description1</description>
+        <iconUrl>episodeIconUrl1</iconUrl>
+        <serviceUrl>episodeServiceUrl1</serviceUrl>
+        <airDate>airDate1</airDate>
+        <airTime>airTime1</airTime>
+        <origAirDate>origAirDate1</origAirDate>
+        <origAirTime>origAirTime1</origAirTime>
+        <channel>channel1</channel>
+        <genres class="sorted-set">
+          <string>genre1</string>
+          <string>genre2</string>
+        </genres>
+        <errors>
+          <uk.co.mdjcox.sagetv.model.ParseError>
+            <item class="uk.co.mdjcox.sagetv.model.Episode" reference="../../.."/>
+            <level>ERROR</level>
+            <message>Episode1 Error</message>
+          </uk.co.mdjcox.sagetv.model.ParseError>
+          <uk.co.mdjcox.sagetv.model.ParseError>
+            <item class="uk.co.mdjcox.sagetv.model.Episode" reference="../../.."/>
+            <level>ERROR</level>
+            <message>Episode2 Error</message>
+          </uk.co.mdjcox.sagetv.model.ParseError>
+        </errors>
+        <metaUrls>
+          <string>metaUrl1</string>
+          <string>metaUrl2</string>
+        </metaUrls>
+      </uk.co.mdjcox.sagetv.model.Episode>
+    </entry>
+    <entry>
+      <string>episodeId2</string>
+      <uk.co.mdjcox.sagetv.model.Episode>
+        <sourceId>sourceId</sourceId>
+        <id>episodeId2</id>
+        <programmeTitle>programmeTitle2</programmeTitle>
+        <seriesTitle>seriesTitle2</seriesTitle>
+        <episodeTitle>episodeTitle2</episodeTitle>
+        <podcastTitle>programmeTitle2 - seriesTitle2 - episodeTitle2</podcastTitle>
+        <series>series2</series>
+        <episode>episode2</episode>
+        <description>description2</description>
+        <iconUrl>episodeIconUrl2</iconUrl>
+        <serviceUrl>episodeServiceUrl2</serviceUrl>
+        <airDate>airDate2</airDate>
+        <airTime>airTime2</airTime>
+        <origAirDate>origAirDate2</origAirDate>
+        <origAirTime>origAirTime2</origAirTime>
+        <channel>channel2</channel>
+        <genres class="sorted-set"/>
+        <errors/>
+        <metaUrls/>
+      </uk.co.mdjcox.sagetv.model.Episode>
+    </entry>
+  </episodes>
+  <categories class="linked-hash-map">
+    <entry>
+      <string>rootId</string>
+      <uk.co.mdjcox.sagetv.model.Root>
+        <sourceId></sourceId>
+        <id>rootId</id>
+        <shortName>rootShort</shortName>
+        <longName>rootLong</longName>
+        <serviceUrl>rootServiceUrl</serviceUrl>
+        <iconUrl>iconUrl</iconUrl>
+        <parentId></parentId>
+        <errors>
+          <uk.co.mdjcox.sagetv.model.ParseError>
+            <item class="uk.co.mdjcox.sagetv.model.Root" reference="../../.."/>
+            <level>ERROR</level>
+            <message>Root Error</message>
+          </uk.co.mdjcox.sagetv.model.ParseError>
+          <uk.co.mdjcox.sagetv.model.ParseError>
+            <item class="uk.co.mdjcox.sagetv.model.Root" reference="../../.."/>
+            <level>ERROR</level>
+            <message>Catalog Error</message>
+          </uk.co.mdjcox.sagetv.model.ParseError>
+        </errors>
+        <metaUrls>
+          <string>metaUrl1</string>
+          <string>metaUrl2</string>
+        </metaUrls>
+        <podcastUrl></podcastUrl>
+        <type>Root</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set"/>
+      </uk.co.mdjcox.sagetv.model.Root>
+    </entry>
+    <entry>
+      <string>sourceId</string>
+      <uk.co.mdjcox.sagetv.model.Source>
+        <sourceId>sourceId</sourceId>
+        <id>sourceId</id>
+        <shortName>sourceShortName</shortName>
+        <longName>sourceLongName</longName>
+        <serviceUrl>sourceServiceUrl</serviceUrl>
+        <iconUrl>sourceIconUrl</iconUrl>
+        <parentId>rootId</parentId>
+        <errors>
+          <uk.co.mdjcox.sagetv.model.ParseError>
+            <item class="uk.co.mdjcox.sagetv.model.Source" reference="../../.."/>
+            <level>ERROR</level>
+            <message>Source Error</message>
+          </uk.co.mdjcox.sagetv.model.ParseError>
+        </errors>
+        <metaUrls>
+          <string>metaUrl1</string>
+          <string>metaUrl2</string>
+        </metaUrls>
+        <podcastUrl></podcastUrl>
+        <type>Source</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set">
+          <string>subCatId1</string>
+          <string>subCatId2</string>
+        </subCategories>
+      </uk.co.mdjcox.sagetv.model.Source>
+    </entry>
+    <entry>
+      <string>subCatId1</string>
+      <uk.co.mdjcox.sagetv.model.SubCategory>
+        <sourceId>sourceId</sourceId>
+        <id>subCatId1</id>
+        <shortName>subCatShortName1</shortName>
+        <longName>subCatLongName</longName>
+        <serviceUrl>subcatServiceUrl1</serviceUrl>
+        <iconUrl>subcatIconUrl1</iconUrl>
+        <parentId>sourceId</parentId>
+        <errors>
+          <uk.co.mdjcox.sagetv.model.ParseError>
+            <item class="uk.co.mdjcox.sagetv.model.SubCategory" reference="../../.."/>
+            <level>ERROR</level>
+            <message>SubCat1 Error</message>
+          </uk.co.mdjcox.sagetv.model.ParseError>
+        </errors>
+        <metaUrls>
+          <string>metaUrl1</string>
+          <string>metaUrl2</string>
+        </metaUrls>
+        <podcastUrl></podcastUrl>
+        <type>SubCategory</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set">
+          <string>subCatId2</string>
+        </subCategories>
+      </uk.co.mdjcox.sagetv.model.SubCategory>
+    </entry>
+    <entry>
+      <string>subCatId2</string>
+      <uk.co.mdjcox.sagetv.model.SubCategory>
+        <sourceId>sourceId</sourceId>
+        <id>subCatId2</id>
+        <shortName>subCatShortName2</shortName>
+        <longName>subCatLongName</longName>
+        <serviceUrl>subcatServiceUrl2</serviceUrl>
+        <iconUrl>subcatIconUrl2</iconUrl>
+        <parentId>sourceId</parentId>
+        <errors>
+          <uk.co.mdjcox.sagetv.model.ParseError>
+            <item class="uk.co.mdjcox.sagetv.model.SubCategory" reference="../../.."/>
+            <level>ERROR</level>
+            <message>SubCat2 Error</message>
+          </uk.co.mdjcox.sagetv.model.ParseError>
+        </errors>
+        <metaUrls>
+          <string>metaUrl1</string>
+          <string>metaUrl2</string>
+        </metaUrls>
+        <podcastUrl></podcastUrl>
+        <type>SubCategory</type>
+        <otherParentIds class="linked-hash-set">
+          <string>subCatId1</string>
+        </otherParentIds>
+        <subCategories class="sorted-set"/>
+      </uk.co.mdjcox.sagetv.model.SubCategory>
+    </entry>
+    <entry>
+      <string>programmeId</string>
+      <uk.co.mdjcox.sagetv.model.Programme>
+        <sourceId>sourceId</sourceId>
+        <id>programmeId</id>
+        <shortName>programmeShortName</shortName>
+        <longName>programmeLongname</longName>
+        <serviceUrl>programmeServiceUrl</serviceUrl>
+        <iconUrl>programmeIconUrl</iconUrl>
+        <parentId></parentId>
+        <errors>
+          <uk.co.mdjcox.sagetv.model.ParseError>
+            <item class="uk.co.mdjcox.sagetv.model.Programme" reference="../../.."/>
+            <level>ERROR</level>
+            <message>Programme Error</message>
+          </uk.co.mdjcox.sagetv.model.ParseError>
+        </errors>
+        <metaUrls>
+          <string>metaUrl1</string>
+          <string>metaUrl2</string>
+        </metaUrls>
+        <podcastUrl>/programme?id=programmeId;type=xml</podcastUrl>
+        <type>Programme</type>
+        <otherParentIds class="linked-hash-set"/>
+        <subCategories class="sorted-set"/>
+        <episodes>
+          <string>episodeId1</string>
+          <string>episodeId2</string>
+        </episodes>
+      </uk.co.mdjcox.sagetv.model.Programme>
+    </entry>
+  </categories>
+  <root reference="../categories/entry/uk.co.mdjcox.sagetv.model.Root"/>
+</uk.co.mdjcox.sagetv.model.Catalog>

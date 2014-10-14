@@ -136,7 +136,7 @@ public class SageUtils implements SageUtilsInterface {
         String rolesList[] = {};
         String rated = null;
         String expandedRatedList[] = null;
-        String parentalRating = null;
+        String parentalRating = null; // TODO - this might be available
         String miscList[] = new String[0];
         Long now = Utility.Time();
         String nowString = now.toString();
@@ -250,32 +250,7 @@ public class SageUtils implements SageUtilsInterface {
             logger.error("RecordingEpisode.importAsMediaFile: Object is not an Airing.");
             return null;
         }
-//
-//        String OVT = "parentPodcast"; // TODO
-//        String OVI = "itemWithinPodcast"; //TODO
-//
-//        boolean isFavorite = false; // TODO
-//
-//        // Set metadata to show this is a Podcast.
-//        MediaFileAPI.SetMediaFileMetadata(mediaFile, "Podcast", "true");
-//
-//        // Set metadata if this is a Favorite.
-//        MediaFileAPI.SetMediaFileMetadata(mediaFile, "FavoritePodcast", isFavorite ? "true" : "false");
-//
-//        // Set metadata for OVT, OVI and FeedContext.  This can be used at a later time to
-//        // match MediaFiles to Podcasts.
-//        MediaFileAPI.SetMediaFileMetadata(mediaFile, "OnlineVideoType", OVT);
-//        MediaFileAPI.SetMediaFileMetadata(mediaFile, "OnlineVideoItem", OVI);
-//        MediaFileAPI.SetMediaFileMetadata(mediaFile, "FeedContext", recording.getUrl());
-//
-//        // Use ManualRecord properties to store Airing information.
-//        AiringAPI.SetManualRecordProperty(airing, "Podcast", "true");
-//        AiringAPI.SetManualRecordProperty(airing, "FavoritePodcast", isFavorite ? "true" : "false");
-//        AiringAPI.SetManualRecordProperty(airing, "OnlineVideoType", OVT);
-//        AiringAPI.SetManualRecordProperty(airing, "OnlineVideoItem", OVI);
-//        AiringAPI.SetManualRecordProperty(airing, "FeedContext", recording.getUrl());
 
-        // Return the Airing.
         return airing;
     }
 

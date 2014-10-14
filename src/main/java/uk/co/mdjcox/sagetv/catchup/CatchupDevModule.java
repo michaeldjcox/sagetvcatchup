@@ -86,18 +86,14 @@ public class CatchupDevModule extends AbstractModule {
         File backupFile = new File(backupFileName);
         File runFile = new File(propFileName);
 
-        if (runFile.exists()) {
-          // We have a file
-          logger.info("Properties - reusing existing " + propFileName);
-          return new PropertiesFile(propFileName, true);
-        } else {
+        if (!runFile.exists()) {
           logger.info("Properties - loading seed properties from " + seedFileName);
 
           // We have no file
           PropertiesFile seed = new PropertiesFile(seedFileName, true);
 
           String workingDir = System.getProperty("user.dir");
-          String recordingDir = workingDir + File.separator + "recordings";
+          String recordingDir = workingDir + File.separator + "test" + File.separator + "recordings";
           seed.put("recordingDir", recordingDir);
           seed.put("podcasterPort", "8082");
 
@@ -114,8 +110,13 @@ public class CatchupDevModule extends AbstractModule {
           seed.commit(propFileName, new CatchupPropertiesFileLayout());
         }
 
-        properties = new PropertiesFile(propFileName, true);
+      } else {
+        // We have a file
+        logger.info("Properties - reusing existing " + propFileName);
       }
+
+      properties = new PropertiesFile(propFileName, true);
+
       return properties;
     }
 
@@ -217,24 +218,25 @@ public class CatchupDevModule extends AbstractModule {
     private PropertiesInterface properties;
 
     public DevCatchupContext(PropertiesInterface properties) {
-      tmpDir = System.getProperty("java.io.tmpdir");
-      workingDir = System.getProperty("user.dir");
-      defaultCatalogFileName = workingDir + "/src/main/seeds/default.xml";
-      catalogFileName = tmpDir + File.separator + "catalog_dev.xml";
+      String homeDir = System.getProperty("user.dir") + File.separator;
+      this.workingDir = homeDir + "test" + File.separator;
+      this.tmpDir = workingDir + "tmp" + File.separator;
+      defaultCatalogFileName = homeDir + "src/main/seeds/default.xml";
+      catalogFileName = tmpDir + "catalog_dev.xml";
       refreshRate = 2;
       port = properties.getInt("podcasterPort", 8082);
       podcastBase = "http://localhost:" + getPort() + "/";
-      pluginDir = workingDir + "/src/main/plugins";
-      cssDir = workingDir + "/src/main/css";
-      xsltDir = workingDir + "/src/main/xslt";
-      logDir = workingDir + "/logs";
-      recordingDir = workingDir + "/recordings";
+      pluginDir = homeDir + "src/main/plugins";
+      cssDir = homeDir + "src/main/css";
+      xsltDir = homeDir + "src/main/xslt";
+      logDir = workingDir + "logs";
+      recordingDir = workingDir + "recordings";
       onlineVideoPropsSuffix = "sagetvcatchup";
       onlineVideoPropertiesDir = "/opt/sagetv/server/STVs/SageTV7/OnlineVideos";
       sageTvPluginsFile = new File(workingDir, "SageTVPluginsDev.xml");
       sageTVPluginsURL = "http://mintpad/sagetvcatchup/download/SageTVPluginsDev.xml";
       this.properties = properties;
-      configDir = workingDir + "/src/main/config";
+      configDir = workingDir + "config";
     }
 
     @Override

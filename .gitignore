@@ -1,10 +1,8 @@
 sagetvcatchup.iws
-logs/
-out/
-recordings/
 target/
 buildNumber.properties
-htdocs/
-staging/
 iplayerExtract.xml
-catalog.xml
+test/logs
+test/tmp
+test/recordings
+test/config
