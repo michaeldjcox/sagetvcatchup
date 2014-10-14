@@ -1,9 +1,11 @@
 package uk.co.mdjcox.sagetv.catchup;
 
+import ch.qos.logback.classic.LoggerContext;
 import com.google.common.io.Files;
 import com.google.inject.*;
 import com.google.inject.name.Names;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sage.SageTVPlugin;
 import sage.SageTVPluginRegistry;
 import sagex.plugin.SageEvents;
@@ -13,6 +15,7 @@ import uk.co.mdjcox.sagetv.catchup.server.Server;
 import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
+import uk.co.mdjcox.utils.PersistentRollingFileAppender;
 import uk.co.mdjcox.utils.PropertiesInterface;
 import uk.co.mdjcox.utils.SageUtilsInterface;
 
@@ -120,6 +123,8 @@ public class CatchupPlugin implements SageTVPlugin {
   public void start() {
 
     try {
+      PersistentRollingFileAppender.stopped = false;
+
       if (CatchupContext.isRunningInSageTV()) {
         System.err.println("Running in SageTV");
         module = new CatchupModule();
@@ -249,6 +254,8 @@ public class CatchupPlugin implements SageTVPlugin {
 
     File recordings = new File(context.getRecordingDir());
     File logs = new File(context.getLogDir());
+
+    PersistentRollingFileAppender.stopped = true;
 
     // SageTV should take care of the root
     deleteFileOrDir(recordings, false);
