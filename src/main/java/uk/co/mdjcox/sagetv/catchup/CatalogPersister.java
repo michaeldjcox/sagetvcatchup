@@ -61,15 +61,21 @@ public class CatalogPersister implements CatalogPublisher {
 
     public Catalog load() {
         try {
+          logger.info("Loading previous catalog " + fileName);
             String xml = readCatalog(fileName);
-            return parseXMLIntoCatalog(xml);
+            Catalog catalog =  parseXMLIntoCatalog(xml);
+          logger.info("Done loading previous catalog");
+          return catalog;
         } catch (Exception e) {
             logger.warn("Failed to load previous catalog - starting afresh");
         }
 
       try {
+        logger.info("Loading default catalog " + emptyFileName);
         String xml = readCatalog(emptyFileName);
-        return parseXMLIntoCatalog(xml);
+        Catalog catalog = parseXMLIntoCatalog(xml);
+        logger.info("Done loading empty catalog");
+        return catalog;
       } catch (Exception e) {
         logger.error("Failed to load default catalog", e);
       }

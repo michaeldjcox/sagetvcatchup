@@ -121,19 +121,30 @@ public class Recorder {
     }
 
     public void start() {
-      service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-          return new Thread(r, "catchup-recorder");
-        }
-      });
+      logger.info("Starting recorder service");
+      try {
+        service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+          @Override
+          public Thread newThread(Runnable r) {
+            return new Thread(r, "catchup-recorder");
+          }
+        });
+        logger.info("Started recorder service");
+      } catch (Exception ex) {
+        logger.error("Failed to start the recorder service");
+      }
+
     }
 
     public void shutdown() {
-        logger.info("Shutting down recording");
+        logger.info("Stopping the recorder service");
+      try {
         requestStopAll();
         service.shutdownNow();
-        logger.info("Shutdown recording");
+        logger.info("Stopped the recorder service");
+      } catch (Exception ex) {
+        logger.error("Failed to stop the recorder service");
+      }
     }
 
     public String requestStop(String id) {
@@ -370,8 +381,13 @@ public class Recorder {
     }
 
     public int getProcessCount() {
-        int count = osUtils.findProcessesMatching(".*get_iplayer.*").size();
+        int count = 0;
+      try {
+        osUtils.findProcessesMatching(".*get_iplayer.*").size();
         count += osUtils.findProcessesMatching(".*rtmpdump.*").size();
-        return count;
+      } catch (Exception e) {
+        logger.error("Failed to count processes", e);
+      }
+      return count;
     }
 }

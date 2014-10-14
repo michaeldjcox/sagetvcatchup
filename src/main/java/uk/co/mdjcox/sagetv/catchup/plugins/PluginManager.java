@@ -42,6 +42,9 @@ public class PluginManager {
 
     public void start() {
 
+      logger.info("Starting the plugin manager");
+
+      try {
         String base = context.getPluginDir();
 
         File dir = new File(base);
@@ -70,5 +73,10 @@ public class PluginManager {
             plugin.init();
             plugins.put(sourceId, plugin);
         }
+
+        logger.info("Started the plugin manager");
+      } catch (Exception e) {
+        logger.error("Failed to start the plugin manager", e);
+      }
     }
 }

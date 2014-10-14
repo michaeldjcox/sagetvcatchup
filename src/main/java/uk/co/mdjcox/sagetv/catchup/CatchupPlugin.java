@@ -132,13 +132,13 @@ public class CatchupPlugin implements SageTVPlugin {
       }
 
       injector = Guice.createInjector(module);
+      logger = injector.getInstance(Logger.class);
+
+      logger.info("Starting catchup plugin");
 
       props = injector.getInstance(PropertiesInterface.class);
       context = injector.getInstance(CatchupContextInterface.class);
 
-      logger = injector.getInstance(Logger.class);
-
-      logger.info("Starting catchup plugin");
       logger.info("Properties: " + props.toString());
       logger.info("Context:    " + context.toString());
 

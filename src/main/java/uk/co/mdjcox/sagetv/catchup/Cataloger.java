@@ -416,6 +416,8 @@ public class Cataloger {
     }
 
     public void start(final List<CatalogPublisher> publishers, Catalog initial) {
+      try {
+        logger.info("Starting the catalog service");
         service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
@@ -429,7 +431,11 @@ public class Cataloger {
 
         Runnable runnable = getCatalogRunnable(publishers);
 
-        future = service.scheduleAtFixedRate(runnable, 0, refreshRate, TimeUnit.HOURS);
+        future = service.scheduleAtFixedRate(runnable, 300, refreshRate*60, TimeUnit.MINUTES);
+        logger.info("Started the catalog service");
+      } catch (Exception e) {
+        logger.error("Failed to start the catalog service", e);
+      }
     }
 
     public void shutdown() {

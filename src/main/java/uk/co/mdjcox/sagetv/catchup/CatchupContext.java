@@ -16,6 +16,7 @@ public class CatchupContext implements CatchupContextInterface {
   private static boolean runningInSageTV;
 
   private final String podcastBase;
+  private String tmpDir;
   private String pluginDir;
   private String cssDir;
   private String configDir;
@@ -46,7 +47,13 @@ public class CatchupContext implements CatchupContextInterface {
     refreshRate = properties.getInt("refreshRateHours");
     port = properties.getInt("podcasterPort");
 
-    String defaultFileName = System.getProperty("java.io.tmpdir", ".") + File.separator + "sagetvcatchup.xml";
+    tmpDir = System.getProperty("java.io.tmpdir", ".");
+    if (!tmpDir.endsWith(File.separator)) {
+      tmpDir += File.separator;
+    }
+
+
+    String defaultFileName = tmpDir + "sagetvcatchup.xml";
     catalogFileName = properties.getString("catalogFileName", defaultFileName);
     String seedDir = workingDir + File.separator + "sagetvcatchup" + File.separator + "seeds";
     defaultCatalogFileName = seedDir + File.separator + "default.xml";

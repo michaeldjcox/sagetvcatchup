@@ -137,13 +137,19 @@ public class Server implements CatalogPublisher {
 
     public void start() throws Exception {
         logger.info("Starting the podcast server on port " + port);
+      try {
         server.start();
+        logger.info("Started the podcast server on port " + port);
+      } catch (Exception e) {
+        logger.warn("Failed to start the podcast server", e);
+      }
     }
 
     public void shutdown() {
         logger.info("Stopping the podcast server on port " + port);
         try {
             server.stop();
+          logger.info("Stopped the podcast server on port " + port);
         } catch (Exception e) {
             logger.warn("Failed to stop the podcast server", e);
         }
