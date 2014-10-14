@@ -85,10 +85,6 @@ public class CatchupModule extends AbstractModule {
             // We have no file
             PropertiesFile seed = new PropertiesFile(seedFileName, true);
 
-            String workingDir = System.getProperty("user.dir");
-            String recordingDir = workingDir + File.separator + "recordings";
-            seed.put("recordingDir", recordingDir);
-
             if (backupFile.exists()) {
               logger.info("Properties - applying backup properties " + seedFileName);
 
