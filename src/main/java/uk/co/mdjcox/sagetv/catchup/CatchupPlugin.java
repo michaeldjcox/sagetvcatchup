@@ -1,11 +1,9 @@
 package uk.co.mdjcox.sagetv.catchup;
 
-import ch.qos.logback.classic.LoggerContext;
 import com.google.common.io.Files;
 import com.google.inject.*;
 import com.google.inject.name.Names;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sage.SageTVPlugin;
 import sage.SageTVPluginRegistry;
 import sagex.plugin.SageEvents;
