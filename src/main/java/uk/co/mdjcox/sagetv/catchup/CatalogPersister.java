@@ -64,7 +64,7 @@ public class CatalogPersister implements CatalogPublisher {
             String xml = readCatalog(fileName);
             return parseXMLIntoCatalog(xml);
         } catch (Exception e) {
-            logger.warn("Failed to load previous catalog", e);
+            logger.warn("Failed to load previous catalog - starting afresh");
         }
 
       try {

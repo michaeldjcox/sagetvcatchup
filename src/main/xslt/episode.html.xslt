@@ -6,11 +6,11 @@
 
         <html>
             <head>
-                <title>Details page for <xsl:value-of select="programmeTitle"/> - <xsl:value-of select="seriesTitle"/> - <xsl:value-of select="episodeTitle"/></title>
+                <title>Episode: <xsl:value-of select="podcastTitle"/></title>
                 <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
             </head>
             <body>
-                <h1><xsl:value-of select="programmeTitle"/> - <xsl:value-of select="seriesTitle"/> - <xsl:value-of select="episodeTitle"/></h1>
+                <h1>Episode: <xsl:value-of select="podcastTitle"/></h1>
                 <h2>Details</h2>
                 <table>
                     <tr>
@@ -100,7 +100,7 @@
                     <tr>
                         <td>PodcastTitle</td>
                         <xsl:text>&#10;</xsl:text>
-                        <td><xsl:value-of select="programmeTitle"/> - <xsl:value-of select="seriesTitle"/> - <xsl:value-of select="episodeTitle"/></td>
+                        <td><xsl:value-of select="podcastTitle"/></td>
                     </tr>
                     <tr>
                         <td>IconUrl</td>

@@ -6,11 +6,11 @@
 
             <html>
                 <head>
-                    <title>Details page for <xsl:value-of select="longName"/></title>
+                    <title>Category: <xsl:value-of select="longName"/></title>
                     <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
                 </head>
                 <body>
-                    <h1><xsl:value-of select="shortName"/></h1>
+                    <h1>Category: <xsl:value-of select="longName"/></h1>
                     <h2>Details</h2>
                     <table>
                         <tr>

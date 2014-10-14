@@ -85,7 +85,7 @@
                             </td>
                             <xsl:text>&#10;</xsl:text>
                             <td>
-                                <xsl:value-of select="programmeTitle"/> - <xsl:value-of select="seriesTitle"/> - <xsl:value-of select="episodeTitle"/>
+                                <xsl:value-of select="podcastTitle"/>
                             </td>
                             <xsl:text>&#10;</xsl:text>
                             <td>

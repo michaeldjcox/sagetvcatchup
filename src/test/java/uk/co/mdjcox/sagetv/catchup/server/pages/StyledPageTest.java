@@ -311,12 +311,12 @@ public class StyledPageTest {
     }
 
     private String buildDetailsFor(Episode cat) {
-        String pageTitle = "Details page for " + cat.getPodcastTitle();
+        String pageTitle = "Episode: " + cat.getPodcastTitle();
         HtmlBuilder htmlBuilder = new HtmlBuilder();
         htmlBuilder.startDocument();
         htmlBuilder.addPageHeader(pageTitle);
         htmlBuilder.startBody();
-        htmlBuilder.addHeading1(cat.getPodcastTitle());
+        htmlBuilder.addHeading1(pageTitle);
 
         htmlBuilder.addHeading2("Details");
 
@@ -385,13 +385,13 @@ public class StyledPageTest {
     }
 
     private String buildDetailsFor(Category cat) {
-
-        String pageTitle = "Details page for " + cat.getLongName();
+        String type = cat.isProgrammeCategory() && cat.getParentId().isEmpty() ? "Programme" : "Category";
+        String pageTitle = type + ": " + cat.getLongName();
         HtmlBuilder htmlBuilder = new HtmlBuilder();
         htmlBuilder.startDocument();
         htmlBuilder.addPageHeader(pageTitle);
         htmlBuilder.startBody();
-        htmlBuilder.addHeading1(cat.getShortName());
+        htmlBuilder.addHeading1(pageTitle);
         htmlBuilder.addHeading2("Details");
         htmlBuilder.startTable();
         htmlBuilder.addTableHeader("Field", "Value");
