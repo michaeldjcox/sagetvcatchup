@@ -35,7 +35,7 @@ public class CatchupDevModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        workingDir = System.getProperty("user.dir");
+        workingDir = System.getProperty("user.dir") + File.separator;
         install(new FactoryModuleBuilder()
                 .build(ScriptFactory.class));
         install(new FactoryModuleBuilder()
@@ -46,7 +46,7 @@ public class CatchupDevModule extends AbstractModule {
     @Singleton
     public Logger providesLogger() throws Exception {
       if (logger == null) {
-        System.setProperty("logback.configurationFile", "/home/michael/Documents/Projects/sagetvcatchup/src/main/config/logback-test.xml");
+        System.setProperty("logback.configurationFile", workingDir + "src/main/config/logback-test.xml");
         logger = LoggerFactory.getLogger(CatchupPlugin.class);
       }
       return logger;
@@ -55,7 +55,7 @@ public class CatchupDevModule extends AbstractModule {
   @Provides
   @Named("BackupPropsFile")
   public String providesBackupPropsFileName() {
-    return System.getProperty("java.io.tmpdir", ".") + File.separator + "sagetvcatchup-dev.props.backup";
+    return workingDir + "test/tmp/sagetvcatchup-dev.props.backup";
   }
 
   @Provides
@@ -74,7 +74,7 @@ public class CatchupDevModule extends AbstractModule {
   @Named("PropsFile")
   public String providesPropsFileName() {
     String propFileName = "sagetvcatchup.properties";
-    propFileName = "config" + File.separator + propFileName;
+    propFileName = workingDir + "test" + File.separator + "config" + File.separator + propFileName;
     return propFileName;
   }
 
@@ -91,11 +91,6 @@ public class CatchupDevModule extends AbstractModule {
 
           // We have no file
           PropertiesFile seed = new PropertiesFile(seedFileName, true);
-
-          String workingDir = System.getProperty("user.dir");
-          String recordingDir = workingDir + File.separator + "test" + File.separator + "recordings";
-          seed.put("recordingDir", recordingDir);
-          seed.put("podcasterPort", "8082");
 
           if (backupFile.exists()) {
             logger.info("Properties - applying backup properties " + seedFileName);
@@ -115,7 +110,11 @@ public class CatchupDevModule extends AbstractModule {
         logger.info("Properties - reusing existing " + propFileName);
       }
 
+      String recordingDir = workingDir + File.separator + "test" + File.separator + "recordings";
+
       properties = new PropertiesFile(propFileName, true);
+      properties.put("recordingDir", recordingDir);
+      properties.put("podcasterPort", "8082");
 
       return properties;
     }
