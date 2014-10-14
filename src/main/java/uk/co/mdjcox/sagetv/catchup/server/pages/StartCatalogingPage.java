@@ -26,7 +26,7 @@ public class StartCatalogingPage extends AbstractHtmlPage {
 
     @Override
     public String buildPage() {
-        String message = cataloger.start();
+        String message = cataloger.startCataloging();
         HtmlBuilder builder = new HtmlBuilder();
         builder.startDocument();
         builder.addPageHeader("Cataloging");

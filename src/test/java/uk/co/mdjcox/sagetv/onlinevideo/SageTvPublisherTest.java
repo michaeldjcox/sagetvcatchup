@@ -36,6 +36,7 @@ public class SageTvPublisherTest {
   public void before() throws Exception {
     CatchupTestModule module = new CatchupTestModule();
     Injector injector = Guice.createInjector(module);
+      context = injector.getInstance(CatchupContextInterface.class);
 
     File dir = new File(context.getOnlineVideoPropertiesDir());
 
@@ -59,6 +60,8 @@ public class SageTvPublisherTest {
     try {
       CatchupTestModule module = new CatchupTestModule();
       Injector injector = Guice.createInjector(module);
+      CatchupContextInterface context = injector.getInstance(CatchupContextInterface.class);
+      ((CatchupTestModule.TestCatchupContext)context).setOnlineVideoPropertiesDir(null);
         SageTvPublisher sageTvPublisher = injector.getInstance(SageTvPublisher.class);
     } catch (com.google.inject.ProvisionException e) {
       thrown = true;
@@ -72,6 +75,8 @@ public class SageTvPublisherTest {
     try {
       CatchupTestModule module = new CatchupTestModule();
       Injector injector = Guice.createInjector(module);
+      CatchupContextInterface context = injector.getInstance(CatchupContextInterface.class);
+      ((CatchupTestModule.TestCatchupContext)context).setOnlineVideoPropertiesSuffix(null);
       SageTvPublisher sageTvPublisher = injector.getInstance(SageTvPublisher.class);
     } catch (com.google.inject.ProvisionException e) {
       thrown = true;
@@ -90,11 +95,11 @@ public class SageTvPublisherTest {
   public void testUnpublish() throws Exception {
     Method method = SageTvPublisher.class.getDeclaredMethod("getLinkFile", String.class);
     method.setAccessible(true);
-    String linkFileName = (String) method.invoke(sageTvPublisher, "test");
+    String linkFileName = (String) method.invoke(sageTvPublisher, context.getOnlineVideoPropertiesSuffix());
 
     method = SageTvPublisher.class.getDeclaredMethod("getLabelFile", String.class);
     method.setAccessible(true);
-    String labelFileName = (String) method.invoke(sageTvPublisher, "test");
+    String labelFileName = (String) method.invoke(sageTvPublisher, context.getOnlineVideoPropertiesSuffix());
 
     File linkFile = new File(linkFileName);
     File labelFile = new File(labelFileName);
@@ -181,12 +186,12 @@ public class SageTvPublisherTest {
 
     Method method = SageTvPublisher.class.getDeclaredMethod("getLinkFile", String.class);
     method.setAccessible(true);
-    String linkFileName = (String) method.invoke(sageTvPublisher, "test");
+    String linkFileName = (String) method.invoke(sageTvPublisher, context.getOnlineVideoPropertiesSuffix());
     PropertiesFile linkPropsFile = new PropertiesFile(linkFileName, true);
 
     method = SageTvPublisher.class.getDeclaredMethod("getLabelFile", String.class);
     method.setAccessible(true);
-    String labelFileName = (String) method.invoke(sageTvPublisher, "test");
+    String labelFileName = (String) method.invoke(sageTvPublisher, context.getOnlineVideoPropertiesSuffix());
     PropertiesFile labelPropsFile = new PropertiesFile(labelFileName, true);
 
     TreeMap<Object,Object> linkProps = new  TreeMap<Object,Object>(new LinksPropertyLayout().getComparator(linkPropsFile));
@@ -296,11 +301,11 @@ public class SageTvPublisherTest {
   public void testGetLinkFile() throws Exception {
     Method method = SageTvPublisher.class.getDeclaredMethod("getLinkFile", String.class);
     method.setAccessible(true);
-    Object result = method.invoke(sageTvPublisher, "test");
-    assertEquals("getLinkFile()", "/tmp/OnlineVideos/CustomOnlineVideoLinks_test.properties", result);
+    Object result = method.invoke(sageTvPublisher, context.getOnlineVideoPropertiesSuffix());
+    assertEquals("getLinkFile()", "/tmp/TestOnlineVideos/CustomOnlineVideoLinks_testsagetvcatchup.properties", result);
 
     result =method.invoke(sageTvPublisher, "");
-    assertEquals("getLinkFile()", "/tmp/OnlineVideos/CustomOnlineVideoLinks.properties", result);
+    assertEquals("getLinkFile()", "/tmp/TestOnlineVideos/CustomOnlineVideoLinks.properties", result);
 
   }
 
@@ -311,25 +316,11 @@ public class SageTvPublisherTest {
   public void testGetLabelFile() throws Exception {
     Method method = SageTvPublisher.class.getDeclaredMethod("getLabelFile", String.class);
     method.setAccessible(true);
-    Object result = method.invoke(sageTvPublisher, "test");
-    assertEquals("getLabelFile()", "/tmp/OnlineVideos/CustomOnlineVideoUIText_test.properties", result);
+    Object result = method.invoke(sageTvPublisher, context.getOnlineVideoPropertiesSuffix());
+    assertEquals("getLabelFile()", "/tmp/TestOnlineVideos/CustomOnlineVideoUIText_testsagetvcatchup.properties", result);
 
     result = method.invoke(sageTvPublisher, "");
-    assertEquals("getLabelFile()", "/tmp/OnlineVideos/CustomOnlineVideoUIText.properties", result);
-
-  }
-
-  /**
-   * Method: getRoot()
-   */
-  @Test
-  public void testGetRoot() throws Exception {
-    Method method = sageTvPublisher.getClass().getDeclaredMethod("getRoot");
-    method.setAccessible(true);
-    Object result = method.invoke(sageTvPublisher);
-    assertNotNull("getRoot should return a value", result);
-    assertTrue("getRoot should return a String", (result instanceof String));
-    assertEquals("getRoot", "/tmp/OnlineVideos", result);
+    assertEquals("getLabelFile()", "/tmp/TestOnlineVideos/CustomOnlineVideoUIText.properties", result);
 
   }
 

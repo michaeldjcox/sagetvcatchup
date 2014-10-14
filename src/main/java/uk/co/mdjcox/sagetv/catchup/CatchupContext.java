@@ -15,6 +15,7 @@ public class CatchupContext implements CatchupContextInterface {
 
   private static boolean runningInSageTV;
 
+  private final String podcastBase;
   private String pluginDir;
   private String cssDir;
   private String configDir;
@@ -47,11 +48,13 @@ public class CatchupContext implements CatchupContextInterface {
 
     String defaultFileName = System.getProperty("java.io.tmpdir", ".") + File.separator + "sagetvcatchup.xml";
     catalogFileName = properties.getString("catalogFileName", defaultFileName);
-    defaultCatalogFileName = configDir + File.separator + "default.xml";
+    String seedDir = workingDir + File.separator + "sagetvcatchup" + File.separator + "seeds";
+    defaultCatalogFileName = seedDir + File.separator + "default.xml";
     onlineVideoPropsSuffix = properties.getString("onlineVideoPropsSuffix");
     onlineVideoPropertiesDir = properties.getString("onlineVideoPropertiesDir");
     sageTvPluginsFile = new File(workingDir, "SageTVPluginsDev.xml");
     sageTVPluginsURL = properties.getString("sageTvPluginsURL", "http://mintpad/sagetvcatchup/download/SageTVPluginsDev.xml");
+    podcastBase = "http://localhost:" + port + "/";
   }
 
   public static boolean isRunningInSageTV() {
@@ -80,7 +83,7 @@ public class CatchupContext implements CatchupContextInterface {
 
   @Override
   public String getPodcastBase() {
-    return "http://localhost:" + port + "/";
+    return podcastBase;
   }
 
   @Override
@@ -114,7 +117,7 @@ public class CatchupContext implements CatchupContextInterface {
   }
 
   @Override
-  public String getOnlineVideoPropsSuffix() {
+  public String getOnlineVideoPropertiesSuffix() {
     return onlineVideoPropsSuffix;
   }
 
@@ -151,5 +154,27 @@ public class CatchupContext implements CatchupContextInterface {
   @Override
   public String getSageTVPluginsURL() {
     return sageTVPluginsURL;
+  }
+
+  @Override
+  public String toString() {
+    return "CatchupContext{" + "\n" +
+            "podcastBase='" + podcastBase + '\'' + "\n" +
+            "pluginDir='" + pluginDir + '\'' +"\n" +
+            "cssDir='" + cssDir + '\'' +"\n" +
+            "configDir='" + configDir + '\'' +"\n" +
+            "xsltDir='" + xsltDir + '\'' +"\n" +
+            "logDir='" + logDir + '\'' +"\n" +
+            "recordingDir='" + recordingDir + '\'' +"\n" +
+            "onlineVideoPropertiesDir='" + onlineVideoPropertiesDir + '\'' +"\n" +
+            "port=" + port +"\n" +
+            "refreshRate=" + refreshRate +"\n" +
+            "catalogFileName='" + catalogFileName + '\'' +"\n" +
+            "defaultCatalogFileName='" + defaultCatalogFileName + '\'' +"\n" +
+            "onlineVideoPropsSuffix='" + onlineVideoPropsSuffix + '\'' +"\n" +
+            "sageTvPluginsFile=" + sageTvPluginsFile +"\n" +
+            "sageTVPluginsURL='" + sageTVPluginsURL + '\'' +"\n" +
+            "properties=" + properties +"\n" +
+            '}';
   }
 }

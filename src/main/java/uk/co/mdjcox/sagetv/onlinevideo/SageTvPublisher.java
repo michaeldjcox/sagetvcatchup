@@ -52,7 +52,7 @@ public class SageTvPublisher implements CatalogPublisher {
     @Inject
     private SageTvPublisher(Logger logger, HtmlUtilsInterface htmlUtils, CatchupContextInterface context)
     {
-        this.qualifier = context.getOnlineVideoPropsSuffix();
+        this.qualifier = context.getOnlineVideoPropertiesSuffix();
         this.onlineVideoPropertiesDir = context.getOnlineVideoPropertiesDir();
 
         checkNotNull(qualifier);

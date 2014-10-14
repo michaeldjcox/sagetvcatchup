@@ -167,7 +167,7 @@ public void testGetPartialFilename() throws Exception {
 
   Recording recording = new Recording(episode, context.getRecordingDir(), true);
 
-  File file = new File("filename");
+  File file = new File(context.getRecordingDir() + File.separator + "filename");
 
   recording.setPartialFile(file);
 

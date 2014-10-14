@@ -9,11 +9,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.ScriptFactory;
+import uk.co.mdjcox.sagetv.catchup.server.Server;
+import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.model.Recording;
+import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
 import uk.co.mdjcox.utils.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,13 +61,12 @@ public class CatchupDevModule extends AbstractModule {
   @Provides
   @Named("SeedPropsFile")
   public String providesSeedPropsFileName(OsUtilsInterface osUtils) {
-    String propFileName = "sagetvcatchup.unix.properties";
+    String propFileName = "src/main/seeds/sagetvcatchup.unix.properties";
     if (osUtils.isWindows()) {
-      propFileName = "sagetvcatchup.windows.properties";
+      propFileName = "src/main/seeds/sagetvcatchup.windows.properties";
     } else {
-      propFileName = "sagetvcatchup.unix.properties";
+      propFileName = "src/main/seeds/sagetvcatchup.unix.properties";
     }
-    propFileName = "src/main/config/" + propFileName;
     return propFileName;
   }
 
@@ -75,20 +78,6 @@ public class CatchupDevModule extends AbstractModule {
     return propFileName;
   }
 
-  @Provides
-  @Named("PropsFile")
-  public String providesPropsFileName(OsUtilsInterface osUtils) {
-    String propFileName = "sagetvcatchup.unix.properties";
-    if (osUtils.isWindows()) {
-      propFileName = "sagetvcatchup.windows.properties";
-    } else {
-      propFileName = "sagetvcatchup.unix.properties";
-    }
-    String base = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "config" + File.separator;
-    propFileName = base + propFileName;
-
-    return propFileName;
-  }
 
     @Provides
     @Singleton
@@ -110,6 +99,7 @@ public class CatchupDevModule extends AbstractModule {
           String workingDir = System.getProperty("user.dir");
           String recordingDir = workingDir + File.separator + "recordings";
           seed.put("recordingDir", recordingDir);
+          seed.put("podcasterPort", "8082");
 
           if (backupFile.exists()) {
             logger.info("Properties - applying backup properties " + seedFileName);
@@ -135,7 +125,7 @@ public class CatchupDevModule extends AbstractModule {
     return new DevCatchupContext(properties);
   }
 
-    @Provides
+  @Provides
     @Singleton
     public HtmlUtilsInterface providesHtmlUtils() throws Exception {
         return HtmlUtils.instance();
@@ -209,77 +199,107 @@ public class CatchupDevModule extends AbstractModule {
   public static class DevCatchupContext implements CatchupContextInterface {
     private final String tmpDir;
     private final String workingDir;
-    private final PropertiesInterface properties;
+    private String podcastBase;
+    private String pluginDir;
+    private String cssDir;
+    private String configDir;
+    private String xsltDir;
+    private String logDir;
+    private String recordingDir;
+    private String onlineVideoPropertiesDir;
+    private int port;
+    private int refreshRate;
+    private String catalogFileName;
+    private String defaultCatalogFileName;
+    private String onlineVideoPropsSuffix;
+    private File sageTvPluginsFile;
+    private String sageTVPluginsURL;
+    private PropertiesInterface properties;
 
     public DevCatchupContext(PropertiesInterface properties) {
       tmpDir = System.getProperty("java.io.tmpdir");
       workingDir = System.getProperty("user.dir");
+      defaultCatalogFileName = workingDir + "/src/main/seeds/default.xml";
+      catalogFileName = tmpDir + File.separator + "catalog_dev.xml";
+      refreshRate = 2;
+      port = properties.getInt("podcasterPort", 8082);
+      podcastBase = "http://localhost:" + getPort() + "/";
+      pluginDir = workingDir + "/src/main/plugins";
+      cssDir = workingDir + "/src/main/css";
+      xsltDir = workingDir + "/src/main/xslt";
+      logDir = workingDir + "/logs";
+      recordingDir = workingDir + "/recordings";
+      onlineVideoPropsSuffix = "sagetvcatchup";
+      onlineVideoPropertiesDir = "/opt/sagetv/server/STVs/SageTV7/OnlineVideos";
+      sageTvPluginsFile = new File(workingDir, "SageTVPluginsDev.xml");
+      sageTVPluginsURL = "http://mintpad/sagetvcatchup/download/SageTVPluginsDev.xml";
       this.properties = properties;
+      configDir = workingDir + "/src/main/config";
     }
 
     @Override
     public String getDefaultCatalogFileName() {
-      return workingDir + "src/main/config/default.xml";
+      return defaultCatalogFileName;
     }
 
     @Override
     public String getCatalogFileName() {
-      return tmpDir + File.separator + "catalog_dev.xml";
+      return catalogFileName;
     }
 
     @Override
     public int getRefreshRate() {
-      return 2;
+      return refreshRate;
     }
 
     @Override
     public int getPort() {
-      return 8082;
+      return port;
     }
 
     @Override
     public String getPodcastBase() {
-      return "http://localhost:" + getPort() + "/";
+      return podcastBase;
     }
 
     @Override
     public String getPluginDir() {
-      return workingDir + "/src/main/plugins";
+      return pluginDir;
     }
 
     @Override
     public String getCssDir() {
-      return workingDir + "/src/main/css";
+      return cssDir;
     }
 
     @Override
     public String getConfigDir() {
-      return workingDir + "/src/main/config";
+      return configDir;
     }
 
     @Override
     public String getXsltDir() {
-      return workingDir + "/src/main/xslt";
+      return xsltDir;
     }
 
     @Override
     public String getLogDir() {
-      return workingDir + "/logs";
+      return logDir;
     }
 
     @Override
     public String getRecordingDir() {
-      return workingDir + "/recordings";
+      return recordingDir;
     }
 
     @Override
-    public String getOnlineVideoPropsSuffix() {
-      return "sagetvcatchup";
+    public String getOnlineVideoPropertiesSuffix() {
+      return onlineVideoPropsSuffix;
     }
 
     @Override
     public String getOnlineVideoPropertiesDir() {
-      return "/opt/sagetv/server/STVs/SageTV7/OnlineVideos";
+      return onlineVideoPropertiesDir;
     }
 
     @Override
@@ -304,12 +324,36 @@ public class CatchupDevModule extends AbstractModule {
 
     @Override
     public File getSageTVPluginsDevFile() {
-      return new File(workingDir, "SageTVPluginsDev.xml");
+      return sageTvPluginsFile;
     }
 
     @Override
     public String getSageTVPluginsURL() {
-      return "http://mintpad/sagetvcatchup/download/SageTVPluginsDev.xml";
+      return sageTVPluginsURL;
+    }
+
+    @Override
+    public String toString() {
+      return "DevCatchupContext{" +"\n" +
+              "tmpDir='" + tmpDir + '\'' + "\n" +
+              "workingDir='" + workingDir + '\'' + "\n" +
+              "podcastBase='" + podcastBase + '\'' + "\n" +
+              "pluginDir='" + pluginDir + '\'' + "\n" +
+              "cssDir='" + cssDir + '\'' + "\n" +
+              "configDir='" + configDir + '\'' + "\n" +
+              "xsltDir='" + xsltDir + '\'' + "\n" +
+              "logDir='" + logDir + '\'' + "\n" +
+              "recordingDir='" + recordingDir + '\'' + "\n" +
+              "onlineVideoPropertiesDir='" + onlineVideoPropertiesDir + '\'' + "\n" +
+              "port=" + port + "\n" +
+              "refreshRate=" + refreshRate + "\n" +
+              "catalogFileName='" + catalogFileName + '\'' + "\n" +
+              "defaultCatalogFileName='" + defaultCatalogFileName + '\'' + "\n" +
+              "onlineVideoPropsSuffix='" + onlineVideoPropsSuffix + '\'' + "\n" +
+              "sageTvPluginsFile=" + sageTvPluginsFile + "\n" +
+              "sageTVPluginsURL='" + sageTVPluginsURL + '\'' + "\n" +
+              "properties=" + properties + "\n" +
+              '}';
     }
   }
 }

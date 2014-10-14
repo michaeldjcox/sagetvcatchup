@@ -415,7 +415,7 @@ public class Cataloger {
         progressString = progress;
     }
 
-    public void init(final List<CatalogPublisher> publishers, Catalog initial) {
+    public void start(final List<CatalogPublisher> publishers, Catalog initial) {
         service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
@@ -441,7 +441,7 @@ public class Cataloger {
         return catalogRunning.get();
     }
 
-    public String start() {
+    public String startCataloging() {
         try {
             if (isRunning()) {
                 return "Already running";
@@ -456,7 +456,7 @@ public class Cataloger {
 
     }
 
-    public String stop() {
+    public String stopCataloging() {
         try {
             if (!isRunning()) {
                 return "Already stopped";

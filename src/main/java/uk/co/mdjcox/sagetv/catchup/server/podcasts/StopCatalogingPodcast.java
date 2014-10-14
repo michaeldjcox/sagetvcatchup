@@ -27,7 +27,7 @@ public class StopCatalogingPodcast extends AbstractPodcast {
 
     @Override
     public String buildPage() {
-        String message = cataloger.stop();
+        String message = cataloger.stopCataloging();
         RssBuilder builder = new RssBuilder();
         final String url = getPodcastBaseUrl() + getUri();
         final String title = "CATALOGING";

@@ -26,7 +26,7 @@ public class StopCatalogingPage extends AbstractHtmlPage {
 
     @Override
     public String buildPage() {
-        String message = cataloger.stop();
+        String message = cataloger.stopCataloging();
         HtmlBuilder builder = new HtmlBuilder();
         builder.startDocument();
         builder.addPageHeader("Cataloging");

@@ -152,7 +152,7 @@ public class Server implements CatalogPublisher {
 
         logger.info("Got http request: " + request);
 
-        if (target.startsWith("//")) {
+        while (target.startsWith("/")) {
             target = target.substring(1);
         }
 
@@ -170,7 +170,7 @@ public class Server implements CatalogPublisher {
 
 
         if (target.endsWith(".css")) {
-            new CssPage(logger, cssDir, target.substring(1)).serve(response);
+            new CssPage(logger, cssDir, target).serve(response);
         } else
         if (staticContent.containsKey(page)) {
             staticContent.get(page).serve(response);

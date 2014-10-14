@@ -31,7 +31,7 @@ public interface CatchupContextInterface {
 
   String getRecordingDir();
 
-  String getOnlineVideoPropsSuffix();
+  String getOnlineVideoPropertiesSuffix();
 
   String getOnlineVideoPropertiesDir();
 
@@ -46,4 +46,6 @@ public interface CatchupContextInterface {
   File getSageTVPluginsDevFile();
 
   String getSageTVPluginsURL();
+
+  String toString();
 }

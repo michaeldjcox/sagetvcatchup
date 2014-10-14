@@ -40,7 +40,7 @@ public class PluginManager {
         return plugins.get(sourceId);
     }
 
-    public void load() {
+    public void start() {
 
         String base = context.getPluginDir();
 

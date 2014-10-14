@@ -47,6 +47,10 @@
             </excludes>
         </fileSet>
         <fileSet>
+            <directory>${basedir}/src/main/seeds</directory>
+            <outputDirectory>sagetvcatchup/seeds</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>${basedir}/src/main/logs</directory>
             <outputDirectory>sagetvcatchup/logs</outputDirectory>
         </fileSet>

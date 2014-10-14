@@ -45,14 +45,6 @@ public class Recorder {
         this.osUtils = osUtils;
         this.sageUtils = sageUtils;
         this.recordingDir = context.getRecordingDir();
-
-        service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
-            @Override
-            public Thread newThread(Runnable r) {
-                return new Thread(r, "catchup-recorder");
-            }
-        });
-
     }
 
     private File watch(Episode episode) throws Exception {
@@ -126,6 +118,15 @@ public class Recorder {
             }
             return "All recordings stopping";
         }
+    }
+
+    public void start() {
+      service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+          return new Thread(r, "catchup-recorder");
+        }
+      });
     }
 
     public void shutdown() {

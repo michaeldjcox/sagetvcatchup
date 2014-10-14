@@ -124,23 +124,26 @@ public class CatchupPlugin implements SageTVPlugin {
         try {
             AbstractModule module;
             if (CatchupContext.isRunningInSageTV()) {
-                System.err.println("Running in DEV");
-                module = new CatchupDevModule();
+              System.err.println("Running in SageTV");
+              module = new CatchupModule();
             } else {
-                System.err.println("Running in SageTV");
-                module = new CatchupModule();
+              System.err.println("Running in DEV");
+              module = new CatchupDevModule();
             }
 
             injector = Guice.createInjector(module);
 
             logger = injector.getInstance(Logger.class);
 
-            context = injector.getInstance(CatchupContextInterface.class);
+          logger.info("Starting catchup plugin");
 
-            logger.info("Starting catchup plugin");
+          props = injector.getInstance(PropertiesInterface.class);
+          logger.info("Properties: " + props.toString());
 
-            props = injector.getInstance(PropertiesInterface.class);
-            logger.info(props.toString());
+          context = injector.getInstance(CatchupContextInterface.class);
+
+          logger.info("Context:    " + context.toString());
+
 
           this.downloadUtils = injector.getInstance(DownloadUtilsInterface.class);
 
@@ -149,16 +152,6 @@ public class CatchupPlugin implements SageTVPlugin {
           this.propFileName = injector.getInstance(Key.get(String.class, Names.named("PropsFile")));
           this.backupFileName = injector.getInstance(Key.get(String.class, Names.named("BackupPropsFile")));
 
-
-          if (registry != null) {
-                registry.eventSubscribe(this, SageEvents.PlaybackStarted);
-                registry.eventSubscribe(this, SageEvents.PlaybackStopped);
-                registry.eventSubscribe(this, SageEvents.PlaybackFinished);
-                registry.eventSubscribe(this, SageEvents.MediaFileImported);
-                registry.eventSubscribe(this, SageEvents.MediaFileRemoved);
-            }
-
-
             pluginManager = injector.getInstance(PluginManager.class);
             server = injector.getInstance(Server.class);
             cataloger = injector.getInstance(Cataloger.class);
@@ -166,19 +159,22 @@ public class CatchupPlugin implements SageTVPlugin {
             recorder = injector.getInstance(Recorder.class);
             CatalogPersister persister = injector.getInstance(CatalogPersister.class);
 
-            pluginManager.load();
+            pluginManager.start();
+
+          List<CatalogPublisher> publishers = new ArrayList<CatalogPublisher>();
+          publishers.add(sagetvPublisher);
+          publishers.add(server);
+          publishers.add(persister);
+
+          Catalog initial = persister.load();
+
+            recorder.start();
             server.start();
+            cataloger.start(publishers, initial);
 
-            List<CatalogPublisher> publishers = new ArrayList<CatalogPublisher>();
-            publishers.add(sagetvPublisher);
-            publishers.add(server);
-            publishers.add(persister);
+          registerForEvents();
 
-            Catalog initial = persister.load();
-
-            cataloger.init(publishers, initial);
-
-            init();
+          initConfig();
         } catch (Exception e) {
             if (logger == null) {
                System.err.println("Failed to start catchup plugin");
@@ -188,6 +184,16 @@ public class CatchupPlugin implements SageTVPlugin {
             }
         }
     }
+
+  private void registerForEvents() {
+    if (registry != null) {
+      registry.eventSubscribe(this, SageEvents.PlaybackStarted);
+      registry.eventSubscribe(this, SageEvents.PlaybackStopped);
+      registry.eventSubscribe(this, SageEvents.PlaybackFinished);
+      registry.eventSubscribe(this, SageEvents.MediaFileImported);
+      registry.eventSubscribe(this, SageEvents.MediaFileRemoved);
+    }
+  }
 
   @Override
     public void stop() {
@@ -201,6 +207,9 @@ public class CatchupPlugin implements SageTVPlugin {
       logger.error("Unable to save property backup", e);
     }
 
+
+    unregisterForEvents();
+
     if (recorder != null) {
             recorder.shutdown();
         }
@@ -209,15 +218,6 @@ public class CatchupPlugin implements SageTVPlugin {
             cataloger.shutdown();
         }
 
-        try {
-            registry.eventUnsubscribe(this, SageEvents.PlaybackStarted);
-            registry.eventUnsubscribe(this, SageEvents.PlaybackStopped);
-            registry.eventUnsubscribe(this, SageEvents.PlaybackFinished);
-            registry.eventUnsubscribe(this, SageEvents.MediaFileImported);
-            registry.eventUnsubscribe(this, SageEvents.MediaFileRemoved);
-        } catch (Exception e) {
-            logger.error("Failed to unsubscribe from events", e);
-        }
 
         try {
             if (server != null) {
@@ -228,7 +228,21 @@ public class CatchupPlugin implements SageTVPlugin {
         }
     }
 
-    private void uninstall() {
+  private void unregisterForEvents() {
+    try {
+      if (registry != null) {
+        registry.eventUnsubscribe(this, SageEvents.PlaybackStarted);
+        registry.eventUnsubscribe(this, SageEvents.PlaybackStopped);
+        registry.eventUnsubscribe(this, SageEvents.PlaybackFinished);
+        registry.eventUnsubscribe(this, SageEvents.MediaFileImported);
+        registry.eventUnsubscribe(this, SageEvents.MediaFileRemoved);
+      }
+    } catch (Exception e) {
+      logger.error("Failed to unsubscribe from events", e);
+    }
+  }
+
+  private void uninstall() {
         logger.info("Uninstalling catchup plugin");
         try {
             if (sagetvPublisher != null) {
@@ -284,7 +298,11 @@ public class CatchupPlugin implements SageTVPlugin {
         }
     }
 
-    private void init() {
+    private void initConfig() {
+
+      types.clear();
+      labels.clear();
+      help.clear();
 
         sageUtils.setClientProperty("online_video/cache_time_limit", "10000") ;
 
@@ -491,7 +509,7 @@ public class CatchupPlugin implements SageTVPlugin {
     private void forceCatalogStop() {
         logger.info("Force catalog stop");
         try {
-            stopCatalogValue = cataloger.stop();
+            stopCatalogValue = cataloger.stopCataloging();
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -513,7 +531,7 @@ public class CatchupPlugin implements SageTVPlugin {
     private void forceCatalogStart() {
         logger.info("Force catalog start");
         try {
-            startCatalogValue = cataloger.start();
+            startCatalogValue = cataloger.startCataloging();
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -556,7 +574,7 @@ public class CatchupPlugin implements SageTVPlugin {
     public void resetConfig() {
         try {
             logger.info("Resetting config");
-            init();
+            initConfig();
             logger.info("Done reseting config ");
         } catch (Throwable e) {
             logger.error("Failed to reset config", e);

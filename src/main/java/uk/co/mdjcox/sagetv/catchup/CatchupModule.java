@@ -9,9 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.ScriptFactory;
+import uk.co.mdjcox.sagetv.catchup.server.Server;
+import uk.co.mdjcox.sagetv.model.Catalog;
+import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
 import uk.co.mdjcox.utils.*;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,14 +48,14 @@ public class CatchupModule extends AbstractModule {
     @Provides
     @Named("SeedPropsFile")
     public String providesSeedPropsFileName(OsUtilsInterface osUtils) {
+      String base =  System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator;
       String propFileName = "sagetvcatchup.unix.properties";
       if (osUtils.isWindows()) {
         propFileName = "sagetvcatchup.windows.properties";
       } else {
         propFileName = "sagetvcatchup.unix.properties";
       }
-      String base =  System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator;
-      propFileName = base + "config" + File.separator + propFileName;
+      propFileName = base + "seeds" + File.separator + propFileName;
       return propFileName;
     }
 
