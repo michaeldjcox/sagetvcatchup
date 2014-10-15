@@ -415,7 +415,7 @@ public class Cataloger {
         progressString = progress;
     }
 
-    public void start(final List<CatalogPublisher> publishers, Catalog initial) {
+    public void start(final List<CatalogPublisher> publishers, final CatalogPersister persister) {
       try {
         logger.info("Starting the catalog service");
         service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
@@ -427,11 +427,26 @@ public class Cataloger {
 
         this.publishers = publishers;
 
-        publish(initial, publishers);
 
-        Runnable runnable = getCatalogRunnable(publishers);
+        Runnable runnable = new Runnable() {
+          @Override
+          public void run() {
+            try {
+              logger.info("Restoring catalog from backup");
+              Catalog initial = persister.load();
+              publish(initial, publishers);
+              logger.info("Restored catalog from backup");
+            } catch (Exception e) {
+              logger.error("Failed to restore catalog from backup", e);
+            }
+          }
+        };
 
-        future = service.scheduleAtFixedRate(runnable, 300, refreshRate*60, TimeUnit.MINUTES);
+        service.schedule(runnable, 0, TimeUnit.MINUTES);
+
+        runnable = getCatalogRunnable(publishers);
+
+        future = service.scheduleAtFixedRate(runnable, 2, refreshRate*60, TimeUnit.MINUTES);
         logger.info("Started the catalog service");
       } catch (Exception e) {
         logger.error("Failed to start the catalog service", e);

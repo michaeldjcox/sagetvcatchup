@@ -43,9 +43,19 @@ public class CatalogPersisterTest {
         Catalog catalog2 = persister.load();
 
         assertEquals("Persisted is same as saved", catalog, catalog2);
-
-
     }
 
+//  @Test
+//  public void testLarge() {
+//    CatalogPersister persister = injector.getInstance(CatalogPersister.class);
+//    Catalog catalog = persister.load(System.getProperty("user.dir") + File.separator + "sagetvcatchup.xml");
+//
+//    persister.publish(catalog, System.getProperty("user.dir") + File.separator + "sagetvcatchup2.xml");
+//
+//    Catalog catalog2 = persister.load(System.getProperty("user.dir") + File.separator + "sagetvcatchup2.xml");
+//
+//    assertEquals("Persisted is same as saved", catalog, catalog2);
+//
+//  }
 
 }

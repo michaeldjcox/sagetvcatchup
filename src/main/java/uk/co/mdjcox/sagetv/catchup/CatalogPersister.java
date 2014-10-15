@@ -28,11 +28,15 @@ public class CatalogPersister implements CatalogPublisher {
     }
 
   @Override
-    public void publish(Catalog catalog) {
+  public void publish(Catalog catalog) {
+    publish(catalog, fileName);
+  }
+
+    public void publish(Catalog catalog, String fileName) {
         PrintWriter writer = null;
         try {
-            String xml = parseIntoXML(catalog);
-            writer = writeCatalog(writer, xml);
+          FileOutputStream stream = new FileOutputStream(fileName);
+            xstream.toXML(catalog, stream);
         } catch (Exception e) {
             logger.error("Failed to persist catalog", e);
         }
@@ -42,28 +46,14 @@ public class CatalogPersister implements CatalogPublisher {
         return xstream.toXML(catalog);
     }
 
-    PrintWriter writeCatalog(PrintWriter writer, String xml) throws FileNotFoundException {
-        try {
-            writer = new PrintWriter(fileName);
-            writer.write(xml);
-            writer.flush();
-            return writer;
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (Exception e) {
-                    // Ignore
-                }
-            }
-        }
+    public Catalog load() {
+      return load(fileName);
     }
 
-    public Catalog load() {
+    Catalog load(String fileName) {
         try {
           logger.info("Loading previous catalog " + fileName);
-            String xml = readCatalog(fileName);
-            Catalog catalog =  parseXMLIntoCatalog(xml);
+          Catalog catalog = (Catalog)xstream.fromXML(new File(fileName));
           logger.info("Done loading previous catalog");
           return catalog;
         } catch (Exception e) {
@@ -72,8 +62,7 @@ public class CatalogPersister implements CatalogPublisher {
 
       try {
         logger.info("Loading default catalog " + emptyFileName);
-        String xml = readCatalog(emptyFileName);
-        Catalog catalog = parseXMLIntoCatalog(xml);
+        Catalog catalog = (Catalog)xstream.fromXML(new File(emptyFileName));
         logger.info("Done loading empty catalog");
         return catalog;
       } catch (Exception e) {
@@ -83,41 +72,6 @@ public class CatalogPersister implements CatalogPublisher {
         return new Catalog();
     }
 
-    Catalog parseXMLIntoCatalog(String xml) {
-        return (Catalog)xstream.fromXML(xml);
-    }
-
-    String readCatalog(String fileName) throws Exception {
-        File file = new File(fileName);
-        FileReader reader = null;
-        BufferedReader breader = null;
-        try {
-            reader = new FileReader(file);
-            breader = new BufferedReader(reader);
-            String result = "";
-            String line = "";
-            while ((line = breader.readLine()) != null) {
-                result+=line;
-                result+="\n";
-            }
-            return result;
-        } finally {
-            if (breader != null) {
-                try {
-                    breader.close();
-                } catch (Exception e) {
-                    // Ignore
-                }
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (Exception e) {
-                    // Ignore
-                }
-            }
-        }
-    }
 
 }
 

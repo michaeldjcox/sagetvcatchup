@@ -6,6 +6,7 @@ import com.google.inject.name.Names;
 import org.slf4j.Logger;
 import sage.SageTVPlugin;
 import sage.SageTVPluginRegistry;
+import sagex.api.SystemMessageAPI;
 import sagex.plugin.SageEvents;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
@@ -20,10 +21,7 @@ import uk.co.mdjcox.utils.SageUtilsInterface;
 import java.io.File;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -134,7 +132,9 @@ public class CatchupPlugin implements SageTVPlugin {
       injector = Guice.createInjector(module);
       logger = injector.getInstance(Logger.class);
 
+      logger.info("#######################");
       logger.info("Starting catchup plugin");
+      logger.info("#######################");
 
       props = injector.getInstance(PropertiesInterface.class);
       context = injector.getInstance(CatchupContextInterface.class);
@@ -164,16 +164,19 @@ public class CatchupPlugin implements SageTVPlugin {
       publishers.add(server);
       publishers.add(persister);
 
-      Catalog initial = persister.load();
-
       recorder.start();
       server.start();
-      cataloger.start(publishers, initial);
+      cataloger.start(publishers, persister);
 
       registerForEvents();
 
       initConfig();
-    } catch (Exception e) {
+    } catch (Throwable e) {
+      try {
+        SystemMessageAPI.PostSystemMessage(1204, 3, "Failed to start catchup plugin " + e.getMessage() + "\n" + e.getStackTrace().toString(), new Properties());
+      } catch (Exception e1) {
+        e1.printStackTrace();
+      }
       if (logger == null) {
         System.err.println("Failed to start catchup plugin");
         e.printStackTrace();
@@ -195,34 +198,43 @@ public class CatchupPlugin implements SageTVPlugin {
 
   @Override
   public void stop() {
-    logger.info("Stopping catchup plugin");
-
-
     try {
-      logger.info("Backing up properties");
-      props.commit(backupFileName, new CatchupPropertiesFileLayout());
-    } catch (Exception e) {
-      logger.error("Unable to save property backup", e);
-    }
+      logger.info("Stopping catchup plugin");
 
-
-    unregisterForEvents();
-
-    if (recorder != null) {
-      recorder.shutdown();
-    }
-
-    if (cataloger != null) {
-      cataloger.shutdown();
-    }
-
-
-    try {
-      if (server != null) {
-        server.shutdown();
+      try {
+        logger.info("Backing up properties");
+        props.commit(backupFileName, new CatchupPropertiesFileLayout());
+      } catch (Exception e) {
+        logger.error("Unable to save property backup", e);
       }
-    } catch (Exception e) {
-      logger.error("Failed to stop podcast", e);
+
+
+      unregisterForEvents();
+
+      if (recorder != null) {
+        recorder.shutdown();
+      }
+
+      if (cataloger != null) {
+        cataloger.shutdown();
+      }
+
+
+      try {
+        if (server != null) {
+          server.shutdown();
+        }
+      } catch (Exception e) {
+        logger.error("Failed to stop podcast", e);
+      }
+    } catch (Throwable ex) {
+      logger.error("Failed to stop catchup plugin");
+    }
+    finally
+     {
+       logger.info("#######################");
+       logger.info("Stopped catchup plugin");
+       logger.info("#######################");
     }
   }
 
@@ -241,6 +253,7 @@ public class CatchupPlugin implements SageTVPlugin {
   }
 
   private void uninstall() {
+
     logger.info("Uninstalling catchup plugin");
     try {
       if (sagetvPublisher != null) {
@@ -252,6 +265,10 @@ public class CatchupPlugin implements SageTVPlugin {
 
     File recordings = new File(context.getRecordingDir());
     File logs = new File(context.getLogDir());
+
+    logger.info("###########################");
+    logger.info("Uninstalled catchup plugin");
+    logger.info("###########################");
 
     PersistentRollingFileAppender.stopped = true;
 
@@ -289,9 +306,9 @@ public class CatchupPlugin implements SageTVPlugin {
 
   @Override
   public void destroy() {
-    logger.info("Destroying catchup plugin");
-
     try {
+      logger.info("Destroying catchup plugin");
+
       String enabled = sageUtils.getSageTVProperty("sagetv_core_plugins/sagetvcatchup/enabled", "blah");
       logger.info("Destroying catchup plugin enabled = " + enabled);
 
@@ -300,13 +317,14 @@ public class CatchupPlugin implements SageTVPlugin {
       if (enabled.equalsIgnoreCase("false")) {
         uninstall();
       }
-    } catch (Exception e) {
-      logger.error("Failed to check for uninstall", e);
+    } catch (Throwable e) {
+      logger.error("Failed to destroy plugin", e);
     }
   }
 
   private void initConfig() {
 
+    try {
     types.clear();
     labels.clear();
     help.clear();
@@ -347,7 +365,6 @@ public class CatchupPlugin implements SageTVPlugin {
     labels.put(STOP_RECORDING, "Stop recording");
     help.put(STOP_RECORDING, "Force all recording to stop immediately");
 
-    try {
       File sageTvDevPlugins = context.getSageTVPluginsDevFile();
       if (sageTvDevPlugins.exists()) {
         List<String> lines = Files.readLines(sageTvDevPlugins, Charset.defaultCharset());
@@ -366,7 +383,7 @@ public class CatchupPlugin implements SageTVPlugin {
           logger.info("This is not a sagetv developer site");
         }
       }
-    } catch (Exception e) {
+    } catch (Throwable e) {
       logger.warn("Failed to setup developer config controls", e);
     }
   }
@@ -407,15 +424,18 @@ public class CatchupPlugin implements SageTVPlugin {
     }
 
     if (pluginManager != null) {
-      for (Plugin plugin : pluginManager.getPlugins()) {
-        String name = plugin.getSource().getId();
-        String propName = name + ".maxprogrammes";
-        if (property.equals(propName)) {
-          return String.valueOf(props.getInt(propName, Integer.MAX_VALUE));
+      try {
+        for (Plugin plugin : pluginManager.getPlugins()) {
+          String name = plugin.getSource().getId();
+          String propName = name + ".maxprogrammes";
+          if (property.equals(propName)) {
+            return String.valueOf(props.getInt(propName, Integer.MAX_VALUE));
+          }
         }
+      } catch (Exception e) {
+        logger.error("Failed to add plugin properties", e);
       }
     }
-
 
     return "";
   }

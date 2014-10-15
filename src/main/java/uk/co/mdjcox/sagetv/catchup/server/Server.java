@@ -199,6 +199,7 @@ public class Server implements CatalogPublisher {
 
     public void publish(Catalog catalog) {
         try {
+            logger.info("Publishing new catalog to web server");
             Map<String, ContentProvider> publishedContent = new HashMap<String, ContentProvider>();
 
             ErrorsPage errors = new ErrorsPage(catalog);
@@ -252,9 +253,11 @@ public class Server implements CatalogPublisher {
             }
 
             commitPublishedContent(publishedContent);
+
+            logger.info("Published catalog to web server");
         } catch (Exception e) {
-            catalog.addError("FATAL", "Failed to publish to html server " + e.getMessage());
-            logger.error("Failed to publish catalog to html server", e);
+            catalog.addError("FATAL", "Failed to publish to web server " + e.getMessage());
+            logger.error("Failed to publish catalog to web server", e);
         } finally {
             ErrorsPage provider = new ErrorsPage(catalog);
             addPublishedContent(publishedContent, provider);
