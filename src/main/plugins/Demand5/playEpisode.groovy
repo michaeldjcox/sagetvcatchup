@@ -4,14 +4,18 @@ String filename = recording.getRecordingDir() + File.separator + recording.getId
 
 String command = "get_flash_videos -y -f " + filename + " " + recording.getUrl() ;
 ArrayList<String> output = new ArrayList<String>();
-EXECUTE(command, "record", output, null);
+Process proc = EXECUTE(command, "record", output, null);
 
 LOG_INFO("Recording to " + filename);
 
-File file = WAIT_FOR_FILE_OF_SIZE(filename, 1024000, 10000)
+File file = WAIT_FOR_FILE_OF_SIZE(filename, 1024000, 10000, recording.getStopFlag())
 
 recording.setPartialFile(file);
 
-// TODO set the complete file
+String completedName = filename.replace("default.partial.mp4.flv", "default.mp4");
+File completedFile = new File(completedName);
+recording.setCompletedFile(completedFile);
+
+recording.setProcess(proc);
 
 

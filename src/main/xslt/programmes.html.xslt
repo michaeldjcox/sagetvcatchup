@@ -15,6 +15,8 @@
                         <xsl:text>&#10;</xsl:text>
                         <th>ParentId</th>
                         <xsl:text>&#10;</xsl:text>
+                        <th>Type</th>
+                        <xsl:text>&#10;</xsl:text>
                         <th>Id</th>
                         <xsl:text>&#10;</xsl:text>
                         <th>ShortName</th>

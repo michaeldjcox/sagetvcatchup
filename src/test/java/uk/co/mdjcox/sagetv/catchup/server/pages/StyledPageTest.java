@@ -218,7 +218,7 @@ public class StyledPageTest {
         programmesBuilder.startBody();
         programmesBuilder.addHeading1("Programmes");
         programmesBuilder.startTable();
-        programmesBuilder.addTableHeader("SourceId", "ParentId", "Id", "ShortName", "LongName", "ServiceUrl", "IconUrl", "PodcastUrl");
+        programmesBuilder.addTableHeader("SourceId", "ParentId", "Type", "Id", "ShortName", "LongName", "ServiceUrl", "IconUrl", "PodcastUrl");
 
         categoriesBuilder.startDocument();
         categoriesBuilder.addPageHeader("Categories");

@@ -4,5 +4,5 @@ source.setSourceId("Demand5");
 source.setId("Demand5");
 source.setShortName("Demand5");
 source.setLongName("Demand5");
-source.setIconUrl("http://www.ipteevee.net/wp-content/files_mf/1322128672_magicfields_channel_logo_1_1.jpg");
+source.setIconUrl("http://www.channel5.com/images/logos/demand_5_logo.png");
 source.setServiceUrl("http://www.channel5.com/shows");

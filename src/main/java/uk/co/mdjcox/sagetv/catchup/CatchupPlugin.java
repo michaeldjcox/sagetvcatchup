@@ -34,26 +34,22 @@ import java.util.*;
 
 // In priority order...
 
-// TODO - test properties recovery, enable/disable
-// TODO - release, branch and reversion
+// BUGS
+// TODO - BUG - force refresh on online caching (set client property!)
+// TODO - BUG - get_iplayer will not play some content
+// TODO - BBC - original air date (I have) but last aired date (I don't have)
+// TODO - BUG - No channel is set on TV recordings
 
-  //====================================================
-
-// TODO - stop should save completed to recording
+// Nice if
+// TODO - stop should save completed to recording or even continue to download
 // TODO - size of cat, time taken, recording errors
 // TODO - Podcast stylesheets?
+
+// Refactor
 // TODO - Generalise SageTV Publisher into utils
-// TODO - Programmes/Episodes/Categories - do I need to convert whole catalog to XML (3 times!)
 // TODO - fake programme categories are model breaking
-// TODO - Test!
-
-// TODO - BUG - force refresh on online caching (set client property!)
-
-// TODO - BBC original air date (I have) but last aired date (I don't have)
-// TODO - No channel is set on TV recordings
 
 // TODO - Build on the fly
-
 // TODO - Can I implement a "New" category
 // TODO - check video from other providers
 // TODO - Can we use Sage Favourites to establish a favourites category?
