@@ -17,8 +17,6 @@ _DESCRIPTION_
 </Dependency>
 <ServerOnly>true</ServerOnly>
 <ResourcePath>_PATH_</ResourcePath>
-<Webpage title="_NAME_">_WEBPAGE_</Webpage>
-<Screenshot title="_SCREENSHOTNAME_">_SCREENSHOTLINK_</Screenshot>
 <PluginType>Standard</PluginType>
 <Package>
 <PackageType>System</PackageType>
