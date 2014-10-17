@@ -13,13 +13,13 @@ import java.io.OutputStream;
 /**
  * Created by michael on 07/10/14.
  */
-public class WatchEpisode implements ContentProvider {
+public class WatchAndKeepEpisode implements ContentProvider {
 
     private final Episode episode;
     private final Logger logger;
     private Recorder recorder;
 
-    public WatchEpisode(Logger logger, Episode episode, Recorder recorder) {
+    public WatchAndKeepEpisode(Logger logger, Episode episode, Recorder recorder) {
         this.episode = episode;
         this.recorder = recorder;
         this.logger = logger;
@@ -46,7 +46,7 @@ public class WatchEpisode implements ContentProvider {
             response.setContentLength(Integer.MAX_VALUE);
 
             out = response.getOutputStream();
-            recorder.watch(out, episode, false);
+            recorder.watch(out, episode, true);
         } catch (Exception e) {
             try {
                 if (out != null) {
@@ -66,7 +66,7 @@ public class WatchEpisode implements ContentProvider {
 
     @Override
     public String getUri() {
-        return "watch?id="+episode.getId() +";type=mpeg4";
+        return "watchandkeep?id="+episode.getId() +";type=mpeg4";
     }
 
     @Override

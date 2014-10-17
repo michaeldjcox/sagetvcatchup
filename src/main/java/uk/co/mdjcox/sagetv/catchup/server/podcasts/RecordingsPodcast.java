@@ -34,7 +34,7 @@ public class RecordingsPodcast extends AbstractPodcast {
 
     public String buildPage() {
         String recordingsUrl = getPodcastBaseUrl() + getUri();
-        String title = "RECORDING NOW";
+        String title = "RECORDING PROGRESS";
         String desc = "Recordings in progress";
 
         RssBuilder builder = new RssBuilder();

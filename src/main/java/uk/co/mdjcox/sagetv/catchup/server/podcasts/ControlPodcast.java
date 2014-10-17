@@ -38,6 +38,7 @@ public class ControlPodcast extends AbstractPodcast {
         final String url = episode.getServiceUrl();
         final String stopUrl = getPodcastBaseUrl() + "stop?id=" + episode.getId() + ";type=xml";
         final String watchUrl = getPodcastBaseUrl() + "watch?id=" + episode.getId() + ";type=mpeg4";
+        final String watchAndKeepUrl = getPodcastBaseUrl() + "watchandkeep?id=" + episode.getId() + ";type=mpeg4";
         final String recordUrl = getPodcastBaseUrl() + "record?id=" + episode.getId() + ";type=xml";
 
         boolean isRecording = false;
@@ -49,8 +50,9 @@ public class ControlPodcast extends AbstractPodcast {
         if (isRecording) {
             builder.addCategoryItem("STOP", "Stop recording", stopUrl);
         } else {
-            builder.addVideoItem("WATCH", "Watch now", watchUrl, "");
-            builder.addCategoryItem("RECORD", "Record for later", recordUrl);
+          builder.addVideoItem("WATCH", "Watch now", watchUrl, "");
+          builder.addVideoItem("WATCH AND KEEP", "Watch now and keep", watchAndKeepUrl, "");
+          builder.addCategoryItem("RECORD", "Record for later", recordUrl);
         }
         builder.stopDocument();
         return builder.toString();

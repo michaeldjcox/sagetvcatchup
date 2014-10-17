@@ -14,6 +14,7 @@ import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.catchup.Recorder;
 import uk.co.mdjcox.sagetv.catchup.server.media.CssPage;
 import uk.co.mdjcox.sagetv.catchup.server.media.LogoImage;
+import uk.co.mdjcox.sagetv.catchup.server.media.WatchAndKeepEpisode;
 import uk.co.mdjcox.sagetv.catchup.server.media.WatchEpisode;
 import uk.co.mdjcox.sagetv.catchup.server.pages.*;
 import uk.co.mdjcox.sagetv.catchup.server.podcasts.*;
@@ -205,6 +206,12 @@ public class Server implements CatalogPublisher {
             ErrorsPage errors = new ErrorsPage(catalog);
             addPublishedContent(publishedContent, errors);
 
+          RecordingErrorsPage recerrors = new RecordingErrorsPage(recorder);
+          addPublishedContent(publishedContent, recerrors);
+
+          RecordingErrorsPodcast recerrorscast = new RecordingErrorsPodcast(baseUrl, recorder);
+          addPublishedContent(publishedContent, recerrorscast);
+
             StyledPage programmes = new StyledPage(xsltDir, logger, "Programmes", "programmes.html", null, catalog);
             addPublishedContent(publishedContent, programmes);
 
@@ -249,7 +256,8 @@ public class Server implements CatalogPublisher {
 
                 WatchEpisode watchEpisodeVideoProvider = new WatchEpisode(logger, episode, recorder);
                 addPublishedContent(publishedContent, watchEpisodeVideoProvider);
-
+              WatchAndKeepEpisode watchAndKeepEpisodeVideoProvider = new WatchAndKeepEpisode(logger, episode, recorder);
+              addPublishedContent(publishedContent, watchAndKeepEpisodeVideoProvider);
             }
 
             commitPublishedContent(publishedContent);

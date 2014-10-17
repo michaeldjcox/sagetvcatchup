@@ -14,9 +14,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.SocketException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -36,6 +36,9 @@ public class Recorder {
     private ConcurrentHashMap<String, Recording> currentRecordings = new ConcurrentHashMap<String, Recording>();
     private final String recordingDir;
     private ScheduledExecutorService service;
+    private Set<String> errors = new HashSet<String>();
+    private int failedCount = 0;
+    private int completedCount = 0;
 
     @Inject
     private Recorder(Logger theLogger, PluginManager pluginManager, CatchupContextInterface context,
@@ -225,6 +228,18 @@ public class Recorder {
         return currentRecordings.size();
     }
 
+  public int getFailedCount() {
+    return failedCount;
+  }
+
+  public int getCompletedCount() {
+    return completedCount;
+  }
+
+  public Set<String> getErrors() {
+      return errors;
+    }
+
     public boolean isStopped(String id) {
         Recording recording = currentRecordings.get(id);
         if (recording == null) {
@@ -277,11 +292,15 @@ public class Recorder {
                                 newRecording.setSavedFile(savedFile);
 
                                 sageUtils.addAiringToSageTV(newRecording);
+                              completedCount++;
                             } else {
                                 logger.error("No recording file found for " + episode);
+                              throw new Exception("No recording file found for " + episode);
                             }
                         } catch (Throwable e) {
-                            logger.warn("Recording of " + episode.getId() + " stopped due to exception ", e);
+                          failedCount++;
+                          errors.add("Recording " + episode.getId() + " failed due to exception");
+                          logger.warn("Recording of " + episode.getId() + " stopped due to exception ", e);
                         } finally {
                             try {
                                 stop(episode.getId());
@@ -304,9 +323,10 @@ public class Recorder {
 
     }
 
-        public void watch(final OutputStream out, final Episode episode) throws Exception {
+        public void watch(final OutputStream out, final Episode episode, final boolean keep) throws Exception {
         FileInputStream in = null;
         String id = episode.getId();
+          boolean clientTermination = false;
 
         try {
 
@@ -347,14 +367,22 @@ public class Recorder {
                 if (isStopped(id)) {
                     logger.info("Streaming of " + id + " stopped due to stop request");
                 } else {
+                  completedCount++;
                     logger.info("Streaming of " + id + " stopped due to completion");
                 }
             } finally {
                 logger.info("Streaming of " + id + " stopped after serving " + served + "/" + file.length());
             }
         } catch (Exception e) {
+          if (e.getCause() != null && e.getCause() instanceof SocketException) {
+            logger.warn("Streaming of " + id + " stopped due to client termination ", e);
+            clientTermination = true;
+          } else {
+            failedCount++;
+            errors.add("Watching " + id + " failed due to exception");
             logger.warn("Streaming of " + id + " stopped due to exception ", e);
             throw new Exception("Failed to stream video", e);
+          }
         } finally {
             try {
                 if (in != null) {
@@ -364,14 +392,82 @@ public class Recorder {
                 // Ignore
             }
             try {
+              if (clientTermination && keep) {
+                convertToRecord(id);
+              } else {
                 stop(id);
+              }
             } catch (Exception e) {
                 logger.error("Failed to stop recording in the recorder", e);
             }
         }
     }
 
-    private boolean isCompleted(String id) {
+  private void convertToRecord(String id) {
+    final Recording newRecording = currentRecordings.get(id);
+    if (newRecording != null) {
+      logger.info("Converting watched item " + id + " to recording");
+            
+      Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+          File partialFile = newRecording.getPartialFile();
+          Episode episode = newRecording.getEpisode();
+          try {
+            try {
+
+              File completedFile = newRecording.getCompletedFile();
+              while (partialFile.exists() && !(newRecording.isStopped() || newRecording.isComplete())) {
+                osUtils.waitFor(1000);
+                logger.info("File " + partialFile.getAbsolutePath() + " exists size=" + partialFile.length());
+              }
+
+              osUtils.waitFor(1000);
+
+              System.err.println("Done recording. File " + completedFile + " exists=" + completedFile.exists());
+
+              if (completedFile.exists()) {
+
+                File[] recordingDirs = sageUtils.getRecordingDirectories();
+
+                String recDir = recordingDir;
+
+                if (recordingDirs.length > 0) {
+                  recDir = recordingDirs[0].getAbsolutePath();
+                }
+
+                File savedFile = new File(recDir, episode.getId() + ".mp4");
+
+                Files.move(completedFile.toPath(), savedFile.toPath());
+
+                newRecording.setSavedFile(savedFile);
+
+                sageUtils.addAiringToSageTV(newRecording);
+              } else {
+                logger.error("No recording file found for " + episode);
+              }
+            } catch (Throwable e) {
+              logger.warn("Recording of " + episode.getId() + " stopped due to exception ", e);
+            } finally {
+              try {
+                stop(episode.getId());
+              } catch (Exception e1) {
+                logger.error("Failed to stop recording in the recorder", e1);
+              }
+            }
+          } catch (Throwable e) {
+            logger.error("Recording of " + episode.getId() + " threw exception on stop", e);
+          }
+
+        }
+      };
+
+      new Thread(runnable).start();
+    }
+
+  }
+
+  private boolean isCompleted(String id) {
         Recording recording = currentRecordings.get(id);
         if (recording == null) {
             return true;

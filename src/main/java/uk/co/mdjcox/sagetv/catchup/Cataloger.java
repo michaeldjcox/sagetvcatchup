@@ -7,6 +7,7 @@ import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.*;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -28,7 +29,8 @@ public class Cataloger {
     private ScheduledFuture<?> future;
     private List<CatalogPublisher> publishers;
     private String errorSummary = "";
-    private long refreshRate;
+    private String statsSummary = "";
+  private long refreshRate;
     private CatchupContextInterface context;
 
   @Inject
@@ -74,7 +76,27 @@ public class Cataloger {
         };
     }
 
-    private void publish(Catalog catalog, List<CatalogPublisher> publishers) {
+  private void buildStatsSummary(Catalog catalog) {
+    int sourceStats = 0;
+    int programmeStats = 0;
+    int episodeStats = 0;
+
+    for (Category category : catalog.getCategories()) {
+      if (category.isProgrammeCategory() && category.getParentId().isEmpty()) {
+        programmeStats++;
+      }
+
+      if (category.isSource() && !category.getSourceId().equals("status")) {
+        sourceStats++;
+      }
+    }
+
+    episodeStats = catalog.getEpisodes().size();
+
+    statsSummary = sourceStats + " sources " + programmeStats + " programmes " + episodeStats + " episodes";
+  }
+
+  private void publish(Catalog catalog, List<CatalogPublisher> publishers) {
         for (CatalogPublisher publisher : publishers) {
             publisher.publish(catalog);
         }
@@ -109,6 +131,10 @@ public class Cataloger {
 
         Catalog catalog = new Catalog();
 
+        int sourceStats = 0;
+        int programmeStats = 0;
+        int episodeStats = 0;
+
         try {
             Map<String, Category> newCategories = new LinkedHashMap<String, Category>();
             Map<String, Episode> newEpisodes = new LinkedHashMap<String, Episode>();
@@ -134,6 +160,8 @@ public class Cataloger {
 
                 newCategories.put(sourceCat.getId(), sourceCat);
 
+                sourceStats++;
+
                 logger.info("Found source: " + sourceCat);
 
                 Map<String, Programme> newProgCategories = new LinkedHashMap<String, Programme>();
@@ -152,6 +180,8 @@ public class Cataloger {
                     checkForStop();
 
                     programmeCount++;
+
+                    programmeStats++;
 
                     if (programmeCount > testMaxProgrammes) {
                         break;
@@ -180,6 +210,8 @@ public class Cataloger {
                         episode.setPodcastUrl(podcastUrlBase + "control?id=" + episode.getId() + ";type=xml");
 
                         newEpisodes.put(episode.getId(), episode);
+
+                        episodeStats++;
 
                         programme.addEpisode(episode);
                     }
@@ -236,6 +268,8 @@ public class Cataloger {
             catalog.setCategories(root, newCategories, newEpisodes);
 
             progressString = "Finished cataloging";
+
+            statsSummary = sourceStats + " sources " + programmeStats + " programmes " + episodeStats + " episodes";
 
             return catalog;
 
@@ -398,10 +432,14 @@ public class Cataloger {
     public String getProgress() {
         if ("Finished".equals(progressString) || "Failed".equals(progressString) || "Waiting".equals(progressString)) {
             if (future == null) {
-              progressString += " - no next attempt scheduled";
+              progressString += "";
             } else {
-              long delay = future.getDelay(TimeUnit.MINUTES);
-              progressString += " - next attempt " + (delay / 60) + "hrs " + (delay % 60) + "mins";
+              long delay = future.getDelay(TimeUnit.MILLISECONDS);
+              delay = System.currentTimeMillis() + delay;
+              Date date = new Date(delay);
+              SimpleDateFormat format = new SimpleDateFormat("h:mma");
+              String dateStr = format.format(date);
+              progressString += " until " + dateStr;
             }
         }
         return progressString;
@@ -409,6 +447,10 @@ public class Cataloger {
 
     public String getErrorSummary() {
         return errorSummary;
+    }
+
+    public String getStatsSummary() {
+      return statsSummary;
     }
 
     public void setProgress(String progress) {
@@ -434,6 +476,7 @@ public class Cataloger {
             try {
               logger.info("Restoring catalog from backup");
               Catalog initial = persister.load();
+              buildStatsSummary(initial);
               publish(initial, publishers);
               logger.info("Restored catalog from backup");
             } catch (Exception e) {
