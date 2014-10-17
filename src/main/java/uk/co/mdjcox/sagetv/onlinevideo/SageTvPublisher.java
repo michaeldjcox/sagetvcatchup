@@ -147,7 +147,8 @@ public class SageTvPublisher implements CatalogPublisher {
                     addSource((Root)category, links, labels);
                 } else if (category.isSource()) {
                     logger.info("Online adding source " + category.getId());
-                    addDynamicSource((Source)category, links, labels);
+                  boolean isSearch = category.getId().equals("search");
+                    addDynamicSource((Source)category, links, labels, isSearch);
                 }
             }
 
@@ -160,7 +161,7 @@ public class SageTvPublisher implements CatalogPublisher {
 
     }
 
-    private void addDynamicSource(Source programme, PropertiesFile links, PropertiesFile labels) {
+    private void addDynamicSource(Source programme, PropertiesFile links, PropertiesFile labels, boolean isSearch) {
         String id = programme.getId();
         String parentId = programme.getParentId();
         String name = programme.getShortName();
@@ -194,6 +195,12 @@ public class SageTvPublisher implements CatalogPublisher {
         result += ";" + url;
 
         links.setProperty("xFeedPodcastCustom/" + id, result);
+
+        if (isSearch) {
+          links.setProperty(id + "/IsSearch", "true");
+          links.setProperty(id + "/URLSearchPrefix", "http://localhost:8081/search?text=");
+          links.setProperty(id + "/URLSearchPostfix", ";type=xml");
+        }
     }
 
     private void addDynamicSubcategory(Category programme, PropertiesFile links, PropertiesFile labels) {

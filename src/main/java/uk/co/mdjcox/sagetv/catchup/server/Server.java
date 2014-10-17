@@ -158,33 +158,37 @@ public class Server implements CatalogPublisher {
 
     private void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch)
             throws IOException, ServletException {
-        response.setStatus(HttpServletResponse.SC_OK);
+      response.setStatus(HttpServletResponse.SC_OK);
 
-        logger.info("Got http request: " + request);
+      logger.info("Got http request: " + request);
 
-        while (target.startsWith("/")) {
-            target = target.substring(1);
+      while (target.startsWith("/")) {
+        target = target.substring(1);
+      }
+
+      String page = target;
+      Enumeration params = request.getParameterNames();
+      while (params.hasMoreElements()) {
+        Object name = params.nextElement();
+        if (page.equals(target)) {
+          page += "?";
+        } else {
+          page += "&";
         }
-
-        String page = target;
-        Enumeration params = request.getParameterNames();
-        while (params.hasMoreElements()) {
-            Object name = params.nextElement();
-            if (page.equals(target)) {
-                page +="?";
-            } else {
-                page += "&";
-            }
-            page += name +"=" + request.getParameter(name.toString());
-        }
+        page += name + "=" + request.getParameter(name.toString());
+      }
 
 
-        if (target.endsWith(".css")) {
-            new CssPage(logger, cssDir, target).serve(response);
-        } else
-        if (staticContent.containsKey(page)) {
-            staticContent.get(page).serve(response);
-        } else
+      if (target.endsWith(".css")) {
+        new CssPage(logger, cssDir, target).serve(response);
+      } else if (staticContent.containsKey(page)) {
+        staticContent.get(page).serve(response);
+      } else
+      if (page.contains("search?text=")) {
+        SearchPodcast searchPodcast = (SearchPodcast)publishedContent.get(page.replaceAll("text=.*;type=xml", "type=xml"));
+        searchPodcast.setSearchString(page.replaceAll("search\\?text=", "").replaceAll(";type=xml", ""));
+        searchPodcast.serve(response);
+      } else
         if (publishedContent.containsKey(page)) {
             publishedContent.get(page).serve(response);
         } else {
@@ -259,6 +263,9 @@ public class Server implements CatalogPublisher {
               WatchAndKeepEpisode watchAndKeepEpisodeVideoProvider = new WatchAndKeepEpisode(logger, episode, recorder);
               addPublishedContent(publishedContent, watchAndKeepEpisodeVideoProvider);
             }
+
+          SearchPodcast searchPodcast = new SearchPodcast(baseUrl, catalog);
+          addPublishedContent(publishedContent, searchPodcast);
 
             commitPublishedContent(publishedContent);
 

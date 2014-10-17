@@ -35,10 +35,10 @@ import java.util.*;
 
 // BUGS
 // TODO - BUG - force refresh on online caching (set client property!)
-// TODO - BUG - get_iplayer will not play some content
-// TODO - BBC - original air date (I have) but last aired date (I don't have)
-// TODO - BUG - No channel is set on TV recordings
-// TODO - More controls in config screen
+// TODO - BUG - get_iplayer will not play some content - is this the 7 day issue - wait for 2.87
+// TODO - BUG - original air date (I have) but last aired date (I don't have)
+// TODO - BUG - No channel is set on TV recordings - you can create a detailed airing and link to media file
+// TODO - default for windows XP
 
 // Refactor
 // TODO - Podcast stylesheets?

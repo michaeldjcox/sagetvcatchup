@@ -86,7 +86,7 @@ public class Cataloger {
         programmeStats++;
       }
 
-      if (category.isSource() && !category.getSourceId().equals("status")) {
+      if (category.isSource() && !category.getSourceId().equals("zzsagetvcatchupStatus") && !category.getSourceId().equals("zzsagetvcatchupSearch")) {
         sourceStats++;
       }
     }
@@ -142,10 +142,15 @@ public class Cataloger {
             Root root = new Root("Catchup", "Catchup TV", "Catchup TV", podcastUrlBase, podcastUrlBase + "logo.png");
             newCategories.put(root.getId(), root);
 
-            Source statusSource = new Source(root.getId(), "status", "Catchup Status", "Catchup Status", "", podcastUrlBase + "logo.png");
+            Source statusSource = new Source(root.getId(), "zzsagetvcatchupStatus", "Status", "Status", "", "");
             statusSource.setPodcastUrl(podcastUrlBase + "category?id=status;type=xml");
             newCategories.put(statusSource.getId(), statusSource);
             root.addSubCategory(statusSource);
+
+          Source searchSource = new Source(root.getId(), "zzsagetvcatchupSearch", "Search", "Search", "", "");
+          searchSource.setPodcastUrl(podcastUrlBase + "search?type=xml");
+          newCategories.put(searchSource.getId(), searchSource);
+          root.addSubCategory(searchSource);
 
             for (Plugin plugin : pluginManager.getPlugins()) {
                 checkForStop();
