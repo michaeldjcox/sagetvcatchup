@@ -11,7 +11,6 @@ import sagex.plugin.SageEvents;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.catchup.server.Server;
-import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.PersistentRollingFileAppender;
@@ -39,27 +38,26 @@ import java.util.*;
 // TODO - BUG - get_iplayer will not play some content
 // TODO - BBC - original air date (I have) but last aired date (I don't have)
 // TODO - BUG - No channel is set on TV recordings
-
-// Nice if
-// TODO - stop should save completed to recording or even continue to download
-// TODO - size of cat, time taken, recording errors
-// TODO - Podcast stylesheets?
+// TODO - More controls in config screen
 
 // Refactor
+// TODO - Podcast stylesheets?
 // TODO - Generalise SageTV Publisher into utils
-// TODO - fake programme categories are model breaking
+// TODO - fake programme categories are model breaking, always have to filter out source, root, category, programme
 
-// TODO - Build on the fly
-// TODO - Can I implement a "New" category
-// TODO - check video from other providers
+// SageTV Integration
 // TODO - Can we use Sage Favourites to establish a favourites category?
 // TODO - Can "watched" status extend from recordings to Online
-
-// WISHLIST
-// TODO - can resume be made to work?
-// TODO - is there any way I can incrementally update the catalog?
 // TODO - Can request such downloads from the existing EPG?
 
+// WISHLIST
+
+// TODO - Can I implement a "New" category
+// TODO - Demand5 - record fails
+// TODO - 4OD
+// TODO - ITVPlayer
+// TODO - is there any way I can incrementally update the catalog?
+// TODO - STVI
 
 public class CatchupPlugin implements SageTVPlugin {
 
@@ -339,16 +337,6 @@ public class CatchupPlugin implements SageTVPlugin {
     labels.put(STOP_CATALOG, "Stop cataloging");
     help.put(STOP_CATALOG, "Force cataloging to stop immediately");
 
-    if (pluginManager != null) {
-      for (Plugin plugin : pluginManager.getPlugins()) {
-        String name = plugin.getSource().getId();
-        String propName = name + ".maxprogrammes";
-        types.put(propName, CONFIG_INTEGER);
-        labels.put(propName, name + " max programmes");
-        help.put(propName, name + " max programmes");
-      }
-    }
-
     types.put(RECORDINGS_IN_PROGRESS, CONFIG_TEXT);
     labels.put(RECORDINGS_IN_PROGRESS, "Recordings in progress");
     help.put(RECORDINGS_IN_PROGRESS, "Show number of recordings progress");
@@ -361,6 +349,13 @@ public class CatchupPlugin implements SageTVPlugin {
     labels.put(STOP_RECORDING, "Stop recording");
     help.put(STOP_RECORDING, "Force all recording to stop immediately");
 
+      for (String name : pluginManager.getPluginNames()) {
+        String propName = name + ".skip";
+        types.put(propName, CONFIG_BOOL);
+        labels.put(propName, name + " enabled");
+        help.put(propName, name + " enabled");
+      }
+
       File sageTvDevPlugins = context.getSageTVPluginsDevFile();
       if (sageTvDevPlugins.exists()) {
         List<String> lines = Files.readLines(sageTvDevPlugins, Charset.defaultCharset());
@@ -372,9 +367,23 @@ public class CatchupPlugin implements SageTVPlugin {
         }
         if (isDevSite) {
           logger.info("This is a sagetv developer site");
+
+          if (pluginManager != null) {
+            for (String name : pluginManager.getPluginNames()) {
+              String propName = name + ".maxprogrammes";
+              types.put(propName, CONFIG_INTEGER);
+              labels.put(propName, name + " max programmes");
+              help.put(propName, name + " max programmes");
+            }
+          }
+
+
           types.put(PULL_UPGRADE, CONFIG_BUTTON);
           labels.put(PULL_UPGRADE, "Check for upgrade");
           help.put(PULL_UPGRADE, "Get SageTV to pull a new dev version");
+
+
+
         } else {
           logger.info("This is not a sagetv developer site");
         }
@@ -421,11 +430,15 @@ public class CatchupPlugin implements SageTVPlugin {
 
     if (pluginManager != null) {
       try {
-        for (Plugin plugin : pluginManager.getPlugins()) {
-          String name = plugin.getSource().getId();
+        for (String name : pluginManager.getPluginNames()) {
           String propName = name + ".maxprogrammes";
           if (property.equals(propName)) {
             return String.valueOf(props.getInt(propName, Integer.MAX_VALUE));
+          }
+
+          String propNameSkip = name + ".skip";
+          if (property.equals(propNameSkip)) {
+            return String.valueOf(!props.getBoolean(propNameSkip, Boolean.FALSE));
           }
         }
       } catch (Exception e) {
@@ -487,17 +500,21 @@ public class CatchupPlugin implements SageTVPlugin {
     }
 
     if (pluginManager != null) {
-      for (Plugin plugin : pluginManager.getPlugins()) {
-        String name = plugin.getSource().getId();
+      for (String name : pluginManager.getPluginNames()) {
         String propName = name + ".maxprogrammes";
         if (property.equals(propName)) {
-          setCatchupProperty(value, propName);
+          setCatchupProperty(propName, value);
+        }
+        String propNameSkip = name + ".skip";
+        if (property.equals(propNameSkip)) {
+
+          setCatchupProperty(propNameSkip, (value.equals("true") ? "false" : "true"));
         }
       }
     }
   }
 
-  private void setCatchupProperty(String value, String propName) {
+  private void setCatchupProperty(String propName, String value) {
     props.setProperty(propName, value);
     try {
       props.commit(propFileName, new CatchupPropertiesFileLayout());

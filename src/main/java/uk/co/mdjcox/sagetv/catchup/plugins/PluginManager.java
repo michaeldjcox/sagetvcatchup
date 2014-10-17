@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,6 +24,7 @@ public class PluginManager {
 
     private Logger logger;
     private LinkedHashMap<String, Plugin> plugins = new  LinkedHashMap<String, Plugin>();
+    private Set<String> pluginNames = new TreeSet<String>();
     @Inject
     private PluginFactory pluginFactory;
     private CatchupContextInterface context;
@@ -65,6 +68,7 @@ public class PluginManager {
 
         for (File pluginDir : pluginDirs) {
             String sourceId = pluginDir.getName();
+          pluginNames.add(sourceId);
           if (context.skipPlugin(sourceId)) {
             logger.info("Skipping plugin " + sourceId);
             continue;
@@ -79,4 +83,8 @@ public class PluginManager {
         logger.error("Failed to start the plugin manager", e);
       }
     }
+
+  public Set<String> getPluginNames() {
+    return pluginNames;
+  }
 }
