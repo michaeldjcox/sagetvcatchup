@@ -27,7 +27,7 @@ public class MessagePodcast extends AbstractPodcast {
     @Override
     public String buildPage() {
         RssBuilder builder = new RssBuilder();
-        final String url = getPodcastBaseUrl() + getUri();
+        final String url = getPodcastBaseUrl() + "/" + getUri();
         final String title = "ERROR";
         builder.startDocument(title, message, url);
         builder.addTextItem(title, message, url);

@@ -61,7 +61,7 @@ public class CatchupContext implements CatchupContextInterface {
     onlineVideoPropertiesDir = properties.getString("onlineVideoPropertiesDir");
     sageTvPluginsFile = new File(workingDir, "SageTVPluginsDev.xml");
     sageTVPluginsURL = properties.getString("sageTvPluginsURL", "http://mintpad/sagetvcatchup/download/SageTVPluginsDev.xml");
-    podcastBase = "http://localhost:" + port + "/";
+    podcastBase = "http://localhost:" + port;
   }
 
   public static boolean isRunningInSageTV() {

@@ -42,6 +42,8 @@ public class SageTvPublisher implements CatalogPublisher {
     private String qualifier;
     /** The SageTV STV directory */
     private String onlineVideoPropertiesDir;
+    /** The base URL */
+    private String podcastBaseUrl;
 
     /**
      * Creates a new instance which can be used to create new online video property files.
@@ -55,7 +57,7 @@ public class SageTvPublisher implements CatalogPublisher {
     {
         this.qualifier = context.getOnlineVideoPropertiesSuffix();
         this.onlineVideoPropertiesDir = context.getOnlineVideoPropertiesDir();
-
+        this.podcastBaseUrl = context.getPodcastBase();
         checkNotNull(qualifier);
         checkNotNull(onlineVideoPropertiesDir);
         this.logger = logger;
@@ -170,6 +172,14 @@ public class SageTvPublisher implements CatalogPublisher {
         String iconUrl = programme.getIconUrl();
         String url = programme.getPodcastUrl();
 
+        if (iconUrl != null && iconUrl.startsWith("/")) {
+          iconUrl = podcastBaseUrl + iconUrl;
+        }
+
+      if (url != null && url.startsWith("/")) {
+        url = podcastBaseUrl + url;
+      }
+
         id = htmlUtils.makeIdSafe(id);
         parentId = htmlUtils.makeIdSafe(parentId);
 
@@ -199,7 +209,7 @@ public class SageTvPublisher implements CatalogPublisher {
 
         if (isSearch) {
           links.setProperty(id + "/IsSearch", "true");
-          links.setProperty(id + "/URLSearchPrefix", "http://localhost:8081/search?text=");
+          links.setProperty(id + "/URLSearchPrefix", podcastBaseUrl + "/search?text=");
           links.setProperty(id + "/URLSearchPostfix", ";type=xml");
         }
     }
@@ -213,7 +223,15 @@ public class SageTvPublisher implements CatalogPublisher {
         String url = programme.getServiceUrl();
 //        Set<String> otherParentIds = programme.getOtherParentIds();
 
-        id = htmlUtils.makeIdSafe(id);
+      if (iconUrl != null && iconUrl.startsWith("/")) {
+        iconUrl = podcastBaseUrl + iconUrl;
+      }
+
+      if (url != null && url.startsWith("/")) {
+        url = podcastBaseUrl + url;
+      }
+
+      id = htmlUtils.makeIdSafe(id);
         parentId = htmlUtils.makeIdSafe(parentId);
 
         if ((iconUrl != null) && (!iconUrl.isEmpty())) {
@@ -262,7 +280,15 @@ public class SageTvPublisher implements CatalogPublisher {
         String url = programme.getPodcastUrl();
         Set<String> otherParentIds = programme.getOtherParentIds();
 
-        id = htmlUtils.makeIdSafe(id);
+      if (iconUrl != null && iconUrl.startsWith("/")) {
+        iconUrl = podcastBaseUrl + iconUrl;
+      }
+
+      if (url != null && url.startsWith("/")) {
+        url = podcastBaseUrl + url;
+      }
+
+      id = htmlUtils.makeIdSafe(id);
         parentId = htmlUtils.makeIdSafe(parentId);
 
         if ((iconUrl != null) && (!iconUrl.isEmpty())) {
@@ -314,7 +340,15 @@ public class SageTvPublisher implements CatalogPublisher {
         String url = episode.getPodcastUrl();
         Set<String> otherParentIds = new HashSet<String>();
 
-        id = htmlUtils.makeIdSafe(id);
+      if (iconUrl != null && iconUrl.startsWith("/")) {
+        iconUrl = podcastBaseUrl + iconUrl;
+      }
+
+      if (url != null && url.startsWith("/")) {
+        url = podcastBaseUrl + url;
+      }
+
+      id = htmlUtils.makeIdSafe(id);
         parentId = htmlUtils.makeIdSafe(parentId);
 
         if ((iconUrl != null) && (!iconUrl.isEmpty())) {
@@ -399,7 +433,11 @@ public class SageTvPublisher implements CatalogPublisher {
         String description = category.getLongName();
         String iconUrl = category.getIconUrl();
 
-        parentId = htmlUtils.makeIdSafe(parentId);
+      if (iconUrl != null && iconUrl.startsWith("/")) {
+        iconUrl = podcastBaseUrl + iconUrl;
+      }
+
+      parentId = htmlUtils.makeIdSafe(parentId);
         id = htmlUtils.makeIdSafe(id);
 
         links.setProperty("xFeedPodcastCustom/" + id, "xPodcast" + parentId + ";xURLNone");
@@ -423,7 +461,11 @@ public class SageTvPublisher implements CatalogPublisher {
         String description = category.getLongName();
         String iconUrl = category.getIconUrl();
 
-        parentId = htmlUtils.makeIdSafe(parentId);
+      if (iconUrl != null && iconUrl.startsWith("/")) {
+        iconUrl = podcastBaseUrl + iconUrl;
+      }
+
+      parentId = htmlUtils.makeIdSafe(parentId);
         id = htmlUtils.makeIdSafe(id);
 
         String result = "";

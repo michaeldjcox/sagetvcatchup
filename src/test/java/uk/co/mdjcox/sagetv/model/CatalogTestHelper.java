@@ -62,7 +62,7 @@ public class CatalogTestHelper {
         Episode ep1 = new Episode("sourceId", "episodeId1", "programmeTitle1", "seriesTitle1", "episodeTitle1",
                 "series1", "episode1", "description1", "episodeIconUrl1", "episodeServiceUrl1", "airDate1",
                 "airTime1", "origAirDate1", "origAirTime1", "channel1", genres1);
-
+      ep1.setPodcastUrl("podcastUrl1");
 
         Set<String> genres2 = new HashSet<String>();
         genres1.add("genre3");
@@ -71,6 +71,7 @@ public class CatalogTestHelper {
         Episode ep2 = new Episode("sourceId", "episodeId2", "programmeTitle2", "seriesTitle2", "episodeTitle2",
                 "series2", "episode2", "description2", "episodeIconUrl2", "episodeServiceUrl2", "airDate2",
                 "airTime2", "origAirDate2", "origAirTime2", "channel2", genres2);
+      ep2.setPodcastUrl("podcastUrl1");
 
         programme.addEpisode(ep1);
         programme.addEpisode(ep2);

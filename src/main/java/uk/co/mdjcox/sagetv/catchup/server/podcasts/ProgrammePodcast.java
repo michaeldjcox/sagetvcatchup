@@ -30,8 +30,15 @@ public class ProgrammePodcast extends AbstractPodcast {
 
         final String shortName = htmlUtils.makeContentSafe(service.getShortName());
         final String longName = htmlUtils.makeContentSafe(service.getLongName());
-        final String url = service.getServiceUrl();
-        final String iconUrl = service.getIconUrl();
+        String url = service.getServiceUrl();
+        String iconUrl = service.getIconUrl();
+      if (iconUrl != null && iconUrl.startsWith("/")) {
+        iconUrl = getPodcastBaseUrl() + iconUrl;
+      }
+
+      if (url != null && url.startsWith("/")) {
+        url = getPodcastBaseUrl() + url;
+      }
 
         RssBuilder builder = new RssBuilder();
         builder.startDocument(shortName, longName, url);
@@ -42,8 +49,11 @@ public class ProgrammePodcast extends AbstractPodcast {
             Episode episode = catalog.getEpisode(episodeId);
             final String title = htmlUtils.makeContentSafe(episode.getPodcastTitle());
             final String desc = htmlUtils.makeContentSafe(episode.getDescription());
-            final String episodeIconUrl = episode.getIconUrl();
-            final String controlUrl=getPodcastBaseUrl() +  "control?id=" + episode.getId() + ";type=xml";
+            String episodeIconUrl = episode.getIconUrl();
+            if (episodeIconUrl != null && episodeIconUrl.startsWith("/")) {
+              episodeIconUrl = getPodcastBaseUrl() + episodeIconUrl;
+            }
+            final String controlUrl=getPodcastBaseUrl() +  "/control?id=" + episode.getId() + ";type=xml";
             builder.addCategoryItem(title, desc, controlUrl, episodeIconUrl);
         }
         builder.stopDocument();

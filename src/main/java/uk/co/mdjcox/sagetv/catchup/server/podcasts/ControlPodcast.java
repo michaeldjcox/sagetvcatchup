@@ -35,11 +35,16 @@ public class ControlPodcast extends AbstractPodcast {
     public String buildPage() {
         final String title = htmlUtils.makeContentSafe(episode.getPodcastTitle());
         final String desc = htmlUtils.makeContentSafe(episode.getDescription());
-        final String url = episode.getServiceUrl();
-        final String stopUrl = getPodcastBaseUrl() + "stop?id=" + episode.getId() + ";type=xml";
-        final String watchUrl = getPodcastBaseUrl() + "watch?id=" + episode.getId() + ";type=mpeg4";
-        final String watchAndKeepUrl = getPodcastBaseUrl() + "watchandkeep?id=" + episode.getId() + ";type=mpeg4";
-        final String recordUrl = getPodcastBaseUrl() + "record?id=" + episode.getId() + ";type=xml";
+        String url = episode.getServiceUrl();
+
+        if (url != null && url.startsWith("/")) {
+          url = getPodcastBaseUrl() + url;
+        }
+
+        final String stopUrl = getPodcastBaseUrl() + "/stop?id=" + episode.getId() + ";type=xml";
+        final String watchUrl = getPodcastBaseUrl() + "/watch?id=" + episode.getId() + ";type=mpeg4";
+        final String watchAndKeepUrl = getPodcastBaseUrl() + "/watchandkeep?id=" + episode.getId() + ";type=mpeg4";
+        final String recordUrl = getPodcastBaseUrl() + "/record?id=" + episode.getId() + ";type=xml";
 
         boolean isRecording = false;
 

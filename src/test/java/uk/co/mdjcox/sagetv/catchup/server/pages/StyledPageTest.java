@@ -45,7 +45,6 @@ public class StyledPageTest {
         testTransformation(title, webpage);
     }
 
-
     @Test
     public void testProgrammesTransformation() throws Exception {
         final String title = "Programmes";
@@ -225,14 +224,14 @@ public class StyledPageTest {
         categoriesBuilder.startBody();
         categoriesBuilder.addHeading1("Categories");
         categoriesBuilder.startTable();
-        categoriesBuilder.addTableHeader("SourceId", "ParentId", "Type", "Id", "ShortName", "LongName", "ServiceUrl", "IconUrl");
+        categoriesBuilder.addTableHeader("SourceId", "ParentId", "Type", "Id", "ShortName", "LongName", "ServiceUrl", "IconUrl", "PodcastUrl");
 
         episodesBuilder.startDocument();
         episodesBuilder.addPageHeader("Episodes");
         episodesBuilder.startBody();
         episodesBuilder.addHeading1("Episodes");
         episodesBuilder.startTable();
-        episodesBuilder.addTableHeader("SourceId", "Id", "Channel", "ProgrammeTitle", "Series", "SeriesTitle", "Episode", "EpisodeTitle", "Description", "PodcastTitle", "AirDate", "AirTime", "OrigAirDate", "OrigAirTime", "ServiceUrl", "IconUrl" );
+        episodesBuilder.addTableHeader("SourceId", "Id", "Channel", "ProgrammeTitle", "Series", "SeriesTitle", "Episode", "EpisodeTitle", "Description", "PodcastTitle", "AirDate", "AirTime", "OrigAirDate", "OrigAirTime", "ServiceUrl", "IconUrl", "PodcastUrl" );
 
 
         for (Category cat : catalog.getCategories()) {
@@ -257,12 +256,14 @@ public class StyledPageTest {
                 linkBuilder1.addLink(cat.getServiceUrl(), cat.getServiceUrl());
                 HtmlBuilder linkBuilder2 = new HtmlBuilder();
                 linkBuilder2.addLink(cat.getIconUrl(), cat.getIconUrl());
+                HtmlBuilder linkBuilder3 = new HtmlBuilder();
+                linkBuilder3.addLink(cat.getPodcastUrl(), cat.getPodcastUrl());
 
                 HtmlBuilder linkBuilder4 = new HtmlBuilder();
                 String link = "/category?id=" + cat.getId() + ";type=html";
                 linkBuilder4.addLink(cat.getId(), link);
 
-                categoriesBuilder.addTableRow(cat.getSourceId(), cat.getParentId(), cat.getType(), linkBuilder4.toString(), cat.getShortName(), cat.getLongName(), linkBuilder1.toString(), linkBuilder2.toString());
+                categoriesBuilder.addTableRow(cat.getSourceId(), cat.getParentId(), cat.getType(), linkBuilder4.toString(), cat.getShortName(), cat.getLongName(), linkBuilder1.toString(), linkBuilder2.toString(), linkBuilder3.toString());
 
             }
 
@@ -275,12 +276,14 @@ public class StyledPageTest {
                     linkBuilder1.addLink(ep.getServiceUrl(), ep.getServiceUrl());
                     HtmlBuilder linkBuilder2 = new HtmlBuilder();
                     linkBuilder2.addLink(ep.getIconUrl(), ep.getIconUrl());
+                  HtmlBuilder linkBuilder3 = new HtmlBuilder();
+                  linkBuilder3.addLink(ep.getPodcastUrl(), ep.getPodcastUrl());
 
                     HtmlBuilder linkBuilder4 = new HtmlBuilder();
                     String link = "/episode?id=" + ep.getId() + ";type=html";
                     linkBuilder4.addLink(ep.getId(), link);
 
-                    episodesBuilder.addTableRow(ep.getSourceId(), linkBuilder4.toString(), ep.getChannel(), ep.getProgrammeTitle(), ep.getSeries(), ep.getSeriesTitle(), ep.getEpisode(), ep.getEpisodeTitle(), ep.getDescription(), ep.getPodcastTitle(), ep.getAirDate(), ep.getAirTime(), ep.getOrigAirDate(), ep.getOrigAirTime(), linkBuilder1.toString(), linkBuilder2.toString() );
+                    episodesBuilder.addTableRow(ep.getSourceId(), linkBuilder4.toString(), ep.getChannel(), ep.getProgrammeTitle(), ep.getSeries(), ep.getSeriesTitle(), ep.getEpisode(), ep.getEpisodeTitle(), ep.getDescription(), ep.getPodcastTitle(), ep.getAirDate(), ep.getAirTime(), ep.getOrigAirDate(), ep.getOrigAirTime(), linkBuilder1.toString(), linkBuilder2.toString(), linkBuilder3.toString() );
                 }
             }
         }
@@ -352,6 +355,9 @@ public class StyledPageTest {
         HtmlBuilder linkBuilder2 = new HtmlBuilder();
         linkBuilder2.addLink(cat.getServiceUrl(), cat.getServiceUrl());
         data.put("ServiceUrl", linkBuilder2.toString());
+      HtmlBuilder linkBuilder3 = new HtmlBuilder();
+      linkBuilder3.addLink(cat.getPodcastUrl(), cat.getPodcastUrl());
+      data.put("PodcastUrl", linkBuilder3.toString());
 
         HtmlBuilder metaListBuilder = new HtmlBuilder();
         metaListBuilder.startList();

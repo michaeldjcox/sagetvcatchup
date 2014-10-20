@@ -31,7 +31,7 @@ public class SearchPodcast extends AbstractPodcast {
 
   @Override
   public String buildPage() {
-    String errorsUrl = getPodcastBaseUrl() + getUri();
+    String errorsUrl = getPodcastBaseUrl() + "/" + getUri();
     String title = "SEARCH";
     String desc = "Search for '" + searchString + "'";
 
@@ -47,7 +47,12 @@ public class SearchPodcast extends AbstractPodcast {
           continue;
         }
 
-        builder.addCategoryItem(prog.getShortName(), prog.getLongName(), prog.getPodcastUrl());
+        String url = prog.getPodcastUrl();
+        if ((url != null) && url.startsWith("/")) {
+          url = getPodcastBaseUrl() + url;
+        }
+
+        builder.addCategoryItem(prog.getShortName(), prog.getLongName(), url);
 //        if (prog.hasEpisodes()) {
 //          for (String episodeId : ((Programme)cat).getEpisodes()) {
 //            Episode episode = catalog.getEpisode(episodeId);

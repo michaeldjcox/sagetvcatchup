@@ -22,7 +22,6 @@ public class Cataloger {
 
     private Logger logger;
     private PluginManager pluginManager;
-    private String podcastUrlBase;
     private String progressString = "Waiting";
     private AtomicBoolean stop = new AtomicBoolean(false);
     private AtomicBoolean catalogRunning = new AtomicBoolean(false);
@@ -38,7 +37,6 @@ public class Cataloger {
     private Cataloger(Logger logger, CatchupContextInterface context, PluginManager pluginManager) {
         this.logger = logger;
         this.pluginManager = pluginManager;
-        this.podcastUrlBase = context.getPodcastBase();
         this.refreshRate = context.getRefreshRate();
         this.context = context;
     }
@@ -140,16 +138,16 @@ public class Cataloger {
             Map<String, Category> newCategories = new LinkedHashMap<String, Category>();
             Map<String, Episode> newEpisodes = new LinkedHashMap<String, Episode>();
 
-            Root root = new Root("Catchup", "Catchup TV", "Catchup TV", podcastUrlBase, podcastUrlBase + "logo.png");
+            Root root = new Root("Catchup", "Catchup TV", "Catchup TV", "/", "/logo.png");
             newCategories.put(root.getId(), root);
 
             Source statusSource = new Source(root.getId(), "zzsagetvcatchupStatus", "Status", "Status", "", "");
-            statusSource.setPodcastUrl(podcastUrlBase + "category?id=status;type=xml");
+            statusSource.setPodcastUrl("/category?id=status;type=xml");
             newCategories.put(statusSource.getId(), statusSource);
             root.addSubCategory(statusSource);
 
           Source searchSource = new Source(root.getId(), "zzsagetvcatchupSearch", "Search", "Search", "", "");
-          searchSource.setPodcastUrl(podcastUrlBase + "search?type=xml");
+          searchSource.setPodcastUrl("/search?type=xml");
           newCategories.put(searchSource.getId(), searchSource);
           root.addSubCategory(searchSource);
 
@@ -180,7 +178,7 @@ public class Cataloger {
                 root.addSubCategory(sourceCat);
                 sourceCat.setParentId(root.getId());
 
-                sourceCat.setPodcastUrl(podcastUrlBase + "category?id=" + sourceCat.getId() + ";type=xml");
+                sourceCat.setPodcastUrl("/category?id=" + sourceCat.getId() + ";type=xml");
 
 
                 logger.info("Getting programmes found on: " + sourceCat);
@@ -209,7 +207,7 @@ public class Cataloger {
                         }
                     }
 
-                    programme.setPodcastUrl(podcastUrlBase + "programme?id=" + programmeId + ";type=xml");
+                    programme.setPodcastUrl("/programme?id=" + programmeId + ";type=xml");
 
                     Collection<Episode> episodes = plugin.getEpisodes(sourceCat, programme);
 
@@ -218,7 +216,7 @@ public class Cataloger {
 
                         plugin.getEpisode(sourceCat, programme, episode);
 
-                        episode.setPodcastUrl(podcastUrlBase + "control?id=" + episode.getId() + ";type=xml");
+                        episode.setPodcastUrl("/control?id=" + episode.getId() + ";type=xml");
 
                         newEpisodes.put(episode.getId(), episode);
 
@@ -314,7 +312,7 @@ public class Cataloger {
             airdateCat =
                     new SubCategory(sourceId, airdateId, "Air Date", "Air Date", sourceCat.getServiceUrl(),
                             sourceCat.getIconUrl(), sourceId);
-            airdateCat.setPodcastUrl(podcastUrlBase + "category?id=" + airdateId + ";type=xml");
+            airdateCat.setPodcastUrl("/category?id=" + airdateId + ";type=xml");
             newSubCategories.put(airdateId, airdateCat);
             sourceCat.addSubCategory(airdateCat);
         }
@@ -326,7 +324,7 @@ public class Cataloger {
             airDateInstanceCat =
                     new Programme(sourceId, airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(),
                             sourceCat.getIconUrl(), airdateCat.getId());
-            airDateInstanceCat.setPodcastUrl(podcastUrlBase + "category?id=" + airDateInstanceId + ";type=xml");
+            airDateInstanceCat.setPodcastUrl("/category?id=" + airDateInstanceId + ";type=xml");
             newSubCategories.put(airDateInstanceId, airDateInstanceCat);
             airdateCat.addSubCategory(airDateInstanceCat);
         }
@@ -346,7 +344,7 @@ public class Cataloger {
                 channelCat =
                         new SubCategory(sourceId, channelId, "Channel", "Channel", sourceCat.getServiceUrl(),
                                 sourceCat.getIconUrl(), sourceId);
-                channelCat.setPodcastUrl(podcastUrlBase + "/category?id=" + channelCat.getId() + ";type=xml");
+                channelCat.setPodcastUrl("/category?id=" + channelCat.getId() + ";type=xml");
                 newSubCategories.put(channelId, channelCat);
                 sourceCat.addSubCategory(channelCat);
             }
@@ -356,7 +354,7 @@ public class Cataloger {
                 channelInstanceCat =
                         new SubCategory(sourceId, channelInstanceId, channelName, channelName, sourceCat.getServiceUrl(),
                                 sourceCat.getIconUrl(), channelCat.getId());
-                channelInstanceCat.setPodcastUrl(podcastUrlBase + "/category?id=" + channelInstanceCat.getId() + ";type=xml");
+                channelInstanceCat.setPodcastUrl("/category?id=" + channelInstanceCat.getId() + ";type=xml");
                 newSubCategories.put(channelInstanceId, channelInstanceCat);
                 channelCat.addSubCategory(channelInstanceCat);
             }
@@ -378,7 +376,7 @@ public class Cataloger {
                     genreCat =
                             new SubCategory(sourceId, genreId, "Genre", "Genre", sourceCat.getServiceUrl(),
                                     sourceCat.getIconUrl(), sourceId);
-                    genreCat.setPodcastUrl(podcastUrlBase + "/category?id=" + genreCat.getId() + ";type=xml");
+                    genreCat.setPodcastUrl("/category?id=" + genreCat.getId() + ";type=xml");
 
                     newSubCategories.put(genreId, genreCat);
                     sourceCat.addSubCategory(genreCat);
@@ -390,7 +388,7 @@ public class Cataloger {
                             new SubCategory(sourceId, genreInstanceId, genreName, genreName, sourceCat.getServiceUrl(),
                                     sourceCat.getIconUrl(), genreCat.getId());
                     newSubCategories.put(genreInstanceId, genreInstanceCat);
-                    genreInstanceCat.setPodcastUrl(podcastUrlBase + "/category?id=" + genreInstanceCat.getId() + ";type=xml");
+                    genreInstanceCat.setPodcastUrl("/category?id=" + genreInstanceCat.getId() + ";type=xml");
                     genreCat.addSubCategory(genreInstanceCat);
                 }
                 programmeCat.addOtherParentId(genreInstanceId);
@@ -421,7 +419,7 @@ public class Cataloger {
             atozCat =
                     new SubCategory(sourceId, atozId, "A to Z", "A to Z", sourceCat.getServiceUrl(),
                             sourceCat.getIconUrl(), sourceId);
-            atozCat.setPodcastUrl(podcastUrlBase + "/category?id=" + atozCat.getId() + ";type=xml");
+            atozCat.setPodcastUrl("/category?id=" + atozCat.getId() + ";type=xml");
             newSubCategories.put(atozId, atozCat);
             sourceCat.addSubCategory(atozCat);
         }
@@ -431,7 +429,7 @@ public class Cataloger {
             azCat =
                     new SubCategory(sourceId, azId, azName, azName, sourceCat.getServiceUrl(), sourceCat.getIconUrl(),
                             atozCat.getId());
-            azCat.setPodcastUrl(podcastUrlBase + "/category?id=" + azCat.getId() + ";type=xml");
+            azCat.setPodcastUrl("/category?id=" + azCat.getId() + ";type=xml");
             newSubCategories.put(azId, azCat);
             atozCat.addSubCategory(azCat);
         }

@@ -29,7 +29,7 @@ public class StopAllRecordingPodcast extends AbstractPodcast {
     public String buildPage() {
         String message = recorder.requestStopAll();
         RssBuilder builder = new RssBuilder();
-        final String url = getPodcastBaseUrl() + getUri();
+        final String url = getPodcastBaseUrl() + "/" + getUri();
         final String title = "RECORDING";
         builder.startDocument(title, message, url);
         builder.addTextItem(title, message, url);

@@ -113,6 +113,11 @@
                         <td><a href="{serviceUrl}"><xsl:value-of select="serviceUrl"/></a></td>
                     </tr>
                     <tr>
+                        <td>PodcastUrl</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><a href="{podcastUrl}"><xsl:value-of select="podcastUrl"/></a></td>
+                    </tr>
+                    <tr>
                         <td>MetaUrls</td>
                         <xsl:text>&#10;</xsl:text>
                         <td><ul>

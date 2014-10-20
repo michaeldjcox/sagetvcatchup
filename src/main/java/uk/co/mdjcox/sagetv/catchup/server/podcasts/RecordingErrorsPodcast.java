@@ -21,7 +21,7 @@ public class RecordingErrorsPodcast extends AbstractPodcast {
     }
 
     public String buildPage() {
-        String errorsUrl = getPodcastBaseUrl() + getUri();
+        String errorsUrl = getPodcastBaseUrl() + "/" + getUri();
         String title = "ERRORS";
         String desc = "Recording errors";
 

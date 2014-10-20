@@ -42,6 +42,8 @@
                         <th>ServiceUrl</th>
                         <xsl:text>&#10;</xsl:text>
                         <th>IconUrl</th>
+                        <xsl:text>&#10;</xsl:text>
+                        <th>PodcastUrl</th>
                     </tr>
                     <xsl:for-each
                             select="uk.co.mdjcox.sagetv.model.Catalog/episodes/entry/uk.co.mdjcox.sagetv.model.Episode">
@@ -113,6 +115,12 @@
                             <td>
                                 <a href="{iconUrl}">
                                     <xsl:value-of select="iconUrl"/>
+                                </a>
+                            </td>
+                            <xsl:text>&#10;</xsl:text>
+                            <td>
+                                <a href="{podcastUrl}">
+                                    <xsl:value-of select="podcastUrl"/>
                                 </a>
                             </td>
                         </tr>

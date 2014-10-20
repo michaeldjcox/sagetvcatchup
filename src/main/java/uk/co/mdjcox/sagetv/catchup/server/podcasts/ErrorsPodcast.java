@@ -44,7 +44,7 @@ public class ErrorsPodcast extends AbstractPodcast {
 
         }
 
-        String errorsUrl = getPodcastBaseUrl() + getUri();
+        String errorsUrl = getPodcastBaseUrl() + "/"+ getUri();
         String title = "ERRORS";
         String desc = "Cataloging errors";
 

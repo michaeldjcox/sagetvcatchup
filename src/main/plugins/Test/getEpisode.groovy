@@ -1,12 +1,12 @@
 package Test
 
-String link = "http://localhost:" + GET_INT_PROPERTY("podcasterPort") + "/episode?id=TestEpisode;type=html"
+String link = "/episode?id=TestEpisode;type=html";
 episode.addMetaUrl(link);
 episode.setEpisodeTitle("Test Episode");
 episode.setSeriesTitle("Test Series");
 episode.setDescription("Test Episode Description");
-episode.setIconUrl("http://localhost:" + GET_INT_PROPERTY("podcasterPort") + "/logo.png");
-episode.setServiceUrl("http://localhost:" + GET_INT_PROPERTY("podcasterPort") + "/watch?id=TestEpisode;type=mpeg4");
+episode.setIconUrl("/logo.png");
+episode.setServiceUrl("/watch?id=TestEpisode;type=mpeg4");
 episode.setChannel("Test");
 episode.addGenre("Factual");
 episode.addGenre("News")

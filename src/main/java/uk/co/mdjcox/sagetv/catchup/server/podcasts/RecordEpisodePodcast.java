@@ -33,7 +33,7 @@ public class RecordEpisodePodcast extends AbstractPodcast {
         recorder.record(episode);
         String message = "Recording " + episode.getPodcastTitle();
         RssBuilder builder = new RssBuilder();
-        final String url = getPodcastBaseUrl() + getUri();
+        final String url = getPodcastBaseUrl() + "/"+ getUri();
         final String title = "RECORDING";
         builder.startDocument(title, message, url);
         builder.addTextItem(title, message, url);

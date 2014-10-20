@@ -105,7 +105,7 @@ public class CatchupTestModule extends AbstractModule {
       catalogFileName = tmpDir + "catalog_test.xml";
       refreshRate = 2;
       port = 8083;
-      podcastBase = "http://localhost:" + getPort() + "/";
+      podcastBase = "http://localhost:" + getPort();
       pluginDir = homeDir + "src/main/plugins";
       cssDir = homeDir + "src/main/css";
       configDir = homeDir + "src/main/config";

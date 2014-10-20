@@ -33,7 +33,7 @@ public class RecordingsPodcast extends AbstractPodcast {
     }
 
     public String buildPage() {
-        String recordingsUrl = getPodcastBaseUrl() + getUri();
+        String recordingsUrl = getPodcastBaseUrl() + "/" + getUri();
         String title = "RECORDING PROGRESS";
         String desc = "Recordings in progress";
 
@@ -45,8 +45,11 @@ public class RecordingsPodcast extends AbstractPodcast {
             final Episode episode = recording.getEpisode();
             final String episodeTitle = htmlUtils.makeContentSafe(episode.getPodcastTitle());
             final String episodeDesc = htmlUtils.makeContentSafe(episode.getDescription());
-            final String episodeIconUrl = episode.getIconUrl();
-            final String controlUrl = getPodcastBaseUrl() + "control?id=" + episode.getId() + ";type=xml";
+            String episodeIconUrl = episode.getIconUrl();
+            if (episodeIconUrl != null && episodeIconUrl.startsWith("/")) {
+              episodeIconUrl = getPodcastBaseUrl() + episodeIconUrl;
+            }
+            final String controlUrl = getPodcastBaseUrl() + "/control?id=" + episode.getId() + ";type=xml";
 
             builder.addCategoryItem(episodeTitle, episodeDesc, controlUrl, episodeIconUrl);
         }

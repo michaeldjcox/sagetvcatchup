@@ -219,7 +219,7 @@ public class CatchupDevModule extends AbstractModule {
       catalogFileName = tmpDir + "catalog_dev.xml";
       refreshRate = 2;
       port = properties.getInt("podcasterPort", 8082);
-      podcastBase = "http://localhost:" + getPort() + "/";
+      podcastBase = "http://localhost:" + getPort();
       pluginDir = homeDir + "src/main/plugins";
       cssDir = homeDir + "src/main/css";
       xsltDir = homeDir + "src/main/xslt";
