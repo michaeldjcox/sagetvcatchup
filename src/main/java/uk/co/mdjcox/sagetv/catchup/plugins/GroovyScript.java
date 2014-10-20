@@ -1,6 +1,7 @@
 package uk.co.mdjcox.sagetv.catchup.plugins;
 
-import org.slf4j.Logger;
+
+import uk.co.mdjcox.logger.Logger;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.model.ErrorRecorder;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;

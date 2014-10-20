@@ -3,19 +3,17 @@ package uk.co.mdjcox.sagetv.catchup;
 import com.google.common.io.Files;
 import com.google.inject.*;
 import com.google.inject.name.Names;
-import org.slf4j.Logger;
+
 import sage.SageTVPlugin;
 import sage.SageTVPluginRegistry;
 import sagex.api.SystemMessageAPI;
 import sagex.plugin.SageEvents;
+import uk.co.mdjcox.logger.Logger;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.catchup.server.Server;
 import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
-import uk.co.mdjcox.utils.DownloadUtilsInterface;
-import uk.co.mdjcox.utils.PersistentRollingFileAppender;
-import uk.co.mdjcox.utils.PropertiesInterface;
-import uk.co.mdjcox.utils.SageUtilsInterface;
+import uk.co.mdjcox.utils.*;
 
 import java.io.File;
 import java.net.URL;
@@ -39,6 +37,11 @@ import java.util.*;
 // TODO - BUG - original air date (I have) but last aired date (I don't have)
 // TODO - BUG - No channel is set on TV recordings - you can create a detailed airing and link to media file
 // TODO - default for windows XP
+// TODO - conflicts in log framework
+// TODO - conflicts in servlet API - should I separate the server from sagetv?
+// TODO - ensure directories are present for logging?
+// TODO - port and rec dir are not in config
+// TODO - The port is in the catalog
 
 // Refactor
 // TODO - Podcast stylesheets?
@@ -75,7 +78,11 @@ public class CatchupPlugin implements SageTVPlugin {
 
   private static final String STOP_RECORDING = "stopRecording";
 
-  public static Logger logger;
+  private static final String RECORDING_DIR = "recordingDir";
+
+  private static final String PORT = "podcasterPort";
+
+  public Logger logger;
   public static Injector injector;
 
   private LinkedHashMap<String, Integer> types = new LinkedHashMap<String, Integer>();
@@ -116,10 +123,9 @@ public class CatchupPlugin implements SageTVPlugin {
       PersistentRollingFileAppender.stopped = false;
 
       if (CatchupContext.isRunningInSageTV()) {
-        System.err.println("Running in SageTV");
+        SageUtils.debug("Starting SageTV Catchup plugin");
         module = new CatchupModule();
       } else {
-        System.err.println("Running in DEV");
         module = new CatchupDevModule();
       }
 
@@ -167,7 +173,10 @@ public class CatchupPlugin implements SageTVPlugin {
       initConfig();
     } catch (Throwable e) {
       try {
-        SystemMessageAPI.PostSystemMessage(1204, 3, "Failed to start catchup plugin " + e.getMessage() + "\n" + e.getStackTrace().toString(), new Properties());
+        if (CatchupContext.isRunningInSageTV()) {
+          SageUtils.debug("Failed to start catchup plugin");
+          SageUtils.debug(Arrays.toString(e.getStackTrace()));
+        }
       } catch (Exception e1) {
         e1.printStackTrace();
       }
@@ -229,7 +238,10 @@ public class CatchupPlugin implements SageTVPlugin {
        logger.info("#######################");
        logger.info("Stopped catchup plugin");
        logger.info("#######################");
-    }
+
+       logger.flush();
+
+     }
   }
 
   private void unregisterForEvents() {
@@ -265,6 +277,8 @@ public class CatchupPlugin implements SageTVPlugin {
     logger.info("###########################");
 
     PersistentRollingFileAppender.stopped = true;
+
+    logger.flush();
 
     // SageTV should take care of the root
     deleteFileOrDir(recordings, false);
@@ -313,6 +327,8 @@ public class CatchupPlugin implements SageTVPlugin {
       }
     } catch (Throwable e) {
       logger.error("Failed to destroy plugin", e);
+    } finally {
+      logger.flush();
     }
   }
 
@@ -348,6 +364,14 @@ public class CatchupPlugin implements SageTVPlugin {
     types.put(STOP_RECORDING, CONFIG_BUTTON);
     labels.put(STOP_RECORDING, "Stop recording");
     help.put(STOP_RECORDING, "Force all recording to stop immediately");
+
+      types.put(RECORDING_DIR, CONFIG_TEXT);
+      labels.put(RECORDING_DIR, "Temporary recording dir");
+      help.put(RECORDING_DIR, "Change temporary recording dir");
+
+      types.put(PORT, CONFIG_INTEGER);
+      labels.put(PORT, "Server port");
+      help.put(PORT, "Change the server port if it conflicts with one in use");
 
       for (String name : pluginManager.getPluginNames()) {
         String propName = name + ".skip";
@@ -418,6 +442,14 @@ public class CatchupPlugin implements SageTVPlugin {
 
     if (property.equals(STOP_RECORDING)) {
       return stopRecordingValue;
+    }
+
+    if (property.equals(RECORDING_DIR)) {
+      return props.getString(RECORDING_DIR);
+    }
+
+    if (property.equals(PORT)) {
+      return props.getString(PORT);
     }
 
     if (property.equals(RECORDINGS_IN_PROGRESS)) {
@@ -497,6 +529,27 @@ public class CatchupPlugin implements SageTVPlugin {
 
     if (property.equals(STOP_RECORDING)) {
       forceStopRecording();
+    }
+
+    if (property.equals(RECORDING_DIR)) {
+      setCatchupProperty(RECORDING_DIR, value);
+      context.setRecordingDir(value);
+    }
+
+    if (property.equals(PORT)) {
+      setCatchupProperty(PORT, value);
+      final Integer newPort = Integer.valueOf(value);
+      context.setPort(newPort);
+      server.shutdown();
+
+      server.setPort(newPort);
+
+      try {
+        server.start();
+      } catch (Exception e) {
+        logger.error("Failed to restart server");
+      }
+
     }
 
     if (pluginManager != null) {

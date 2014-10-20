@@ -42,7 +42,8 @@ public class SearchPodcast extends AbstractPodcast {
       if (cat.isProgrammeCategory() && cat.getParentId().isEmpty()) {
         Programme prog  = (Programme)cat;
 
-        if (!prog.getLongName().contains(searchString) && !prog.getShortName().contains(searchString)) {
+        if (!prog.getLongName().toUpperCase().contains(searchString.toUpperCase()) &&
+                !prog.getShortName().toUpperCase().contains(searchString.toUpperCase())) {
           continue;
         }
 

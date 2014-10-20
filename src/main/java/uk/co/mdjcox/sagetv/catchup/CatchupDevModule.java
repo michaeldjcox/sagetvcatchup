@@ -5,8 +5,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Named;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import uk.co.mdjcox.logger.Logger;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.ScriptFactory;
 import uk.co.mdjcox.sagetv.model.Recording;
@@ -43,7 +42,7 @@ public class CatchupDevModule extends AbstractModule {
     public Logger providesLogger() throws Exception {
       if (logger == null) {
         System.setProperty("logback.configurationFile", workingDir + "src/main/config/logback-test.xml");
-        logger = LoggerFactory.getLogger(CatchupPlugin.class);
+        logger = new Logger(CatchupPlugin.class);
       }
       return logger;
     }
@@ -327,6 +326,14 @@ public class CatchupDevModule extends AbstractModule {
     @Override
     public String getSageTVPluginsURL() {
       return sageTVPluginsURL;
+    }
+
+    public void setRecordingDir(String recordingDir) {
+      this.recordingDir = recordingDir;
+    }
+
+    public void setPort(int port) {
+      this.port = port;
     }
 
     @Override

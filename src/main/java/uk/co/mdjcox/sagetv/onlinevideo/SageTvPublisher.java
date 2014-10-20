@@ -9,7 +9,8 @@ package uk.co.mdjcox.sagetv.onlinevideo;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.slf4j.Logger;
+
+import uk.co.mdjcox.logger.Logger;
 import uk.co.mdjcox.sagetv.catchup.CatalogPublisher;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.model.*;
@@ -147,7 +148,7 @@ public class SageTvPublisher implements CatalogPublisher {
                     addSource((Root)category, links, labels);
                 } else if (category.isSource()) {
                     logger.info("Online adding source " + category.getId());
-                  boolean isSearch = category.getId().equals("search");
+                  boolean isSearch = category.getId().equals("zzsagetvcatchupSearch");
                     addDynamicSource((Source)category, links, labels, isSearch);
                 }
             }

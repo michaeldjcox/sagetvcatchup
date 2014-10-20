@@ -2,7 +2,8 @@ package uk.co.mdjcox.sagetv.catchup.plugins;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.slf4j.Logger;
+
+import uk.co.mdjcox.logger.Logger;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 
 import java.io.File;
@@ -69,10 +70,6 @@ public class PluginManager {
         for (File pluginDir : pluginDirs) {
             String sourceId = pluginDir.getName();
           pluginNames.add(sourceId);
-          if (context.skipPlugin(sourceId)) {
-            logger.info("Skipping plugin " + sourceId);
-            continue;
-          }
             Plugin plugin = pluginFactory.createPlugin(sourceId, pluginDir.getAbsolutePath());
             plugin.init();
             plugins.put(sourceId, plugin);

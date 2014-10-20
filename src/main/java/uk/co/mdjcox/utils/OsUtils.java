@@ -9,7 +9,9 @@
 package uk.co.mdjcox.utils;
 
 
-import org.slf4j.Logger;
+
+
+import uk.co.mdjcox.logger.Logger;
 
 import java.io.*;
 import java.util.*;

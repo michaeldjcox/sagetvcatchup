@@ -1,8 +1,9 @@
 package uk.co.mdjcox.utils;
 
 import com.google.common.base.Preconditions;
-import org.slf4j.Logger;
+
 import sagex.api.*;
+import uk.co.mdjcox.logger.Logger;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
 
@@ -254,4 +255,7 @@ public class SageUtils implements SageUtilsInterface {
         return airing;
     }
 
+  public static void debug(String message) {
+    Global.DebugLog(message);
+  }
 }

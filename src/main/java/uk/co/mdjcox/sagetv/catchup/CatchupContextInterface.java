@@ -48,4 +48,8 @@ public interface CatchupContextInterface {
   String getSageTVPluginsURL();
 
   String toString();
+
+  void setPort(int port);
+
+  void setRecordingDir(String recordDir);
 }

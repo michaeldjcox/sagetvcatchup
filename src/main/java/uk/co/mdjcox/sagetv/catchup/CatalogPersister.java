@@ -3,7 +3,8 @@ package uk.co.mdjcox.sagetv.catchup;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.thoughtworks.xstream.XStream;
-import org.slf4j.Logger;
+
+import uk.co.mdjcox.logger.Logger;
 import uk.co.mdjcox.sagetv.model.Catalog;
 
 import java.io.*;

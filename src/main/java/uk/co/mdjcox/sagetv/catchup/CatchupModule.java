@@ -5,8 +5,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Named;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import uk.co.mdjcox.logger.Logger;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.ScriptFactory;
 import uk.co.mdjcox.utils.*;
@@ -110,7 +109,7 @@ public class CatchupModule extends AbstractModule {
         if (logger == null) {
           String base =  System.getProperty("user.dir") + File.separator + "sagetvcatchup" + File.separator;
           System.setProperty("logback.configurationFile", base + "config" + File.separator + "logback.xml");
-          logger = LoggerFactory.getLogger(CatchupPlugin.class);
+          logger = new Logger(CatchupPlugin.class);
         }
         return logger;
     }

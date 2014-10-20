@@ -7,7 +7,7 @@ import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.handler.AbstractHandler;
-import org.slf4j.Logger;
+import uk.co.mdjcox.logger.Logger;
 import uk.co.mdjcox.sagetv.catchup.CatalogPublisher;
 import uk.co.mdjcox.sagetv.catchup.Cataloger;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
@@ -45,7 +45,8 @@ public class Server implements CatalogPublisher {
     private final String cssDir;
     private final String xsltDir;
     private final String logDir;
-    private Logger logger;
+  private final SocketConnector connector;
+  private Logger logger;
     private org.mortbay.jetty.Server server;
     private int port;
     private Recorder recorder;
@@ -69,7 +70,7 @@ public class Server implements CatalogPublisher {
             }
         };
         server = new org.mortbay.jetty.Server();
-        Connector connector = new SocketConnector();
+        connector = new SocketConnector();
         port = context.getPort();
         connector.setPort(port);
         server.setConnectors(new Connector[]{connector});
@@ -280,4 +281,9 @@ public class Server implements CatalogPublisher {
             addPublishedContent(publishedContent, errProvider);
         }
     }
+
+  public void setPort(int port) {
+    this.port = port;
+    connector.setPort(port);
+  }
 }

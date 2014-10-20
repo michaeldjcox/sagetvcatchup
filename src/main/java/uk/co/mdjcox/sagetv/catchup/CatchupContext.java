@@ -163,6 +163,15 @@ public class CatchupContext implements CatchupContextInterface {
     return sageTVPluginsURL;
   }
 
+
+  public void setPort(int port) {
+    this.port = port;
+  }
+
+  public void setRecordingDir(String recordingDir) {
+    this.recordingDir = recordingDir;
+  }
+
   @Override
   public String toString() {
     return "CatchupContext{" + "\n" +
