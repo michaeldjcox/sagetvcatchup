@@ -7,7 +7,7 @@ import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.handler.AbstractHandler;
-import uk.co.mdjcox.logger.Logger;
+import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.CatalogPublisher;
 import uk.co.mdjcox.sagetv.catchup.Cataloger;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;

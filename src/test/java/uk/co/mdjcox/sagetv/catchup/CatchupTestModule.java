@@ -5,17 +5,13 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.mockito.MockitoAnnotations;
-import uk.co.mdjcox.logger.Logger;
+import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.ScriptFactory;
-import uk.co.mdjcox.sagetv.catchup.server.Server;
-import uk.co.mdjcox.sagetv.model.Catalog;
-import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
 import uk.co.mdjcox.utils.*;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.

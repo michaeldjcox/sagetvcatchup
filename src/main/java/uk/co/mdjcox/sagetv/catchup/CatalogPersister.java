@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.thoughtworks.xstream.XStream;
 
-import uk.co.mdjcox.logger.Logger;
+import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.model.Catalog;
 
 import java.io.*;

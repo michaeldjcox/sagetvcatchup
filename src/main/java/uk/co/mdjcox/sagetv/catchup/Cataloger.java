@@ -3,7 +3,7 @@ package uk.co.mdjcox.sagetv.catchup;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import uk.co.mdjcox.logger.Logger;
+import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.*;

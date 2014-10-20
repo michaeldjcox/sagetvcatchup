@@ -4,7 +4,7 @@ import com.thoughtworks.xstream.XStream;
 
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-import uk.co.mdjcox.logger.Logger;
+import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.utils.HtmlBuilder;
 
 import javax.xml.parsers.DocumentBuilder;

@@ -10,7 +10,7 @@ package uk.co.mdjcox.sagetv.onlinevideo;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import uk.co.mdjcox.logger.Logger;
+import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.CatalogPublisher;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.model.*;

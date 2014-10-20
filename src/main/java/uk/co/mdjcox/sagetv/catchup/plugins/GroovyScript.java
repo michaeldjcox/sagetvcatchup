@@ -1,7 +1,7 @@
 package uk.co.mdjcox.sagetv.catchup.plugins;
 
 
-import uk.co.mdjcox.logger.Logger;
+import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.model.ErrorRecorder;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;

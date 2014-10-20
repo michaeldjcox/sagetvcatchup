@@ -3,7 +3,6 @@ package uk.co.mdjcox.utils;
 import com.google.common.base.Preconditions;
 
 import sagex.api.*;
-import uk.co.mdjcox.logger.Logger;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
 

@@ -1,4 +1,4 @@
-package uk.co.mdjcox.logger;
+package uk.co.mdjcox.utils;
 
 import org.slf4j.LoggerFactory;
 

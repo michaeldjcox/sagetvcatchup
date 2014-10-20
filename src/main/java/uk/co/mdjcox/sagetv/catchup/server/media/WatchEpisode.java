@@ -1,7 +1,7 @@
 package uk.co.mdjcox.sagetv.catchup.server.media;
 
 
-import uk.co.mdjcox.logger.Logger;
+import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.Recorder;
 import uk.co.mdjcox.sagetv.catchup.server.ContentProvider;
 import uk.co.mdjcox.sagetv.model.Episode;

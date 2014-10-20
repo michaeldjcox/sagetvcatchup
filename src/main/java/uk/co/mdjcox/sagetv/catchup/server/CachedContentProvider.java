@@ -2,7 +2,7 @@ package uk.co.mdjcox.sagetv.catchup.server;
 
 
 
-import uk.co.mdjcox.logger.Logger;
+import uk.co.mdjcox.utils.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;

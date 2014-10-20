@@ -11,8 +11,6 @@ package uk.co.mdjcox.utils;
 
 
 
-import uk.co.mdjcox.logger.Logger;
-
 import java.io.File;
 import java.util.ArrayList;
 

@@ -6,10 +6,8 @@ import com.google.inject.name.Names;
 
 import sage.SageTVPlugin;
 import sage.SageTVPluginRegistry;
-import sagex.api.SystemMessageAPI;
 import sagex.plugin.SageEvents;
-import uk.co.mdjcox.logger.Logger;
-import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
+import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.catchup.server.Server;
 import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
@@ -40,8 +38,6 @@ import java.util.*;
 // TODO - conflicts in log framework
 // TODO - conflicts in servlet API - should I separate the server from sagetv?
 // TODO - ensure directories are present for logging?
-// TODO - port and rec dir are not in config
-// TODO - The port is in the catalog
 
 // Refactor
 // TODO - Podcast stylesheets?
