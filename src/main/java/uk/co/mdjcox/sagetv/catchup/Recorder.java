@@ -1,15 +1,16 @@
 package uk.co.mdjcox.sagetv.catchup;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
+import uk.co.mdjcox.utils.LoggerInterface;
+import uk.co.mdjcox.utils.OrderedPropertiesFileLayout;
 import uk.co.mdjcox.utils.OsUtilsInterface;
-import uk.co.mdjcox.utils.SageUtilsInterface;
+import uk.co.mdjcox.utils.PropertiesFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,25 +31,25 @@ import java.util.concurrent.*;
 @Singleton
 public class Recorder {
 
-    private final Logger logger;
+    private final LoggerInterface logger;
     private final OsUtilsInterface osUtils;
-    private final SageUtilsInterface sageUtils;
     private PluginManager pluginManager;
     private ConcurrentHashMap<String, Recording> currentRecordings = new ConcurrentHashMap<String, Recording>();
     private final String recordingDir;
+    private final String recordingsLogDir;
     private ScheduledExecutorService service;
     private Set<String> errors = new HashSet<String>();
     private int failedCount = 0;
     private int completedCount = 0;
 
     @Inject
-    private Recorder(Logger theLogger, PluginManager pluginManager, CatchupContextInterface context,
-                     OsUtilsInterface osUtils, SageUtilsInterface sageUtils) {
+    private Recorder(LoggerInterface theLogger, PluginManager pluginManager, CatchupContextInterface context,
+                     OsUtilsInterface osUtils) {
         this.logger = theLogger;
         this.pluginManager = pluginManager;
         this.osUtils = osUtils;
-        this.sageUtils = sageUtils;
         this.recordingDir = context.getRecordingDir();
+        this.recordingsLogDir = context.getTmpDir() + File.separator + "recordings" + File.separator;
     }
 
     private File watch(Episode episode) throws Exception {
@@ -274,25 +275,10 @@ public class Recorder {
 
                             osUtils.waitFor(1000);
 
-                            System.err.println("Done recording. File " + completedFile + " exists=" + completedFile.exists());
+                            logger.info("Done recording. File " + completedFile + " exists=" + completedFile.exists());
 
                             if (completedFile.exists()) {
-
-                                File[] recordingDirs = sageUtils.getRecordingDirectories();
-
-                                String recDir = recordingDir;
-
-                                if (recordingDirs.length > 0) {
-                                    recDir = recordingDirs[0].getAbsolutePath();
-                                }
-
-                                File savedFile = new File(recDir, episode.getId() + ".mp4");
-
-                                Files.move(completedFile.toPath(), savedFile.toPath());
-
-                                newRecording.setSavedFile(savedFile);
-
-                                sageUtils.addAiringToSageTV(newRecording);
+                                documentRecording(newRecording);
                               completedCount++;
                             } else {
                                 logger.error("No recording file found for " + episode);
@@ -323,6 +309,75 @@ public class Recorder {
         }
 
     }
+
+  /**
+   * Imports recording into the Sage database as an Airing.
+   * <p>
+   * @return The Airing if success, null otherwise.
+   */
+  public void documentRecording(Recording recording) {
+
+    try {
+      Preconditions.checkNotNull(recording);
+
+      File recordingFile = recording.getCompletedFile();
+      String id = recording.getId();
+      Episode episode = recording.getEpisode();
+      String programmeTitle = episode.getProgrammeTitle();
+      String episodeTitle = episode.getEpisodeTitle();
+      String description = episode.getDescription();
+      String[] categories = episode.getGenres().toArray(new String[episode.getGenres().size()]);
+      String origAirDate = episode.getOrigAirDate();
+      String origAirTime = episode.getOrigAirTime();
+      String airDate = episode.getAirDate() ;
+      String airTime = episode.getAirTime();
+      int seriesNumber = 0;
+      int episodeNumber = 0;
+      if (!episode.getSeries().isEmpty()) {
+        try {
+          seriesNumber = Integer.parseInt(episode.getSeries());
+        } catch (NumberFormatException e) {
+
+        }
+      }
+      if (!episode.getEpisode().isEmpty()) {
+        try {
+          episodeNumber = Integer.parseInt(episode.getSeries());
+        } catch (NumberFormatException e) {
+
+        }
+      }
+
+      String filename = recordingsLogDir + episode.getId() + ".properties";
+
+      PropertiesFile recordingProps = new PropertiesFile();
+      recordingProps.setProperty("file", recordingFile.getAbsolutePath());
+      recordingProps.setProperty("id", id);
+      recordingProps.setProperty("programmeTitle", programmeTitle);
+      recordingProps.setProperty("episodeTitle", episodeTitle);
+      recordingProps.setProperty("description", description);
+      int cat = 1;
+      for (String category : categories) {
+        recordingProps.setProperty("category." + cat, category);
+        cat++;
+      }
+      recordingProps.setProperty("origAirDate", origAirDate);
+      recordingProps.setProperty("origAirTime", origAirTime);
+      recordingProps.setProperty("airDate", airDate);
+      recordingProps.setProperty("airTime", airTime);
+      recordingProps.setProperty("seriesNumber", String.valueOf(seriesNumber));
+      recordingProps.setProperty("episodeNumber", String.valueOf(episodeNumber));
+
+      List<String> order = new LinkedList<String>();
+      for (Object key : recordingProps.keySet()) {
+        order.add(key.toString());
+      }
+
+      recordingProps.commit(filename, new OrderedPropertiesFileLayout(order, "Recording of " + episode.getId(), ""));
+    } catch (Exception e) {
+      logger.error("Failed to document recording", e);
+    }
+  }
 
         public void watch(final OutputStream out, final Episode episode, final boolean keep) throws Exception {
         FileInputStream in = null;
@@ -425,29 +480,18 @@ public class Recorder {
 
               osUtils.waitFor(1000);
 
-              System.err.println("Done recording. File " + completedFile + " exists=" + completedFile.exists());
+              logger.info("Done recording. File " + completedFile + " exists=" + completedFile.exists());
 
               if (completedFile.exists()) {
-
-                File[] recordingDirs = sageUtils.getRecordingDirectories();
-
-                String recDir = recordingDir;
-
-                if (recordingDirs.length > 0) {
-                  recDir = recordingDirs[0].getAbsolutePath();
-                }
-
-                File savedFile = new File(recDir, episode.getId() + ".mp4");
-
-                Files.move(completedFile.toPath(), savedFile.toPath());
-
-                newRecording.setSavedFile(savedFile);
-
-                sageUtils.addAiringToSageTV(newRecording);
+                documentRecording(newRecording);
+                              completedCount++;
               } else {
                 logger.error("No recording file found for " + episode);
+                              throw new Exception("No recording file found for " + episode);
               }
             } catch (Throwable e) {
+                          failedCount++;
+                          errors.add("Recording " + episode.getId() + " failed due to exception");
               logger.warn("Recording of " + episode.getId() + " stopped due to exception ", e);
             } finally {
               try {

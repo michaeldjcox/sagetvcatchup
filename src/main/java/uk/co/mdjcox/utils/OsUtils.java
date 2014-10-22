@@ -17,10 +17,10 @@ import java.util.*;
 
 public abstract class OsUtils implements OsUtilsInterface {
     private static OsUtilsInterface instance;
-    protected Logger logger;
+    protected LoggerInterface logger;
     private String os;
 
-    public static OsUtilsInterface instance(Logger logger) {
+    public static OsUtilsInterface instance(LoggerInterface logger) {
         if (instance == null) {
             if (File.separatorChar=='\\') {
                 instance = new WindowsUtils(logger);
@@ -31,7 +31,7 @@ public abstract class OsUtils implements OsUtilsInterface {
         return instance;
     }
 
-    protected OsUtils(Logger logger) {
+    protected OsUtils(LoggerInterface logger) {
         this.logger = logger;
         os =  System.getProperty("os.name");
         os = os.replace(' ', '_');
@@ -39,13 +39,16 @@ public abstract class OsUtils implements OsUtilsInterface {
     }
 
     @Override
-    public Process spawnProcess(String osCommand, String loggerName, boolean waitForCompletion) throws Exception {
-        return spawnProcess(osCommand, loggerName, waitForCompletion, null, null);
+    public Process spawnProcess(String osCommand, String loggerName, boolean waitForCompletion, File workingDir) throws Exception {
+        return spawnProcess(osCommand, loggerName, waitForCompletion, null, null, workingDir);
     }
 
     @Override
-    public Process spawnProcess(String osCommand, String loggerName, boolean waitForCompletion, ArrayList<String> output, ArrayList<String> errors) throws Exception {
-        logger.info("Spawn " + osCommand);
+    public Process spawnProcess(String osCommand, String loggerName, boolean waitForCompletion,
+                                ArrayList<String> output, ArrayList<String> errors, File workingDir) throws Exception {
+        if (loggerName != null) {
+          logger.info("Spawn " + osCommand);
+        }
 
         String command = "";
         String envVar = "";
@@ -67,24 +70,33 @@ public abstract class OsUtils implements OsUtilsInterface {
             envVar = "";
         }
 
-        logger.info("Command=" + command);
-        logger.info("Env=" + envVar);
+//        logger.info("Command=" + command);
+//        logger.info("MyCMD=" + envVar);
 
         String[] env = getEnvAsStrings("MYCMD=" + envVar);
 
-        Process process = Runtime.getRuntime().exec(split(command), env);
+//        for (String envVariable : env) {
+//          logger.info("ENV: " + envVariable);
+//        }
 
+        Process process = null;
+
+        if (workingDir != null) {
+         process = Runtime.getRuntime().exec(split(command), env, workingDir);
+        } else {
+          process = Runtime.getRuntime().exec(split(command), env);
+        }
         captureStreams(process, loggerName, output, errors, waitForCompletion);
         if (waitForCompletion) {
-            logger.info("Entering proc waitfor " + osCommand);
+//            logger.info("Entering proc waitfor " + osCommand);
             try {
                 process.waitFor();
             } catch (InterruptedException e) {
-                logger.info("Interrupted waiting for process");
+//                logger.info("Interrupted waiting for process");
             }
-            logger.info("Exiting proc waitfor " + osCommand);
+//            logger.info("Exiting proc waitfor " + osCommand);
             int result = process.exitValue();
-            logger.info("Result is " + result + " for " + osCommand);
+//            logger.info("Result is " + result + " for " + osCommand);
             return process;
         } else {
             return process;
@@ -124,15 +136,15 @@ public abstract class OsUtils implements OsUtilsInterface {
           if (current.trim().length()>0) {
               params.add(current);
           }
+
           return params.toArray(new String[params.size()]);
     }
 
     private void captureStreams(final Process proc, String action, ArrayList<String> output, ArrayList<String> errors, boolean wait) {
-        logger.info("Setting up streams for " + action);
         StreamConsumer stderr ;
         StreamConsumer stdout ;
-        stderr = new StreamConsumer( proc.getErrorStream(), action + ".err", logger, errors);
-        stdout = new StreamConsumer( proc.getInputStream(), action + ".out", logger, output);
+        stderr = new StreamConsumer( proc.getErrorStream(), action == null ? null : action + ".err", logger, errors);
+        stdout = new StreamConsumer( proc.getInputStream(), action == null ? null : action + ".out", logger, output);
         stderr.start();
         stdout.start();
         // Send a linefeed to get around any pause for error
@@ -194,7 +206,7 @@ public abstract class OsUtils implements OsUtilsInterface {
 
     private class StreamConsumer extends Thread {
         private InputStream is;
-        private Logger logger;
+        private LoggerInterface logger;
         private String type;
         private ArrayList<String> output;
 
@@ -202,7 +214,7 @@ public abstract class OsUtils implements OsUtilsInterface {
         private StreamConsumer() {
         }
 
-        public StreamConsumer(InputStream is, String type, Logger logger, ArrayList<String> output) {
+        public StreamConsumer(InputStream is, String type, LoggerInterface logger, ArrayList<String> output) {
             this.is = is;
             this.logger = logger;
             this.type = type;
@@ -216,16 +228,18 @@ public abstract class OsUtils implements OsUtilsInterface {
                 String line = null;
                 while ((line = br.readLine()) != null) {
                     if (logger != null) {
+                      if (type != null) {
                         logger.info(type + ": " + line);
+                      }
                     }
                     if (output != null) {
                         output.add(line);
                     }
                 }
             } catch (IOException ioe) {
-                logger.error("Stream consumer terminatated with exception", ioe);
+                logger.error("Stream consumer terminated with exception", ioe);
             } finally {
-                logger.info("Stream consumer " + type + " terminating ");
+//                logger.info("Stream consumer " + type + " terminating ");
             }
         }
 
@@ -239,7 +253,7 @@ public abstract class OsUtils implements OsUtilsInterface {
         try {
             ArrayList<String> output = new ArrayList<String>();
             ArrayList<String> errors = new ArrayList<String>();
-            spawnProcess(command, "ps", true, output, errors);
+            spawnProcess(command, "ps", true, output, errors, null);
             for (String out : output) {
                 String[] split = split(out);
                 String commandString = "";
@@ -248,7 +262,7 @@ public abstract class OsUtils implements OsUtilsInterface {
                 }
                 if (split.length > 1) {
 //                    logger.info(split[split.length-1].trim() + "=" + commandString.trim());
-                    results.put(commandString.trim(), split[split.length-1].trim());
+                    results.put(split[split.length-1].trim(), commandString.trim());
                 }
             }
         } catch (Exception e) {
@@ -259,10 +273,11 @@ public abstract class OsUtils implements OsUtilsInterface {
 
   @Override
   public void killProcessesMatching(String regex) {
+    logger.info("Killing processes matching: " + regex);
     HashMap<String, String> processes = getProcesses();
     Set<String> kills = new HashSet<String>();
-    for (String process : processes.keySet()) {
-      String pid = processes.get(process);
+    for (String pid : processes.keySet()) {
+      String process = processes.get(pid);
       if (process.matches(regex)) {
         killProcess(pid, process);
         kills.add(pid);
@@ -278,34 +293,39 @@ public abstract class OsUtils implements OsUtilsInterface {
   }
 
     public Map<String, String> findProcessesContaining(String token) {
+      logger.info("Finding processes containing: " + token);
         HashMap<String, String> matching = new HashMap<String, String>();
         HashMap<String, String> processes = getProcesses();
-        for (String process : processes.keySet()) {
-            String pid = processes.get(process);
+        for (String pid : processes.keySet()) {
+            String process = processes.get(pid);
             if (process.contains(token)) {
                 matching.put(pid, process);
             }
         }
-        return matching;
+      logger.info("Found: " + matching.keySet());
+      return matching;
     }
 
     public Map<String, String> findProcessesMatching(String regex) {
+      logger.info("Finding processes matching: " + regex);
         HashMap<String, String> matching = new HashMap<String, String>();
         HashMap<String, String> processes = getProcesses();
-        for (String process : processes.keySet()) {
-            String pid = processes.get(process);
+        for (String pid : processes.keySet()) {
+            String process = processes.get(pid);
             if (process.matches(regex)) {
                 matching.put(pid, process);
             }
         }
-        return matching;
+      logger.info("Found: " + matching.keySet());
+      return matching;
     }
 
   public void killProcessesContaining(String token) {
+    logger.info("Killing processes containing: " + token);
         HashMap<String, String> processes = getProcesses();
         Set<String> kills = new HashSet<String>();
-        for (String process : processes.keySet()) {
-            String pid = processes.get(process);
+        for (String pid : processes.keySet()) {
+            String process = processes.get(pid);
             if (process.contains(token)) {
                 killProcess(pid, process);
                 kills.add(pid);

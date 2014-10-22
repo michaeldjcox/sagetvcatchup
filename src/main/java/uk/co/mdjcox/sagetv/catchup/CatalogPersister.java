@@ -3,11 +3,12 @@ package uk.co.mdjcox.sagetv.catchup;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.thoughtworks.xstream.XStream;
-
-import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.model.Catalog;
+import uk.co.mdjcox.utils.LoggerInterface;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 
 /**
  * Created by michael on 02/10/14.
@@ -16,12 +17,12 @@ import java.io.*;
 public class CatalogPersister implements CatalogPublisher {
 
     private final XStream xstream;
-    private Logger logger;
+    private LoggerInterface logger;
     private String fileName;
     private String emptyFileName;
 
     @Inject
-    private CatalogPersister(Logger logger, CatchupContextInterface context) {
+    private CatalogPersister(LoggerInterface logger, CatchupContextInterface context) {
         this.logger = logger;
       fileName = context.getCatalogFileName();
       emptyFileName = context.getDefaultCatalogFileName();

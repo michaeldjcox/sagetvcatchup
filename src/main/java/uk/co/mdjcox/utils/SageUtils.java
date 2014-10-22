@@ -1,15 +1,13 @@
 package uk.co.mdjcox.utils;
 
-import com.google.common.base.Preconditions;
-
 import sagex.api.*;
-import uk.co.mdjcox.sagetv.model.Episode;
-import uk.co.mdjcox.sagetv.model.Recording;
 
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
@@ -18,19 +16,17 @@ import java.util.regex.Pattern;
  */
 public class SageUtils implements SageUtilsInterface {
 
-    protected Logger logger;
-
     private static SageUtilsInterface instance;
 
-    public static SageUtilsInterface instance(final Logger logger) {
+    public static SageUtilsInterface instance() {
         if (instance == null) {
-            instance = new SageUtils(logger);
+            instance = new SageUtils();
         }
         return instance;
     }
 
-    private SageUtils(Logger logger) {
-        this.logger = logger;
+    private SageUtils() {
+
     }
 
     @Override
@@ -72,25 +68,6 @@ public class SageUtils implements SageUtilsInterface {
         }
     }
 
-    /*
- * This is needed because when a SageClient running Windows creates a path it always assumes the server
- * is running Windows and uses the wrong separator character.
- */
-    private String fixPath(String Path) {
-
-        // Nothing to do if we're running the plugin on a Windows machine.
-        if (Global.IsWindowsOS()) {
-            return Path;
-        }
-
-        // Replace all of the Windows separator characters with linux separator characters.
-        String NewPath = Path.replaceAll("\\\\", File.separator);
-
-        logger.info("RecordingEpisode.fixPath: " + Path + "->" + NewPath);
-
-        return NewPath;
-    }
-
     @Override
     public File[] getRecordingDirectories() {
         return Configuration.GetVideoDirectories();
@@ -103,158 +80,182 @@ public class SageUtils implements SageUtilsInterface {
 
     }
 
-    /**
-     * Imports recording into the Sage database as an Airing.
-     * <p>
-     * @return The Airing if success, null otherwise.
-     */
-    public Object addAiringToSageTV(Recording recording) {
+  public void addRecordingToSageTV(String file, String programmeTitle, String episodeTitle, String description, List<String> categories, String origAirDate, String origAirTime, String airDate, String airTime, int seriesNumber, int episodeNumber) {
+    File recordingFile = new File(file);
 
-        Preconditions.checkNotNull(recording);
-
-        File recordingFile = recording.getSavedFile();
-
-        if (!recordingFile.exists()) {
-            logger.error("RecordingEpisode.importAsMediaFile: Error. MovedFile does not exist.");
-        }
-
-        // Add the MediaFile to the database.
-        Object mediaFile = MediaFileAPI.AddMediaFile(recordingFile, "");
-        if (mediaFile == null) {
-            logger.error("RecordingEpisode.importAsMediaFile: AddMediaFile failed for " + recordingFile.getAbsolutePath());
-            return null;
-        }
-
-        Episode episode = recording.getEpisode();
-
-        String title = episode.getProgrammeTitle();
-        String episodeTitle = episode.getEpisodeTitle();
-        String description = episode.getDescription();
-        long duration = 1000; // TODO but sageTV seems to work it out anyway
-        String[] category = episode.getGenres().toArray(new String[episode.getGenres().size()]);
-        String peopleList[] = {};
-        String rolesList[] = {};
-        String rated = null;
-        String expandedRatedList[] = null;
-        String parentalRating = null; // TODO - this might be available
-        String miscList[] = new String[0];
-        Long now = Utility.Time();
-        String nowString = now.toString();
-        String externalID = "ONL" + nowString;
-        String airingExternalID = "EP" + nowString;
-        String language = "English";
-
-        String origAirDate = episode.getOrigAirDate();
-        String origAirTime = episode.getOrigAirTime();
-
-      long originalAirDate = now;
-
-      if ((origAirDate != null) && (origAirTime != null)) {
-        try {
-          String dateTime = origAirDate + " " + origAirTime;
-          SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-          format.setTimeZone(TimeZone.getTimeZone("Europe/London"));
-          Date date = format.parse(dateTime);
-
-          originalAirDate = date.getTime();
-
-          logger.info("Uploading episode " + episode + " sageTV " + date + " from " + dateTime);
-
-        } catch (ParseException e) {
-          logger.warn("Failed to parse original air date " + origAirDate + " " + origAirTime + " into long time");
-        }
-      }
-
-      SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
-      yearFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
-      String year = yearFormat.format(new Date(originalAirDate));
-
-        boolean isFirstRun = true;
-
-
-      String airDate = episode.getAirDate() ;
-      String airTime = episode.getAirTime();
-
-      if ((airDate != null) && (airTime != null)) {
-        try {
-          String dateTime = airDate + " " + airDate;
-          SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-          format.setTimeZone(TimeZone.getTimeZone("Europe/London"));
-          Date date = format.parse(dateTime);
-
-          isFirstRun = date.getTime() == originalAirDate;
-
-        } catch (ParseException e) {
-          logger.warn("Failed to parse air date " + airDate + " " + airTime + " into long time");
-        }
-      }
-
-        int seriesNumber = 0;
-        int episodeNumber = 0;
-        if (!episode.getSeries().isEmpty()) {
-            try {
-                seriesNumber = Integer.parseInt(episode.getSeries());
-            } catch (NumberFormatException e) {
-
-            }
-        }
-        if (!episode.getEpisode().isEmpty()) {
-            try {
-                episodeNumber = Integer.parseInt(episode.getSeries());
-            } catch (NumberFormatException e) {
-
-            }
-        }
-        Object Show = ShowAPI.AddShow(
-                title,
-                isFirstRun,
-                episodeTitle,
-                description,
-                duration,
-                category,
-                peopleList,
-                rolesList,
-                rated,
-                expandedRatedList,
-                year,
-                parentalRating,
-                miscList,
-                externalID,
-                language,
-                originalAirDate,
-                seriesNumber,
-                episodeNumber);
-
-        if (Show == null) {
-            logger.error("RecordingEpisode.importAsMediaFile: AddShow failed.");
-            return null;
-        }
-
-        if (!MediaFileAPI.SetMediaFileShow(mediaFile, Show)) {
-            logger.error("RecordingEpisode.importAsMediaFile: SetMediaFileShow failed.");
-            return null;
-        }
-
-        logger.info("RecordingEpisode.importAsMediaFile succeeded.");
-
-        // Change the ExternalID metadata to something that starts with "EP" to turn the Imported video
-        // file into an archived TV recording.
-        MediaFileAPI.SetMediaFileMetadata(mediaFile, "ExternalID", airingExternalID);
-
-        // Clear the Archived flag.
-        MediaFileAPI.MoveTVFileOutOfLibrary(mediaFile);
-
-        Object airing = MediaFileAPI.GetMediaFileAiring(mediaFile);
-
-        if (!AiringAPI.IsAiringObject(airing)) {
-            logger.error("RecordingEpisode.importAsMediaFile: Object is not an Airing.");
-            return null;
-        }
-
-        return airing;
+    if (!recordingFile.exists()) {
+        debug("Add airing to SageTV - recording does not exist: " + recordingFile.getAbsolutePath());
+      return;
     }
 
-  public static void debug(String message) {
-    Global.DebugLog(message);
+    // Add the MediaFile to the database.
+    Object mediaFile = MediaFileAPI.AddMediaFile(recordingFile, "");
+    if (mediaFile == null) {
+        debug("Add airing to SageTV - add media file failed: " + recordingFile.getAbsolutePath());
+        return;
+    }
+
+
+    long duration = 1000; // TODO but sageTV seems to work it out anyway
+    String peopleList[] = {};
+    String rolesList[] = {};
+    String rated = null;
+    String expandedRatedList[] = null;
+    String parentalRating = null; // TODO - this might be available
+    String miscList[] = new String[0];
+    Long now = Utility.Time();
+    String nowString = now.toString();
+    String externalID = "ONL" + nowString;
+    String airingExternalID = "EP" + nowString;
+    String language = "English";
+
+
+    long originalAirDate = now;
+
+    if ((origAirDate != null) && (origAirTime != null)) {
+      try {
+        String dateTime = origAirDate + " " + origAirTime;
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        format.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+        Date date = format.parse(dateTime);
+
+        originalAirDate = date.getTime();
+
+        debug("Add airing to SageTV - Uploading recording of " + episodeTitle + " to sageTV " + date + " from " + dateTime);
+
+      } catch (ParseException e) {
+        debug("Add airing to SageTV - Failed to parse original air date " + origAirDate + " " + origAirTime + " into long time");
+      }
+    }
+
+    SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+    yearFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    String year = yearFormat.format(new Date(originalAirDate));
+
+    boolean isFirstRun = true;
+
+
+    if ((airDate != null) && (airTime != null)) {
+      try {
+        String dateTime = airDate + " " + airDate;
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        format.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+        Date date = format.parse(dateTime);
+
+        isFirstRun = date.getTime() == originalAirDate;
+
+      } catch (ParseException e) {
+        debug("Add airing to SageTV - Failed to parse air date " + airDate + " " + airTime + " into long time");
+      }
+    }
+
+    String[] categoryArray = new String[0];
+    if (categories != null) {
+      categoryArray = categories.toArray(new String[categories.size()]);
+    }
+
+
+    Object Show = ShowAPI.AddShow(
+            programmeTitle,
+            isFirstRun,
+            episodeTitle,
+            description,
+            duration,
+            categoryArray,
+            peopleList,
+            rolesList,
+            rated,
+            expandedRatedList,
+            year,
+            parentalRating,
+            miscList,
+            externalID,
+            language,
+            originalAirDate,
+            seriesNumber,
+            episodeNumber);
+
+    if (Show == null) {
+      debug("Add airing to SageTV - Failed to add show");
+        return ;
+    }
+
+    if (!MediaFileAPI.SetMediaFileShow(mediaFile, Show)) {
+      debug("Add airing to SageTV - Failed to set media show");
+        return ;
+    }
+
+    // Change the ExternalID metadata to something that starts with "EP" to turn the Imported video
+    // file into an archived TV recording.
+    MediaFileAPI.SetMediaFileMetadata(mediaFile, "ExternalID", airingExternalID);
+
+    // Clear the Archived flag.
+    MediaFileAPI.MoveTVFileOutOfLibrary(mediaFile);
+
+    Object airing = MediaFileAPI.GetMediaFileAiring(mediaFile);
+
+    if (!AiringAPI.IsAiringObject(airing)) {
+      debug("Add airing to SageTV - Object is not an Airing.");
+        return ;
+    }
+
+    debug("Add airing to SageTV - Succeeded");
+
   }
+
+  @Override
+  public void info(String s) {
+    debug("INFO: " + s);
+  }
+
+  @Override
+  public void info(String s, Throwable throwable) {
+    debug("INFO: " + s, throwable);
+  }
+
+  @Override
+  public void warn(String s) {
+    debug("WARN: " + s);
+  }
+
+  @Override
+  public void warn(String s, Throwable throwable) {
+    debug("WARN: " + s, throwable);
+  }
+
+  @Override
+  public void error(String s) {
+    debug("ERROR: " + s);
+  }
+
+  @Override
+  public void error(String s, Throwable throwable) {
+    debug("ERROR: " + s, throwable);
+  }
+
+  @Override
+  public void flush() {
+
+  }
+
+  private void debug(String message) {
+    try {
+      Global.DebugLog(message);
+    } catch (Exception e) {
+      // Ignore
+    }
+  }
+
+  private void debug(String message, Throwable ex) {
+    try {
+      Global.DebugLog(message);
+      Global.DebugLog(ex.getMessage());
+      for (StackTraceElement el : ex.getStackTrace()) {
+        Global.DebugLog(el.toString());
+      }
+    } catch (Exception e) {
+      // Ignore
+    }
+  }
+
 }

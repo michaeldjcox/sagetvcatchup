@@ -1,5 +1,6 @@
 package uk.co.mdjcox.utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,9 +13,10 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public interface OsUtilsInterface {
-    Process spawnProcess(String osCommand, String loggerName, boolean waitForCompletion) throws Exception;
+    Process spawnProcess(String osCommand, String loggerName, boolean waitForCompletion, File workingDir) throws Exception;
 
-    Process spawnProcess(String osCommand, String loggerName, boolean waitForCompletion, ArrayList<String> output, ArrayList<String> errors) throws Exception;
+    Process spawnProcess(String osCommand, String loggerName, boolean waitForCompletion,
+                         ArrayList<String> output, ArrayList<String> errors, File workingDir) throws Exception;
 
     void killProcess(String pid, String cmd);
 

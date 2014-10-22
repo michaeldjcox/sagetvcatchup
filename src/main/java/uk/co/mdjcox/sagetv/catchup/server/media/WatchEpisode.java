@@ -1,10 +1,10 @@
 package uk.co.mdjcox.sagetv.catchup.server.media;
 
 
-import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.Recorder;
 import uk.co.mdjcox.sagetv.catchup.server.ContentProvider;
 import uk.co.mdjcox.sagetv.model.Episode;
+import uk.co.mdjcox.utils.LoggerInterface;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -17,10 +17,10 @@ import java.io.OutputStream;
 public class WatchEpisode implements ContentProvider {
 
     private final Episode episode;
-    private final Logger logger;
+    private final LoggerInterface logger;
     private Recorder recorder;
 
-    public WatchEpisode(Logger logger, Episode episode, Recorder recorder) {
+    public WatchEpisode(LoggerInterface logger, Episode episode, Recorder recorder) {
         this.episode = episode;
         this.recorder = recorder;
         this.logger = logger;

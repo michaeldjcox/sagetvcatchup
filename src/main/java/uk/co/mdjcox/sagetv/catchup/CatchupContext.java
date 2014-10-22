@@ -13,8 +13,6 @@ public class CatchupContext implements CatchupContextInterface {
   private final static String workingDir = System.getProperty("user.dir");
   private final static String userHome = System.getProperty("user.home");
 
-  private static boolean runningInSageTV;
-
   private final String podcastBase;
   private String tmpDir;
   private String pluginDir;
@@ -29,21 +27,18 @@ public class CatchupContext implements CatchupContextInterface {
   private String catalogFileName;
   private String defaultCatalogFileName;
   private String onlineVideoPropsSuffix;
-  private File sageTvPluginsFile;
-  private String sageTVPluginsURL;
   private PropertiesInterface properties;
 
   public CatchupContext(final PropertiesInterface properties) {
     this.properties = properties;
 
-    xsltDir = workingDir + File.separator + "sagetvcatchup" + File.separator + "xslt";
-    cssDir = workingDir + File.separator + "sagetvcatchup" + File.separator + "css";
-    logDir = workingDir + File.separator + "sagetvcatchup" + File.separator + "logs";
-    pluginDir = workingDir + File.separator + "sagetvcatchup" + File.separator + "plugins";
-    configDir = workingDir + File.separator + "sagetvcatchup" + File.separator + "config";
+    xsltDir = workingDir + File.separator + "xslt";
+    cssDir = workingDir + File.separator + "css";
+    logDir = workingDir + File.separator + "logs";
+    pluginDir = workingDir + File.separator + "plugins";
+    configDir = workingDir + File.separator + "config";
 
     recordingDir = properties.getString("recordingDir");
-
     refreshRate = properties.getInt("refreshRateHours");
     port = properties.getInt("podcasterPort");
 
@@ -51,21 +46,31 @@ public class CatchupContext implements CatchupContextInterface {
     if (!tmpDir.endsWith(File.separator)) {
       tmpDir += File.separator;
     }
+    tmpDir += "sagetvcatchup";
+    tmpDir += File.separator;
 
+    File tmpDirFle = new File(tmpDir);
+    tmpDirFle.mkdirs();
 
     String defaultFileName = tmpDir + "sagetvcatchup.xml";
     catalogFileName = properties.getString("catalogFileName", defaultFileName);
-    String seedDir = workingDir + File.separator + "sagetvcatchup" + File.separator + "seeds";
+    String seedDir = workingDir + File.separator + "seeds";
     defaultCatalogFileName = seedDir + File.separator + "default.xml";
     onlineVideoPropsSuffix = properties.getString("onlineVideoPropsSuffix");
     onlineVideoPropertiesDir = properties.getString("onlineVideoPropertiesDir");
-    sageTvPluginsFile = new File(workingDir, "SageTVPluginsDev.xml");
-    sageTVPluginsURL = properties.getString("sageTvPluginsURL", "http://mintpad/sagetvcatchup/download/SageTVPluginsDev.xml");
     podcastBase = "http://localhost:" + port;
   }
 
-  public static boolean isRunningInSageTV() {
-    return !(workingDir.startsWith(userHome) && workingDir.endsWith("sagetvcatchup"));
+  public static boolean isRunningInDev() {
+    return (workingDir.startsWith(userHome) && workingDir.endsWith("sagetvcatchup"));
+  }
+
+  public static boolean isRunningInsideSageTV() {
+    return (!workingDir.startsWith(userHome)) && !workingDir.endsWith("sagetvcatchup");
+  }
+
+  public static boolean isRunningOutsideSageTV() {
+    return (!workingDir.startsWith(userHome)) && workingDir.endsWith("sagetvcatchup");
   }
 
   @Override
@@ -106,6 +111,11 @@ public class CatchupContext implements CatchupContextInterface {
   @Override
   public String getConfigDir() {
     return configDir;
+  }
+
+  @Override
+  public String getTmpDir() {
+    return tmpDir;
   }
 
   @Override
@@ -153,17 +163,6 @@ public class CatchupContext implements CatchupContextInterface {
     return properties.getBoolean(sourceId + ".skip");
   }
 
-  @Override
-  public File getSageTVPluginsDevFile() {
-    return sageTvPluginsFile;
-  }
-
-  @Override
-  public String getSageTVPluginsURL() {
-    return sageTVPluginsURL;
-  }
-
-
   public void setPort(int port) {
     this.port = port;
   }
@@ -188,8 +187,6 @@ public class CatchupContext implements CatchupContextInterface {
             "catalogFileName='" + catalogFileName + '\'' +"\n" +
             "defaultCatalogFileName='" + defaultCatalogFileName + '\'' +"\n" +
             "onlineVideoPropsSuffix='" + onlineVideoPropsSuffix + '\'' +"\n" +
-            "sageTvPluginsFile=" + sageTvPluginsFile +"\n" +
-            "sageTVPluginsURL='" + sageTVPluginsURL + '\'' +"\n" +
             "properties=" + properties +"\n" +
             '}';
   }

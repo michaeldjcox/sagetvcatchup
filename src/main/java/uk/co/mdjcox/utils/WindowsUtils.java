@@ -23,7 +23,7 @@ class WindowsUtils extends OsUtils {
     private static final String CRLF = "\r\n";
     private static final String SEPARATOR = "AAAA";
 
-    public WindowsUtils(Logger logger) {
+    public WindowsUtils(LoggerInterface logger) {
         super(logger);
     }
 
@@ -149,7 +149,6 @@ class WindowsUtils extends OsUtils {
     public HashMap<String, String> getProcesses() {
         HashMap<String,String> results = new HashMap<String,String>();
         try {
-            logger.info("Getting OS processes");
             String result = getWMIValue("select ProcessId,Name,CommandLine from win32_process", "ProcessId,Name,CommandLine");
             String[] resultsTokens = result.split("\r\n");
             for (int i=0; i<resultsTokens.length-1; i++) {
@@ -164,8 +163,7 @@ class WindowsUtils extends OsUtils {
                     cmd = resultsTokens2[2].trim();
                 }
                 cmd = cmd.replace("  ", " ");
-                logger.info(i + " " + pid + " " + name + " " + cmd);
-                results.put(cmd, pid);
+                results.put(pid, cmd);
             }
         } catch (Exception e) {
             logger.warn("Cannot check OS processes", e);

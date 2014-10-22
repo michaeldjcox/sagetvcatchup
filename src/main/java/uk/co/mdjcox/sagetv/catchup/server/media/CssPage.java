@@ -1,8 +1,8 @@
 package uk.co.mdjcox.sagetv.catchup.server.media;
 
 
-import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.server.ContentProvider;
+import uk.co.mdjcox.utils.LoggerInterface;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -17,10 +17,10 @@ import java.io.IOException;
 public class CssPage implements ContentProvider {
 
     private final String cssDir;
-    private final Logger logger;
+    private final LoggerInterface logger;
     private String stylesheet;
 
-    public CssPage(Logger logger, String cssDir, String stylesheet) {
+    public CssPage(LoggerInterface logger, String cssDir, String stylesheet) {
         this.stylesheet = stylesheet;
         this.cssDir = cssDir;
         this.logger = logger;

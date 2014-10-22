@@ -1,9 +1,6 @@
 package uk.co.mdjcox.utils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by michael on 10/10/14.
@@ -11,9 +8,9 @@ import java.util.Properties;
 public class OrderedPropertiesFileLayout extends PropertiesFileLayout {
   private final String headComment;
   private final String tailComment;
-  private ArrayList<String> order = new ArrayList<String>();
+  private List<String> order = new ArrayList<String>();
 
-  public OrderedPropertiesFileLayout(ArrayList<String> order, String headComment, String tailComment) {
+  public OrderedPropertiesFileLayout(List<String> order, String headComment, String tailComment) {
     this.order = order;
     this.headComment=headComment;
     this.tailComment=tailComment;

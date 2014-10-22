@@ -1,11 +1,11 @@
 package uk.co.mdjcox.sagetv.catchup.plugins;
 
 
-import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.model.ErrorRecorder;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
+import uk.co.mdjcox.utils.LoggerInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
 
 import java.io.File;
@@ -28,13 +28,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class GroovyScript extends groovy.lang.Script {
 
-    private Logger logger;
+    private LoggerInterface logger;
     private HtmlUtilsInterface htmlUtils;
     private DownloadUtilsInterface downloadUtils;
     private OsUtilsInterface osUtils;
     private CatchupContextInterface context;
 
-    public void setLogger(Logger logger) {
+    public void setLogger(LoggerInterface logger) {
         this.logger = logger;
     }
 
@@ -116,18 +116,18 @@ public abstract class GroovyScript extends groovy.lang.Script {
 
 
     public Process EXECUTE(String osCommand, String loggerName) throws Exception {
-        return osUtils.spawnProcess(osCommand, loggerName, false);
+        return osUtils.spawnProcess(osCommand, loggerName, false, null);
     }
     public Process EXECUTE_AND_WAIT(String osCommand, String loggerName) throws Exception {
-        return osUtils.spawnProcess(osCommand, loggerName, true);
+        return osUtils.spawnProcess(osCommand, loggerName, true, null);
     }
 
     public Process EXECUTE(String osCommand, String loggerName, ArrayList<String> output, ArrayList<String> errors) throws Exception {
-        return osUtils.spawnProcess(osCommand, loggerName, false, output, errors);
+        return osUtils.spawnProcess(osCommand, loggerName, false, output, errors, null);
     }
 
     public Process EXECUTE_AND_WAIT(String osCommand, String loggerName, ArrayList<String> output, ArrayList<String> errors) throws Exception {
-        return osUtils.spawnProcess(osCommand, loggerName, true, output, errors);
+        return osUtils.spawnProcess(osCommand, loggerName, true, output, errors, null);
     }
 
     public void KILL(String pid, String cmd) {

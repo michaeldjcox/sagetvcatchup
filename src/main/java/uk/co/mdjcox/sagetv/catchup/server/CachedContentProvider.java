@@ -1,8 +1,7 @@
 package uk.co.mdjcox.sagetv.catchup.server;
 
 
-
-import uk.co.mdjcox.utils.Logger;
+import uk.co.mdjcox.utils.LoggerInterface;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -16,12 +15,12 @@ public class CachedContentProvider implements ContentProvider {
 
     private final String htdocsDir;
     private final String encoding;
-    private final Logger logger;
+    private final LoggerInterface logger;
     private String type;
     private String uri;
     private String fileName;
 
-    public CachedContentProvider(Logger logger, String htdocsDir, ContentProvider provider) {
+    public CachedContentProvider(LoggerInterface logger, String htdocsDir, ContentProvider provider) {
         type = provider.getType();
         uri = provider.getUri();
         this.logger = logger;

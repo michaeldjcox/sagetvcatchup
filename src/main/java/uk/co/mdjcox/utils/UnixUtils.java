@@ -17,7 +17,7 @@ import java.util.HashMap;
 
 class UnixUtils extends OsUtils {
 
-    UnixUtils(Logger logger) {
+    UnixUtils(LoggerInterface logger) {
         super(logger);
     }
 
@@ -34,16 +34,16 @@ class UnixUtils extends OsUtils {
         try {
             ArrayList<String> output = new ArrayList<String>();
             ArrayList<String> errors = new ArrayList<String>();
-            spawnProcess(command, "ps", true, output, errors);
+            spawnProcess(command, null, true, output, errors, null);
             for (String out : output) {
+                out = out.trim();
                 String[] split = split(out);
                 String commandString = "";
-                for (int i=1; i<split.length-1; i++) {
+                for (int i=1; i<split.length; i++) {
                     commandString += split[i] + " ";
                 }
                 if (split.length > 1) {
-                    logger.info(split[0].trim() + "=" + commandString.trim());
-                    results.put(commandString.trim(), split[0].trim());
+                    results.put(split[0].trim(), commandString.trim());
                 }
             }
         } catch (Exception e) {

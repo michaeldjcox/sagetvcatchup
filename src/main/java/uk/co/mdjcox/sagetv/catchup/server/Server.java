@@ -7,7 +7,6 @@ import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.handler.AbstractHandler;
-import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.CatalogPublisher;
 import uk.co.mdjcox.sagetv.catchup.Cataloger;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
@@ -23,6 +22,7 @@ import uk.co.mdjcox.sagetv.model.Category;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Programme;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
+import uk.co.mdjcox.utils.LoggerInterface;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +46,7 @@ public class Server implements CatalogPublisher {
     private final String xsltDir;
     private final String logDir;
   private final SocketConnector connector;
-  private Logger logger;
+  private LoggerInterface logger;
     private org.mortbay.jetty.Server server;
     private int port;
     private Recorder recorder;
@@ -56,7 +56,7 @@ public class Server implements CatalogPublisher {
     private Map<String, ContentProvider> staticContent = new HashMap<String, ContentProvider>();
 
     @Inject
-    private Server(Logger logger, CatchupContextInterface context, HtmlUtilsInterface htmlUtils,
+    private Server(LoggerInterface logger, CatchupContextInterface context, HtmlUtilsInterface htmlUtils,
                    Cataloger cataloger, Recorder recorder) throws Exception {
         this.logger = logger;
         this.htmlUtils = htmlUtils;
@@ -87,6 +87,9 @@ public class Server implements CatalogPublisher {
     }
 
     private void init(HtmlUtilsInterface htmlUtils, Cataloger cataloger, Recorder recorder) {
+        StatusPage statusPageProvider = new StatusPage(cataloger, recorder);
+        addStaticContent(statusPageProvider);
+
         RecordingsPage recProvider = new RecordingsPage(recorder);
         addStaticContent(recProvider);
 
@@ -165,6 +168,10 @@ public class Server implements CatalogPublisher {
 
       while (target.startsWith("/")) {
         target = target.substring(1);
+      }
+
+      if (target.equals("stopserver?type=html")) {
+        System.exit(1);
       }
 
       String page = target;

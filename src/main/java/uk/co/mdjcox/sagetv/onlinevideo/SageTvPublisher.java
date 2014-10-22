@@ -9,12 +9,11 @@ package uk.co.mdjcox.sagetv.onlinevideo;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.CatalogPublisher;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
+import uk.co.mdjcox.utils.LoggerInterface;
 import uk.co.mdjcox.utils.PropertiesFile;
 
 import java.io.File;
@@ -35,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SageTvPublisher implements CatalogPublisher {
 
     /** The logger to be used for debug output */
-    private Logger logger;
+    private LoggerInterface logger;
     /** The utilities used to perform some string manipulation */
     private HtmlUtilsInterface htmlUtils;
     /** The qualifier added to the custom SageTV online video link and UIText files */
@@ -53,7 +52,7 @@ public class SageTvPublisher implements CatalogPublisher {
      * @param context The properties and environment
      */
     @Inject
-    private SageTvPublisher(Logger logger, HtmlUtilsInterface htmlUtils, CatchupContextInterface context)
+    private SageTvPublisher(LoggerInterface logger, HtmlUtilsInterface htmlUtils, CatchupContextInterface context)
     {
         this.qualifier = context.getOnlineVideoPropertiesSuffix();
         this.onlineVideoPropertiesDir = context.getOnlineVideoPropertiesDir();

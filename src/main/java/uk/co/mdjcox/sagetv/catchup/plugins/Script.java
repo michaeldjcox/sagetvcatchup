@@ -4,11 +4,10 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
 import org.codehaus.groovy.control.CompilerConfiguration;
-
-import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
+import uk.co.mdjcox.utils.LoggerInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
 
 import java.io.File;
@@ -22,14 +21,14 @@ import java.io.File;
  */
 public abstract class Script {
 
-    private Logger logger;
+    private LoggerInterface logger;
     private String script;
     private HtmlUtilsInterface htmlUtils;
     private DownloadUtilsInterface downloadUtils;
     private OsUtilsInterface osUtils;
     private CatchupContextInterface context;
 
-    protected Script(Logger logger, String script, HtmlUtilsInterface htmlUtils,
+    protected Script(LoggerInterface logger, String script, HtmlUtilsInterface htmlUtils,
                      DownloadUtilsInterface downloadUtils, OsUtilsInterface osUtils,
                      CatchupContextInterface catchupContext) {
         this.logger = logger;
@@ -40,7 +39,7 @@ public abstract class Script {
         this.context = catchupContext;
     }
 
-    protected Logger getLogger() {
+    protected LoggerInterface getLogger() {
         return logger;
     }
 

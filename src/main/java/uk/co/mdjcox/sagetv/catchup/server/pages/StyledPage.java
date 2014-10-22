@@ -1,11 +1,10 @@
 package uk.co.mdjcox.sagetv.catchup.server.pages;
 
 import com.thoughtworks.xstream.XStream;
-
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.utils.HtmlBuilder;
+import uk.co.mdjcox.utils.LoggerInterface;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,7 +23,7 @@ import java.io.StringWriter;
  */
 public class StyledPage extends AbstractHtmlPage {
 
-    private final Logger logger;
+    private final LoggerInterface logger;
     private final XStream xstream;
     private final String title;
     private final String stylesheet;
@@ -33,7 +32,7 @@ public class StyledPage extends AbstractHtmlPage {
     private final String page;
     private final String xsltDir;
 
-    public StyledPage(String xsltDir, Logger logger, String title, String stylesheet, String id, Object object) {
+    public StyledPage(String xsltDir, LoggerInterface logger, String title, String stylesheet, String id, Object object) {
         this.logger = logger;
         this.title = title;
         this.stylesheet = stylesheet;

@@ -2,7 +2,6 @@ package uk.co.mdjcox.sagetv.catchup;
 
 import uk.co.mdjcox.utils.PropertiesInterface;
 
-import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -25,6 +24,8 @@ public interface CatchupContextInterface {
 
   String getConfigDir();
 
+  String getTmpDir();
+
   String getXsltDir();
 
   String getLogDir();
@@ -42,10 +43,6 @@ public interface CatchupContextInterface {
   PropertiesInterface getProperties();
 
   boolean skipPlugin(String sourceId);
-
-  File getSageTVPluginsDevFile();
-
-  String getSageTVPluginsURL();
 
   String toString();
 

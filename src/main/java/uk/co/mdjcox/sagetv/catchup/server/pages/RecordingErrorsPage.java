@@ -1,10 +1,7 @@
 package uk.co.mdjcox.sagetv.catchup.server.pages;
 
 import uk.co.mdjcox.sagetv.catchup.Recorder;
-import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.HtmlBuilder;
-
-import java.util.TreeSet;
 
 /**
  * Created by michael on 06/10/14.

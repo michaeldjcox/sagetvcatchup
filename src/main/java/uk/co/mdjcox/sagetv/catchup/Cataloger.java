@@ -2,11 +2,10 @@ package uk.co.mdjcox.sagetv.catchup;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.*;
+import uk.co.mdjcox.utils.LoggerInterface;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -20,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Singleton
 public class Cataloger {
 
-    private Logger logger;
+    private LoggerInterface logger;
     private PluginManager pluginManager;
     private String progressString = "Waiting";
     private AtomicBoolean stop = new AtomicBoolean(false);
@@ -34,7 +33,7 @@ public class Cataloger {
     private CatchupContextInterface context;
 
   @Inject
-    private Cataloger(Logger logger, CatchupContextInterface context, PluginManager pluginManager) {
+    private Cataloger(LoggerInterface logger, CatchupContextInterface context, PluginManager pluginManager) {
         this.logger = logger;
         this.pluginManager = pluginManager;
         this.refreshRate = context.getRefreshRate();

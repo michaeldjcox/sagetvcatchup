@@ -6,7 +6,7 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <dependencySets>
         <dependencySet>
-            <outputDirectory>JARs</outputDirectory>
+            <outputDirectory>sagetvcatchup/libs</outputDirectory>
             <excludes>
                 <exclude>*sagetvcatchup*</exclude>
             </excludes>
@@ -15,7 +15,7 @@
     <fileSets>
         <fileSet>
             <directory>target</directory>
-            <outputDirectory>JARs</outputDirectory>
+            <outputDirectory>sagetvcatchup/libs</outputDirectory>
             <includes>
                 <include>*.jar</include>
             </includes>
@@ -59,6 +59,11 @@
         <file>
             <source>target/${artifactId}-${version}.${packaging}</source>
             <outputDirectory>JARs/</outputDirectory>
+            <destName>${artifactId}Plugin.${packaging}</destName>
+        </file>
+        <file>
+            <source>target/${artifactId}-${version}.${packaging}</source>
+            <outputDirectory>sagetvcatchup/libs</outputDirectory>
             <destName>${artifactId}.${packaging}</destName>
         </file>
     </files>

@@ -2,9 +2,8 @@ package uk.co.mdjcox.sagetv.catchup.plugins;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
+import uk.co.mdjcox.utils.LoggerInterface;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -23,7 +22,7 @@ import java.util.TreeSet;
 @Singleton
 public class PluginManager {
 
-    private Logger logger;
+    private LoggerInterface logger;
     private LinkedHashMap<String, Plugin> plugins = new  LinkedHashMap<String, Plugin>();
     private Set<String> pluginNames = new TreeSet<String>();
     @Inject
@@ -31,7 +30,7 @@ public class PluginManager {
     private CatchupContextInterface context;
 
     @Inject
-    private PluginManager(Logger logger, CatchupContextInterface context) {
+    private PluginManager(LoggerInterface logger, CatchupContextInterface context) {
         this.logger = logger;
         this.context = context;
     }

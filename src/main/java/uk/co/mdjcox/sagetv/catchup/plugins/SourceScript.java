@@ -2,12 +2,11 @@ package uk.co.mdjcox.sagetv.catchup.plugins;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-
-import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.model.Source;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
+import uk.co.mdjcox.utils.LoggerInterface;
 import uk.co.mdjcox.utils.OsUtilsInterface;
 
 import java.io.File;
@@ -24,7 +23,7 @@ public class SourceScript extends Script {
     private String sourceId;
 
     @AssistedInject
-    public SourceScript(Logger logger, @Assisted("id") String id, @Assisted("base") String base,
+    public SourceScript(LoggerInterface logger, @Assisted("id") String id, @Assisted("base") String base,
                         HtmlUtilsInterface htmlUtils, DownloadUtilsInterface downloadUtils,
                         OsUtilsInterface osUtils, CatchupContextInterface context) {
         super(logger, base + File.separator + "getSource.groovy", htmlUtils, downloadUtils, osUtils, context);

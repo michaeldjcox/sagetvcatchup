@@ -5,10 +5,8 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Named;
-import uk.co.mdjcox.utils.Logger;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.ScriptFactory;
-import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.utils.*;
 
 import java.io.File;
@@ -25,7 +23,7 @@ import java.util.Map;
 public class CatchupDevModule extends AbstractModule {
 
   private PropertiesFile properties;
-    private Logger logger;
+    private LoggerInterface logger;
     private String workingDir;
 
     @Override
@@ -39,10 +37,10 @@ public class CatchupDevModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public Logger providesLogger() throws Exception {
+    public LoggerInterface providesLogger() throws Exception {
       if (logger == null) {
         System.setProperty("logback.configurationFile", workingDir + "src/main/config/logback-test.xml");
-        logger = new Logger(CatchupPlugin.class);
+        logger = new Logger(CatchupServer.class);
       }
       return logger;
     }
@@ -50,7 +48,7 @@ public class CatchupDevModule extends AbstractModule {
   @Provides
   @Named("BackupPropsFile")
   public String providesBackupPropsFileName() {
-    return workingDir + "test/tmp/sagetvcatchup-dev.props.backup";
+    return workingDir + "test/tmp/sagetvcatchup-dev.properties.backup";
   }
 
   @Provides
@@ -138,59 +136,6 @@ public class CatchupDevModule extends AbstractModule {
         return DownloadUtils.instance();
     }
 
-    @Provides
-    @Singleton
-    public SageUtilsInterface providesSageUtils() throws Exception {
-        return new SageUtilsInterface() {
-            @Override
-            public String getSageTVProperty(String property, String defaultValue) throws Exception {
-                return "";
-            }
-
-            @Override
-            public String[] findTitlesWithName(String regex) {
-                return new String[0];
-            }
-
-            @Override
-            public Object[] findAiringsByText(String name) {
-                return new Object[0];
-            }
-
-            @Override
-            public String printAiring(Object airing) {
-                return "";
-            }
-
-            @Override
-            public Object findShowForAiring(Object airing) {
-                return null;
-            }
-
-            @Override
-            public String printShow(Object show) {
-                return "";
-            }
-
-            @Override
-            public Object addAiringToSageTV(Recording recording) {
-                return null;
-            }
-
-            @Override
-            public File[] getRecordingDirectories() {
-                return new File[0];
-            }
-
-            @Override
-            public void setClientProperty(String name, String value) {
-
-            }
-        };
-
-
-    }
-
   public static class DevCatchupContext implements CatchupContextInterface {
     private final String tmpDir;
     private final String workingDir;
@@ -207,8 +152,6 @@ public class CatchupDevModule extends AbstractModule {
     private String catalogFileName;
     private String defaultCatalogFileName;
     private String onlineVideoPropsSuffix;
-    private File sageTvPluginsFile;
-    private String sageTVPluginsURL;
     private PropertiesInterface properties;
 
     public DevCatchupContext(PropertiesInterface properties) {
@@ -227,8 +170,6 @@ public class CatchupDevModule extends AbstractModule {
       recordingDir = workingDir + "recordings";
       onlineVideoPropsSuffix = "sagetvcatchup";
       onlineVideoPropertiesDir = "/opt/sagetv/server/STVs/SageTV7/OnlineVideos";
-      sageTvPluginsFile = new File(workingDir, "SageTVPluginsDev.xml");
-      sageTVPluginsURL = "http://mintpad/sagetvcatchup/download/SageTVPluginsDev.xml";
       this.properties = properties;
       configDir = workingDir + "config";
     }
@@ -271,6 +212,11 @@ public class CatchupDevModule extends AbstractModule {
     @Override
     public String getConfigDir() {
       return configDir;
+    }
+
+    @Override
+    public String getTmpDir() {
+      return tmpDir;
     }
 
     @Override
@@ -318,16 +264,6 @@ public class CatchupDevModule extends AbstractModule {
       return properties.getBoolean(sourceId + ".skip");
     }
 
-    @Override
-    public File getSageTVPluginsDevFile() {
-      return sageTvPluginsFile;
-    }
-
-    @Override
-    public String getSageTVPluginsURL() {
-      return sageTVPluginsURL;
-    }
-
     public void setRecordingDir(String recordingDir) {
       this.recordingDir = recordingDir;
     }
@@ -354,8 +290,6 @@ public class CatchupDevModule extends AbstractModule {
               "catalogFileName='" + catalogFileName + '\'' + "\n" +
               "defaultCatalogFileName='" + defaultCatalogFileName + '\'' + "\n" +
               "onlineVideoPropsSuffix='" + onlineVideoPropsSuffix + '\'' + "\n" +
-              "sageTvPluginsFile=" + sageTvPluginsFile + "\n" +
-              "sageTVPluginsURL='" + sageTVPluginsURL + '\'' + "\n" +
               "properties=" + properties + "\n" +
               '}';
     }
