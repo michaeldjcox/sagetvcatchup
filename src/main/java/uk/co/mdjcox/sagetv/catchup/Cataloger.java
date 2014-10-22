@@ -28,16 +28,18 @@ public class Cataloger {
     private ScheduledFuture<?> future;
     private List<CatalogPublisher> publishers;
     private String errorSummary = "";
-    private String statsSummary = "";
-  private long refreshRate;
-    private CatchupContextInterface context;
+  private int refreshRate;
+  private CatchupContextInterface context;
+  private int sourceStats=0;
+  private int programmeStats=0;
+  private int episodeStats=0;
 
   @Inject
     private Cataloger(LoggerInterface logger, CatchupContextInterface context, PluginManager pluginManager) {
         this.logger = logger;
         this.pluginManager = pluginManager;
         this.refreshRate = context.getRefreshRate();
-        this.context = context;
+    this.context = context;
     }
 
     private Runnable getCatalogRunnable(final List<CatalogPublisher> publishers) {
@@ -75,9 +77,9 @@ public class Cataloger {
     }
 
   private void buildStatsSummary(Catalog catalog) {
-    int sourceStats = 0;
-    int programmeStats = 0;
-    int episodeStats = 0;
+    sourceStats = 0;
+    programmeStats = 0;
+    episodeStats = 0;
 
     for (Category category : catalog.getCategories()) {
       if (category.isProgrammeCategory() && category.getParentId().isEmpty()) {
@@ -91,7 +93,6 @@ public class Cataloger {
 
     episodeStats = catalog.getEpisodes().size();
 
-    statsSummary = sourceStats + " sources " + programmeStats + " programmes " + episodeStats + " episodes";
   }
 
   private void publish(Catalog catalog, List<CatalogPublisher> publishers) {
@@ -277,7 +278,9 @@ public class Cataloger {
 
             progressString = "Finished cataloging";
 
-            statsSummary = sourceStats + " sources " + programmeStats + " programmes " + episodeStats + " episodes";
+          this.sourceStats = sourceStats;
+          this.programmeStats = programmeStats;
+          this.episodeStats = episodeStats;
 
             return catalog;
 
@@ -438,7 +441,8 @@ public class Cataloger {
     }
 
     public String getProgress() {
-        if ("Finished".equals(progressString) || "Failed".equals(progressString) || "Waiting".equals(progressString)) {
+        if ("Finished".equals(progressString) || "Failed".equals(progressString)
+             || "Waiting".equals(progressString) || "Stopped".equals(progressString)) {
             if (future == null) {
               progressString += "";
             } else {
@@ -458,7 +462,7 @@ public class Cataloger {
     }
 
     public String getStatsSummary() {
-      return statsSummary;
+      return sourceStats + " sources " + programmeStats + " programmes " + episodeStats + " episodes";
     }
 
     public void setProgress(String progress) {
@@ -497,7 +501,26 @@ public class Cataloger {
 
         runnable = getCatalogRunnable(publishers);
 
-        future = service.scheduleAtFixedRate(runnable, 2, refreshRate*60, TimeUnit.MINUTES);
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.set(Calendar.HOUR_OF_DAY, context.getRefreshStartHour());
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        while (cal.getTimeInMillis() < System.currentTimeMillis()) {
+          cal.add(Calendar.HOUR_OF_DAY, refreshRate);
+        }
+        long refreshStartTime = cal.getTimeInMillis();
+
+         long initialDelay = (refreshStartTime - System.currentTimeMillis());
+
+        logger.info("First catalog will be at " + cal.getTime() + " thats in " + (initialDelay/(1000*60*60)) + " Hours" );
+
+        if (programmeStats < context.getRefreshStartNowProgrammeThreshold()) {
+          logger.info("Doing early cataloging as catalog looks a bit sparse");
+          future = service.schedule(runnable, 0, TimeUnit.MILLISECONDS);
+        }
+
+        future = service.scheduleAtFixedRate(runnable, initialDelay, refreshRate*60*60*1000, TimeUnit.MILLISECONDS);
         logger.info("Started the catalog service");
       } catch (Exception e) {
         logger.error("Failed to start the catalog service", e);

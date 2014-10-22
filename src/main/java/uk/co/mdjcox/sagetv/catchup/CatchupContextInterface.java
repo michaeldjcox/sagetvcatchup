@@ -14,6 +14,8 @@ public interface CatchupContextInterface {
 
   int getRefreshRate();
 
+  int getRefreshStartHour();
+
   int getPort();
 
   String getPodcastBase();
@@ -49,4 +51,6 @@ public interface CatchupContextInterface {
   void setPort(int port);
 
   void setRecordingDir(String recordDir);
+
+  int getRefreshStartNowProgrammeThreshold();
 }

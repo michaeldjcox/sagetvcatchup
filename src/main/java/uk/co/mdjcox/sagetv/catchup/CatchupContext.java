@@ -14,6 +14,7 @@ public class CatchupContext implements CatchupContextInterface {
   private final static String userHome = System.getProperty("user.home");
 
   private final String podcastBase;
+  private final int refreshStartHour;
   private String tmpDir;
   private String pluginDir;
   private String cssDir;
@@ -28,6 +29,7 @@ public class CatchupContext implements CatchupContextInterface {
   private String defaultCatalogFileName;
   private String onlineVideoPropsSuffix;
   private PropertiesInterface properties;
+  private int refreshStartNowProgrammeThreshold;
 
   public CatchupContext(final PropertiesInterface properties) {
     this.properties = properties;
@@ -40,6 +42,8 @@ public class CatchupContext implements CatchupContextInterface {
 
     recordingDir = properties.getString("recordingDir");
     refreshRate = properties.getInt("refreshRateHours");
+    refreshStartHour = properties.getInt("refreshStartHour");
+    refreshStartNowProgrammeThreshold = properties.getInt("refreshStartNowProgrammeThreshold");
     port = properties.getInt("podcasterPort");
 
     tmpDir = System.getProperty("java.io.tmpdir", ".");
@@ -86,6 +90,11 @@ public class CatchupContext implements CatchupContextInterface {
   @Override
   public int getRefreshRate() {
     return refreshRate;
+  }
+
+  @Override
+  public int getRefreshStartHour() {
+    return refreshStartHour;
   }
 
   @Override
@@ -169,6 +178,11 @@ public class CatchupContext implements CatchupContextInterface {
 
   public void setRecordingDir(String recordingDir) {
     this.recordingDir = recordingDir;
+  }
+
+  @Override
+  public int getRefreshStartNowProgrammeThreshold() {
+    return refreshStartNowProgrammeThreshold;
   }
 
   @Override

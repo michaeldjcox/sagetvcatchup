@@ -18,6 +18,8 @@ public class CatchupPropertiesFileLayout extends OrderedPropertiesFileLayout {
     ORDER.add("recordingDir");
     ORDER.add("podcasterPort");
     ORDER.add("refreshRateHours");
+    ORDER.add("refreshStartHour");
+    ORDER.add("refreshStartNowProgrammeThreshold");
     ORDER.add("Iplayer.scriptDir");
     ORDER.add("Iplayer.command");
     ORDER.add("Iplayer.skip");

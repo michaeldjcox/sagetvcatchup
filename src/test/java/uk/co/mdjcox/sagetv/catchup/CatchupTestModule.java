@@ -120,6 +120,16 @@ public class CatchupTestModule extends AbstractModule {
     }
 
     @Override
+    public int getRefreshStartHour() {
+      return 2;
+    }
+
+    @Override
+    public int getRefreshStartNowProgrammeThreshold() {
+      return 10000;
+    }
+
+    @Override
     public int getPort() {
       return port;
     }
