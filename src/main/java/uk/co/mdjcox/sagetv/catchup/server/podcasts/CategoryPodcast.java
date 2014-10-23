@@ -7,6 +7,7 @@ import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.RssBuilder;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by michael on 07/10/14.
@@ -45,8 +46,13 @@ public class CategoryPodcast extends AbstractPodcast {
         builder.addImage(iconUrl, shortName, url);
 
         Set<String> subCats = ((SubCategory) service).getSubCategories();
-        for (String subCatId : subCats) {
-            SubCategory subCat = (SubCategory)catalog.getCategory(subCatId);
+      SubcategoryComparator comparator = new SubcategoryComparator();
+        Set<SubCategory> subCatSet = new TreeSet<SubCategory>(comparator);
+      for (String subCatId : subCats) {
+        SubCategory subCat = (SubCategory) catalog.getCategory(subCatId);
+        subCatSet.add(subCat);
+      }
+        for (SubCategory subCat: subCatSet) {
             if (subCat.isProgrammeCategory()) {
                 final String categoryUrl = getPodcastBaseUrl() + "/programme?id=" + subCat.getId() + ";type=xml";
                 builder.addCategoryItem(subCat.getShortName(), subCat.getLongName(), categoryUrl);

@@ -6,7 +6,7 @@ import uk.co.mdjcox.sagetv.model.Programme;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.RssBuilder;
 
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by michael on 07/10/14.
@@ -45,10 +45,24 @@ public class ProgrammePodcast extends AbstractPodcast {
         builder.addImage(iconUrl, shortName, url);
         Programme programme = (Programme) service;
         Set<String> episodes = programme.getEpisodes();
+        EpisodeComparator comparator = new EpisodeComparator();
+        TreeSet<Episode> sortedEpisodes = new TreeSet<Episode>(comparator);
         for (String episodeId : episodes) {
-            Episode episode = catalog.getEpisode(episodeId);
+          Episode episode = catalog.getEpisode(episodeId);
+          sortedEpisodes.add(episode);
+        }
+        for (Episode episode : sortedEpisodes) {
             final String title = htmlUtils.makeContentSafe(episode.getPodcastTitle());
-            final String desc = htmlUtils.makeContentSafe(episode.getDescription());
+            String desc = htmlUtils.makeContentSafe(episode.getDescription());
+          desc += "<br/><br/>";
+          desc += episode.getOrigAirDate() + " " + episode.getOrigAirTime();
+          desc += "<br/>";
+          if (!episode.getSeries().isEmpty() && !episode.getSeries().equals("0")) {
+            desc += "Series:  " + episode.getSeries() + " ";
+          }
+          if (!episode.getEpisode().isEmpty() && !episode.getEpisode().equals("0")) {
+            desc += "Episode: " + episode.getEpisode();
+          }
             String episodeIconUrl = episode.getIconUrl();
             if (episodeIconUrl != null && episodeIconUrl.startsWith("/")) {
               episodeIconUrl = getPodcastBaseUrl() + episodeIconUrl;
