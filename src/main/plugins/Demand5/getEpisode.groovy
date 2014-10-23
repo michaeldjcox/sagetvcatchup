@@ -32,7 +32,7 @@ if (title != null) {
 
 // SERIES TITLE
 
-// TODO - no series title?
+// No series title?
 //LOG_WARNING(episode, "Series title not found");
 
 // SYNOPSIS
@@ -155,7 +155,7 @@ if (date != null) {
         newDate = date;
     }
 
-    episode.setAirDate(newDate); //TODO
+    episode.setAirDate(newDate);
     episode.setOrigAirDate(newDate);
 } else {
     LOG_WARNING(episode, "Original air date not found");
@@ -170,7 +170,7 @@ if (time != null) {
         newTime = time;
     }
 
-    episode.setAirTime(newTime); //TODO
+    episode.setAirTime(newTime);
     episode.setOrigAirTime(newTime);
 } else {
     LOG_WARNING(episode, "Original air time not found");

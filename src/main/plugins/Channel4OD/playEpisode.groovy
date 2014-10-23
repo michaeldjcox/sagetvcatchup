@@ -12,5 +12,5 @@ File file = WAIT_FOR_FILE_OF_SIZE(filename, 1024000, 10000)
 
 recording.setPartialFile(file);
 
-// TODO set the complete file
-
+// Needs to be like Iplayer
+// recording.setCompletedFile(file)

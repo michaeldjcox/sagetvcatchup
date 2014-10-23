@@ -11,8 +11,6 @@ import java.io.*;
  * Created by michael on 07/10/14.
  */
 public class CachedContentProvider implements ContentProvider {
-    // TODO some form of staging and cleanup
-
     private final String htdocsDir;
     private final String encoding;
     private final LoggerInterface logger;

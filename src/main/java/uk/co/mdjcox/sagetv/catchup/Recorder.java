@@ -177,7 +177,6 @@ public class Recorder {
         recording.setStopped();
         Plugin plugin = pluginManager.getPlugin(recording.getSourceId());
         plugin.stopEpisode(recording);
-        // TODO If resume would work - do not delete
         File partialFile = recording.getPartialFile();
         if (partialFile != null && partialFile.exists()) {
             partialFile.delete();

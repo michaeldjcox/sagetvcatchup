@@ -96,12 +96,12 @@ public class SageUtils implements SageUtilsInterface {
     }
 
 
-    long duration = 1000; // TODO but sageTV seems to work it out anyway
+    long duration = 1000;
     String peopleList[] = {};
     String rolesList[] = {};
     String rated = null;
     String expandedRatedList[] = null;
-    String parentalRating = null; // TODO - this might be available
+    String parentalRating = null;
     String miscList[] = new String[0];
     Long now = Utility.Time();
     String nowString = now.toString();

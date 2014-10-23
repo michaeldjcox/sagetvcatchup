@@ -2,7 +2,6 @@ package uk.co.mdjcox.sagetv.catchup;
 
 import sage.SageTVPlugin;
 import sage.SageTVPluginRegistry;
-import sagex.api.Configuration;
 import uk.co.mdjcox.utils.*;
 
 import java.io.BufferedReader;
@@ -24,38 +23,6 @@ import java.util.concurrent.TimeUnit;
  * Time: 18:05
  * To change this template use File | Settings | File Templates.
  */
-
-// In priority order...
-
-// BUGS
-// TODO - BUG - force refresh on online caching (set client property!)
-// TODO - BUG - get_iplayer will not play some content - is this the 7 day issue - wait for 2.87
-// TODO - BUG - original air date (I have) but last aired date (I don't have)
-// TODO - BUG - No channel is set on TV recordings - you can create a detailed airing and link to media file
-// TODO - default for windows XP
-// TODO - conflicts in log framework
-// TODO - conflicts in servlet API - should I separate the server from sagetv?
-// TODO - ensure directories are present for logging?
-
-// Refactor
-// TODO - Podcast stylesheets?
-// TODO - Generalise SageTV Publisher into utils
-// TODO - fake programme categories are model breaking, always have to filter out source, root, category, programme
-
-// SageTV Integration
-// TODO - Can we use Sage Favourites to establish a favourites category?
-// TODO - Can "watched" status extend from recordings to Online
-// TODO - Can request such downloads from the existing EPG?
-
-// WISHLIST
-
-// TODO - Can I implement a "New" category
-// TODO - Demand5 - record fails
-// TODO - 4OD
-// TODO - ITVPlayer
-// TODO - is there any way I can incrementally update the catalog?
-// TODO - STVI
-
 public class CatchupPlugin implements SageTVPlugin {
 
   private static final String PULL_UPGRADE = "pullUpgrade";
@@ -204,7 +171,6 @@ public class CatchupPlugin implements SageTVPlugin {
           }
 
           if (!recording.delete()) {
-            // TODO needs more resilience?
             throw new Exception("Failed to delete recording log file");
           }
 
