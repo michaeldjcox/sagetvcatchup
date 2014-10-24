@@ -65,11 +65,44 @@
         </repository>
     </repositories>
 
-    <properties>
-        <sagedir>/opt/sagetv/server</sagedir>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.build.timestamp.format>yyyy.MM.dd</maven.build.timestamp.format>
-    </properties>
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <devpluginsdest>C:/Program Files (x86)/SageTV/SageTV/SageTVPluginsDev.xml</devpluginsdest>
+                <websiteurl>file:///C:/Users/Michael/Documents/Projects/site</websiteurl>
+                <downloadurl>file:///C:/Users/michael/.m2/repository/uk/co/mdjcox/sagetvcatchup/sagetvcatchup</downloadurl>
+                <downloaddir>C:/Users/michael/.m2/repository/uk/co/mdjcox/sagetvcatchup/sagetvcatchup</downloaddir>
+                <sagedir>C:/Program Files (x86)/SageTV/SageTV</sagedir>
+                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+                <maven.build.timestamp.format>yyyy.MM.dd</maven.build.timestamp.format>
+            </properties>
+
+        </profile>
+
+        <profile>
+            <id>linux</id>
+            <activation>
+                <os>
+                    <family>linux</family>
+                </os>
+            </activation>
+            <properties>
+                <devpluginsdest>/var/www/sagetvcatchup/download/SageTVPluginsDev.xml</devpluginsdest>
+                <websiteurl>file://localhost/var/www/sagetvcatchup</websiteurl>
+                <downloadurl>file://localhost/var/www/sagetvcatchup/download</downloadurl>
+                <downloaddir>/var/www/sagetvcatchup/download</downloaddir>
+                <sagedir>/opt/sagetv/server</sagedir>
+                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+                <maven.build.timestamp.format>yyyy.MM.dd</maven.build.timestamp.format>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
@@ -130,7 +163,7 @@
                         </goals>
                         <configuration>
                             <file>${basedir}/src/main/assembly/SageTVPlugins.template</file>
-                            <outputFile>/var/www/sagetvcatchup/download/SageTVPluginsDev.xml</outputFile>
+                            <outputFile>${devpluginsdest}</outputFile>
                             <replacements>
                                 <replacement>
                                     <token>_NAME_</token>
@@ -196,7 +229,7 @@
                                 <replacement>
                                     <token>_MD5_</token>
                                     <valueFile>
-                                        /var/www/sagetvcatchup/download/${project.version}/${project.artifactId}-${project.version}-plugin.zip.md5
+                                        ${downloaddir}/${project.version}/${project.artifactId}-${project.version}-plugin.zip.md5
                                     </valueFile>
                                 </replacement>
                             </replacements>
@@ -276,7 +309,7 @@
                                 <replacement>
                                     <token>_MD5_</token>
                                     <valueFile>
-                                        /var/www/sagetvcatchup/download/${project.version}/${project.artifactId}-${project.version}-plugin.zip.md5
+                                        ${downloaddir}/${project.version}/${project.artifactId}-${project.version}-plugin.zip.md5
                                     </valueFile>
                                 </replacement>
                             </replacements>
@@ -506,12 +539,12 @@
         <repository>
             <id>sagetvcatchup.repo</id>
             <name>Local file system</name>
-            <url>file://localhost/var/www/sagetvcatchup/download</url>
+            <url>${downloadurl}</url>
         </repository>
         <site>
             <id>sagetvcatchup.website</id>
             <name>Sage TV Catchup Website</name>
-            <url>file://localhost/var/www/sagetvcatchup</url>
+            <url>${websiteurl}</url>
         </site>
     </distributionManagement>
 
