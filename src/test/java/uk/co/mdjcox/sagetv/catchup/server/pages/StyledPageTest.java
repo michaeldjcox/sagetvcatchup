@@ -128,7 +128,7 @@ public class StyledPageTest {
         transformer.transform(source, result);
 
         String resultStr = writer.getBuffer().toString();
-        resultStr = resultStr.replaceFirst("<META.*>\n", "");
+        resultStr = resultStr.replaceFirst("<META.*>" + System.getProperty("line.separator"), "");
 
         assertEquals(title, webPages.get(webpage), resultStr);
     }
@@ -164,7 +164,7 @@ public class StyledPageTest {
         transformer.transform(source, result);
 
         String resultStr = writer.getBuffer().toString();
-        resultStr = resultStr.replaceFirst("<META.*>\n", "");
+        resultStr = resultStr.replaceFirst("<META.*>" + System.getProperty("line.separator"), "");
 
         assertEquals(title, webPages.get(webpage.replace(".", "-" + id + ".")), resultStr);
     }
@@ -200,7 +200,7 @@ public class StyledPageTest {
         transformer.transform(source, result);
 
         String resultStr = writer.getBuffer().toString();
-        resultStr = resultStr.replaceFirst("<META.*>\n", "");
+        resultStr = resultStr.replaceFirst("<META.*>" + System.getProperty("line.separator"), "");
 
         assertEquals(title, webPages.get(webpage.replace(".", "-" + id + ".")), resultStr);
     }

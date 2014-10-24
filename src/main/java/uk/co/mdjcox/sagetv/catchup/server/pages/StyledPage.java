@@ -72,7 +72,7 @@ public class StyledPage extends AbstractHtmlPage {
             transformer.transform(source, result);
 
             String resultStr = writer.getBuffer().toString();
-            resultStr = resultStr.replaceFirst("<META.*>\n", "");
+            resultStr = resultStr.replaceFirst("<META.*>" + System.getProperty("line.separator"), "");
 
             return resultStr;
     }
