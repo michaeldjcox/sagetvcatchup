@@ -6,3 +6,5 @@ test/logs
 test/tmp
 test/recordings
 test/config
+desktop.ini
+test/tmp/catalog_test.xml
