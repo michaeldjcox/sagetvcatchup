@@ -52,12 +52,12 @@ public class Recorder {
         this.recordingsLogDir = context.getTmpDir() + File.separator + "recordings" + File.separator;
     }
 
-    private File watch(Episode episode) throws Exception {
+    private File watch(Episode episode, boolean keep) throws Exception {
         Recording recording = checkForExistingRecording(episode.getId());
         if (recording != null) {
             return recording.getPartialFile();
         } else {
-            recording = createNewRecording(episode, true);
+            recording = createNewRecording(episode, !keep);
             return download(recording);
         }
     }
@@ -385,7 +385,7 @@ public class Recorder {
 
         try {
 
-            File file = watch(episode);
+            File file = watch(episode, keep);
 
             logger.info("Streaming " + file + " exists=" + file.exists());
 
