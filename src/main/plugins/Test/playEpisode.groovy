@@ -25,8 +25,6 @@ Thread thread = new Thread(new Runnable() {
         } catch (Exception ex) {
         }
 
-        LOG_INFO("TEST RECORDING IS COMPLETE");
-
         if (file.exists()) {
             Files.copy(file.toPath(), completedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }

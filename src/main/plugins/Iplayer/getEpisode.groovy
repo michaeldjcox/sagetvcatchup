@@ -36,7 +36,6 @@ if (title == null) {
 
 if (title != null) {
     episode.setEpisodeTitle(title);
-    LOG_INFO("EpisodeTitle: " + title)
 } else {
     LOG_ERROR(episode, "Episode title not found");
 }
@@ -55,7 +54,6 @@ seriesTitle = REMOVE_HTML_TAGS(seriesTitle);
 
 if (seriesTitle != null) {
     episode.setSeriesTitle(seriesTitle);
-    LOG_INFO("SeriesTitle: " + seriesTitle)
 } else {
     LOG_WARNING(episode, "Series title not found");
 }
@@ -79,7 +77,6 @@ if (desc == null) {
 
 if (desc != null) {
     episode.setDescription(desc);
-    LOG_INFO("Synopsis: " + desc);
 } else {
     LOG_ERROR(episode, "Episode description not found" );
 }
@@ -93,7 +90,6 @@ image = "http://ichef.bbci.co.uk/images/ic/272x153/" + image + ".jpg";
 
 if (image != null) {
     episode.setIconUrl(image);
-    LOG_INFO("Icon: " + image);
 } else {
     LOG_WARNING(episode, "Episode image not found" );
 }
@@ -107,7 +103,6 @@ tuneurl = MAKE_LINK_ABSOLUTE("http://www.bbc.co.uk", tuneurl);
 
 if (tuneurl != null) {
     episode.setServiceUrl(tuneurl);
-    LOG_INFO("URL: " + tuneurl);
 } else {
     LOG_ERROR(episode, "Tuning URL not found" );
 }
@@ -141,7 +136,6 @@ if (channel == null) {
     channel="BBC";
 }
 episode.setChannel(channel);
-LOG_INFO("Channel: " + channel)
 
 // CATEGORY
 details = MOVE_TO("<categories>", metadetails);
@@ -156,7 +150,6 @@ while (genres != null) {
         genre = genre.replace(" & ", " and ");
         genre = genre.replace("&", " and ");
         genre = genre.replace("_", " ");
-        LOG_INFO("Genre: " + genre);
         episode.addGenre(genre);
     }
 }
@@ -184,7 +177,6 @@ if (details == null || !details.startsWith("/>")) {
         if (!seriesNumber.matches("[0-9]*")) {
             LOG_WARNING(episode, "Series number '" + seriesNumber + "' is not a number");
         }
-        LOG_INFO("Series: " + seriesNumber)
         episode.setSeries(seriesNumber);
     } else {
         LOG_WARNING(episode, "Series number not found");
@@ -202,7 +194,6 @@ if (details == null || !details.startsWith("/>")) {
         if (!episodeNo.matches("[0-9]*")) {
             LOG_WARNING(episode, "Episode number '" + episodeNo + "' is not a number");
         }
-        LOG_INFO("Episode: " + episodeNo);
         episode.setEpisode(episodeNo);
     } else {
         LOG_WARNING(episode, "Episode number not found");
@@ -233,8 +224,6 @@ if (details == null || !details.startsWith("/>")) {
 
 
     if (date != null) {
-        LOG_INFO("Date: " + date)
-
         String newDate = FIX_DATE("yyyy-MM-dd", date);
         if (newDate == null) {
             LOG_ERROR(episode, "Failed to parse air date " + date);
@@ -248,8 +237,6 @@ if (details == null || !details.startsWith("/>")) {
     }
 
     if (time != null) {
-        LOG_INFO("Time: " + time)
-
         String newTime = FIX_TIME("HH:mm:ss", time);
         if (newTime == null) {
             LOG_ERROR(episode, "Failed to parse air time " + time);

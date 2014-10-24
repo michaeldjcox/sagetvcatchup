@@ -24,8 +24,6 @@ if (filename == null || filename.trim().isEmpty()) {
 
 filename = recording.getRecordingDir() + File.separator + filename.substring(prefix.length()).trim() + ".partial.mp4.flv";
 
-LOG_INFO("Recording to " + filename);
-
 File file = WAIT_FOR_FILE_OF_SIZE(filename, 1024000, 10000, recording.getStopFlag())
 
 recording.setPartialFile(file);
