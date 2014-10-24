@@ -9,12 +9,10 @@ import uk.co.mdjcox.utils.RssBuilder;
 public class RecordingErrorsPodcast extends AbstractPodcast {
 
     private final Recorder recorder;
-    private String page;
 
     public RecordingErrorsPodcast(String baseUrl, Recorder recorder) {
         super(baseUrl);
         this.recorder = recorder;
-        this.page = buildPage();
     }
 
     public String buildPage() {
@@ -41,6 +39,6 @@ public class RecordingErrorsPodcast extends AbstractPodcast {
 
     @Override
     public String getPage() {
-        return page;
+        return buildPage();
     }
 }
