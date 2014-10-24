@@ -164,28 +164,28 @@ public class Server implements CatalogPublisher {
             throws IOException, ServletException {
       response.setStatus(HttpServletResponse.SC_OK);
 
-      logger.info("Got http request: " + request);
-
       while (target.startsWith("/")) {
         target = target.substring(1);
       }
 
-      if (target.equals("stopserver?type=html")) {
+        String page = target;
+        Enumeration params = request.getParameterNames();
+        while (params.hasMoreElements()) {
+            Object name = params.nextElement();
+            if (page.equals(target)) {
+                page += "?";
+            } else {
+                page += "&";
+            }
+            page += name + "=" + request.getParameter(name.toString());
+        }
+
+        logger.info("Got http request: " + page);
+
+      if (target.contains("stopserver")) {
+        logger.info("Calling system exit");
         System.exit(1);
       }
-
-      String page = target;
-      Enumeration params = request.getParameterNames();
-      while (params.hasMoreElements()) {
-        Object name = params.nextElement();
-        if (page.equals(target)) {
-          page += "?";
-        } else {
-          page += "&";
-        }
-        page += name + "=" + request.getParameter(name.toString());
-      }
-
 
       if (target.endsWith(".css")) {
         new CssPage(logger, cssDir, target).serve(response);
