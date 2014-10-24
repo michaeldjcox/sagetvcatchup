@@ -79,7 +79,11 @@ public class CatchupPlugin implements SageTVPlugin {
   public CatchupPlugin(sage.SageTVPluginRegistry registry) {
     this.registry = registry;
     if (File.separator.equals("\\")) {
-      seedFileName = "sagetvcatchup.windows.properties";
+      if (sageHomeDir.contains(File.separator + "Program Files" + File.separator)) {
+          seedFileName = "sagetvcatchup.windows32.properties";
+      } else {
+          seedFileName = "sagetvcatchup.windows.properties";
+      }
     } else {
       seedFileName = "sagetvcatchup.unix.properties";
     }
@@ -207,13 +211,25 @@ public class CatchupPlugin implements SageTVPlugin {
 
   private void startCatchupServer()  {
     try {
-      String javaCmd = System.getProperty("java.home");
-      if (!javaCmd.endsWith(File.separator)) {
-        javaCmd += File.separator;
-      }
-      javaCmd += "bin";
-      javaCmd += File.separator;
-      javaCmd += "java -jar " + catchupDir + "libs" + File.separator + "sagetvcatchup.jar";
+        String javaCmd = "";
+        if (osUtils.isWindows()) {
+            javaCmd += "\"";
+            javaCmd += System.getProperty("java.home");
+            if (!javaCmd.endsWith(File.separator)) {
+                javaCmd += File.separator;
+            }
+            javaCmd += "bin";
+            javaCmd += File.separator;
+            javaCmd += "java\" \"-jar\" \"" + catchupDir + "libs" + File.separator + "sagetvcatchup.jar\"";
+        } else {
+            javaCmd = System.getProperty("java.home");
+            if (!javaCmd.endsWith(File.separator)) {
+                javaCmd += File.separator;
+            }
+            javaCmd += "bin";
+            javaCmd += File.separator;
+            javaCmd += "java -jar " + catchupDir + "libs" + File.separator + "sagetvcatchup.jar";
+        }
 
       osUtils.spawnProcess(javaCmd, "catchupserver", false, new File(catchupDir));
     } catch (Exception e) {
@@ -225,7 +241,10 @@ public class CatchupPlugin implements SageTVPlugin {
   private void stopCatchupServer()  {
     try {
       if (isCatchupServerRunning()) {
-        performServerOperation("stopserver");
+          sageUtils.info("Requesting catchup server shutdown");
+          performServerOperation("stopserver");
+      } else {
+          sageUtils.info("Catchup Server is not running");
       }
 
       try {
@@ -235,19 +254,34 @@ public class CatchupPlugin implements SageTVPlugin {
       }
 
       if (isCatchupServerRunning()) {
-        osUtils.killProcessesContaining("jar " + catchupDir + "libs" + File.separator + "sagetvcatchup.jar");
+          sageUtils.info("Server is still alive so killing catchup server");
+          if (osUtils.isWindows()) {
+              osUtils.killProcessesContaining("\"-jar\" \"" + catchupDir + "libs" + File.separator + "sagetvcatchup.jar\"");
+          } else {
+              osUtils.killProcessesContaining("-jar " + catchupDir + "libs" + File.separator + "sagetvcatchup.jar");
+          }
+      } else {
+          sageUtils.info("Catchup Server is not running");
       }
 
       if (isCatchupServerRunning()) {
         sageUtils.error("Failed to stop catchup server");
       }
+
     } catch (Exception e) {
       sageUtils.error("Failed to stop catchup server", e);
     }
   }
 
   private boolean isCatchupServerRunning() {
-    Map<String, String> processes = osUtils.findProcessesContaining("jar " + catchupDir + "libs" + File.separator + "sagetvcatchup.jar");
+    sageUtils.info("Is catchup server running?");
+    Map<String, String> processes = new HashMap<String, String>();
+      if (osUtils.isWindows()) {
+          processes = osUtils.findProcessesContaining("\"-jar\" \"" + catchupDir + "libs" + File.separator + "sagetvcatchup.jar\"");
+      } else {
+          processes = osUtils.findProcessesContaining("-jar " + catchupDir + "libs" + File.separator + "sagetvcatchup.jar");
+          }
+
     sageUtils.info("Found running catchup servers: " + processes.keySet());
     return !processes.isEmpty();
   }
