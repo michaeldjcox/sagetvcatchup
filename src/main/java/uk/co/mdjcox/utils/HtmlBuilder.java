@@ -6,61 +6,62 @@ package uk.co.mdjcox.utils;
 public class HtmlBuilder  {
 
   private final StringBuilder html = new StringBuilder();
+  private final static String CRLF = System.getProperty("line.separator");
 
   public HtmlBuilder() {
   }
 
   public void startDocument() {
-    html.append("<html>\n");
+    html.append("<html>").append(CRLF);
   }
 
   public void stopDocument() {
-    html.append("</html>\n");
+    html.append("</html>").append(CRLF);
   }
 
   public void addPageHeader(String pageTitle) {
-      html.append("<head>\n");
+      html.append("<head>").append(CRLF);
       html.append("<title>");
       html.append(pageTitle);
-      html.append("</title>\n");
-      html.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"stylesheet.css\">\n");
-      html.append("</head>\n");
+      html.append("</title>").append(CRLF);
+      html.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"stylesheet.css\">").append(CRLF);
+      html.append("</head>").append(CRLF);
   }
 
   public void startBody() {
-    html.append("<body>\n");
+    html.append("<body>").append(CRLF);
   }
 
   public void stopBody() {
-    html.append("</body>\n");
+    html.append("</body>").append(CRLF);
   }
 
   public void startTable() {
-    html.append("<table>\n");
+    html.append("<table>").append(CRLF);
   }
 
   public void addTableHeader(String... columns) {
-    html.append("<tr>\n");
+    html.append("<tr>").append(CRLF);
     for (String col : columns) {
       html.append("<th>");
       html.append(col);
-      html.append("</th>\n");
+      html.append("</th>").append(CRLF);
     }
-    html.append("</tr>\n");
+    html.append("</tr>").append(CRLF);
   }
 
   public void addTableRow(String... columns) {
-    html.append("<tr>\n");
+    html.append("<tr>").append(CRLF);
     for (String col : columns) {
       html.append("<td>");
       html.append(col);
-      html.append("</td>\n");
+      html.append("</td>").append(CRLF);
     }
-    html.append("</tr>\n");
+    html.append("</tr>").append(CRLF);
   }
 
   public void stopTable() {
-    html.append("</table>\n");
+    html.append("</table>").append(CRLF);
   }
 
   @Override
@@ -69,20 +70,20 @@ public class HtmlBuilder  {
   }
 
   public void startList() {
-    html.append("\n<ul>\n");
+    html.append(CRLF).append("<ul>").append(CRLF);
   }
 
   public void stopList() {
-    if (html.substring(html.length()-5).equals("<ul>\n")) {
+    if (html.substring(html.length()-5).equals("<ul>" + CRLF)) {
         html.deleteCharAt(html.length()-1);
     }
-    html.append("</ul>\n");
+    html.append("</ul>").append(CRLF);
   }
 
   public void addListItem(String item) {
     html.append("<li>");
     html.append(item);
-    html.append("</li>\n");
+    html.append("</li>").append(CRLF);
   }
 
   public void addLink(String name, String link) {
@@ -96,19 +97,19 @@ public class HtmlBuilder  {
   public void addHeading1(String title) {
     html.append("<h1>");
     html.append(title);
-    html.append("</h1>\n");
+    html.append("</h1>").append(CRLF);
   }
 
   public void addHeading2(String title) {
     html.append("<h2>");
     html.append(title);
-    html.append("</h2>\n");
+    html.append("</h2>").append(CRLF);
   }
 
     public void addHeading3(String title) {
         html.append("<h3>");
         html.append(title);
-        html.append("</h3>\n");
+        html.append("</h3>").append(CRLF);
     }
     public void addBreak() {
         html.append("<br/>");
@@ -130,6 +131,6 @@ public class HtmlBuilder  {
     }
 
     public void addLineFeed() {
-        html.append("\n");
+        html.append("").append(CRLF);
     }
 }
