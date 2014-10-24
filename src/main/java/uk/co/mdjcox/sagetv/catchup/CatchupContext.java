@@ -66,15 +66,8 @@ public class CatchupContext implements CatchupContextInterface {
   }
 
   public static boolean isRunningInDev() {
-    return (workingDir.startsWith(userHome) && workingDir.endsWith("sagetvcatchup"));
-  }
-
-  public static boolean isRunningInsideSageTV() {
-    return (!workingDir.startsWith(userHome)) && !workingDir.endsWith("sagetvcatchup");
-  }
-
-  public static boolean isRunningOutsideSageTV() {
-    return (!workingDir.startsWith(userHome)) && workingDir.endsWith("sagetvcatchup");
+    File src = new File("src");
+    return src.exists();
   }
 
   @Override
