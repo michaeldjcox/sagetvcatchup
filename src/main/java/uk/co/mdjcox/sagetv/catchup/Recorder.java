@@ -7,10 +7,7 @@ import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
-import uk.co.mdjcox.utils.LoggerInterface;
-import uk.co.mdjcox.utils.OrderedPropertiesFileLayout;
-import uk.co.mdjcox.utils.OsUtilsInterface;
-import uk.co.mdjcox.utils.PropertiesFile;
+import uk.co.mdjcox.utils.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,10 +30,10 @@ public class Recorder {
 
     private final LoggerInterface logger;
     private final OsUtilsInterface osUtils;
-    private PluginManager pluginManager;
+  private final CatchupContextInterface context;
+  private PluginManager pluginManager;
     private ConcurrentHashMap<String, Recording> currentRecordings = new ConcurrentHashMap<String, Recording>();
     private final String recordingDir;
-    private final String recordingsLogDir;
     private ScheduledExecutorService service;
     private Set<String> errors = new HashSet<String>();
     private int failedCount = 0;
@@ -48,8 +45,8 @@ public class Recorder {
         this.logger = theLogger;
         this.pluginManager = pluginManager;
         this.osUtils = osUtils;
+        this.context = context;
         this.recordingDir = context.getRecordingDir();
-        this.recordingsLogDir = context.getTmpDir() + File.separator + "recordings" + File.separator;
     }
 
     private File watch(Episode episode, boolean keep) throws Exception {
@@ -58,16 +55,11 @@ public class Recorder {
             return recording.getPartialFile();
         } else {
             recording = createNewRecording(episode, !keep);
-            return download(recording);
+            return callPlayScript(recording);
         }
     }
 
     private Recording checkForExistingRecording(String id) throws Exception {
-        File dir = new File(recordingDir);
-        if (!dir.exists()) {
-            Files.createDirectories(dir.toPath());
-        }
-
         logger.info("Looking for recording of " + id);
         Recording recording = currentRecordings.get(id);
         if ((recording != null) && recording.isStopped()) {
@@ -94,7 +86,7 @@ public class Recorder {
         return recording;
     }
 
-    private File download(Recording recording) throws Exception {
+    private File callPlayScript(Recording recording) throws Exception {
         Plugin plugin = pluginManager.getPlugin(recording.getSourceId());
         plugin.playEpisode(recording);
 
@@ -128,6 +120,11 @@ public class Recorder {
     public void start() {
       logger.info("Starting recorder service");
       try {
+        File dir = new File(recordingDir);
+        if (!dir.exists()) {
+          Files.createDirectories(dir.toPath());
+        }
+
         service = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
           @Override
           public Thread newThread(Runnable r) {
@@ -140,6 +137,12 @@ public class Recorder {
       }
 
     }
+
+  private CatchupPluginRemote getCatchupPluginRemote() throws Exception {
+    int rmiRegistryPort = context.getCatchupPluginRmiPort();
+
+    return (CatchupPluginRemote) RmiHelper.lookup("localhost", rmiRegistryPort, "CatchupPlugin");
+  }
 
     public void shutdown() {
         logger.info("Stopping the recorder service");
@@ -264,7 +267,7 @@ public class Recorder {
                     public void run() {
                       try {
                         try {
-                            File partialFile = download(newRecording);
+                            File partialFile = callPlayScript(newRecording);
 
                             File completedFile = newRecording.getCompletedFile();
                             while (partialFile.exists() && !(newRecording.isStopped() || newRecording.isComplete())) {
@@ -277,7 +280,7 @@ public class Recorder {
                             logger.info("Done recording. File " + completedFile + " exists=" + completedFile.exists());
 
                             if (completedFile.exists()) {
-                                documentRecording(newRecording);
+                                uploadToSageTv(newRecording);
                               completedCount++;
                             } else {
                                 logger.error("No recording file found for " + episode);
@@ -314,7 +317,7 @@ public class Recorder {
    * <p>
    * @return The Airing if success, null otherwise.
    */
-  public void documentRecording(Recording recording) {
+  public void uploadToSageTv(Recording recording) {
 
     try {
       Preconditions.checkNotNull(recording);
@@ -347,34 +350,27 @@ public class Recorder {
         }
       }
 
-      String filename = recordingsLogDir + episode.getId() + ".properties";
-
-      PropertiesFile recordingProps = new PropertiesFile();
-      recordingProps.setProperty("file", recordingFile.getAbsolutePath());
-      recordingProps.setProperty("id", id);
-      recordingProps.setProperty("programmeTitle", programmeTitle);
-      recordingProps.setProperty("episodeTitle", episodeTitle);
-      recordingProps.setProperty("description", description);
-      int cat = 1;
+      List<String> categoriesList= new ArrayList<String>();
       for (String category : categories) {
-        recordingProps.setProperty("category." + cat, category);
-        cat++;
-      }
-      recordingProps.setProperty("origAirDate", origAirDate);
-      recordingProps.setProperty("origAirTime", origAirTime);
-      recordingProps.setProperty("airDate", airDate);
-      recordingProps.setProperty("airTime", airTime);
-      recordingProps.setProperty("seriesNumber", String.valueOf(seriesNumber));
-      recordingProps.setProperty("episodeNumber", String.valueOf(episodeNumber));
-
-      List<String> order = new LinkedList<String>();
-      for (Object key : recordingProps.keySet()) {
-        order.add(key.toString());
+        categoriesList.add(category);
       }
 
-      recordingProps.commit(filename, new OrderedPropertiesFileLayout(order, "Recording of " + episode.getId(), ""));
+      getCatchupPluginRemote().addRecordingToSageTV(
+              id,
+              recordingFile.getAbsolutePath(),
+              programmeTitle,
+              episodeTitle,
+              description,
+              categoriesList,
+              origAirDate,
+              origAirTime,
+              airDate,
+              airTime,
+              seriesNumber,
+              episodeNumber
+              );;
     } catch (Exception e) {
-      logger.error("Failed to document recording", e);
+      logger.error("Failed to upload recording", e);
     }
   }
 
@@ -435,7 +431,7 @@ public class Recorder {
           } else {
             failedCount++;
             errors.add("Watching " + id + " failed due to exception");
-            logger.warn("Streaming of " + id + " stopped due to exception ", e);
+            logger.warn("Watching of " + id + " stopped due to exception ", e);
             throw new Exception("Failed to stream video", e);
           }
         } finally {
@@ -482,16 +478,16 @@ public class Recorder {
               logger.info("Done recording. File " + completedFile + " exists=" + completedFile.exists());
 
               if (completedFile.exists()) {
-                documentRecording(newRecording);
-                              completedCount++;
+                uploadToSageTv(newRecording);
+                completedCount++;
               } else {
                 logger.error("No recording file found for " + episode);
-                              throw new Exception("No recording file found for " + episode);
+                throw new Exception("No recording file found for " + episode);
               }
             } catch (Throwable e) {
-                          failedCount++;
-                          errors.add("Recording " + episode.getId() + " failed due to exception");
-              logger.warn("Recording of " + episode.getId() + " stopped due to exception ", e);
+                failedCount++;
+                errors.add("Recording " + episode.getId() + " failed due to exception");
+                logger.warn("Recording of " + episode.getId() + " stopped due to exception ", e);
             } finally {
               try {
                 stop(episode.getId());

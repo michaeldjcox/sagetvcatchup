@@ -153,6 +153,8 @@ public class CatchupDevModule extends AbstractModule {
     private String defaultCatalogFileName;
     private String onlineVideoPropsSuffix;
     private PropertiesInterface properties;
+    private int catchupServerRmiPort;
+    private int catchupPluginRmiPort;
 
     public DevCatchupContext(PropertiesInterface properties) {
       String homeDir = System.getProperty("user.dir") + File.separator;
@@ -172,6 +174,9 @@ public class CatchupDevModule extends AbstractModule {
       onlineVideoPropertiesDir = "/opt/sagetv/server/STVs/SageTV7/OnlineVideos";
       this.properties = properties;
       configDir = workingDir + "config";
+      catchupPluginRmiPort = properties.getInt("catchupPluginRmiPort", 1105);
+      catchupServerRmiPort = properties.getInt("catchupServerRmiPort", 1106);
+
     }
 
     @Override
@@ -284,6 +289,16 @@ public class CatchupDevModule extends AbstractModule {
     }
 
     @Override
+    public int getCatchupServerRmiPort() {
+      return catchupServerRmiPort;
+    }
+
+    @Override
+    public int getCatchupPluginRmiPort() {
+      return catchupPluginRmiPort;
+    }
+
+    @Override
     public String toString() {
       return "DevCatchupContext{" +"\n" +
               "tmpDir='" + tmpDir + '\'' + "\n" +
@@ -301,6 +316,8 @@ public class CatchupDevModule extends AbstractModule {
               "catalogFileName='" + catalogFileName + '\'' + "\n" +
               "defaultCatalogFileName='" + defaultCatalogFileName + '\'' + "\n" +
               "onlineVideoPropsSuffix='" + onlineVideoPropsSuffix + '\'' + "\n" +
+              "catchupServerRmiPort='" + catchupServerRmiPort + '\'' + "\n" +
+              "catchupPluginRmiPort='" + catchupPluginRmiPort + '\'' + "\n" +
               "properties=" + properties + "\n" +
               '}';
     }

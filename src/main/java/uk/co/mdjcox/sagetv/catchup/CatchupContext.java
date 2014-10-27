@@ -30,6 +30,8 @@ public class CatchupContext implements CatchupContextInterface {
   private String onlineVideoPropsSuffix;
   private PropertiesInterface properties;
   private int refreshStartNowProgrammeThreshold;
+  private int catchupServerRmiPort;
+  private int catchupPluginRmiPort;
 
   public CatchupContext(final PropertiesInterface properties) {
     this.properties = properties;
@@ -63,6 +65,8 @@ public class CatchupContext implements CatchupContextInterface {
     onlineVideoPropsSuffix = properties.getString("onlineVideoPropsSuffix");
     onlineVideoPropertiesDir = properties.getString("onlineVideoPropertiesDir");
     podcastBase = "http://localhost:" + port;
+    catchupPluginRmiPort = properties.getInt("catchupPluginRmiPort", 1105);
+    catchupServerRmiPort = properties.getInt("catchupServerRmiPort", 1106);
   }
 
   public static boolean isRunningInDev() {
@@ -179,6 +183,16 @@ public class CatchupContext implements CatchupContextInterface {
   }
 
   @Override
+  public int getCatchupServerRmiPort() {
+    return catchupServerRmiPort;
+  }
+
+  @Override
+  public int getCatchupPluginRmiPort() {
+    return catchupPluginRmiPort;
+  }
+
+  @Override
   public String toString() {
     return "CatchupContext{" + "\n" +
             "podcastBase='" + podcastBase + '\'' + "\n" +
@@ -194,6 +208,8 @@ public class CatchupContext implements CatchupContextInterface {
             "catalogFileName='" + catalogFileName + '\'' +"\n" +
             "defaultCatalogFileName='" + defaultCatalogFileName + '\'' +"\n" +
             "onlineVideoPropsSuffix='" + onlineVideoPropsSuffix + '\'' +"\n" +
+            "catchupServerRmiPort='" + catchupServerRmiPort + '\'' + "\n" +
+            "catchupPluginRmiPort='" + catchupPluginRmiPort + '\'' + "\n" +
             "properties=" + properties +"\n" +
             '}';
   }

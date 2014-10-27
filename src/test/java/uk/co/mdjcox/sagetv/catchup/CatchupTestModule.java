@@ -83,6 +83,8 @@ public class CatchupTestModule extends AbstractModule {
     private String onlineVideoPropsSuffix;
     private String onlineVideoPropertiesDir;
     private PropertiesInterface properties;
+    private int catchupServerRmiPort;
+    private int catchupPluginRmiPort;
 
     public TestCatchupContext() {
       String homeDir = System.getProperty("user.dir") + File.separator;
@@ -102,6 +104,8 @@ public class CatchupTestModule extends AbstractModule {
       onlineVideoPropsSuffix = "testsagetvcatchup";
       onlineVideoPropertiesDir = tmpDir + "TestOnlineVideos";
       properties = new PropertiesFile();
+      catchupPluginRmiPort = properties.getInt("catchupPluginRmiPort", 1105);
+      catchupServerRmiPort = properties.getInt("catchupServerRmiPort", 1106);
     }
 
     @Override
@@ -221,6 +225,16 @@ public class CatchupTestModule extends AbstractModule {
     }
 
     @Override
+    public int getCatchupServerRmiPort() {
+      return catchupServerRmiPort;
+    }
+
+    @Override
+    public int getCatchupPluginRmiPort() {
+      return catchupPluginRmiPort;
+    }
+
+    @Override
     public String toString() {
       return "TestCatchupContext{" +
               "workingDir='" + workingDir + '\'' +
@@ -238,6 +252,8 @@ public class CatchupTestModule extends AbstractModule {
               ", defaultCatalogFileName='" + defaultCatalogFileName + '\'' +
               ", onlineVideoPropsSuffix='" + onlineVideoPropsSuffix + '\'' +
               ", onlineVideoPropertiesDir='" + onlineVideoPropertiesDir + '\'' +
+              ", catchupServerRmiPort='" + catchupServerRmiPort + '\'' +
+              ", catchupPluginRmiPort='" + catchupPluginRmiPort + '\'' +
               ", properties=" + properties +
               '}';
     }

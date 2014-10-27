@@ -8,12 +8,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -67,14 +66,8 @@ public class CatchupPlugin implements SageTVPlugin {
   private String seedFileName;
   private String sageTvDevPluginsFile = sageHomeDir +  "SageTVPluginsDev.xml";
   private String devDownloadUrl = "http://mintpad/sagetvcatchup/download/SageTVPluginsDev.xml";
-
   private PropertiesInterface props;
-
-  private ScheduledExecutorService recordingChecker;
-
-  private Map<String, String> statii = new HashMap<String, String>();
-  private File sageRecordingDir = null;
-
+  private CatchupPluginService rmiService;
 
   public CatchupPlugin(sage.SageTVPluginRegistry registry) {
     this.registry = registry;
@@ -90,16 +83,50 @@ public class CatchupPlugin implements SageTVPlugin {
     seedFileName = catchupDir + "seeds" + File.separator + seedFileName;
   }
 
+  private void startRmiServer() {
+    try {
+      rmiService = new CatchupPluginService(sageUtils);
+
+      int rmiRegistryPort = props.getInt("catchupPluginRmiPort", 1105);
+      sageUtils.info("Offer remote access to plugin");
+      RmiHelper.startupLocalRmiRegistry(rmiRegistryPort);
+      String name =RmiHelper.rebind("localhost", rmiRegistryPort, "CatchupPlugin", rmiService);
+      sageUtils.info("Bound name >" + name +"<");
+
+      Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+
+        public void run() {
+          try {
+            sageUtils.info("Stopping catchup plugin rmi server");
+            stopRmiServer();
+            sageUtils.info("Stopped catchup plugin rmi server");
+          } catch (Exception e) {
+            sageUtils.warn("Failed to stop catchup plugin rmi server", e);
+          }
+        }
+      }));
+    } catch (Exception e) {
+      sageUtils.error("Cannot start server ", e);
+    }
+  }
+
+  private void stopRmiServer() throws Exception {
+    try {
+      sageUtils.info("Discontinue rmi access to catchup plugin");
+      int rmiRegistryPort = props.getInt("catchupPluginRmiPort", 1105);
+      RmiHelper.unbind("localhost", rmiRegistryPort, "CatchupPlugin");
+    } catch (NotBoundException nb) {
+      // Ignore
+    } catch (Exception e) {
+      sageUtils.error("Cannot stop server ", e);
+    }
+  }
+
+
   @Override
   public void start() {
     try {
       sageUtils = SageUtils.instance();
-
-      File[] dirs = sageUtils.getRecordingDirectories();
-
-      if (dirs.length > 0) {
-        sageRecordingDir = dirs[0];
-      }
 
       sageUtils.info("Starting catchup plugin");
 
@@ -107,18 +134,7 @@ public class CatchupPlugin implements SageTVPlugin {
 
       osUtils = OsUtils.instance(sageUtils);
 
-      recordingChecker = Executors.newSingleThreadScheduledExecutor();
-
-      recordingChecker.scheduleAtFixedRate(new Runnable() {
-        @Override
-        public void run() {
-          processRecordings();
-
-          statii = getServerStatus();
-
-          sageUtils.info("Got status " + statii);
-        }
-      }, 15, 15, TimeUnit.SECONDS);
+      startRmiServer();
 
       startCatchupServer();
 
@@ -131,58 +147,10 @@ public class CatchupPlugin implements SageTVPlugin {
     }
   }
 
-  private void processRecordings() {
-    File recordingsLog = new File(tmpDir + "recordings");
-    recordingsLog.mkdirs();
-    File[] recordings = recordingsLog.listFiles();
-    for (File recording : recordings) {
-      if (recording.exists()) {
-        try {
-          PropertiesFile recordingLog = new PropertiesFile(recording.getAbsolutePath(), false);
-          String file = recordingLog.getString("file");
-          String episodeId = recordingLog.getString("id");
-          String programmeTitle = recordingLog.getString("programmeTitle");
-          String episodeTitle = recordingLog.getString("episodeTitle");
-          String description = recordingLog.getString("description");
-          ArrayList<String> categories = recordingLog.getPropertySequence("category");
-          String origAirDate = recordingLog.getString("origAirDate");
-          String origAirTime = recordingLog.getString("origAirTime");
-          String airDate = recordingLog.getString("airDate");
-          String airTime = recordingLog.getString("airTime");
-          int seriesNumber = recordingLog.getInt("seriesNumber", 0);
-          int episodeNumber = recordingLog.getInt("episodeNumber", 0);
+  private CatchupServerRemote getCatchupServerRemote() throws Exception {
+    int rmiRegistryPort = props.getInt("catchupServerRmiPort", 1106);
 
-          if (sageRecordingDir != null && sageRecordingDir.exists()) {
-            File savedFile = new File(sageRecordingDir, episodeId + ".mp4");
-            File completedFile = new File(file);
-            Files.move(completedFile.toPath(), savedFile.toPath());
-
-            sageUtils.addRecordingToSageTV(
-                    savedFile.getAbsolutePath(),
-                    programmeTitle,
-                    episodeTitle,
-                    description,
-                    categories,
-                    origAirDate,
-                    origAirTime,
-                    airDate,
-                    airTime,
-                    seriesNumber,
-                    episodeNumber
-            );
-          } else {
-            sageUtils.error("No SageTV recording directory found for catchup TV");
-          }
-
-          if (!recording.delete()) {
-            throw new Exception("Failed to delete recording log file");
-          }
-
-        } catch (Exception e) {
-          sageUtils.error("Failed to import recording into SageTV", e);
-        }
-      }
-    }
+    return (CatchupServerRemote)RmiHelper.lookup("localhost", rmiRegistryPort, "CatchupServer");
   }
 
   @Override
@@ -190,7 +158,7 @@ public class CatchupPlugin implements SageTVPlugin {
     try {
       sageUtils.info("Stopping catchup plugin");
 
-      recordingChecker.shutdownNow();
+      stopRmiServer();
 
       stopCatchupServer();
 
@@ -242,7 +210,7 @@ public class CatchupPlugin implements SageTVPlugin {
     try {
       if (isCatchupServerRunning()) {
           sageUtils.info("Requesting catchup server shutdown");
-          performServerOperation("stopserver");
+          stopServer();
       } else {
           sageUtils.info("Catchup Server is not running");
       }
@@ -463,6 +431,8 @@ public class CatchupPlugin implements SageTVPlugin {
   @Override
   public String getConfigValue(String property) {
 
+    Map<String, String> statii = getServerStatus();
+
     if (property.equals(PULL_UPGRADE)) {
       return pullUpgradeValue;
     }
@@ -628,7 +598,7 @@ public class CatchupPlugin implements SageTVPlugin {
   private void forceStopRecording() {
     sageUtils.info("Force recording stop");
     try {
-      stopRecordingValue = performServerOperation("stopall");
+      stopRecordingValue = stopAllRecording();
 
       Thread thread = new Thread(new Runnable() {
         @Override
@@ -651,7 +621,7 @@ public class CatchupPlugin implements SageTVPlugin {
   private void forceCatalogStop() {
     sageUtils.info("Force catalog stop");
     try {
-      stopCatalogValue = performServerOperation("stopcat");
+      stopCatalogValue = stopCataloging();
       Thread thread = new Thread(new Runnable() {
         @Override
         public void run() {
@@ -673,7 +643,7 @@ public class CatchupPlugin implements SageTVPlugin {
   private void forceCatalogStart() {
     sageUtils.info("Force catalog start");
     try {
-      startCatalogValue = performServerOperation("startcat");
+      startCatalogValue = startCataloging();
       Thread thread = new Thread(new Runnable() {
         @Override
         public void run() {
@@ -692,38 +662,50 @@ public class CatchupPlugin implements SageTVPlugin {
     }
   }
 
-  private String performServerOperation(String operation) {
+  private String startCataloging() {
     String result = "Server not running";
     try {
-      result = DownloadUtils.instance().downloadFileString("http://localhost:" + props.getString("podcasterPort") + "/" + operation + "?type=html");
-      if (result != null) {
-        HtmlUtilsInterface utils = HtmlUtils.instance();
-        result = utils.moveTo("<h1>", result);
-        result = utils.extractTo("</h1>", result);
-      }
+      return getCatchupServerRemote().startCataloging();
     } catch (Exception e) {
-      sageUtils.error("Failed to perform server operation " + operation, e);
-    } finally {
-      statii = getServerStatus();
+      sageUtils.error("Failed to request start cataloging", e);
+    }
+    return result;
+  }
+
+  private String stopCataloging() {
+    String result = "Server not running";
+    try {
+      return getCatchupServerRemote().stopCataloging();
+    } catch (Exception e) {
+      sageUtils.error("Failed to request stop cataloging", e);
+    }
+    return result;
+  }
+
+  private String stopAllRecording() {
+    String result = "Server not running";
+    try {
+      return getCatchupServerRemote().stopAllRecording();
+    } catch (Exception e) {
+      sageUtils.error("Failed to request stop all recording", e);
+    }
+    return result;
+  }
+
+  private String stopServer() {
+    String result = "Server not running";
+    try {
+      return getCatchupServerRemote().shutdown();
+    } catch (Exception e) {
+      sageUtils.error("Failed to request catchup server shutdown", e);
     }
     return result;
   }
 
   private Map<String,String> getServerStatus() {
-    HashMap<String, String> results = new HashMap<String,String>();
+    Map<String, String> results = new HashMap<String,String>();
     try {
-      HtmlUtilsInterface utils = HtmlUtils.instance();
-      String result = DownloadUtils.instance().downloadFileString("http://localhost:" + props.getString("podcasterPort") + "/" + "status?type=html");
-      if (result != null) {
-        while (result.contains("<tr>")) {
-          result = utils.moveTo("<td>", result);
-          String key = utils.extractTo("</td>", result);
-          result = utils.moveTo("<td>", result);
-          String value = utils.extractTo("</td>", result);
-          results.put(key, value);
-
-        }
-      }
+      results = getCatchupServerRemote().getStatus();
     } catch (Exception e) {
       sageUtils.error("Failed to perform server operation status", e);
     }

@@ -3,15 +3,17 @@ package uk.co.mdjcox.sagetv.catchup;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.catchup.server.Server;
 import uk.co.mdjcox.sagetv.onlinevideo.SageTvPublisher;
 import uk.co.mdjcox.utils.LoggerInterface;
 import uk.co.mdjcox.utils.PersistentRollingFileAppender;
 import uk.co.mdjcox.utils.PropertiesInterface;
+import uk.co.mdjcox.utils.RmiHelper;
 
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +27,6 @@ public class CatchupServer {
 
   private Server server;
   private SageTvPublisher sagetvPublisher;
-  private PropertiesInterface props;
   private Cataloger cataloger;
   private PluginManager pluginManager;
   private Recorder recorder;
@@ -33,6 +34,7 @@ public class CatchupServer {
   private AbstractModule module;
 
   private boolean started = false;
+  private CatchupServerService rmiService;
 
   public void start() {
     try {
@@ -65,7 +67,7 @@ public class CatchupServer {
       logger.info("Starting catchup server");
       logger.info("#######################");
 
-      props = injector.getInstance(PropertiesInterface.class);
+      PropertiesInterface props = injector.getInstance(PropertiesInterface.class);
       context = injector.getInstance(CatchupContextInterface.class);
 
       logger.info("Properties: " + props.toString());
@@ -88,6 +90,10 @@ public class CatchupServer {
       recorder.start();
       server.start();
       cataloger.start(publishers, persister);
+
+      startRmiServer();
+
+      new CatchupSuicideThread(logger, context).run();
 
       started = true;
     } catch (Throwable e) {
@@ -135,6 +141,8 @@ public class CatchupServer {
         }
       }
 
+      stopRmiServer();
+
       started = false;
     } catch (Throwable ex) {
       if (logger != null) {
@@ -160,6 +168,46 @@ public class CatchupServer {
 
   public boolean isStopped() {
     return !started;
+  }
+
+  private void startRmiServer() {
+    try {
+      rmiService = new CatchupServerService(cataloger, recorder);
+
+      int rmiRegistryPort = context.getCatchupServerRmiPort();
+      logger.info("Offer remote access to server");
+      RmiHelper.startupLocalRmiRegistry(rmiRegistryPort);
+      String name =RmiHelper.rebind("localhost", rmiRegistryPort, "CatchupServer", rmiService);
+      logger.info("Bound name >" + name +"<");
+
+      Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+
+        public void run() {
+          try {
+            logger.info("Stopping catchup rmi server");
+            stopRmiServer();
+            logger.info("Stopped catchup rmi server");
+          } catch (Exception e) {
+            logger.warn("Failed to stop catchup rmi server", e);
+          }
+        }
+      }));
+    } catch (Exception e) {
+      logger.error("Cannot start catchup rmi server ", e);
+    }
+  }
+
+  private void stopRmiServer() {
+    try {
+      logger.info("Discontinue rmi access to catchup server");
+      int rmiRegistryPort = context.getCatchupServerRmiPort();
+      RmiHelper.unbind("localhost", rmiRegistryPort, "CatchupServer");
+    } catch (NotBoundException nb) {
+      // Ignore
+    }
+    catch (Exception e) {
+      logger.error("Cannot stop catchup rmi server ", e);
+    }
   }
 
   public static void main(String[] args) {

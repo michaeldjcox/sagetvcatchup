@@ -53,4 +53,8 @@ public interface CatchupContextInterface {
   void setRecordingDir(String recordDir);
 
   int getRefreshStartNowProgrammeThreshold();
+
+  int getCatchupServerRmiPort();
+
+  int getCatchupPluginRmiPort();
 }
