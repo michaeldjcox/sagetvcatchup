@@ -204,51 +204,7 @@ public abstract class OsUtils implements OsUtilsInterface {
         return env;
     }
 
-    private class StreamConsumer extends Thread {
-        private InputStream is;
-        private LoggerInterface logger;
-        private String type;
-        private ArrayList<String> output;
-
-        /** No access to default constructor */
-        private StreamConsumer() {
-        }
-
-        public StreamConsumer(InputStream is, String type, LoggerInterface logger, ArrayList<String> output) {
-            this.is = is;
-            this.logger = logger;
-            this.type = type;
-            this.output = output;
-        }
-
-        public void run() {
-            try {
-                InputStreamReader isr = new InputStreamReader(is);
-                BufferedReader br = new BufferedReader(isr);
-                String line = null;
-                while ((line = br.readLine()) != null) {
-                    if (logger != null) {
-                      if (type != null) {
-                        logger.info(type + ": " + line);
-                      }
-                    }
-                    if (output != null) {
-                        output.add(line);
-                    }
-                }
-            } catch (IOException ioe) {
-                logger.error("Stream consumer terminated with exception", ioe);
-            } finally {
-//                logger.info("Stream consumer " + type + " terminating ");
-            }
-        }
-
-        public ArrayList<String> getOutput() {
-            return output;
-        }
-    }
-
-    protected HashMap<String, String> getProcesses(String command) {
+  protected HashMap<String, String> getProcesses(String command) {
         HashMap<String,String> results = new HashMap<String,String>();
         try {
             ArrayList<String> output = new ArrayList<String>();
@@ -293,7 +249,7 @@ public abstract class OsUtils implements OsUtilsInterface {
   }
 
     public Map<String, String> findProcessesContaining(String token) {
-      logger.info("Finding processes containing: " + token);
+//      logger.info("Finding processes containing: " + token);
         HashMap<String, String> matching = new HashMap<String, String>();
         HashMap<String, String> processes = getProcesses();
         for (String pid : processes.keySet()) {
@@ -302,12 +258,12 @@ public abstract class OsUtils implements OsUtilsInterface {
                 matching.put(pid, process);
             }
         }
-      logger.info("Found: " + matching.keySet());
+//      logger.info("Found: " + matching.keySet());
       return matching;
     }
 
     public Map<String, String> findProcessesMatching(String regex) {
-      logger.info("Finding processes matching: " + regex);
+//      logger.info("Finding processes matching: " + regex);
         HashMap<String, String> matching = new HashMap<String, String>();
         HashMap<String, String> processes = getProcesses();
         for (String pid : processes.keySet()) {
@@ -316,7 +272,7 @@ public abstract class OsUtils implements OsUtilsInterface {
                 matching.put(pid, process);
             }
         }
-      logger.info("Found: " + matching.keySet());
+//      logger.info("Found: " + matching.keySet());
       return matching;
     }
 
@@ -342,7 +298,6 @@ public abstract class OsUtils implements OsUtilsInterface {
 
     @Override
     public void waitFor(long millis) {
-      logger.info("Waiting for " + millis + "ms");
       long stopTime = System.currentTimeMillis() + millis;
       while (System.currentTimeMillis() < stopTime) {
         try {
