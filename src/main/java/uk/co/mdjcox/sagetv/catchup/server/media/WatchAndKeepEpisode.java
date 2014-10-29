@@ -44,24 +44,26 @@ public class WatchAndKeepEpisode implements ContentProvider {
         try {
             response.setContentType(getType());
             response.setCharacterEncoding(getEncoding());
-            response.setContentLength(Integer.MAX_VALUE);
+            response.setContentLength(-1);
 
             out = response.getOutputStream();
-            recorder.watch(out, episode, true);
+            recorder.watch(out, episode, false);
         } catch (Exception e) {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException e1) {
-                // Ignore
-            }
-
             logger.warn("Streaming of " + episode.getId() + " stopped due to exception ", e);
             throw new ServletException("Failed to stream video", e);
         } finally {
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            response.flushBuffer();
+          logger.info("Streaming of " + episode.getId() + " closing output channel to client");
+          response.setStatus(HttpServletResponse.SC_OK);
+          response.flushBuffer();
+          try {
+            if (out != null) {
+              out.flush();
+              out.close();
+            }
+          } catch (IOException e1) {
+            // Ignore
+          }
+
         }
     }
 

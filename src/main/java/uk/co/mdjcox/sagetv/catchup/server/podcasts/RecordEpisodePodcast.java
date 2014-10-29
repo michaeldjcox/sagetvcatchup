@@ -30,14 +30,19 @@ public class RecordEpisodePodcast extends AbstractPodcast {
 
     @Override
     public String buildPage() {
-        recorder.record(episode);
-        String message = "Recording " + episode.getPodcastTitle();
-        RssBuilder builder = new RssBuilder();
-        final String url = getPodcastBaseUrl() + "/"+ getUri();
-        final String title = "RECORDING";
-        builder.startDocument(title, message, url);
-        builder.addTextItem(title, message, url);
-        builder.stopDocument();
-        return builder.toString();
+      String message = "Recording " + episode.getPodcastTitle();
+
+      try {
+        recorder.record(episode, false);
+      } catch (Exception e) {
+        message = "Recording failed: " + e.getMessage();
+      }
+      RssBuilder builder = new RssBuilder();
+      final String url = getPodcastBaseUrl() + "/"+ getUri();
+      final String title = "RECORDING";
+      builder.startDocument(title, message, url);
+      builder.addTextItem(title, message, url);
+      builder.stopDocument();
+      return builder.toString();
     }
 }

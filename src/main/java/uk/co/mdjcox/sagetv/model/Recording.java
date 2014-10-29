@@ -27,16 +27,24 @@ public class Recording {
      */
     private File partialFile;
     private File completedFile;
-    private File savedFile;
+
     /**
      * The process doing the recording
      */
     private Process process;
     private Episode episode;
     private AtomicBoolean stopFlag = new AtomicBoolean(false);
-    private boolean isC;
+    private boolean failed;
+    private boolean stalled = false;
 
-    /**
+    private String failedReason;
+    private Throwable failureException;
+
+    private long startTime = System.currentTimeMillis();
+    private long stopTime = System.currentTimeMillis();
+    private long lastSize = 0;
+
+  /**
      * Constructor of the recording object which details a recording in progress
      * @param episode   the episode to record
      * @param recordingDir the directory where the recording will be kept
@@ -85,14 +93,6 @@ public class Recording {
 
     public void setCompletedFile(File completedFile) {
         this.completedFile = checkNotNull(completedFile);
-    }
-
-    public File getSavedFile() {
-        return savedFile;
-    }
-
-    public void setSavedFile(File savedFile) {
-        this.savedFile = checkNotNull(savedFile);
     }
 
     /**
@@ -170,7 +170,6 @@ public class Recording {
     }
 
     public boolean isComplete() {
-        System.err.println("completedFile=" + completedFile + " exists=" + (completedFile == null ? false : completedFile.exists()));
         return completedFile != null && completedFile.exists();
     }
 
@@ -189,6 +188,9 @@ public class Recording {
     }
 
     public void setStopped() {
+      if (stopTime == startTime) {
+        stopTime = System.currentTimeMillis();
+      }
         stopFlag.set(true);
     }
 
@@ -200,4 +202,54 @@ public class Recording {
         return episode;
     }
 
+    public boolean isFailed() {
+      return failed;
+    }
+
+  public String getFailedReason() {
+    return failedReason;
+  }
+
+  public Throwable getFailureException() {
+    return failureException;
+  }
+
+  public void setFailed(String reason, Throwable ex) {
+    if (stopTime == startTime) {
+      stopTime = System.currentTimeMillis();
+    }
+      failedReason = reason;
+      failureException = ex;
+      failed = true;
+    }
+
+  public long getStartTime() {
+    return startTime;
+  }
+
+  public long getStopTime() {
+    return stopTime;
+  }
+
+  public void setCompleted() {
+    if (stopTime == startTime) {
+      stopTime = System.currentTimeMillis();
+    }
+  }
+
+  public void setStalled() {
+    stalled = true;
+  }
+
+  public boolean isStalled() {
+    return stalled;
+  }
+
+  public long getLastSize() {
+    return lastSize;
+  }
+
+  public void setLastSize(long lastSize) {
+    this.lastSize = lastSize;
+  }
 }

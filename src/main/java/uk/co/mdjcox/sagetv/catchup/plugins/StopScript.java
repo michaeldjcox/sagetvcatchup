@@ -29,11 +29,11 @@ public class StopScript extends Script {
 
     public void stop(Recording recording) {
         try {
-            getLogger().info("Stopping playback of " + recording);
+            getLogger().info("Stopping recording of " + recording);
             call("recording", recording);
-            getLogger().info("Stopped episode " + recording);
+            getLogger().info("Stopped recording of " + recording);
         } catch (Throwable e) {
-            getLogger().error("Unable to stop: " + recording, e);
+            getLogger().error("Unable to stop recording of " + recording, e);
         }
     }
 

@@ -53,7 +53,7 @@ public class StatusPodcast extends AbstractPodcast {
       recordingProgress.append(" processes<br/>");
 
       builder.addCategoryItem("RECORDING PROGRESS", recordingProgress.toString(), recordingsUrl);
-        builder.addCategoryItem("RECORDING ERRORS", String.valueOf(recorder.getErrors().size()), recerrorsUrl);
+        builder.addCategoryItem("RECORDING ERRORS", String.valueOf(recorder.getFailedRecordings().size()), recerrorsUrl);
         builder.addTextItem("CATALOGING PROGRESS", cataloger.getProgress() + "<br/>" + cataloger.getStatsSummary(), statusUrl);
         builder.addCategoryItem("CATALOGING ERRORS", cataloger.getErrorSummary(), errorsUrl);
         builder.addCategoryItem("STOP ALL RECORDING", "Abandon all recording", stopUrl);

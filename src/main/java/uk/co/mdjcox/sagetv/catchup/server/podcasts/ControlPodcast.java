@@ -48,7 +48,7 @@ public class ControlPodcast extends AbstractPodcast {
 
         boolean isRecording = false;
 
-        isRecording = recorder.isRecording(episode.getId());
+        isRecording = recorder.isInProgress(episode.getId());
 
         RssBuilder builder = new RssBuilder();
         builder.startDocument(title, desc, url);

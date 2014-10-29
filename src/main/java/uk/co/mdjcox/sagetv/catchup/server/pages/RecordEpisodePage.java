@@ -29,9 +29,13 @@ public class RecordEpisodePage extends AbstractHtmlPage {
 
     @Override
     public String buildPage() {
-        recorder.record(episode);
-        String message = "Recording " + episode.getPodcastTitle();
-        HtmlBuilder builder = new HtmlBuilder();
+      String message = "Recording " + episode.getPodcastTitle();
+      try {
+        recorder.record(episode, false);
+      } catch (Exception e) {
+        message = "Recording failed: " + e.getMessage();
+      }
+      HtmlBuilder builder = new HtmlBuilder();
         builder.startDocument();
         builder.addPageHeader("Recording");
         builder.startBody();
