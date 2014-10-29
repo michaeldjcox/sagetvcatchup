@@ -11,7 +11,7 @@ if (IS_WINDOWS()) {
 }
 
 ArrayList<String> output = new ArrayList<String>();
-Process proc = EXECUTE(command, "record", output, null);
+Process proc = EXECUTE(command, "get_iplayer", output, null);
 
 long TIMEOUT = 30000;
 
