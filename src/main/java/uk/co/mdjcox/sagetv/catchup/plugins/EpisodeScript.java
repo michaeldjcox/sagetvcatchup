@@ -31,7 +31,7 @@ public class EpisodeScript extends Script {
 
     public void getEpisode(Source source, Programme programme, Episode episode) {
         try {
-            getLogger().info("Getting episode at URL " + episode.getServiceUrl());
+            getLogger().info("Getting episode " + episode);
             call("programme", programme, "url", episode.getServiceUrl(), "episode", episode);
             String iconUrl = programme.getIconUrl();
             if ((iconUrl == null) || iconUrl.isEmpty()) {
