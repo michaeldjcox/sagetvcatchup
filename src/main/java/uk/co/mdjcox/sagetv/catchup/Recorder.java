@@ -220,7 +220,7 @@ public class Recorder {
 
       file = recording.isComplete() ? recording.getCompletedFile() : recording.getPartialFile();
 
-      if (!file.exists()) {
+      if (file == null || !file.exists()) {
         throw new Exception("Failed to stream episode " + episode);
       }
 
