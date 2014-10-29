@@ -28,11 +28,11 @@ public class PlayScript extends Script {
 
     public void play(Recording recording) {
         try {
-            getLogger().info("Starting playback of " + recording);
+            getLogger().info("Starting recording of " + recording);
             call("recording", recording);
-            getLogger().info("Playing episode " + recording);
+            getLogger().info("Recording " + recording);
         } catch (Throwable e) {
-            getLogger().error("Unable to playback: " + recording, e);
+            getLogger().error("Unable to record: " + recording, e);
         }
     }
 
