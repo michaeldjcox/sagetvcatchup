@@ -515,7 +515,19 @@ public class Cataloger {
 
         logger.info("First catalog will be at " + cal.getTime() + " thats in " + (initialDelay/(1000*60*60)) + " Hours" );
 
-        if (programmeStats < context.getRefreshStartNowProgrammeThreshold()) {
+        int threshold = 0;
+        for (String name : pluginManager.getPluginNames()) {
+            if (!context.skipPlugin(name)) {
+              if (context.getMaxProgrammes(name) != Integer.MAX_VALUE) {
+                threshold += context.getMaxProgrammes(name);
+              }
+            }
+        }
+        if (threshold == 0) {
+          threshold = context.getRefreshStartNowProgrammeThreshold();
+        }
+
+        if (programmeStats < threshold) {
           logger.info("Doing early cataloging as catalog looks a bit sparse");
           future = service.schedule(runnable, 0, TimeUnit.MILLISECONDS);
         }
