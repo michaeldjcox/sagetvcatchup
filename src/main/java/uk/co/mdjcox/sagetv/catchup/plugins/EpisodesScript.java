@@ -44,7 +44,7 @@ public class EpisodesScript extends Script {
           if (category.hasErrors()) {
             getLogger().warn("Programme " + category.getShortName() + " has errors");
           }
-          getLogger().info(category + " has " + category.getEpisodes().size() + " episodes");
+          getLogger().info(category + " has " + episodes.size() + " episodes");
         }
         return episodes;
     }
