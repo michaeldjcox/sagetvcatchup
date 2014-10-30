@@ -21,7 +21,8 @@ public class Recording {
      * The directory where the recording will be kept
      */
     private final String recordingDir;
-    private final boolean watchOnly;
+    private final boolean toWatch;
+    private final boolean toKeep;
     /**
      * The disk file containing the recording
      */
@@ -43,20 +44,27 @@ public class Recording {
     private long startTime = System.currentTimeMillis();
     private long stopTime = System.currentTimeMillis();
     private long lastSize = 0;
+    private final AtomicBoolean finishedStreaming = new AtomicBoolean(false);
+    private final AtomicBoolean finishedRecording = new AtomicBoolean(false);
 
   /**
      * Constructor of the recording object which details a recording in progress
      * @param episode   the episode to record
      * @param recordingDir the directory where the recording will be kept
      */
-    public Recording(Episode episode, String recordingDir, boolean watchOnly) {
+    public Recording(Episode episode, String recordingDir, boolean toWatch, boolean toKeep) {
         this.recordingDir = checkNotNull(recordingDir);
         this.episode = checkNotNull(episode);
-        this.watchOnly = watchOnly;
+        this.toWatch = toWatch;
+        this.toKeep = toKeep;
     }
 
-    public boolean isWatchOnly() {
-        return watchOnly;
+    public boolean isToWatch() {
+        return toWatch;
+    }
+
+    public boolean isToKeep() {
+        return toKeep;
     }
 
     /**
@@ -252,4 +260,20 @@ public class Recording {
   public void setLastSize(long lastSize) {
     this.lastSize = lastSize;
   }
+
+    public boolean hasFinishedStreaming() {
+        return finishedStreaming.get();
+    }
+
+    public void setFinishedStreaming() {
+        finishedStreaming.set(true);
+    }
+
+    public boolean hasFinishedRecording() {
+        return finishedRecording.get();
+    }
+
+    public void setFinishedRecording() {
+        finishedRecording.set(true);
+    }
 }

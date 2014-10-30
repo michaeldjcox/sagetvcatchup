@@ -167,8 +167,6 @@ class WindowsUtils extends OsUtils {
             }
         } catch (Exception e) {
             logger.warn("Cannot check OS processes", e);
-        } finally{
-            logger.info("Got OS processes");
         }
 
         return results;

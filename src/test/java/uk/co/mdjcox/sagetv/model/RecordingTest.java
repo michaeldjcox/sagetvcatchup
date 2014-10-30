@@ -40,7 +40,7 @@ public void after() throws Exception {
 @Test
 public void testCreate() {
   try {
-    new Recording(null, null, true);
+    new Recording(null, null, true, false);
   } catch (NullPointerException e) {
     return;
   }
@@ -54,7 +54,7 @@ public void testCreate() {
       Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
                                     "series", "episode", "description", "iconUrl", "serviceUrl",
                                     "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
-      Recording recording = new Recording(episode, context.getRecordingDir(), true);
+      Recording recording = new Recording(episode, context.getRecordingDir(), true, false);
 
       recording.setPartialFile(null);
     } catch (NullPointerException e) {
@@ -76,7 +76,7 @@ public void testSetGetPartialFile() throws Exception {
                                 "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
   File file = new File("filename");
 
-  Recording recording = new Recording(episode, context.getRecordingDir(), true);
+  Recording recording = new Recording(episode, context.getRecordingDir(), true, false);
 
   File file3 = recording.getPartialFile();
 
@@ -100,7 +100,7 @@ public void testGetSourceId() throws Exception {
   Episode episode = new Episode("sourceId", "id", "programmeTitle", "seriesTitle", "episodeTitle",
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
-  Recording recording = new Recording(episode, context.getRecordingDir(), true);
+  Recording recording = new Recording(episode, context.getRecordingDir(), true, false);
 
   assertEquals("getSourceId", "sourceId", recording.getSourceId());
 }
@@ -116,7 +116,7 @@ public void testGetUrl() throws Exception {
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
 
-  Recording recording = new Recording(episode, context.getRecordingDir(), true);
+  Recording recording = new Recording(episode, context.getRecordingDir(), true, false);
 
   assertEquals("getUrl", "serviceUrl", recording.getUrl());
 } 
@@ -132,7 +132,7 @@ public void testGetId() throws Exception {
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
 
-  Recording recording = new Recording(episode, context.getRecordingDir(), true);
+  Recording recording = new Recording(episode, context.getRecordingDir(), true, false);
 
   assertEquals("getId", "id", recording.getId());
 }
@@ -148,7 +148,7 @@ public void testGetName() throws Exception {
                                 "series", "episode", "description", "iconUrl", "serviceUrl",
                                 "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
 
-  Recording recording = new Recording(episode, context.getRecordingDir(), true);
+  Recording recording = new Recording(episode, context.getRecordingDir(), true, false);
 
   assertEquals("getName", episode.getPodcastTitle(), recording.getName());
 }
@@ -165,7 +165,7 @@ public void testGetPartialFilename() throws Exception {
                                 "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
 
 
-  Recording recording = new Recording(episode, context.getRecordingDir(), true);
+  Recording recording = new Recording(episode, context.getRecordingDir(), true, false);
 
   File file = new File(context.getRecordingDir() + File.separator + "filename");
 
@@ -181,7 +181,7 @@ public void testGetPartialFilename() throws Exception {
                                   "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
 
 
-    Recording recording = new Recording(episode, context.getRecordingDir(), true);
+    Recording recording = new Recording(episode, context.getRecordingDir(), true, false);
 
     assertEquals("getPartialFileName", "", recording.getPartialFilename());
   }
@@ -198,7 +198,7 @@ public void testToString() throws Exception {
                                 "airDate","airTime", "origAirDate", "origAirTime",  "channel", Sets.newHashSet("category"));
 
 
-  Recording recording = new Recording(episode, context.getRecordingDir(), true);
+  Recording recording = new Recording(episode, context.getRecordingDir(), true, false);
 
   assertEquals("toString", episode.toString(), recording.toString());
 

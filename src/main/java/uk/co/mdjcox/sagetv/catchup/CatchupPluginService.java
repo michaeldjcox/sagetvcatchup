@@ -5,6 +5,7 @@ import uk.co.mdjcox.utils.SageUtilsInterface;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
@@ -44,7 +45,7 @@ public class CatchupPluginService extends UnicastRemoteObject implements Catchup
 
       File completedFile = new File(file);
       File savedFile = new File(sageRecordingDir, episodeId + ".mp4");
-      Files.move(completedFile.toPath(), savedFile.toPath());
+      Files.move(completedFile.toPath(), savedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
       sageUtils.addRecordingToSageTV(
               savedFile.getAbsolutePath(),
@@ -60,7 +61,7 @@ public class CatchupPluginService extends UnicastRemoteObject implements Catchup
               episodeNumber);
     } catch (Exception e) {
       sageUtils.error("Failed to add catchup tv recording " + episodeId, e);
-      e.printStackTrace();
+      throw new RemoteException("Catchup Plugin unable to add recording to SageTV", e);
     }
   }
 }

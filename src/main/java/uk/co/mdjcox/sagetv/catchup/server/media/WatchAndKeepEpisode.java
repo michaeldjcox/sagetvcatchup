@@ -47,7 +47,7 @@ public class WatchAndKeepEpisode implements ContentProvider {
             response.setContentLength(-1);
 
             out = response.getOutputStream();
-            recorder.watch(out, episode, false);
+            recorder.watch(out, episode, true);
         } catch (Exception e) {
             logger.warn("Streaming of " + episode.getId() + " stopped due to exception ", e);
             throw new ServletException("Failed to stream video", e);

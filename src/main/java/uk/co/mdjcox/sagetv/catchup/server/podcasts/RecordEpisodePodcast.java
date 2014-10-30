@@ -33,7 +33,7 @@ public class RecordEpisodePodcast extends AbstractPodcast {
       String message = "Recording " + episode.getPodcastTitle();
 
       try {
-        recorder.record(episode, false);
+        recorder.record(episode, false, true);
       } catch (Exception e) {
         message = "Recording failed: " + e.getMessage();
       }

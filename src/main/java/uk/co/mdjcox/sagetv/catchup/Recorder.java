@@ -17,10 +17,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.SocketException;
 import java.nio.file.Files;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,7 +34,6 @@ import java.util.concurrent.*;
 @Singleton
 public class Recorder {
 
-  private static final int TIMEOUT = 10000;
   private static final int RECORDING_TIMEOUT = 10000;
   private final LoggerInterface logger;
   private final OsUtilsInterface osUtils;
@@ -44,6 +45,9 @@ public class Recorder {
   private ConcurrentHashMap<String, Recording> completedRecordings = new ConcurrentHashMap<String, Recording>();
 
   private ScheduledExecutorService service;
+
+  private AtomicInteger processCount = new AtomicInteger(0);
+  private long lastChecked = 0;
 
   @Inject
   private Recorder(LoggerInterface theLogger, PluginManager pluginManager, CatchupContextInterface context,
@@ -107,16 +111,17 @@ public class Recorder {
    * Schedules a recording of the specified episode
    *
    * @param episode the episode to record
-   * @param watchOnly <code>true</code> if the recording is not to be saved
+   * @param toWatch <code>true</code> if the recording is being streamed
+   * @param toKeep <code>true</code> if the recording is being saved
    * @return the associated recording object
    * @throws Exception if the recording cannot be started
    */
-  public Recording record(final Episode episode, final boolean watchOnly) throws Exception {
+  public Recording record(final Episode episode, final boolean toWatch, boolean toKeep) throws Exception {
     Recording existingRecording = checkForExistingRecording(episode.getId());
 
     if (existingRecording == null) {
 
-      final Recording recording = createNewRecording(episode, watchOnly);
+      final Recording recording = createNewRecording(episode, toWatch, toKeep);
 
       Runnable runnable = new Runnable() {
         @Override
@@ -155,26 +160,31 @@ public class Recorder {
             logger.info("Done recording " + recording+ " File " + completedFile + " exists=" + completedFile.exists());
 
             if (completedFile.exists()) {
-              if (!recording.isWatchOnly()) {
-                uploadToSageTv(recording);
-              }
               setCompleted(recording);
             } else {
-              if (!recording.isWatchOnly()) {
+              if (!(recording.isToWatch() && !recording.isToKeep())) {
                 logger.error("No completed recording file found for " + episode);
                 throw new Exception("No completed recording file found for " + episode);
               }
             }
           } catch (Throwable e) {
-            setFailed(recording, e);
+              setFailed(recording, e);
           } finally {
-            if (recording != null) {
-              if (!recording.isWatchOnly()) {
-                stop(recording);
-                houseKeepFiles(recording);
-                removeRecording(recording);
+              if (recording != null) {
+                  if (!recording.isToWatch() && recording.isToKeep()) {
+                      logger.info("Recording of " + recording + " tidying up");
+                      finalizeRecording(recording);
+                  } else
+                  if (recording.isToWatch()) {
+                      if (recording.hasFinishedStreaming()) {
+                          logger.info("Recording of " + recording + " tidying up");
+                          finalizeRecording(recording);
+                      }  else {
+                          logger.info("Recorder is letting streaming tidy up when done");
+                          recording.setFinishedRecording();
+                      }
+                  }
               }
-            }
           }
         }
       };
@@ -190,16 +200,16 @@ public class Recorder {
    * Schedules a recording and immediately starts streaming it back to the user
    * @param out the output stream to feed the content back on
    * @param episode the episode to record
-   * @param watchOnly <code>true</code> if the recording is not to be saved
+   * @param toKeep <code>true</code> if the recording is being saved
    * @throws Exception if the recording cannot be started
    */
-  public void watch(final OutputStream out, final Episode episode, final boolean watchOnly) throws Exception {
+  public void watch(final OutputStream out, final Episode episode, final boolean toKeep) throws Exception {
 
     Recording recording = null;
     FileInputStream in = null;
     String id = episode.getId();
     try {
-      recording = record(episode, watchOnly);
+      recording = record(episode, true, toKeep);
 
       if (recording.isStopped()) {
         logger.info("SageTV is asking for the content again because we did not not the content size");
@@ -241,7 +251,11 @@ public class Recorder {
             while ((count = in.read(buf)) >= 0 && !isStopped(id) && !isFailed(id) && !isStalled(id)) {
               out.write(buf, 0, count);
               streamed += count;
-              out.flush();
+                try {
+                    out.flush();
+                } catch (IOException e) {
+                    // Ignore
+                }
             }
             osUtils.waitFor(1000);
 
@@ -264,7 +278,7 @@ public class Recorder {
         }
       } catch (Exception e) {
         if (e.getCause() != null && e.getCause() instanceof SocketException) {
-          logger.warn("Streaming of " + id + " stopped due to client termination ", e);
+          logger.warn("Streaming of " + id + " stopped due to client termination");
         } else {
           logger.warn("Streaming of " + id + " stopped due to exception ", e);
           throw e;
@@ -278,19 +292,36 @@ public class Recorder {
         // Ignore
       }
       if (recording != null) {
-        if (watchOnly) {
-          logger.info("Streaming of " + id + " tidying up");
-          if (!recording.isStopped()) {
-            stop(recording);
+          if (recording.isToWatch() && !recording.isToKeep()) {
+              logger.info("Streaming of " + id + " tidying up");
+              finalizeRecording(recording);
+          } else
+          if (recording.isToWatch()) {
+              if (recording.hasFinishedRecording()) {
+                  logger.info("Streaming of " + id + " tidying up");
+                  finalizeRecording(recording);
+              } else {
+                  logger.info("Streamer is letting recording tidy up when done");
+                  recording.setFinishedStreaming();
+              }
           }
-          houseKeepFiles(recording);
-          removeRecording(recording);
         }
       }
-    }
   }
 
-  private boolean isFailed(String id) {
+    private void finalizeRecording(Recording recording) {
+        if (!recording.isStopped()) {
+          stop(recording);
+        }
+        if (recording.isToKeep() && recording.isComplete()) {
+                uploadToSageTv(recording);
+        }
+        houseKeepFiles(recording);
+        removeRecording(recording);
+        updateProcessCount();
+    }
+
+    private boolean isFailed(String id) {
     Recording recording = currentRecordings.get(id);
     if (recording == null) {
       return false;
@@ -319,10 +350,10 @@ public class Recorder {
     return null;
   }
 
-  private Recording createNewRecording(Episode episode, boolean watchOnly) throws Exception {
-    logger.info("Starting new recording of " + episode);
+  private Recording createNewRecording(Episode episode, boolean toWatch, boolean toKeep) throws Exception {
+    logger.info("Starting new recording of " + episode + (toWatch ? " to watch" : "" ) + (toKeep ? " to keep" : "") );
     String recordingDir = context.getRecordingDir();
-    Recording recording = new Recording(episode, recordingDir, watchOnly);
+    Recording recording = new Recording(episode, recordingDir, toWatch, toKeep);
     currentRecordings.put(episode.getId(), recording);
     return recording;
   }
@@ -390,11 +421,13 @@ public class Recorder {
     try {
       File partialFile = recording.getPartialFile();
       if (partialFile != null && partialFile.exists()) {
+        logger.info("Deleting partial recording " + partialFile);
         partialFile.delete();
       }
 
       File completedFile = recording.getCompletedFile();
       if (completedFile != null && completedFile.exists()) {
+          logger.info("Deleting completed recording " + completedFile);
         completedFile.delete();
       }
     } catch (Exception e) {
@@ -425,6 +458,8 @@ public class Recorder {
 
     try {
       Preconditions.checkNotNull(recording);
+
+      logger.info("Uploading " + recording + " to SageTV");
 
       File recordingFile = recording.getCompletedFile();
       String id = recording.getId();
@@ -474,7 +509,10 @@ public class Recorder {
               episodeNumber
       );
 
+        logger.info("Completed uploading " + recording + " to SageTV");
+
     } catch (Exception e) {
+        setFailed(recording, e);
       logger.error("Failed to upload recording", e);
     }
   }
@@ -553,17 +591,27 @@ public class Recorder {
    * @return the number of processes
    */
   public int getProcessCount() {
-    int count = 0;
-    try {
-      osUtils.findProcessesMatching(".*get_iplayer.*").size();
-      count += osUtils.findProcessesMatching(".*rtmpdump.*").size();
-    } catch (Exception e) {
-      logger.error("Failed to count processes", e);
+
+    if ((System.currentTimeMillis() - lastChecked) > 10000) {
+        updateProcessCount();
     }
-    return count;
+    return processCount.get();
   }
 
-  /**
+    private void updateProcessCount() {
+        int count = 0;
+        try {
+            osUtils.findProcessesMatching(".*get_iplayer.*").size();
+            count += osUtils.findProcessesMatching(".*rtmpdump.*").size();
+            processCount.set(count);
+        } catch (Exception e) {
+            logger.error("Failed to count recording processes", e);
+        } finally {
+            lastChecked = System.currentTimeMillis();
+        }
+    }
+
+    /**
    * Indicates if any recording is currently in progress
    *
    * @return <code>true</code> if there are any recording records
@@ -635,6 +683,11 @@ public class Recorder {
    */
   private void setFailed(Recording recording, Throwable e) {
     final String message = "Recording " + recording + " failed due to exception";
+    if (e instanceof RemoteException) {
+        if (e.getCause() != null) {
+            e = e.getCause();
+        }
+    }
     recording.setFailed(message, e);
     failedRecordings.put(recording.getId() + "-" + recording.getStartTime(), recording);
     logger.warn(message, e);
