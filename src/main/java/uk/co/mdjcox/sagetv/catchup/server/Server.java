@@ -96,6 +96,12 @@ public class Server implements CatalogPublisher {
         RecordingsPodcast recordingsPodcastProvider = new RecordingsPodcast(htmlUtils, baseUrl, recorder);
         addStaticContent(recordingsPodcastProvider);
 
+        RecordingStatusPodcast recordingStatusPodcast = new RecordingStatusPodcast(baseUrl, recorder);
+        addStaticContent(recordingStatusPodcast);
+
+        CatalogingStatusPodcast cataloging = new CatalogingStatusPodcast(baseUrl, cataloger);
+        addStaticContent(cataloging);
+
         LogsPage logsProvider = new LogsPage(logDir + File.separator + "sagetvcatchup.log");
         addStaticContent(logsProvider);
 

@@ -65,7 +65,7 @@ public class Cataloger {
                     setProgress("Failed");
                 } finally {
                     if (catalog != null) {
-                        errorSummary = buildErrorSummary(catalog.getErrors());
+                        errorSummary = buildErrorSummary(catalog);
                     }
                     catalogRunning.set(false);
                 }
@@ -101,7 +101,8 @@ public class Cataloger {
         }
     }
 
-    private String buildErrorSummary(Collection<ParseError> errorList) {
+    private String buildErrorSummary(Catalog catalog) {
+        Collection<ParseError> errorList = catalog.getErrors();
         HashMap<String, Integer> errorSum = new HashMap<String, Integer>();
         for (ParseError error : errorList) {
             Integer count = errorSum.get(error.getLevel());
@@ -488,6 +489,7 @@ public class Cataloger {
             try {
               logger.info("Restoring catalog from backup");
               Catalog initial = persister.load();
+              errorSummary = buildErrorSummary(initial);
               buildStatsSummary(initial);
               publish(initial, publishers);
               logger.info("Restored catalog from backup");

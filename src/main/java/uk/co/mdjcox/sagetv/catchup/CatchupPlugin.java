@@ -780,7 +780,7 @@ public class CatchupPlugin implements SageTVPlugin {
         PropertiesFile seed = new PropertiesFile(seedFileName, true);
 
         if (backupFile.exists()) {
-          sageUtils.info("Properties - applying backup properties " + seedFileName);
+          sageUtils.info("Properties - applying backup properties " + backupFileName);
 
           // We can reuse an old one
           PropertiesFile backup = new PropertiesFile(backupFileName, true);
