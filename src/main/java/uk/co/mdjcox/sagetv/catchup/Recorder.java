@@ -140,8 +140,10 @@ public class Recorder {
                 lastChecked = System.currentTimeMillis();
               } else {
                 if ((System.currentTimeMillis() - lastChecked) > RECORDING_TIMEOUT) {
-                  recording.setStalled();
-                  throw new Exception("Recording of " + episode + " stalled");
+                  if (!(recording.isComplete() || recording.isStopped() || recording.isFailed())) {
+                    recording.setStalled();
+                    throw new Exception("Recording of " + episode + " stalled");
+                  }
                 }
               }
             }

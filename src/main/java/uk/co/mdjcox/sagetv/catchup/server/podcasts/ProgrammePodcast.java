@@ -14,7 +14,7 @@ import java.util.*;
 public class ProgrammePodcast extends AbstractPodcast {
 
     private final HtmlUtilsInterface htmlUtils;
-    private final Programme service;
+    private final Programme programme;
     private final Catalog catalog;
     private String page;
 
@@ -22,16 +22,16 @@ public class ProgrammePodcast extends AbstractPodcast {
         super(baseUrl);
         this.htmlUtils = htmlUtils;
         this.catalog = catalog;
-        this.service = category;
+        this.programme = category;
         page = buildPage();
     }
 
     public String buildPage() {
 
-        final String shortName = htmlUtils.makeContentSafe(service.getShortName());
-        final String longName = htmlUtils.makeContentSafe(service.getLongName());
-        String url = service.getServiceUrl();
-        String iconUrl = service.getIconUrl();
+        final String shortName = htmlUtils.makeContentSafe(programme.getShortName());
+        final String longName = htmlUtils.makeContentSafe(programme.getLongName());
+        String url = programme.getServiceUrl();
+        String iconUrl = programme.getIconUrl();
       if (iconUrl != null && iconUrl.startsWith("/")) {
         iconUrl = getPodcastBaseUrl() + iconUrl;
       }
@@ -43,7 +43,6 @@ public class ProgrammePodcast extends AbstractPodcast {
         RssBuilder builder = new RssBuilder();
         builder.startDocument(shortName, longName, url);
         builder.addImage(iconUrl, shortName, url);
-        Programme programme = (Programme) service;
         Set<String> episodes = programme.getEpisodes();
         EpisodeComparator comparator = new EpisodeComparator();
         TreeSet<Episode> sortedEpisodes = new TreeSet<Episode>(comparator);
@@ -52,23 +51,50 @@ public class ProgrammePodcast extends AbstractPodcast {
           sortedEpisodes.add(episode);
         }
         for (Episode episode : sortedEpisodes) {
-            final String title = htmlUtils.makeContentSafe(episode.getPodcastTitle());
-            String desc = htmlUtils.makeContentSafe(episode.getDescription());
-          desc += "<br/><br/>";
-          desc += episode.getOrigAirDate() + " " + episode.getOrigAirTime();
-          desc += "<br/>";
+            StringBuilder titleBuilder = new StringBuilder("");
+
           if (!episode.getSeries().isEmpty() && !episode.getSeries().equals("0")) {
-            desc += "Series:  " + episode.getSeries() + " ";
+            titleBuilder.append(episode.getSeries());
           }
           if (!episode.getEpisode().isEmpty() && !episode.getEpisode().equals("0")) {
-            desc += "Episode: " + episode.getEpisode();
-          }
-            String episodeIconUrl = episode.getIconUrl();
-            if (episodeIconUrl != null && episodeIconUrl.startsWith("/")) {
-              episodeIconUrl = getPodcastBaseUrl() + episodeIconUrl;
+            if (titleBuilder.length() != 0) {
+              titleBuilder.append(".");
             }
-            final String controlUrl=getPodcastBaseUrl() +  "/control?id=" + episode.getId() + ";type=xml";
-            builder.addCategoryItem(title, desc, controlUrl, episodeIconUrl);
+            titleBuilder.append(episode.getEpisode());
+            titleBuilder.append(": ");
+          } else {
+            if (titleBuilder.length() != 0) {
+              titleBuilder.append(": ");
+            }
+          }
+          titleBuilder.append(episode.getEpisodeTitle());
+
+          StringBuilder descBuilder = new StringBuilder("");
+          descBuilder.append("<i>");
+          descBuilder.append(episode.getOrigAirDate());
+          descBuilder.append(' ');
+          descBuilder.append(episode.getOrigAirTime());
+          descBuilder.append("</i>");
+          descBuilder.append("<br/>");
+          descBuilder.append(episode.getDescription());
+
+// TODO forget this for now
+//          if (!episode.getSeriesTitle().isEmpty()) {
+//            descBuilder.append(episode.getSeriesTitle());
+//          }
+
+          final String controlUrl=getPodcastBaseUrl() +  "/control?id=" + episode.getId() + ";type=xml";
+
+          // TODO takes too much space
+//          String episodeIconUrl = episode.getIconUrl();
+//          if (episodeIconUrl != null && episodeIconUrl.startsWith("/")) {
+//            episodeIconUrl = getPodcastBaseUrl() + episodeIconUrl;
+//          }
+
+          String desc = htmlUtils.makeContentSafe(descBuilder.toString());
+          String title = htmlUtils.makeContentSafe(titleBuilder.toString());
+
+          builder.addCategoryItem(title, desc, controlUrl, "");
         }
         builder.stopDocument();
         return builder.toString();
@@ -76,7 +102,7 @@ public class ProgrammePodcast extends AbstractPodcast {
 
     @Override
     public String getUri() {
-        return "programme?id=" + service.getId() + ";type=xml";
+        return "programme?id=" + programme.getId() + ";type=xml";
     }
 
     @Override

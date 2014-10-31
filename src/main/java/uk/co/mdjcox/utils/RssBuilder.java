@@ -35,6 +35,7 @@ public class RssBuilder {
   }
 
     public void addImage(String iconUrl, String name, String url) {
+      if (iconUrl.isEmpty()) {
         resultStr.append("<image>");
         resultStr.append(CRLF);
         resultStr.append("<url>");
@@ -51,6 +52,7 @@ public class RssBuilder {
         resultStr.append(CRLF);
         resultStr.append("</image>");
         resultStr.append(CRLF);
+      }
     }
 
   public void stopDocument() {
@@ -111,10 +113,12 @@ public class RssBuilder {
         resultStr.append(message);
         resultStr.append("]]></media:description>");
         resultStr.append(CRLF);
+      if (!iconUrl.isEmpty()) {
         resultStr.append("<media:thumbnail url=\"");
         resultStr.append(iconUrl);
         resultStr.append("\"/>");
         resultStr.append(CRLF);
+      }
         resultStr.append("</media:content>");
         resultStr.append(CRLF);
         resultStr.append("</item>");

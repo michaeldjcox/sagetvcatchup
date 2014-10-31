@@ -54,8 +54,12 @@ public class CategoryPodcast extends AbstractPodcast {
       }
         for (SubCategory subCat: subCatSet) {
             if (subCat.isProgrammeCategory()) {
+                        String programmeIconUrl = subCat.getIconUrl();
+          if (programmeIconUrl != null && programmeIconUrl.startsWith("/")) {
+            programmeIconUrl = getPodcastBaseUrl() + programmeIconUrl;
+          }
                 final String categoryUrl = getPodcastBaseUrl() + "/programme?id=" + subCat.getId() + ";type=xml";
-                builder.addCategoryItem(subCat.getShortName(), subCat.getLongName(), categoryUrl);
+                builder.addCategoryItem(subCat.getShortName(), subCat.getLongName(), categoryUrl, programmeIconUrl);
             } else {
                 final String categoryUrl = getPodcastBaseUrl() + "/category?id=" + subCat.getId() + ";type=xml";
                 builder.addCategoryItem(subCat.getShortName(), subCat.getLongName(), categoryUrl);
