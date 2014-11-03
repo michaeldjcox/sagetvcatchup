@@ -1,4 +1,26 @@
 <![CDATA[
-0.2.6 - First beta release. Contains Iplayer catalog, watch and record to TV recordings
+0.3.2 - Second beta release.
+
+        Correct SageTV plugin xml to pass SageTV tests.
+        Fix Demand5 meta data (but demand5 no longer works possible due to encryption).
+        Add Type column to category and programmes web page.
+        Add "Watch and Keep mode" as SageTV only lets you record if fully downloaded.
+        Add recording errors better recording outcome reporting.
+        Add enable/disable of individual sources in plugin configuration screen.
+        Allow catchup server port and recording directory to be configured from SageTV
+        Remove the catchup server host and port from podcast URLs from the catalog
+        Move the catchup server to its own JVM to limit the plugins impact on SageTV classpath
+        Add a catalog start hour so cataloging always starts at a set hour of day and occurs every X hours
+        On plugin startup only start cataloging if the catalog looks sparse otherwise wait to scheduled time
+        Reverse order sorting of categories and episodes by orig air date
+        Add seed properties for 32bit windows e.g. windows XP
+        Set up RMI servers in plugin and now separate server for better control and feedback
+        Made record and watch much more resilient to different outcomes
+        Recording and catalog status are now a further click away as cannot stop SageTV caching downloads at top level
+        Added a search podcast to allow programme search from SageTV
+        Improved visibility of meta-data in online services
+        Moved show icons to programme level from episode level to facilitate better meta-data visibility
+
+0.2.7 - First beta release. Contains Iplayer catalog, watch and record to TV recordings
 ]]>
 
