@@ -96,6 +96,9 @@ public class Server implements CatalogPublisher {
         RecordingsPodcast recordingsPodcastProvider = new RecordingsPodcast(htmlUtils, baseUrl, recorder);
         addStaticContent(recordingsPodcastProvider);
 
+        RecordingsCompletePodcast recordingsCompletePodcast = new RecordingsCompletePodcast(htmlUtils, baseUrl, recorder);
+        addStaticContent(recordingsCompletePodcast);
+
         RecordingStatusPodcast recordingStatusPodcast = new RecordingStatusPodcast(baseUrl, recorder);
         addStaticContent(recordingStatusPodcast);
 
@@ -227,7 +230,7 @@ public class Server implements CatalogPublisher {
           RecordingErrorsPage recerrors = new RecordingErrorsPage(recorder);
           addPublishedContent(publishedContent, recerrors);
 
-          RecordingErrorsPodcast recerrorscast = new RecordingErrorsPodcast(baseUrl, recorder);
+          RecordingErrorsPodcast recerrorscast = new RecordingErrorsPodcast(htmlUtils, baseUrl, recorder);
           addPublishedContent(publishedContent, recerrorscast);
 
             StyledPage programmes = new StyledPage(xsltDir, logger, "Programmes", "programmes.html", null, catalog);

@@ -47,6 +47,7 @@ public class Recording {
     private final AtomicBoolean finishedStreaming = new AtomicBoolean(false);
     private final AtomicBoolean finishedRecording = new AtomicBoolean(false);
     private String progress = "Started";
+    private boolean completed = false;
 
   /**
      * Constructor of the recording object which details a recording in progress
@@ -175,11 +176,13 @@ public class Recording {
         } catch (IllegalThreadStateException e) {
             return true;
         }
-        return !isComplete();
+        return !completed;
     }
 
-    public boolean isComplete() {
-        return completedFile != null && completedFile.exists();
+    public boolean hasCompletedFile() {
+      final boolean completedFileExists = completedFile != null && completedFile.exists();
+      completed = completed || completedFileExists;
+      return completedFileExists;
     }
 
     /**
@@ -244,6 +247,7 @@ public class Recording {
     if (stopTime == startTime) {
       stopTime = System.currentTimeMillis();
     }
+    completed=true;
   }
 
   public void setStalled() {
@@ -305,5 +309,10 @@ public class Recording {
 
       }
       return status;
+  }
+
+  public boolean isComplete() {
+    hasCompletedFile();
+    return completed;
   }
 }

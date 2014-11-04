@@ -23,6 +23,7 @@ public class RecordingStatusPodcast extends AbstractPodcast {
         String desc = "Recording status";
 
         String recordingsUrl = getPodcastBaseUrl() + "/recordings?type=xml";
+        String recordingsDoneUrl = getPodcastBaseUrl() + "/recordingsdone?type=xml";
         String statusUrl = getPodcastBaseUrl() + "/category?id=status;type=xml";
         String recerrorsUrl = getPodcastBaseUrl() + "/recerrors?type=xml";
         String recstatusUrl = getPodcastBaseUrl() + "/" + getUri();
@@ -31,7 +32,7 @@ public class RecordingStatusPodcast extends AbstractPodcast {
         RssBuilder builder = new RssBuilder();
         builder.startDocument(title, desc, recstatusUrl);
         builder.addCategoryItem("IN PROGRESS", recorder.getRecordingCount() + " in progress", recordingsUrl);
-        builder.addTextItem("COMPLETED", recorder.getCompletedCount() + " completed", statusUrl);
+        builder.addCategoryItem("COMPLETED", recorder.getCompletedCount() + " completed", recordingsDoneUrl);
         builder.addCategoryItem("FAILED", recorder.getFailedCount() + " failed", recerrorsUrl);
         builder.addTextItem("PROCESSES", recorder.getProcessCount() + " processes running", statusUrl);
         builder.addCategoryItem("STOP ALL RECORDING", "Abandon all recording", stopUrl);

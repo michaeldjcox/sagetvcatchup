@@ -1,7 +1,9 @@
 package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
 import uk.co.mdjcox.sagetv.catchup.Recorder;
+import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
+import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.RssBuilder;
 
 import java.text.SimpleDateFormat;
@@ -12,10 +14,13 @@ import java.text.SimpleDateFormat;
 public class RecordingErrorsPodcast extends AbstractPodcast {
 
     private final Recorder recorder;
+    private final HtmlUtilsInterface htmlUtils;
 
-    public RecordingErrorsPodcast(String baseUrl, Recorder recorder) {
+    public RecordingErrorsPodcast(HtmlUtilsInterface htmlUtils, String baseUrl, Recorder recorder) {
         super(baseUrl);
         this.recorder = recorder;
+        this.htmlUtils = htmlUtils;
+
     }
 
     public String buildPage() {
@@ -29,13 +34,22 @@ public class RecordingErrorsPodcast extends AbstractPodcast {
       SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
       for (Recording failedRecording : recorder.getFailedRecordings()) {
-            String error =
+        final Episode episode = failedRecording.getEpisode();
+        final String episodeTitle = htmlUtils.makeContentSafe(episode.getPodcastTitle());
+
+        String error =
                     format.format(failedRecording.getStopTime()) + "<br/>" +
                     failedRecording.getId() + "<br/>" +
                     failedRecording.getFailedReason() + "<br/>" +
                     failedRecording.getFailureException();
-            builder.addTextItem("ERROR", error, "");
-        }
+
+        final String controlUrl = getPodcastBaseUrl() + "/control?id=" + episode.getId() + ";type=xml";
+
+        final String errorDesc = htmlUtils.makeContentSafe(error);
+
+        builder.addCategoryItem(episodeTitle, errorDesc, controlUrl);
+
+      }
         builder.stopDocument();
 
         return builder.toString();

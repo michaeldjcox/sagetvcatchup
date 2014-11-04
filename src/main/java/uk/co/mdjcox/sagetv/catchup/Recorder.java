@@ -214,7 +214,7 @@ public class Recorder {
         return;
       }
 
-      File file = recording.isComplete() ? recording.getCompletedFile() : recording.getPartialFile();
+      File file = recording.hasCompletedFile() ? recording.getCompletedFile() : recording.getPartialFile();
 
       if (file == null || !file.exists()) {
         synchronized (recording) {
@@ -226,7 +226,7 @@ public class Recorder {
         }
       }
 
-      file = recording.isComplete() ? recording.getCompletedFile() : recording.getPartialFile();
+      file = recording.hasCompletedFile() ? recording.getCompletedFile() : recording.getPartialFile();
 
       if (file == null || !file.exists()) {
         throw new Exception("Failed to stream episode " + episode);
@@ -311,7 +311,7 @@ public class Recorder {
         if (!recording.isStopped()) {
           stop(recording);
         }
-        if (recording.isToKeep() && recording.isComplete()) {
+        if (recording.isToKeep() && recording.hasCompletedFile()) {
                 uploadToSageTv(recording);
         }
         houseKeepFiles(recording);
@@ -689,5 +689,9 @@ public class Recorder {
     recording.setFailed(message, e);
     failedRecordings.put(recording.getId() + "-" + recording.getStartTime(), recording);
     logger.warn(message, e);
+  }
+
+  public Collection<Recording> getCompletedRecordings() {
+    return completedRecordings.values();
   }
 }
