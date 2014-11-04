@@ -24,6 +24,7 @@
         Reduce cataloging time to 15 mins - previously took hours
         Added a "New" category for programmes added since the last catalog
         Added a "Favourite" category for programmes which are also SageTV favourite series
+        Added recording status messages to recordings podcast
 
 0.2.7 - First beta release. Contains Iplayer catalog, watch and record to TV recordings
 ]]>
