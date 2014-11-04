@@ -44,18 +44,23 @@ public class RecordingsPodcast extends AbstractPodcast {
         for (Recording recording : recordings) {
             final Episode episode = recording.getEpisode();
             final String episodeTitle = htmlUtils.makeContentSafe(episode.getPodcastTitle());
-            final String episodeDesc = htmlUtils.makeContentSafe(episode.getDescription());
+
+          String status = recording.getRecordingStatus();
+
+            final String statusDesc = htmlUtils.makeContentSafe(status);
             String episodeIconUrl = episode.getIconUrl();
             if (episodeIconUrl != null && episodeIconUrl.startsWith("/")) {
               episodeIconUrl = getPodcastBaseUrl() + episodeIconUrl;
             }
             final String controlUrl = getPodcastBaseUrl() + "/control?id=" + episode.getId() + ";type=xml";
 
-            builder.addCategoryItem(episodeTitle, episodeDesc, controlUrl, episodeIconUrl);
+            builder.addCategoryItem(episodeTitle, statusDesc, controlUrl, episodeIconUrl);
         }
 
         builder.stopDocument();
 
         return builder.toString();
     }
+
+
 }

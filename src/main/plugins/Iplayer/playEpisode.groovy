@@ -11,7 +11,8 @@ if (IS_WINDOWS()) {
 }
 
 ArrayList<String> output = new ArrayList<String>();
-Process proc = EXECUTE(command, "get_iplayer", output, null);
+ArrayList<String> errors = new ArrayList<String>();
+Process proc = EXECUTE(command, "get_iplayer", output, errors);
 
 long TIMEOUT = 30000;
 
@@ -27,6 +28,8 @@ filename = recording.getRecordingDir() + File.separator + filename.substring(pre
 File file = WAIT_FOR_FILE_OF_SIZE(filename, 1024000, 10000, recording.getStopFlag())
 
 recording.setPartialFile(file);
+
+TRACK_PROGRESS(".*kB.*sec.*", errors, recording);
 
 String completedName = filename.replace("default.partial.mp4.flv", "default.mp4");
 File completedFile = new File(completedName);

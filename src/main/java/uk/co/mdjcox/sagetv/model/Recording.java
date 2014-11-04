@@ -46,6 +46,7 @@ public class Recording {
     private long lastSize = 0;
     private final AtomicBoolean finishedStreaming = new AtomicBoolean(false);
     private final AtomicBoolean finishedRecording = new AtomicBoolean(false);
+    private String progress = "Started";
 
   /**
      * Constructor of the recording object which details a recording in progress
@@ -276,4 +277,33 @@ public class Recording {
     public void setFinishedRecording() {
         finishedRecording.set(true);
     }
+
+  public void setProgress(String progress) {
+    this.progress = progress;
+  }
+
+  public String getProgress() {
+    return progress;
+  }
+
+  public String getRecordingStatus() {
+      String status = "Started";
+      if (isFailed()) {
+        status = "Failed";
+      } else
+      if (isComplete()) {
+        status = "Complete";
+      } else
+      if (isStalled()) {
+        status = "Stalled";
+      } else
+      if (isStopped()) {
+        status = "Stopped";
+      } else
+      if (isInProgress()) {
+        status = getProgress();
+
+      }
+      return status;
+  }
 }

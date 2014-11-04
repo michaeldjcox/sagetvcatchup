@@ -3,6 +3,7 @@ package uk.co.mdjcox.sagetv.catchup.plugins;
 
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.model.ErrorRecorder;
+import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.utils.DownloadUtilsInterface;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.LoggerInterface;
@@ -265,6 +266,31 @@ public abstract class GroovyScript extends groovy.lang.Script {
         }
         return "";
     }
+
+  public void TRACK_PROGRESS(final String regex, final ArrayList<String> output, final Recording recording) {
+    Runnable runnable = new Runnable() {
+
+      public void run() {
+        int last = 0;
+        while (!recording.getStopFlag().get()) {
+          int i = 0;
+          for (i = last; i < output.size(); i++) {
+            String result = output.get(i);
+            if (result.matches(regex)) {
+              recording.setProgress(result);
+            }
+          }
+          last = i;
+          try {
+            Thread.sleep(5000);
+          } catch (InterruptedException e) {
+            // Ignore
+          }
+        }
+      }
+    };
+    new Thread(runnable, "recording-tracker-" + recording.getId()).start();
+  }
 
     public boolean IS_WINDOWS() {
         return osUtils.isWindows();
