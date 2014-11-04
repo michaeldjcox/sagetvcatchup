@@ -49,16 +49,16 @@
                 <otherParentIds class="linked-hash-set"/>
                 <subCategories class="sorted-set">
                     <string>Test</string>
-                    <string>zzsagetvcatchupSearch</string>
-                    <string>zzsagetvcatchupStatus</string>
+                    <string>Search</string>
+                    <string>Status</string>
                 </subCategories>
             </uk.co.mdjcox.sagetv.model.Root>
         </entry>
         <entry>
-            <string>zzsagetvcatchupStatus</string>
+            <string>Status</string>
             <uk.co.mdjcox.sagetv.model.Source>
-                <sourceId>zzsagetvcatchupStatus</sourceId>
-                <id>zzsagetvcatchupStatus</id>
+                <sourceId>Status</sourceId>
+                <id>Status</id>
                 <shortName>Status</shortName>
                 <longName>Status</longName>
                 <serviceUrl></serviceUrl>
@@ -73,10 +73,10 @@
             </uk.co.mdjcox.sagetv.model.Source>
         </entry>
         <entry>
-            <string>zzsagetvcatchupSearch</string>
+            <string>Search</string>
             <uk.co.mdjcox.sagetv.model.Source>
-                <sourceId>zzsagetvcatchupSearch</sourceId>
-                <id>zzsagetvcatchupSearch</id>
+                <sourceId>Search</sourceId>
+                <id>Search</id>
                 <shortName>Search</shortName>
                 <longName>Search</longName>
                 <serviceUrl></serviceUrl>
@@ -98,7 +98,7 @@
                 <shortName>Test</shortName>
                 <longName>Test</longName>
                 <serviceUrl>/category?id=test;type=html</serviceUrl>
-                <iconUrl>/logo.png</iconUrl>
+                <iconUrl></iconUrl>
                 <parentId>Catchup</parentId>
                 <errors/>
                 <metaUrls>

@@ -149,7 +149,7 @@ public class SageTvPublisher implements CatalogPublisher {
                     addSource((Root)category, links, labels);
                 } else if (category.isSource()) {
                     logger.info("Online adding source " + category.getId());
-                  boolean isSearch = category.getId().equals("zzsagetvcatchupSearch");
+                  boolean isSearch = category.getId().equals("Search");
                     addDynamicSource((Source)category, links, labels, isSearch);
                 }
             }

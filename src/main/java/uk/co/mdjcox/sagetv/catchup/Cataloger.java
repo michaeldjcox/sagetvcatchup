@@ -100,7 +100,7 @@ public class Cataloger {
         programmeStats++;
       }
 
-      if (category.isSource() && !category.getSourceId().equals("zzsagetvcatchupStatus") && !category.getSourceId().equals("zzsagetvcatchupSearch")) {
+      if (category.isSource() && !category.getSourceId().equals("Status") && !category.getSourceId().equals("Search")) {
         sourceStats++;
       }
     }
@@ -164,12 +164,12 @@ public class Cataloger {
       Root root = new Root("Catchup", "Catchup TV", "Catchup TV", "/", "/logo.png");
       newCategories.put(root.getId(), root);
 
-      Source statusSource = new Source(root.getId(), "zzsagetvcatchupStatus", "Status", "Status", "", "");
+      Source statusSource = new Source(root.getId(), "Status", "Status", "Status", "", "");
       statusSource.setPodcastUrl("/category?id=status;type=xml");
       newCategories.put(statusSource.getId(), statusSource);
       root.addSubCategory(statusSource);
 
-      Source searchSource = new Source(root.getId(), "zzsagetvcatchupSearch", "Search", "Search", "", "");
+      Source searchSource = new Source(root.getId(), "Search", "Search", "Search", "", "");
       searchSource.setPodcastUrl("/search?type=xml");
       newCategories.put(searchSource.getId(), searchSource);
       root.addSubCategory(searchSource);
@@ -707,7 +707,7 @@ public class Cataloger {
       }
 
       if (programmeStats < threshold) {
-        logger.info("Doing early cataloging as catalog looks a bit sparse");
+        logger.info("Doing early cataloging as catalog looks a bit sparse: " + programmeStats + " programmes when expected at least " + threshold);
         future = catalogingScheduler.schedule(runnable, 0, TimeUnit.MILLISECONDS);
       }
 
