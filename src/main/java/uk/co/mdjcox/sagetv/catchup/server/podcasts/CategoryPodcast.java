@@ -43,7 +43,9 @@ public class CategoryPodcast extends AbstractPodcast {
 
       RssBuilder builder = new RssBuilder();
         builder.startDocument(shortName, longName, url);
+      if (iconUrl != null && !iconUrl.isEmpty()) {
         builder.addImage(iconUrl, shortName, url);
+      }
 
         Set<String> subCats = ((SubCategory) service).getSubCategories();
       SubcategoryComparator comparator = new SubcategoryComparator();
