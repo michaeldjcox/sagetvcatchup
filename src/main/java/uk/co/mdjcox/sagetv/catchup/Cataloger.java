@@ -345,9 +345,6 @@ public class Cataloger {
           // Favourite
           doFavouriteCategorisation(sourceCat, programmeCat, newSubCategories);
 
-          // New
-          doNewProgrammeCategorisation(sourceCat, programmeCat, newSubCategories);
-
           for (String episodeId : programmeCat.getEpisodes()) {
             Episode episode = newEpisodes.get(episodeId);
             if ((episode == null) || episodeId.isEmpty()) {
@@ -363,8 +360,7 @@ public class Cataloger {
             doAirDateCategorisation(sourceCat, programmeCat, episode, newSubCategories);
 
             // New
-
-
+            doNewProgrammeCategorisation(sourceCat, programmeCat, episode, newSubCategories);
           }
         }
 
@@ -429,7 +425,7 @@ public class Cataloger {
     }
   }
 
-  private void doNewProgrammeCategorisation(Source sourceCat, Programme programmeCat,
+  private void doNewProgrammeCategorisation(Source sourceCat, Programme programmeCat, Episode episode,
                                          Map<String, SubCategory> newSubCategories) {
     String sourceId = sourceCat.getId();
     String favouriteId = sourceId + "/New";
@@ -445,11 +441,36 @@ public class Cataloger {
 
     if (lastCatalog != null) {
       String id = programmeCat.getId();
+      String epId = episode.getId();
       Category cat = lastCatalog.getCategory(id);
+      Episode ep = lastCatalog.getEpisode(epId);
       if (cat == null) {
-        favouriteCat.addSubCategory(programmeCat);
+        Programme newProgrammeCat = addNewProgrammeCat(programmeCat, newSubCategories, sourceId, favouriteId, favouriteCat, id);
+        newProgrammeCat.addAllEpisodes(programmeCat.getEpisodes());
+      } else
+      if (ep == null)
+      {
+        Programme newProgrammeCat = addNewProgrammeCat(programmeCat, newSubCategories, sourceId, favouriteId, favouriteCat, id);
+        newProgrammeCat.addEpisode(episode);
       }
     }
+  }
+
+  private Programme addNewProgrammeCat(Programme programmeCat, Map<String, SubCategory> newSubCategories, String sourceId, String favouriteId, SubCategory favouriteCat, String id) {
+    String favouriteProgId = sourceId + "/New/" + id;
+    Programme newProgCat = (Programme)newSubCategories.get(favouriteProgId);
+    if (newProgCat == null) {
+      newProgCat = new Programme(sourceId, favouriteProgId,
+              programmeCat.getShortName(),
+              programmeCat.getLongName(),
+              programmeCat.getServiceUrl(),
+              programmeCat.getIconUrl(),
+              favouriteId);
+      newSubCategories.put(favouriteProgId, newProgCat);
+      favouriteCat.addSubCategory(newProgCat);
+    }
+    favouriteCat.addSubCategory(programmeCat);
+    return programmeCat;
   }
 
   private void doAirDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode,

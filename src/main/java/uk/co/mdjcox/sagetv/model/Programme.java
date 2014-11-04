@@ -103,6 +103,6 @@ public class Programme extends SubCategory {
     }
 
   public void addAllEpisodes(Set<String> episodes) {
-    episodes.addAll(episodes);
+    this.episodes.addAll(episodes);
   }
 }
