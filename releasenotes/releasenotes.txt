@@ -1,5 +1,5 @@
 <![CDATA[
-0.3.2 - Second beta release.
+0.3.1 - Second beta release.
 
         Correct SageTV plugin xml to pass SageTV tests.
         Fix Demand5 meta data (but demand5 no longer works possible due to encryption).
