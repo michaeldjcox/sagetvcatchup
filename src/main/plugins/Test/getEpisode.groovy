@@ -5,7 +5,7 @@ episode.addMetaUrl(link);
 episode.setEpisodeTitle("Test Episode");
 episode.setSeriesTitle("Test Series");
 episode.setDescription("Test Episode Description");
-episode.setIconUrl("/logo.png");
+episode.setIconUrl("http://upload.wikimedia.org/wikipedia/en/0/02/The_Amazing_Spider-Man_theatrical_poster.jpeg");
 episode.setServiceUrl("/watch?id=TestEpisode;type=mpeg4");
 episode.setChannel("Test");
 episode.addGenre("Factual");

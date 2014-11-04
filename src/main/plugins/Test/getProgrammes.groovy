@@ -9,7 +9,7 @@ Programme programme = new Programme(
         "Test Programme",
         "Test Programme",
         link,
-        "/logo.png",
+        "http://upload.wikimedia.org/wikipedia/en/0/02/The_Amazing_Spider-Man_theatrical_poster.jpeg",
         ""
 );
 programme.addMetaUrl(link);
