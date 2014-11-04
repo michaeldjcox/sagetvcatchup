@@ -231,7 +231,7 @@ public class StyledPageTest {
         episodesBuilder.startBody();
         episodesBuilder.addHeading1("Episodes");
         episodesBuilder.startTable();
-        episodesBuilder.addTableHeader("SourceId", "Id", "Channel", "ProgrammeTitle", "Series", "SeriesTitle", "Episode", "EpisodeTitle", "Description", "PodcastTitle", "AirDate", "AirTime", "OrigAirDate", "OrigAirTime", "ServiceUrl", "IconUrl", "PodcastUrl" );
+        episodesBuilder.addTableHeader("SourceId", "Id", "Channel", "ProgrammeTitle", "Series", "SeriesTitle", "Episode", "EpisodeTitle", "PodcastTitle", "AirDate", "AirTime", "OrigAirDate", "OrigAirTime", "ServiceUrl", "IconUrl", "PodcastUrl" );
 
 
         for (Category cat : catalog.getCategories()) {
@@ -283,7 +283,7 @@ public class StyledPageTest {
                     String link = "/episode?id=" + ep.getId() + ";type=html";
                     linkBuilder4.addLink(ep.getId(), link);
 
-                    episodesBuilder.addTableRow(ep.getSourceId(), linkBuilder4.toString(), ep.getChannel(), ep.getProgrammeTitle(), ep.getSeries(), ep.getSeriesTitle(), ep.getEpisode(), ep.getEpisodeTitle(), ep.getDescription(), ep.getPodcastTitle(), ep.getAirDate(), ep.getAirTime(), ep.getOrigAirDate(), ep.getOrigAirTime(), linkBuilder1.toString(), linkBuilder2.toString(), linkBuilder3.toString() );
+                    episodesBuilder.addTableRow(ep.getSourceId(), linkBuilder4.toString(), ep.getChannel(), ep.getProgrammeTitle(), ep.getSeries(), ep.getSeriesTitle(), ep.getEpisode(), ep.getEpisodeTitle(), ep.getPodcastTitle(), ep.getAirDate(), ep.getAirTime(), ep.getOrigAirDate(), ep.getOrigAirTime(), linkBuilder1.toString(), linkBuilder2.toString(), linkBuilder3.toString() );
                 }
             }
         }

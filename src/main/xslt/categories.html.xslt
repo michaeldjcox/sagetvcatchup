@@ -31,6 +31,7 @@
                     </tr>
                     <xsl:for-each
                             select="uk.co.mdjcox.sagetv.model.Catalog/categories/entry/uk.co.mdjcox.sagetv.model.Root|uk.co.mdjcox.sagetv.model.Catalog/categories/entry/uk.co.mdjcox.sagetv.model.Source|uk.co.mdjcox.sagetv.model.Catalog/categories/entry/uk.co.mdjcox.sagetv.model.SubCategory">
+                        <xsl:sort select="id"/>
                         <tr>
                             <td>
                                 <xsl:value-of select="sourceId"/>

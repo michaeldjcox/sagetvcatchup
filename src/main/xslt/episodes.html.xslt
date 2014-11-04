@@ -27,8 +27,6 @@
                         <xsl:text>&#10;</xsl:text>
                         <th>EpisodeTitle</th>
                         <xsl:text>&#10;</xsl:text>
-                        <th>Description</th>
-                        <xsl:text>&#10;</xsl:text>
                         <th>PodcastTitle</th>
                         <xsl:text>&#10;</xsl:text>
                         <th>AirDate</th>
@@ -47,6 +45,7 @@
                     </tr>
                     <xsl:for-each
                             select="uk.co.mdjcox.sagetv.model.Catalog/episodes/entry/uk.co.mdjcox.sagetv.model.Episode">
+                        <xsl:sort select="id"/>
                         <tr>
                             <td>
                                 <xsl:value-of select="sourceId"/>
@@ -80,10 +79,6 @@
                             <xsl:text>&#10;</xsl:text>
                             <td>
                                 <xsl:value-of select="episodeTitle"/>
-                            </td>
-                            <xsl:text>&#10;</xsl:text>
-                            <td>
-                                <xsl:value-of select="description"/>
                             </td>
                             <xsl:text>&#10;</xsl:text>
                             <td>

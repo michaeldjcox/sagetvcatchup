@@ -31,8 +31,9 @@
                     </tr>
                     <xsl:for-each
                             select="uk.co.mdjcox.sagetv.model.Catalog/categories/entry/uk.co.mdjcox.sagetv.model.Programme">
+                        <xsl:sort select="id"/>
                         <xsl:if test="parentId=''">
-                        <tr>
+                            <tr>
                             <td>
                                 <xsl:value-of select="sourceId"/>
                             </td>
