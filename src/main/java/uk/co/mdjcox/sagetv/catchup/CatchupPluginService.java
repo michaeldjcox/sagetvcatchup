@@ -1,5 +1,6 @@
 package uk.co.mdjcox.sagetv.catchup;
 
+import sagex.api.FavoriteAPI;
 import uk.co.mdjcox.utils.SageUtils;
 import uk.co.mdjcox.utils.SageUtilsInterface;
 
@@ -8,7 +9,9 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by michael on 24/10/14.
@@ -63,5 +66,22 @@ public class CatchupPluginService extends UnicastRemoteObject implements Catchup
       sageUtils.error("Failed to add catchup tv recording " + episodeId, e);
       throw new RemoteException("Catchup Plugin unable to add recording to SageTV", e);
     }
+  }
+
+  @Override
+  public Set<String> getFavouriteTitles() throws RemoteException {
+    HashSet<String> favouriteTitles = new HashSet<String>();
+    Object[] faves = FavoriteAPI.GetFavorites();
+    for (Object fave : faves) {
+      try {
+        String title = FavoriteAPI.GetFavoriteTitle(fave);
+        if (title != null && !title.isEmpty()) {
+          favouriteTitles.add(title.toUpperCase());
+        }
+      } catch (Exception e) {
+        sageUtils.warn("Failed to get favourite title", e);
+      }
+    }
+    return favouriteTitles;
   }
 }

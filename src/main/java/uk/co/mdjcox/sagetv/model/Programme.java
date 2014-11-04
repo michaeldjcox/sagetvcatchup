@@ -101,4 +101,8 @@ public class Programme extends SubCategory {
         result = 31 * result + (episodes != null ? episodes.hashCode() : 0);
         return result;
     }
+
+  public void addAllEpisodes(Set<String> episodes) {
+    episodes.addAll(episodes);
+  }
 }

@@ -1,6 +1,5 @@
 package uk.co.mdjcox.sagetv.catchup;
 
-import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
@@ -8,6 +7,7 @@ import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.utils.LoggerInterface;
+import uk.co.mdjcox.utils.NumberedThreadFactory;
 import uk.co.mdjcox.utils.OsUtilsInterface;
 import uk.co.mdjcox.utils.RmiHelper;
 
@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Created with IntelliJ IDEA.
@@ -74,13 +76,7 @@ public class Recorder {
         Files.createDirectories(dir.toPath());
       }
 
-      service = Executors.newScheduledThreadPool(5, new ThreadFactory() {
-        private int number=0;
-        @Override
-        public Thread newThread(Runnable r) {
-          return new Thread(r, "catchup-recorder-" + (number++));
-        }
-      });
+      service = Executors.newScheduledThreadPool(5, new NumberedThreadFactory("catchup-recorder"));
       logger.info("Started recorder service");
     } catch (Exception ex) {
       logger.error("Failed to start the recorder service");
@@ -459,7 +455,7 @@ public class Recorder {
   public void uploadToSageTv(Recording recording) {
 
     try {
-      Preconditions.checkNotNull(recording);
+      checkNotNull(recording);
 
       logger.info("Uploading " + recording + " to SageTV");
 

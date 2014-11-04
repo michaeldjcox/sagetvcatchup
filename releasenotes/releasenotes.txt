@@ -20,6 +20,10 @@
         Added a search podcast to allow programme search from SageTV
         Improved visibility of meta-data in online services
         Moved show icons to programme level from episode level to facilitate better meta-data visibility
+        Deal with duplicate programme entries in iplayer
+        Reduce cataloging time to 15 mins - previously took hours
+        Added a "New" category for programmes added since the last catalog
+        Added a "Favourite" category for programmes which are also SageTV favourite series
 
 0.2.7 - First beta release. Contains Iplayer catalog, watch and record to TV recordings
 ]]>

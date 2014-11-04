@@ -31,13 +31,12 @@ public class EpisodeScript extends Script {
 
     public void getEpisode(Source source, Programme programme, Episode episode) {
         try {
-            getLogger().info("Getting episode " + episode);
             call("programme", programme, "url", episode.getServiceUrl(), "episode", episode);
             String iconUrl = programme.getIconUrl();
             if ((iconUrl == null) || iconUrl.isEmpty()) {
                 programme.setIconUrl(episode.getIconUrl());
             }
-            getLogger().info("Found episode " + episode);
+            getLogger().info("Got episode " + episode);
         } catch (Throwable e) {
             programme.addError("ERROR", "Unable to get an episode: " + e.getMessage());
             programme.removeEpisode(episode);
