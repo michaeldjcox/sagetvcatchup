@@ -168,36 +168,39 @@ if (details == null) {
 
 details = MOVE_TO("<position", details);
 
-if (details == null || !details.startsWith("/>")) {
-    details = MOVE_TO(">", details);
-    String seriesNumber = EXTRACT_TO("<", details)
-    seriesNumber = REMOVE_HTML_TAGS(seriesNumber);
+String seriesNumber = null;
 
-    if (seriesNumber != null) {
-        if (!seriesNumber.matches("[0-9]*")) {
-            LOG_WARNING(episode, "Series number '" + seriesNumber + "' is not a number");
-        }
-        episode.setSeries(seriesNumber);
-    } else {
-        LOG_WARNING(episode, "Series number not found");
+if (details != null && !details.startsWith("/>")) {
+    details = MOVE_TO(">", details);
+    seriesNumber = EXTRACT_TO("<", details)
+    seriesNumber = REMOVE_HTML_TAGS(seriesNumber);
+}
+
+if (seriesNumber != null) {
+    if (!seriesNumber.matches("[0-9]*")) {
+        LOG_WARNING(episode, "Series number '" + seriesNumber + "' is not a number");
     }
+    episode.setSeries(seriesNumber);
+} else {
+    LOG_WARNING(episode, "Series number not found");
 }
 
 // EPISODE
+String episodeNo = null;
 details = MOVE_TO("<position", metadetails);
-if (details == null || !details.startsWith("/>")) {
+if (details != null && !details.startsWith("/>")) {
     details = MOVE_TO(">", details);
-    String episodeNo = EXTRACT_TO("</position", details)
+    episodeNo = EXTRACT_TO("</position", details)
     episodeNo = REMOVE_HTML_TAGS(episodeNo);
+}
 
-    if (episodeNo != null) {
-        if (!episodeNo.matches("[0-9]*")) {
-            LOG_WARNING(episode, "Episode number '" + episodeNo + "' is not a number");
-        }
-        episode.setEpisode(episodeNo);
-    } else {
-        LOG_WARNING(episode, "Episode number not found");
+if (episodeNo != null) {
+    if (!episodeNo.matches("[0-9]*")) {
+        LOG_WARNING(episode, "Episode number '" + episodeNo + "' is not a number");
     }
+    episode.setEpisode(episodeNo);
+} else {
+    LOG_WARNING(episode, "Episode number not found");
 }
 
 //AIRING DATE AND TIME
