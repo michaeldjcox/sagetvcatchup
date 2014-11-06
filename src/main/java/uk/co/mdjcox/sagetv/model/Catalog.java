@@ -10,6 +10,7 @@ package uk.co.mdjcox.sagetv.model;
 import com.google.common.collect.ImmutableList;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -20,14 +21,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class Catalog {
 
-    private Map<String, Episode> episodes = new LinkedHashMap<String, Episode>();
+    private Map<String, Episode> episodes = new ConcurrentHashMap<String, Episode>();
 
   /**
    * The <code>Map</code> of categories indexed by <code>id</code>
    */
-  private Map<String, Category> categories = new LinkedHashMap<String, Category>();
+  private Map<String, Category> categories = new ConcurrentHashMap<String, Category>();
 
-  private Root root;
+  private String rootId;
 
     /**
    * Default constructor
@@ -47,8 +48,7 @@ public class Catalog {
    *
    * @param categoryMap A map of all metadata indexed by id
    */
-  public final void setCategories(Root root, Map<String, Category> categoryMap, Map<String, Episode> episodeMap) {
-      this.root = checkNotNull(root);
+  public final void setCategories(String rootId, Map<String, Category> categoryMap, Map<String, Episode> episodeMap) {
       categories = new LinkedHashMap<String, Category>();
       categories.putAll(categoryMap);
       episodes.putAll(episodeMap);
@@ -66,7 +66,7 @@ public class Catalog {
     checkNotNull(cat);
     this.categories.put(cat.getId(), cat);
       if (cat instanceof Root) {
-          root = (Root)cat;
+          rootId = cat.getId();
       }
   }
 
@@ -75,15 +75,8 @@ public class Catalog {
         this.episodes.put(episode.getId(), episode);
     }
 
-    public Root getRoot() {
-        return root;
-    }
-
-    public void setRoot(Root root) {
-        this.root = root;
-    }
-
     public void addError(String level, String error) {
+      Category root = categories.get(rootId);
         if (root != null) {
             root.addError(level, error);
         }
@@ -93,7 +86,7 @@ public class Catalog {
     public boolean equals(Object obj) {
         if (obj instanceof Catalog) {
             Catalog that = (Catalog) obj;
-            return this.categories.equals(that.categories);
+            return this.rootId.equals(that.rootId) && this.categories.equals(that.categories) && this.episodes.equals(that.episodes);
         } else {
             return false;
         }
@@ -114,11 +107,16 @@ public class Catalog {
     public Collection<ParseError> getErrors() {
         ArrayList<ParseError> errorMap = new ArrayList<ParseError>();
         for (Category cat : categories.values()) {
-            errorMap.addAll(cat.getErrors());
+          for (ParseError err : cat.getErrors()) {
+            err.setItem(cat);
+            errorMap.add(err);
+          }
         }
         for (Episode ep : episodes.values()) {
-            errorMap.addAll(ep.getErrors());
-        }
+          for (ParseError err : ep.getErrors()) {
+            err.setItem(ep);
+            errorMap.add(err);
+          }        }
         return errorMap;
     }
 }
