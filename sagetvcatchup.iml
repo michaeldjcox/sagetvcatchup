@@ -13,6 +13,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/target/archive-tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/target/checkout" />
       <excludeFolder url="file://$MODULE_DIR$/target/classes" />
       <excludeFolder url="file://$MODULE_DIR$/target/maven-archiver" />
       <excludeFolder url="file://$MODULE_DIR$/target/maven-status" />
@@ -35,13 +36,7 @@
     <orderEntry type="library" name="Maven: javax.inject:javax.inject:1" level="project" />
     <orderEntry type="library" name="Maven: aopalliance:aopalliance:1.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.inject.extensions:guice-assistedinject:3.0" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.groovy:groovy:2.1.2" level="project" />
-    <orderEntry type="library" name="Maven: antlr:antlr:2.7.7" level="project" />
-    <orderEntry type="library" name="Maven: org.ow2.asm:asm-tree:4.0" level="project" />
-    <orderEntry type="library" name="Maven: org.ow2.asm:asm:4.0" level="project" />
-    <orderEntry type="library" name="Maven: org.ow2.asm:asm-commons:4.0" level="project" />
-    <orderEntry type="library" name="Maven: org.ow2.asm:asm-util:4.0" level="project" />
-    <orderEntry type="library" name="Maven: org.ow2.asm:asm-analysis:4.0" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.groovy:groovy:2.3.7" level="project" />
     <orderEntry type="library" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
     <orderEntry type="library" name="Maven: org.mortbay.jetty:jetty:6.1H.22" level="project" />
     <orderEntry type="library" name="Maven: org.mortbay.jetty:jetty-util:6.1H.22" level="project" />
