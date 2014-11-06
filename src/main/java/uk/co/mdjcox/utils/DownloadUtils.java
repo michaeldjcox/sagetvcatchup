@@ -1,5 +1,7 @@
 package uk.co.mdjcox.utils;
 
+import sun.net.www.protocol.http.HttpURLConnection;
+
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,7 +19,8 @@ import java.nio.charset.Charset;
  */
 public class DownloadUtils implements DownloadUtilsInterface {
 
-    private static DownloadUtilsInterface instance;
+  private static final int DOWNLOAD_TIMEOUT = 30000;
+  private static DownloadUtilsInterface instance;
     private final String DEFAULT_ENCODING = "UTF-8";
 
     public static DownloadUtilsInterface instance() {
@@ -53,10 +56,14 @@ public class DownloadUtils implements DownloadUtilsInterface {
         String nowPlaying = "";
         InputStream stream = null;
         BufferedInputStream bis = null;
-        try {
+      URLConnection conn = null;
+      try {
             URL url = new URL(source);
 
-            URLConnection conn = url.openConnection();
+             conn = url.openConnection();
+          conn.setReadTimeout(DOWNLOAD_TIMEOUT);
+          conn.setConnectTimeout(DOWNLOAD_TIMEOUT);
+           new Thread(new InterruptThread(Thread.currentThread(), conn)).start();
             conn.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17");
 //            conn.setRequestProperty("Accept-Encoding", "tgzip,deflate,sdch");
             stream = conn.getInputStream();
@@ -75,13 +82,50 @@ public class DownloadUtils implements DownloadUtilsInterface {
             return nowPlaying;
         } finally {
             if (bis != null) {
+              try {
                 bis.close();
+              } catch (IOException e) {
+                //Ignore
+              }
             }
             if (stream != null) {
+              try {
                 stream.close();
+              } catch (IOException e) {
+                // Ignore
+              }
             }
+        if (conn != null && conn instanceof HttpURLConnection) {
+          try {
+            ((HttpURLConnection)conn).disconnect();
+          } catch (Exception e) {
+            // Ignore
+          }
+        }
         }
     }
+
+  public class InterruptThread implements Runnable {
+    Thread parent;
+    URLConnection con;
+    public InterruptThread(Thread parent, URLConnection con) {
+      this.parent = parent;
+      this.con = con;
+    }
+
+    public void run() {
+      try {
+        Thread.sleep(DOWNLOAD_TIMEOUT);
+      } catch (InterruptedException e) {
+
+      }
+      try {
+        ((HttpURLConnection)con).disconnect();
+      } catch (Exception e) {
+        // Ignore
+      }
+    }
+  }
 
     /**
      * Downloads the file at the specfied URL and stores in in the specified
