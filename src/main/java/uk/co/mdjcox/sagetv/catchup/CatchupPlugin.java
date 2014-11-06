@@ -15,6 +15,11 @@ import java.rmi.RemoteException;
 import java.util.*;
 
 
+//TODO multithreaded plugin can get stuck on socket reads downloading web pages
+//TODO cataloging times
+//TODO data leakage between episodes?
+//TODO heap size of catchup server
+
 /**
  * Created with IntelliJ IDEA.
  * User: michael
@@ -188,7 +193,7 @@ public class CatchupPlugin implements SageTVPlugin {
             }
             javaCmd += "bin";
             javaCmd += File.separator;
-            javaCmd += "java\" \"-jar\" \"" + catchupDir + "libs" + File.separator + "sagetvcatchup.jar\"";
+            javaCmd += "java\" \"-Xmx250m\" \"-jar\" \"" + catchupDir + "libs" + File.separator + "sagetvcatchup.jar\"";
         } else {
             javaCmd = System.getProperty("java.home");
             if (!javaCmd.endsWith(File.separator)) {
@@ -196,7 +201,7 @@ public class CatchupPlugin implements SageTVPlugin {
             }
             javaCmd += "bin";
             javaCmd += File.separator;
-            javaCmd += "java -jar " + catchupDir + "libs" + File.separator + "sagetvcatchup.jar";
+            javaCmd += "java -Xmx250m -jar " + catchupDir + "libs" + File.separator + "sagetvcatchup.jar";
         }
 
       osUtils.spawnProcess(javaCmd, "catchupserver", false, new File(catchupDir));
