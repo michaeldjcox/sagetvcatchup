@@ -9,9 +9,8 @@ package uk.co.mdjcox.sagetv.model;
 
 import com.google.common.collect.ImmutableSet;
 
-import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -24,9 +23,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SubCategory extends Category {
 
   /** List of {@link Category} ids that are parents of this category. */
-  private Set<String> otherParentIds = new LinkedHashSet<String>();
+  private final Set<String> otherParentIds = new CopyOnWriteArraySet<String>();
   /** Set of child {@link Category} ids. */
-  private Set<String> subCategories = new TreeSet<String>();
+  private final Set<String> subCategories = new CopyOnWriteArraySet<String>();
+
+  public SubCategory() {
+  }
 
   /**
    * Constructs a subcategory.

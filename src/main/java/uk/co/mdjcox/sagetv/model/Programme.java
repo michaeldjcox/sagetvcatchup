@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableSet;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -22,7 +23,10 @@ public class Programme extends SubCategory {
   /**
    * A set containing all episodes of this programme keyed by id
    */
-  private Set<String> episodes = new HashSet<String>();
+  private Set<String> episodes = new CopyOnWriteArraySet<String>();
+
+  public Programme() {
+  }
 
   /**
    * Constructor for the programme meta data.

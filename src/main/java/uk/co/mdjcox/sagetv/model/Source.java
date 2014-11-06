@@ -12,6 +12,9 @@ package uk.co.mdjcox.sagetv.model;
  */
 public class Source extends SubCategory {
 
+  public Source() {
+  }
+
   /**
    * Constructs a new source category.
    *

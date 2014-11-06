@@ -3,12 +3,25 @@ package uk.co.mdjcox.sagetv.catchup;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.thoughtworks.xstream.XStream;
-import uk.co.mdjcox.sagetv.model.Catalog;
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.SingleValueConverter;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.LoggerInterface;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Created by michael on 02/10/14.
@@ -26,7 +39,28 @@ public class CatalogPersister implements CatalogPublisher {
         this.logger = logger;
       fileName = context.getCatalogFileName();
       emptyFileName = context.getDefaultCatalogFileName();
-      xstream = new XStream();
+      xstream = new XStream(new PureJavaReflectionProvider());
+      xstream.addImplicitCollection(Episode.class, "genres", "genre", String.class);
+      xstream.addImplicitCollection(Episode.class, "metaUrls", "metaUrl", String.class);
+      xstream.addImplicitCollection(Episode.class, "errors", "error", ParseError.class);
+      xstream.addImplicitCollection(Category.class, "metaUrls", "metaUrl", String.class);
+      xstream.addImplicitCollection(Category.class, "errors", "error", ParseError.class);
+      xstream.addImplicitCollection(Programme.class, "episodes", "episode", String.class);
+      xstream.addImplicitCollection(SubCategory.class, "otherParentIds", "otherParentId", String.class);
+      xstream.addImplicitCollection(SubCategory.class, "subCategories", "subCategory", String.class);
+      xstream.addImplicitMap(Catalog.class, "episodes", "episode", Episode.class, "id");
+      xstream.addImplicitMap(Catalog.class, "categories", Category.class, "id");
+      xstream.alias("programme", Programme.class);
+      xstream.alias("episode", Episode.class);
+      xstream.alias("subcategory", SubCategory.class);
+      xstream.alias("category", Category.class);
+      xstream.alias("catalog", Catalog.class);
+      xstream.alias("root", Root.class);
+      xstream.alias("source", Source.class);
+      xstream.alias("error", ParseError.class);
+      xstream.addDefaultImplementation(CopyOnWriteArraySet.class, Set.class);
+      xstream.addDefaultImplementation(CopyOnWriteArrayList.class, List.class);
+      xstream.addDefaultImplementation(ConcurrentHashMap.class, Map.class);
     }
 
   @Override
@@ -46,6 +80,10 @@ public class CatalogPersister implements CatalogPublisher {
 
     public String parseIntoXML(Object catalog) {
         return xstream.toXML(catalog);
+    }
+
+    public Catalog parseIntoCatalog(String xml) {
+      return (Catalog)xstream.fromXML(xml);
     }
 
     public Catalog load() {
@@ -73,6 +111,8 @@ public class CatalogPersister implements CatalogPublisher {
 
         return new Catalog();
     }
+
+
 
 
 }

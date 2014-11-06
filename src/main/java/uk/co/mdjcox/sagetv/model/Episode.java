@@ -8,6 +8,8 @@
 package uk.co.mdjcox.sagetv.model;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -49,13 +51,16 @@ public class Episode implements ErrorRecorder {
   /** The TV channel on which the media file last aired */
   private String channel = "";
   /** The category of programme this media file falls into */
-  private Set<String> genres = new TreeSet<String>();
+  private Set<String> genres = new HashSet<String>();
   /** A list of parsing errors associated with this episode */
-  private List<ParseError> errors = new ArrayList<ParseError>();
+  private List<ParseError> errors = new CopyOnWriteArrayList<ParseError>();
   /** The metadata URLs used to populate this item */
-  private final Set<String> metaUrls = new HashSet<String>();
+  private final Set<String> metaUrls = new CopyOnWriteArraySet<String>();
   /** The "control" podcast URL */
   private String podcastUrl;
+
+  public Episode() {
+  }
 
   /**
    * Constructor for the episode meta data.
@@ -83,7 +88,7 @@ public class Episode implements ErrorRecorder {
                  String series, String episode, String description, String iconUrl,
                  String serviceUrl, String airDate, String airTime,
                  String origAirDate, String origAirTime, String channel,
-                 Set genres) {
+                 Set<String> genres) {
     this.sourceId = checkNotNull(sourceId);
     this.id = checkNotNull(id);
     this.programmeTitle = checkNotNull(programmeTitle);
@@ -541,7 +546,7 @@ public class Episode implements ErrorRecorder {
    */
   @Override
   public void addError(String level, String message) {
-    ParseError error = new ParseError(this, level, message);
+    ParseError error = new ParseError(level, message);
     errors.add(error);
   }
 

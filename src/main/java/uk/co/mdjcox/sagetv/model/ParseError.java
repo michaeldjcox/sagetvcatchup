@@ -6,19 +6,25 @@ import java.util.Set;
  * Class representing a parsing error
  */
 public class ParseError implements Comparable<ParseError> {
-  private ErrorRecorder item;
-  private final String level;
-  private final String message;
+  private transient ErrorRecorder item;
+  private String level;
+  private String message;
+
+  public ParseError() {
+  }
 
   /**
    * Constructs a parse error
    * @param level a severity level for the error
    * @param message a message indicating the nature of the failure
    */
-  public ParseError(ErrorRecorder item,  String level, String message) {
-    this.item = item;
+  public ParseError(String level, String message) {
     this.level = level;
     this.message = message;
+  }
+
+  public void setItem(ErrorRecorder item) {
+    this.item = item;
   }
 
   public String getSource() {
@@ -51,12 +57,8 @@ public class ParseError implements Comparable<ParseError> {
     if (o == null || getClass() != o.getClass()) return false;
 
     ParseError that = (ParseError) o;
-
-    if (!getId().equals(that.getId())) return false;
     if (!level.equals(that.level)) return false;
     if (!message.equals(that.message)) return false;
-    if (!getSource().equals(that.getSource())) return false;
-    if (!getType().equals(that.getType())) return false;
 
     return true;
   }

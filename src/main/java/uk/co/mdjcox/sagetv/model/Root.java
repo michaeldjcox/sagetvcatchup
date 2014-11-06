@@ -12,6 +12,9 @@ package uk.co.mdjcox.sagetv.model;
  */
 public class Root extends SubCategory {
 
+  public Root() {
+  }
+
   /**
    * Constructs a new root category.
    *

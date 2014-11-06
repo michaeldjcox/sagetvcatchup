@@ -7,10 +7,13 @@
  */
 package uk.co.mdjcox.sagetv.model;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -34,16 +37,18 @@ public abstract class Category implements ErrorRecorder {
     /** The id of any category which includes this category */
     private String parentId="";
     /** A list of parsing errors associated with this episode */
-    private List<ParseError> errors = new ArrayList<ParseError>();
+    private List<ParseError> errors = new CopyOnWriteArrayList<ParseError>();
     /** The metadata URLs used to populate this item */
-    private final Set<String> metaUrls = new HashSet<String>();
+    private final Set<String> metaUrls = new CopyOnWriteArraySet<String>();
     /** The URL of the podcast listing these episodes */
     private String podcastUrl="";
     /** The type of category */
-    private final String type;
+    private String type="";
 
+  protected Category() {
+  }
 
-    /**
+  /**
      * Default constructor called by concrete subclasses.
      *
      * @param sourceId The media source id of this category
@@ -276,7 +281,7 @@ public abstract class Category implements ErrorRecorder {
      */
     @Override
     public void addError(String level, String message) {
-        ParseError error = new ParseError(this, level, message);
+        ParseError error = new ParseError(level, message);
         errors.add(error);
     }
 
