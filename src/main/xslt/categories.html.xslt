@@ -30,7 +30,7 @@
                         <th>PodcastUrl</th>
                     </tr>
                     <xsl:for-each
-                            select="uk.co.mdjcox.sagetv.model.Catalog/categories/entry/uk.co.mdjcox.sagetv.model.Root|uk.co.mdjcox.sagetv.model.Catalog/categories/entry/uk.co.mdjcox.sagetv.model.Source|uk.co.mdjcox.sagetv.model.Catalog/categories/entry/uk.co.mdjcox.sagetv.model.SubCategory">
+                            select="catalog/root|catalog/source|catalog/subcategory">
                         <xsl:sort select="id"/>
                         <tr>
                             <td>

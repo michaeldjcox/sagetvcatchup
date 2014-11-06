@@ -2,7 +2,7 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:template match="/">
-        <xsl:for-each select="uk.co.mdjcox.sagetv.model.Episode">
+        <xsl:for-each select="episode">
 
         <html>
             <head>
@@ -72,7 +72,7 @@
                         <td>Genres</td>
                         <xsl:text>&#10;</xsl:text>
                         <td><ul>
-                            <xsl:for-each select="genres/string">
+                            <xsl:for-each select="genre">
                             <li><xsl:value-of select="."/></li>
                             </xsl:for-each>
                         </ul></td>
@@ -121,7 +121,7 @@
                         <td>MetaUrls</td>
                         <xsl:text>&#10;</xsl:text>
                         <td><ul>
-                            <xsl:for-each select="metaUrls/string">
+                            <xsl:for-each select="metaUrl">
                                 <li><a href="{.}"><xsl:value-of select="."/></a></li>
                             </xsl:for-each>
                         </ul></td>
@@ -134,7 +134,7 @@
                     <xsl:text>&#10;</xsl:text>
                     <th>Error</th>
                 </tr>
-                <xsl:for-each select="errors/uk.co.mdjcox.sagetv.model.ParseError">
+                <xsl:for-each select="error">
                 <tr>
                     <td><xsl:value-of select="level"/></td>
                     <xsl:text>&#10;</xsl:text>

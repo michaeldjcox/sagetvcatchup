@@ -30,7 +30,7 @@
                         <th>PodcastUrl</th>
                     </tr>
                     <xsl:for-each
-                            select="uk.co.mdjcox.sagetv.model.Catalog/categories/entry/uk.co.mdjcox.sagetv.model.Programme">
+                            select="catalog/programme">
                         <xsl:sort select="id"/>
                         <xsl:if test="parentId=''">
                             <tr>
