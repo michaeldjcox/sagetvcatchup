@@ -27,6 +27,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Cataloger {
 
   private static final String STOPPED_ON_REQUEST = "Stopped on request";
+  private static final int PROGRAMME_THREADS = 20;
+  private static final int EPISODE_THREADS = 20;
   private LoggerInterface logger;
   private PluginManager pluginManager;
   private String progressString = "Waiting";
@@ -46,6 +48,7 @@ public class Cataloger {
   private int episodeStats = 0;
   private Set<String> favourites = new HashSet<String>();
   private Catalog lastCatalog = new Catalog();
+  private boolean multithreaded=true;
 
   @Inject
   private Cataloger(LoggerInterface logger, CatchupContextInterface context, PluginManager pluginManager) {
@@ -100,7 +103,7 @@ public class Cataloger {
         programmeStats++;
       }
 
-      if (category.isSource() && !category.getSourceId().equals("Status") && !category.getSourceId().equals("Search")) {
+      if (category.isSource() && !category.getId().equals("Status") && !category.getId().equals("Search")) {
         sourceStats++;
       }
     }
@@ -236,81 +239,97 @@ public class Cataloger {
           Runnable runnable = new Runnable() {
             public void run() {
               try {
-                logger.info("Doing programme " + programmeId);
+                try {
+                  logger.info("Doing programme " + programmeId);
 
-                programme.setPodcastUrl("/programme?id=" + programmeId + ";type=xml");
+                  programme.setPodcastUrl("/programme?id=" + programmeId + ";type=xml");
 
-                Collection<Episode> episodes = plugin.getEpisodes(sourceCat, programme);
+                  Collection<Episode> episodes = plugin.getEpisodes(sourceCat, programme);
 
-                final CountDownLatch episodesLatch = new CountDownLatch(episodes.size());
+                  final CountDownLatch episodesLatch = new CountDownLatch(episodes.size());
 
-                for (final Episode episode : episodes) {
-                  checkForStop();
+                  for (final Episode episode : episodes) {
+                    checkForStop();
 
-                  Runnable runnable1 = new Runnable() {
-                    public void run() {
-                      try {
-                        plugin.getEpisode(sourceCat, programme, episode);
+                    Runnable runnable1 = new Runnable() {
+                      public void run() {
+                        try {
+                          try {
+                            plugin.getEpisode(sourceCat, programme, episode);
 
-                        episode.setPodcastUrl("/control?id=" + episode.getId() + ";type=xml");
+                            episode.setPodcastUrl("/control?id=" + episode.getId() + ";type=xml");
 
-                        newEpisodes.put(episode.getId(), episode);
+                            newEpisodes.put(episode.getId(), episode);
 
-                        episodeStats.incrementAndGet();
+                            episodeStats.incrementAndGet();
 
-                        synchronized (programme) {
-                          programme.addEpisode(episode);
+                            programme.addEpisode(episode);
+                          } catch (Throwable e) {
+                            if (!e.getMessage().equals(STOPPED_ON_REQUEST)) {
+                              episode.addError("ERROR", "Failed to catalog episode " + e.getMessage());
+                            }
+                          } finally {
+                            episodesLatch.countDown();
+                          }
+                        } catch (Throwable e) {
+                          e.printStackTrace();
                         }
-                      } catch (Exception e) {
-                        if (!e.getMessage().equals(STOPPED_ON_REQUEST)) {
-                          episode.addError("ERROR", "Failed to catalog episode " + e.getMessage());
-                        }
-                      } finally {
-                        episodesLatch.countDown();
+                      }
+                    };
+
+                    if (multithreaded) {
+                      episodeThreadPool.submit(runnable1);
+                    } else {
+                      runnable1.run();
+                    }
+                  }
+
+                  boolean done = false;
+                  while (!done) {
+                    try {
+                      checkForStop();
+                      logger.info("Programme " + programmeId + " Waiting for " + episodesLatch.getCount() + " episode cataloging threads to finish");
+                      done = episodesLatch.await(1, TimeUnit.MINUTES);
+                    } catch (InterruptedException e) {
+                      // Ignore
+                    }
+                  }
+
+                  if (programme.getEpisodes().size() > 0) {
+                    synchronized (newProgCategories) {
+                      logger.info("Programme " + programmeId + " has episodes");
+                      if (newProgCategories.containsKey(programmeId)) {
+                        logger.warn("Programme " + programmeId + " has a duplicate - merging programmes");
+                        Programme existingProg = newProgCategories.get(programmeId);
+                        existingProg.addAllEpisodes(programme.getEpisodes());
+                      } else {
+                        newProgCategories.put(programmeId, programme);
                       }
                     }
-                  };
-
-                  episodeThreadPool.submit(runnable1);
-                }
-
-                boolean done = false;
-                while (!done) {
-                  try {
-                    checkForStop();
-                    logger.info("Programme " + programmeId + " Waiting for " + episodesLatch.getCount() + " episode cataloging threads to finish");
-                    done = episodesLatch.await(1, TimeUnit.MINUTES);
-                  } catch (InterruptedException e) {
-                    // Ignore
-                  }
-                }
-
-                if (programme.getEpisodes().size() > 0) {
-                  logger.info("Programme " + programmeId + " has episodes");
-                  if (newProgCategories.containsKey(programmeId)) {
-                    logger.warn("Programme " + programmeId + " has a duplicate - merging programmes");
-                    Programme existingProg = newProgCategories.get(programmeId);
-                    existingProg.addAllEpisodes(programme.getEpisodes());
                   } else {
-                    newProgCategories.put(programmeId, programme);
+                    logger.warn("Programme " + programmeId + " has no episodes");
                   }
-                } else {
-                  logger.warn("Programme " + programmeId + " has no episodes");
+                } catch (Throwable e) {
+                  if (!e.getMessage().equals(STOPPED_ON_REQUEST)) {
+                    programme.addError("ERROR", "Failed to catalog programme " + e.getMessage());
+                  }
+                } finally {
+                  programmesLatch.countDown();
+                  progressString = "Done " + pluginName + " programme " + (programmesToDo-programmesLatch.getCount()) + "/" + programmesToDo;
+                  logger.info(progressString);
                 }
-              } catch (Exception e) {
-                if (!e.getMessage().equals(STOPPED_ON_REQUEST)) {
-                  programme.addError("ERROR", "Failed to catalog programme " + e.getMessage());
-                }
-              } finally {
-                programmesLatch.countDown();
-                progressString = "Done " + pluginName + " programme " + (programmesToDo-programmesLatch.getCount()) + "/" + programmesToDo;
-                logger.info(progressString);
+              } catch (Throwable e) {
+                e.printStackTrace();
               }
 
             }
           };
 
-          programmeThreadPool.submit(runnable);
+          if (multithreaded) {
+            programmeThreadPool.submit(runnable);
+          } else {
+            runnable.run();
+          }
         }
 
         boolean done = false;
@@ -369,7 +388,7 @@ public class Cataloger {
 
       }
 
-      catalog.setCategories(root, newCategories, newEpisodes);
+      catalog.setCategories(root.getId(), newCategories, newEpisodes);
 
       int duration = (int)(System.currentTimeMillis() - startTime);
 
@@ -653,8 +672,8 @@ public class Cataloger {
         }
       });
 
-      programmeThreadPool = Executors.newFixedThreadPool(10, new NumberedThreadFactory("cataloger-programme"));
-      episodeThreadPool = Executors.newFixedThreadPool(10, new NumberedThreadFactory("cataloger-episode"));
+      programmeThreadPool = Executors.newFixedThreadPool(PROGRAMME_THREADS, new NumberedThreadFactory("cataloger-programme"));
+      episodeThreadPool = Executors.newFixedThreadPool(EPISODE_THREADS, new NumberedThreadFactory("cataloger-episode"));
 
       this.publishers = publishers;
 

@@ -2,6 +2,7 @@ package uk.co.mdjcox.sagetv.catchup.server.pages;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -21,9 +22,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -234,7 +233,15 @@ public class StyledPageTest {
         episodesBuilder.addTableHeader("SourceId", "Id", "Channel", "ProgrammeTitle", "Series", "SeriesTitle", "Episode", "EpisodeTitle", "PodcastTitle", "AirDate", "AirTime", "OrigAirDate", "OrigAirTime", "ServiceUrl", "IconUrl", "PodcastUrl" );
 
 
-        for (Category cat : catalog.getCategories()) {
+        TreeSet<Category> sortedCats = new TreeSet<Category>(new Comparator<Category>() {
+          @Override
+          public int compare(Category o1, Category o2) {
+            return o1.getId().compareTo(o2.getId());
+          }
+        });
+      sortedCats.addAll(catalog.getCategories());
+
+        for (Category cat : sortedCats) {
             String detailStr = buildDetailsFor(cat);
             if (cat.isProgrammeCategory() && cat.getParentId().isEmpty()) {
                 webPages.put("programme-" + cat.getId() + ".html", detailStr);

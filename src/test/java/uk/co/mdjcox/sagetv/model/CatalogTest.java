@@ -67,7 +67,7 @@ public class CatalogTest {
 
       Map<String, Episode> episodes= new HashMap<String, Episode>();
 
-      catalog.setCategories(root, input, episodes);
+      catalog.setCategories(root.getId(), input, episodes);
 
     List<Category> results = catalog.getCategories();
     assertEquals("Results contain one entry", 1, results.size());
@@ -89,7 +89,7 @@ public class CatalogTest {
 
       Map<String, Episode> episodes= new HashMap<String, Episode>();
 
-      catalog.setCategories(root, input, episodes);
+      catalog.setCategories(root.getId(), input, episodes);
 
     List<Category> results = catalog.getCategories();
     assertEquals("Results contain one entry", 1, results.size());
@@ -129,7 +129,7 @@ public class CatalogTest {
 
       Map<String, Episode> episodes= new HashMap<String, Episode>();
 
-      catalog.setCategories(root, input, episodes);
+      catalog.setCategories(root.getId(), input, episodes);
 
     List<Category> results = catalog.getCategories();
     assertEquals("Results contain one entry", 1, results.size());

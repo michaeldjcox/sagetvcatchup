@@ -3,6 +3,7 @@ package uk.co.mdjcox.sagetv.catchup;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.model.CatalogTestHelper;
@@ -31,6 +32,21 @@ public class CatalogPersisterTest {
         catalogFile.delete();
       }
     }
+
+  @Test
+  public void testCatalogFormatParse() {
+    Catalog catalog = CatalogTestHelper.getTestCatalog();
+
+    CatalogPersister persister = injector.getInstance(CatalogPersister.class);
+
+    String xml = persister.parseIntoXML(catalog);
+
+    Catalog catalog2 = persister.parseIntoCatalog(xml);
+
+    String xml2 = persister.parseIntoXML(catalog2);
+
+    assertEquals("Persisted is same as saved", xml, xml2);
+  }
 
     @Test
     public void testCatalogFileWriteRead() {

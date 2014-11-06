@@ -65,8 +65,8 @@ public class CatalogTestHelper {
       ep1.setPodcastUrl("podcastUrl1");
 
         Set<String> genres2 = new HashSet<String>();
-        genres1.add("genre3");
-        genres1.add("genre4");
+        genres2.add("genre3");
+        genres2.add("genre4");
 
         Episode ep2 = new Episode("sourceId", "episodeId2", "programmeTitle2", "seriesTitle2", "episodeTitle2",
                 "series2", "episode2", "description2", "episodeIconUrl2", "episodeServiceUrl2", "airDate2",

@@ -3,6 +3,7 @@ package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.RssBuilder;
 
+import java.util.Collection;
 import java.util.TreeSet;
 
 /**
@@ -20,29 +21,7 @@ public class ErrorsPodcast extends AbstractPodcast {
     }
 
     public String buildPage() {
-        TreeSet<ParseError> errorList = new TreeSet<ParseError>();
-        for (Category cat : catalog.getCategories()) {
-            if (cat.isSource() || cat.isRoot()) {
-                if (cat.hasErrors()) {
-                    errorList.addAll(cat.getErrors());
-                }
-            }
-            if (cat.isProgrammeCategory()) {
-                if (cat.hasErrors()) {
-                    errorList.addAll(cat.getErrors());
-                }
-                Programme prog  = (Programme)cat;
-                if (prog.hasEpisodes()) {
-                    for (String episodeId : ((Programme)cat).getEpisodes()) {
-                        Episode episode = catalog.getEpisode(episodeId);
-                        if (episode.hasErrors()) {
-                            errorList.addAll(episode.getErrors());
-                        }
-                    }
-                }
-            }
-
-        }
+        Collection<ParseError> errorList = catalog.getErrors();
 
         String errorsUrl = getPodcastBaseUrl() + "/"+ getUri();
         String title = "ERRORS";
