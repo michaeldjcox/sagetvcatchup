@@ -48,7 +48,7 @@ public class Cataloger {
   private int episodeStats = 0;
   private Set<String> favourites = new HashSet<String>();
   private Catalog lastCatalog = new Catalog();
-  private boolean multithreaded=true;
+  private boolean multithreaded=false;
 
   @Inject
   private Cataloger(LoggerInterface logger, CatchupContextInterface context, PluginManager pluginManager) {
