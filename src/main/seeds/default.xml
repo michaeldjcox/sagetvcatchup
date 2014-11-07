@@ -237,4 +237,5 @@
         <type>SubCategory</type>
         <subCategory>testProgramme</subCategory>
     </subcategory>
+    <rootId>Catchup</rootId>
 </catalog>
