@@ -52,6 +52,7 @@ public class Catalog {
       categories = new LinkedHashMap<String, Category>();
       categories.putAll(categoryMap);
       episodes.putAll(episodeMap);
+    this.rootId = rootId;
 
   }
 
