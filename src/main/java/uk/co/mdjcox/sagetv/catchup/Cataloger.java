@@ -65,6 +65,8 @@ public class Cataloger {
         try {
           Catalog catalog = null;
           try {
+            long startTime = System.currentTimeMillis();
+
             catalogRunning.set(true);
             logger.info("Refreshing catalog");
             catalog = catalog();
@@ -72,7 +74,16 @@ public class Cataloger {
               setProgress("Publishing catalog");
               publish(catalog, publishers);
               lastCatalog = catalog;
-              setProgress("Finished");
+              int duration = (int)(System.currentTimeMillis() - startTime);
+
+              final int millisInHour = 60 * 60 * 1000;
+              final int millisInMin = 60 * 1000;
+              int hours = (int)(duration / millisInHour) ;
+              int minutes = (int)((duration % millisInHour) / millisInMin);
+              int seconds = (int)((duration % millisInMin) / 1000);
+
+              progressString = "Finished in " + hours + "h" + minutes + "m" + seconds + "s";
+              logger.info(progressString);
             }
           } catch (Throwable e) {
             if (catalog != null) {
@@ -143,8 +154,6 @@ public class Cataloger {
   }
 
   private Catalog catalog() {
-
-    long startTime = System.currentTimeMillis();
 
     progressString = "Started";
 
@@ -230,7 +239,7 @@ public class Cataloger {
             if (!testProgrammes.contains(programmeId)) {
               logger.info("Skipping programme " + programmeId);
               programmesLatch.countDown();
-              progressString = "Done " + pluginName + " programme " + (programmesToDo-programmesLatch.getCount()) + "/" + programmesToDo;
+              progressString = "Doing " + pluginName + " programme " + (programmesToDo-programmesLatch.getCount()) + "/" + programmesToDo;
               logger.info(progressString);
               continue;
             }
@@ -315,7 +324,7 @@ public class Cataloger {
                   }
                 } finally {
                   programmesLatch.countDown();
-                  progressString = "Done " + pluginName + " programme " + (programmesToDo-programmesLatch.getCount()) + "/" + programmesToDo;
+                  progressString = "Doing " + pluginName + " programme " + (programmesToDo-programmesLatch.getCount()) + "/" + programmesToDo;
                   logger.info(progressString);
                 }
               } catch (Throwable e) {
@@ -389,17 +398,6 @@ public class Cataloger {
       }
 
       catalog.setCategories(root.getId(), newCategories, newEpisodes);
-
-      int duration = (int)(System.currentTimeMillis() - startTime);
-
-      final int millisInHour = 60 * 60 * 1000;
-      final int millisInMin = 60 * 1000;
-      int hours = (int)(duration / millisInHour) ;
-      int minutes = (int)((duration % millisInHour) / millisInMin);
-      int seconds = (int)((duration % millisInMin) / 1000);
-
-      progressString = "Finished cataloging in " + hours + "hrs " + minutes + " mins " + seconds + " secs";
-      logger.info(progressString);
 
       this.sourceStats = sourceStats.intValue();
       this.programmeStats = programmeStats.intValue();
@@ -633,17 +631,19 @@ public class Cataloger {
   }
 
   public String getProgress() {
-    if ("Finished".equals(progressString) || "Failed".equals(progressString)
-            || "Waiting".equals(progressString) || "Stopped".equals(progressString)) {
+    if (progressString.startsWith("Finished") || progressString.startsWith("Failed") ||
+            progressString.startsWith("Waiting") || progressString.startsWith("Stopped")) {
       if (future == null) {
         progressString += "";
       } else {
-        long delay = future.getDelay(TimeUnit.MILLISECONDS);
-        delay = System.currentTimeMillis() + delay;
-        Date date = new Date(delay);
-        SimpleDateFormat format = new SimpleDateFormat("h:mma");
-        String dateStr = format.format(date);
-        progressString += " until " + dateStr;
+        if (!progressString.contains("Next catalog")) {
+          long delay = future.getDelay(TimeUnit.MILLISECONDS);
+          delay = System.currentTimeMillis() + delay;
+          Date date = new Date(delay);
+          SimpleDateFormat format = new SimpleDateFormat("h:mma");
+          String dateStr = format.format(date);
+          progressString += ". Next catalog: " + dateStr;
+        }
       }
     }
     return progressString;
