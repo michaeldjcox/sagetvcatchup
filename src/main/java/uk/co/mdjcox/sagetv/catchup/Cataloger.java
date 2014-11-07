@@ -48,7 +48,7 @@ public class Cataloger {
   private int episodeStats = 0;
   private Set<String> favourites = new HashSet<String>();
   private Catalog lastCatalog = new Catalog();
-  private boolean multithreaded=false;
+  private boolean multithreaded=true;
 
   @Inject
   private Cataloger(LoggerInterface logger, CatchupContextInterface context, PluginManager pluginManager) {
@@ -462,32 +462,31 @@ public class Cataloger {
       Category cat = lastCatalog.getCategory(id);
       Episode ep = lastCatalog.getEpisode(epId);
       if (cat == null) {
-        Programme newProgrammeCat = addNewProgrammeCat(programmeCat, newSubCategories, sourceId, favouriteId, favouriteCat, id);
+        Programme newProgrammeCat = addNewProgrammeCat("/New/", programmeCat, newSubCategories, sourceId, favouriteId, favouriteCat, id);
         newProgrammeCat.addAllEpisodes(programmeCat.getEpisodes());
       } else
       if (ep == null)
       {
-        Programme newProgrammeCat = addNewProgrammeCat(programmeCat, newSubCategories, sourceId, favouriteId, favouriteCat, id);
+        Programme newProgrammeCat = addNewProgrammeCat("/New/", programmeCat, newSubCategories, sourceId, favouriteId, favouriteCat, id);
         newProgrammeCat.addEpisode(episode);
       }
     }
   }
 
-  private Programme addNewProgrammeCat(Programme programmeCat, Map<String, SubCategory> newSubCategories, String sourceId, String favouriteId, SubCategory favouriteCat, String id) {
-    String favouriteProgId = sourceId + "/New/" + id;
+  private Programme addNewProgrammeCat(String idInsert, Programme programmeCat, Map<String, SubCategory> newSubCategories, String sourceId, String favouriteId, SubCategory favouriteCat, String id) {
+    String favouriteProgId = sourceId + idInsert + id;
     Programme newProgCat = (Programme)newSubCategories.get(favouriteProgId);
     if (newProgCat == null) {
       newProgCat = new Programme(sourceId, favouriteProgId,
               programmeCat.getShortName(),
               programmeCat.getLongName(),
-              programmeCat.getServiceUrl(),
+              "/programme?id="+ favouriteProgId +";type=html",
               programmeCat.getIconUrl(),
               favouriteId);
       newSubCategories.put(favouriteProgId, newProgCat);
       favouriteCat.addSubCategory(newProgCat);
     }
-    favouriteCat.addSubCategory(programmeCat);
-    return programmeCat;
+    return newProgCat;
   }
 
   private void doAirDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode,
@@ -511,17 +510,20 @@ public class Cataloger {
     String
             airDateInstanceId =
             sourceId + "/AirDate/" + airDateName.replace(" ", "").replace(",", "");
-    Programme airDateInstanceCat = (Programme) newSubCategories.get(airDateInstanceId);
+    SubCategory airDateInstanceCat = (SubCategory) newSubCategories.get(airDateInstanceId);
     if (airDateInstanceCat == null) {
       airDateInstanceCat =
-              new Programme(sourceId, airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(),
+              new SubCategory(sourceId, airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(),
                       sourceCat.getIconUrl(), airdateCat.getId());
       airDateInstanceCat.setPodcastUrl("/category?id=" + airDateInstanceId + ";type=xml");
       newSubCategories.put(airDateInstanceId, airDateInstanceCat);
       airdateCat.addSubCategory(airDateInstanceCat);
     }
 
-    airDateInstanceCat.addEpisode(episode);
+    Programme newProgrammeCat = addNewProgrammeCat("/AirDate/" + airDateName.replace(" ", "").replace(",", "") + "/", programmeCat, newSubCategories, sourceId, airDateInstanceId, airDateInstanceCat, programmeCat.getId());
+    newProgrammeCat.addEpisode(episode);
+
+    airDateInstanceCat.addSubCategory(newProgrammeCat);
   }
 
   private void doChannelCategorisation(Source sourceCat, Programme programmeCat, Episode prog,
