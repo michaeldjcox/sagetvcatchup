@@ -7,10 +7,7 @@ import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.handler.AbstractHandler;
-import uk.co.mdjcox.sagetv.catchup.CatalogPublisher;
-import uk.co.mdjcox.sagetv.catchup.Cataloger;
-import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
-import uk.co.mdjcox.sagetv.catchup.Recorder;
+import uk.co.mdjcox.sagetv.catchup.*;
 import uk.co.mdjcox.sagetv.catchup.server.media.CssPage;
 import uk.co.mdjcox.sagetv.catchup.server.media.LogoImage;
 import uk.co.mdjcox.sagetv.catchup.server.media.WatchAndKeepEpisode;
@@ -46,6 +43,7 @@ public class Server implements CatalogPublisher {
     private final String xsltDir;
     private final String logDir;
   private final SocketConnector connector;
+  private final CatalogPersister persister;
   private LoggerInterface logger;
     private org.mortbay.jetty.Server server;
     private int port;
@@ -57,9 +55,10 @@ public class Server implements CatalogPublisher {
 
     @Inject
     private Server(LoggerInterface logger, CatchupContextInterface context, HtmlUtilsInterface htmlUtils,
-                   Cataloger cataloger, Recorder recorder) throws Exception {
+                   Cataloger cataloger, Recorder recorder, CatalogPersister persister) throws Exception {
         this.logger = logger;
         this.htmlUtils = htmlUtils;
+      this.persister = persister;
 
         Handler handler = new AbstractHandler() {
             public void handle(String target,
@@ -233,20 +232,20 @@ public class Server implements CatalogPublisher {
           RecordingErrorsPodcast recerrorscast = new RecordingErrorsPodcast(htmlUtils, baseUrl, recorder);
           addPublishedContent(publishedContent, recerrorscast);
 
-            StyledPage programmes = new StyledPage(xsltDir, logger, "Programmes", "programmes.html", null, catalog);
+            StyledPage programmes = new StyledPage(xsltDir, logger, "Programmes", "programmes.html", null, catalog, persister);
             addPublishedContent(publishedContent, programmes);
 
-            StyledPage categories = new StyledPage(xsltDir, logger, "Categories", "categories.html", null, catalog);
+            StyledPage categories = new StyledPage(xsltDir, logger, "Categories", "categories.html", null, catalog, persister);
             addPublishedContent(publishedContent, categories);
 
-            StyledPage episodes = new StyledPage(xsltDir, logger, "Episodes", "episodes.html", null, catalog);
+            StyledPage episodes = new StyledPage(xsltDir, logger, "Episodes", "episodes.html", null, catalog, persister);
             addPublishedContent(publishedContent, episodes);
 
             for (Category cat : catalog.getCategories()) {
                 boolean isProgramme =cat.isProgrammeCategory() && cat.getParentId().isEmpty();
                 String title=isProgramme ? "Programme" : "Category";
                 String webpage= isProgramme ? "programme.html" : "category.html";
-                StyledPage provider = new StyledPage(xsltDir, logger, title, webpage, cat.getId(), cat);
+                StyledPage provider = new StyledPage(xsltDir, logger, title, webpage, cat.getId(), cat, persister);
                 addPublishedContent(publishedContent, provider);
                 if (cat.isProgrammeCategory()) {
                     ProgrammePodcast catProvider = new ProgrammePodcast(baseUrl, catalog, (Programme)cat, htmlUtils);
@@ -259,7 +258,7 @@ public class Server implements CatalogPublisher {
             }
 
             for (Episode episode : catalog.getEpisodes()) {
-                StyledPage provider = new StyledPage(xsltDir, logger, "Episode", "episode.html", episode.getId(), episode);
+                StyledPage provider = new StyledPage(xsltDir, logger, "Episode", "episode.html", episode.getId(), episode, persister);
                 addPublishedContent(publishedContent, provider);
 
                 ControlPodcast controlPodcastProvider = new ControlPodcast(baseUrl, recorder, episode, htmlUtils);
