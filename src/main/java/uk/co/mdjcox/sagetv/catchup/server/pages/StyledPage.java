@@ -3,6 +3,7 @@ package uk.co.mdjcox.sagetv.catchup.server.pages;
 import com.thoughtworks.xstream.XStream;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
+import uk.co.mdjcox.sagetv.catchup.CatalogPersister;
 import uk.co.mdjcox.utils.HtmlBuilder;
 import uk.co.mdjcox.utils.LoggerInterface;
 
@@ -24,27 +25,27 @@ import java.io.StringWriter;
 public class StyledPage extends AbstractHtmlPage {
 
     private final LoggerInterface logger;
-    private final XStream xstream;
     private final String title;
     private final String stylesheet;
     private final Object object;
     private final String id;
     private final String page;
     private final String xsltDir;
+    private final CatalogPersister persister;
 
-    public StyledPage(String xsltDir, LoggerInterface logger, String title, String stylesheet, String id, Object object) {
+  public StyledPage(String xsltDir, LoggerInterface logger, String title, String stylesheet, String id, Object object, CatalogPersister persister) {
         this.logger = logger;
         this.title = title;
         this.stylesheet = stylesheet;
         this.object = object;
         this.id = id;
-        xstream = new XStream();
         this.xsltDir = xsltDir;
+      this.persister = persister;
         page = buildPage();
     }
 
     private String parseIntoXML(Object catalog) {
-        return xstream.toXML(catalog);
+        return persister.parseIntoXML(catalog);
     }
 
     private String buildStylesheetResponse(Object catalog, String title, String webpage) throws Exception {
