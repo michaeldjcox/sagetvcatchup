@@ -65,6 +65,7 @@ public class Cataloger {
         try {
           Catalog catalog = null;
           try {
+            stop.set(false);
             long startTime = System.currentTimeMillis();
 
             catalogRunning.set(true);
@@ -415,7 +416,7 @@ public class Cataloger {
   }
 
   private void checkForStop() {
-    if (stop.getAndSet(false)) {
+    if (stop.get()) {
       progressString = "Stopped";
       throw new RuntimeException(STOPPED_ON_REQUEST);
     }
