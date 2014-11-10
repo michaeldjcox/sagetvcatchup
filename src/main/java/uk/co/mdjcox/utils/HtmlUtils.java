@@ -15,8 +15,6 @@ import java.util.ArrayList;
 
 
 public class HtmlUtils implements HtmlUtilsInterface {
-    private Parser parser = new Parser();
-
     private static HtmlUtilsInterface instance;
 
     public static HtmlUtilsInterface instance() {
@@ -55,7 +53,8 @@ public class HtmlUtils implements HtmlUtilsInterface {
         html = html.replace('\n', ' ');
         html = html.replace('\r', ' ');
         html = html.trim();
-        String newhtml = parser.parse(html);
+      Parser parser = new Parser();
+      String newhtml = parser.parse(html);
         if (newhtml == null || newhtml.isEmpty()) {
             return html;
         } else {
