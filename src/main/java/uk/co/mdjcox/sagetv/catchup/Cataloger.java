@@ -198,7 +198,7 @@ public class Cataloger {
         final Source sourceCat = plugin.getSource();
         final String pluginName = sourceCat.getId();
 
-        progressString = "Doing " + pluginName;
+        progressString = "Getting " + pluginName + " programme list";
 
         ArrayList<String> testProgrammes = context.getTestProgrammes(pluginName);
         int testMaxProgrammes = context.getMaxProgrammes(pluginName);
