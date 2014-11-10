@@ -50,13 +50,14 @@ public abstract class Script {
         comp.setScriptBaseClass(GroovyScript.class.getName());
         gse.setConfig(comp);
 
-        Binding binding = new Binding();
+      Binding binding = new Binding();
         for (int i = 0; i < params.length; i = i + 2) {
             binding.setVariable(params[i].toString(), params[i + 1]);
         }
 
-        GroovyShell shell = new GroovyShell(binding, comp);
+        GroovyShell shell = new GroovyShell(comp);
         GroovyScript script = (GroovyScript) shell.parse(new File(this.script));
+        script.setBinding(binding);
         script.setDownloadUtils(downloadUtils);
         script.setHtmlUtils(htmlUtils);
         script.setOsUtils(osUtils);
