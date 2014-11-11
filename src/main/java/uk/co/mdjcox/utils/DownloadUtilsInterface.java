@@ -19,5 +19,7 @@ public interface DownloadUtilsInterface {
 
     String downloadFileString(String source, String encoding) throws Exception;
 
+    String downloadFileString(String source, int timeout, int attempts) throws Exception;
+
     void downloadFile(URL url, String file) throws IOException;
 }

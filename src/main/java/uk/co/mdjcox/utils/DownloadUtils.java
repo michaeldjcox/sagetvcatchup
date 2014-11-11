@@ -32,13 +32,13 @@ public class DownloadUtils implements DownloadUtilsInterface {
 
     @Override
     public String sampleFileString(String source) throws Exception {
-        return downloadFileString(source, DEFAULT_ENCODING, true);
+        return downloadFileString(source, DEFAULT_ENCODING, true, DOWNLOAD_TIMEOUT, 1);
 
     }
 
     @Override
     public String sampleFileString(String source, String encoding) throws Exception {
-        return downloadFileString(source, encoding, true);
+        return downloadFileString(source, encoding, true, DOWNLOAD_TIMEOUT, 1);
     }
 
 
@@ -49,60 +49,72 @@ public class DownloadUtils implements DownloadUtilsInterface {
 
     @Override
     public String downloadFileString(String source, String encoding) throws Exception {
-        return downloadFileString(source, encoding, false);
+        return downloadFileString(source, encoding, false, DOWNLOAD_TIMEOUT, 1);
     }
 
-    private String downloadFileString(String source, String encoding, boolean sample) throws Exception {
-        String nowPlaying = "";
+  public String downloadFileString(String source, int timeout, int attempts) throws Exception {
+    return downloadFileString(source, DEFAULT_ENCODING, false, timeout, attempts);
+  }
+
+    private String downloadFileString(String source, String encoding, boolean sample, int timeout, int attempts) throws Exception {
+      for (int i =0 ; i < attempts; i++) {
+        String webpage = "";
         InputStream stream = null;
         BufferedInputStream bis = null;
-      URLConnection conn = null;
-      try {
-            URL url = new URL(source);
+        URLConnection conn = null;
+        try {
+          URL url = new URL(source);
 
-             conn = url.openConnection();
-          conn.setReadTimeout(DOWNLOAD_TIMEOUT);
-          conn.setConnectTimeout(DOWNLOAD_TIMEOUT);
-           new Thread(new InterruptThread(Thread.currentThread(), conn)).start();
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17");
+          conn = url.openConnection();
+          conn.setReadTimeout(timeout);
+          conn.setConnectTimeout(timeout);
+          new Thread(new InterruptThread(Thread.currentThread(), conn)).start();
+          conn.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17");
 //            conn.setRequestProperty("Accept-Encoding", "tgzip,deflate,sdch");
-            stream = conn.getInputStream();
-            bis = new BufferedInputStream(stream);
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = bis.read(buf)) > 0) {
-                nowPlaying += new String(buf, 0, len, Charset.forName(encoding));
-                if (sample) break;
+          stream = conn.getInputStream();
+          bis = new BufferedInputStream(stream);
+          byte[] buf = new byte[1024];
+          int len;
+          while ((len = bis.read(buf)) > 0) {
+            webpage += new String(buf, 0, len, Charset.forName(encoding));
+            if (sample) break;
+          }
+          return webpage;
+        } catch (Exception ex) {
+          if (!ex.getMessage().contains("Bogus chunk") && !ex.getMessage().contains("missing CR")) {
+            if (i == (attempts-1)) {
+              throw ex;
+            } else {
+              continue;
             }
-            return nowPlaying;
-        } catch (IOException ex) {
-            if (!ex.getMessage().contains("Bogus chunk") && !ex.getMessage().contains("missing CR")) {
-                throw ex;
-            }
-            return nowPlaying;
+          }
+          return webpage;
         } finally {
-            if (bis != null) {
-              try {
-                bis.close();
-              } catch (IOException e) {
-                //Ignore
-              }
+          if (bis != null) {
+            try {
+              bis.close();
+            } catch (IOException e) {
+              //Ignore
             }
-            if (stream != null) {
-              try {
-                stream.close();
-              } catch (IOException e) {
-                // Ignore
-              }
+          }
+          if (stream != null) {
+            try {
+              stream.close();
+            } catch (IOException e) {
+              // Ignore
             }
-        if (conn != null && conn instanceof HttpURLConnection) {
-          try {
-            ((HttpURLConnection)conn).disconnect();
-          } catch (Exception e) {
-            // Ignore
+          }
+          if (conn != null && conn instanceof HttpURLConnection) {
+            try {
+              ((HttpURLConnection) conn).disconnect();
+            } catch (Exception e) {
+              // Ignore
+            }
           }
         }
-        }
+      }
+
+      throw new Exception("Failed to download web page " + source );
     }
 
   public class InterruptThread implements Runnable {
