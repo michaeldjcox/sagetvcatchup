@@ -88,7 +88,7 @@ public class CatalogTestHelper {
         catalog.addCategory(programme);
         catalog.addEpisode(ep1);
         catalog.addEpisode(ep2);
-        catalog.addError("ERROR", "Catalog Error");
+        catalog.getRoot().addError("ERROR", "Catalog Error");
         return catalog;
     }
 }

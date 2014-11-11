@@ -16,14 +16,14 @@ String end = "</li>"; // "</a>";
 String start = "<li";
 
     if (str == null) {
-        LOG_ERROR(source, "Cannot list programmes for " + url + " - no programmes block found");
+        LOG_ERROR(source, "Cannot list programmes - no programmes block found: " + url);
     }
 
 while (str != null) {
     str = MOVE_TO(start, str);
         if (str == null) {
             if (programmes.isEmpty()) {
-                LOG_ERROR(source, "Cannot list programmes for " + site + " - no programme block found");
+                LOG_ERROR(source, "Cannot list programmes - no programme block found: " + site);
             }
             break;
         }
@@ -34,12 +34,12 @@ while (str != null) {
     linkName = EXTRACT_TO("</em>", linkName);
     linkName = REMOVE_HTML_TAGS(linkName);
     if (link == null) {
-        LOG_ERROR(source, "Cannot add programme - no programme link found");
+        LOG_ERROR(source, "No programme link found");
         continue;
     }
     link = MAKE_LINK_ABSOLUTE("http://www.channel5.com", link);
     if ((linkName == null) || linkName.isEmpty()) {
-        LOG_WARNING(source, "No programme name found - using link");
+        LOG_WARNING(source, "No programme name found");
         linkName = link;
     }
 

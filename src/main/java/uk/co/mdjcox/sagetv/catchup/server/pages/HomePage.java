@@ -37,9 +37,8 @@ public class HomePage extends AbstractHtmlPage {
         htmlBuilder.addHeading2("Status");
         htmlBuilder.addHeading3("Catalog progress:");
         htmlBuilder.addParagraph(cataloger.getProgress());
-        htmlBuilder.addParagraph(cataloger.getStatsSummary());
-        htmlBuilder.addLink("Catalog Errors", "/errors?type=html");
-        htmlBuilder.addParagraph(cataloger.getErrorSummary());
+        htmlBuilder.addParagraph(cataloger.getStatsSummaryNew());
+        htmlBuilder.addParagraph(cataloger.getErrorSummaryNew());
         htmlBuilder.addHeading3("Recording progress:");
         StringBuilder recordingProgress = new StringBuilder();
         recordingProgress.append(recorder.getRecordingCount());
@@ -66,6 +65,7 @@ public class HomePage extends AbstractHtmlPage {
         htmlBuilder.addBreak();
 
         htmlBuilder.addHeading2("Catalog");
+        htmlBuilder.addParagraph(cataloger.getStatsSummary());
         htmlBuilder.addLink("Podcasts", "/category?id=Catchup;type=xml");
         htmlBuilder.addBreak();
         htmlBuilder.addLink("Categories", "/categories?type=html");
@@ -73,6 +73,9 @@ public class HomePage extends AbstractHtmlPage {
         htmlBuilder.addLink("Programmes", "/programmes?type=html");
         htmlBuilder.addBreak();
         htmlBuilder.addLink("Episodes", "/episodes?type=html");
+        htmlBuilder.addBreak();
+
+      htmlBuilder.addLink("Errors " + cataloger.getErrorSummary(), "/errors?type=html");
         htmlBuilder.stopBody();
         htmlBuilder.stopDocument();
 

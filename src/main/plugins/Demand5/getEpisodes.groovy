@@ -54,9 +54,6 @@ while (str != null) {
     episodes.add(subCat);
 }
 
-if (episodes.isEmpty()) {
-    LOG_ERROR(category, "No episodes found for this programme");
-}
 
 
 

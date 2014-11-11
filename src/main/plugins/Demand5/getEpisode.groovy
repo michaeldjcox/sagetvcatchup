@@ -80,7 +80,7 @@ details2 = MOVE_TO("content=\"", details2)
 String channel = EXTRACT_TO("\"", details2)
 channel = REMOVE_HTML_TAGS(channel);
 if (channel == null) {
-    LOG_WARNING(episode, "Channel not found - defaulting to 'Five'");
+    LOG_WARNING(episode, "Channel not found: defaulting to 'Five'");
     channel = "Five";
 }
 episode.setChannel(channel);
@@ -96,7 +96,7 @@ if (genre != null) {
 }
 
 if (episode.getGenres().size() == 0) {
-    LOG_WARNING(episode, "Genres not found - defaulting to 'Other'");
+    LOG_WARNING(episode, "Genres not found: defaulting to 'Other'");
     episode.addGenre("Other");
 }
 
@@ -107,7 +107,7 @@ String seriesNumber = EXTRACT_TO(" ", details2)
 seriesNumber = REMOVE_HTML_TAGS(seriesNumber);
 if (seriesNumber != null) {
     if (!seriesNumber.matches("[0-9]*")) {
-        LOG_WARNING(episode, "Series number '" + seriesNumber + "' is not a number");
+        LOG_WARNING(episode, "Series number is not a number:" + seriesNumber);
     }
     LOG_INFO("Series: " + seriesNumber)
     episode.setSeries(seriesNumber);
@@ -122,7 +122,7 @@ episodeNo = REMOVE_HTML_TAGS(episodeNo);
 
 if (episodeNo != null) {
     if (!episodeNo.matches("[0-9]*")) {
-        LOG_WARNING(episode, "Episode number '" + episodeNo + "' is not a number");
+        LOG_WARNING(episode, "Episode number is not a number: " + episodeNo);
     }
     LOG_INFO("Episode: " + episodeNo);
     episode.setEpisode(episodeNo);
@@ -151,14 +151,14 @@ if (date != null) {
 
     String newDate = FIX_DATE("dd MMM yyyy", date);
     if (newDate == null) {
-        LOG_ERROR(episode, "Failed to parse air date " + date);
+        LOG_ERROR(episode, "Failed to parse air date: " + date);
         newDate = date;
     }
 
     episode.setAirDate(newDate);
     episode.setOrigAirDate(newDate);
 } else {
-    LOG_WARNING(episode, "Original air date not found");
+    LOG_WARNING(episode, "Air date not found");
 }
 
 if (time != null) {
@@ -166,14 +166,14 @@ if (time != null) {
 
     String newTime = FIX_TIME("HH:mm", time);
     if (newTime == null) {
-        LOG_ERROR(episode, "Failed to parse air time " + time);
+        LOG_ERROR(episode, "Failed to parse air time: " + time);
         newTime = time;
     }
 
     episode.setAirTime(newTime);
     episode.setOrigAirTime(newTime);
 } else {
-    LOG_WARNING(episode, "Original air time not found");
+    LOG_WARNING(episode, "Air time not found");
 }
 
 episode.setId(MAKE_ID(episode.getPodcastTitle()))

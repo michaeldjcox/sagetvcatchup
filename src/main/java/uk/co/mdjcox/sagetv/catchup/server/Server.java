@@ -14,10 +14,7 @@ import uk.co.mdjcox.sagetv.catchup.server.media.WatchAndKeepEpisode;
 import uk.co.mdjcox.sagetv.catchup.server.media.WatchEpisode;
 import uk.co.mdjcox.sagetv.catchup.server.pages.*;
 import uk.co.mdjcox.sagetv.catchup.server.podcasts.*;
-import uk.co.mdjcox.sagetv.model.Catalog;
-import uk.co.mdjcox.sagetv.model.Category;
-import uk.co.mdjcox.sagetv.model.Episode;
-import uk.co.mdjcox.sagetv.model.Programme;
+import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.LoggerInterface;
 
@@ -26,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -223,9 +221,6 @@ public class Server implements CatalogPublisher {
             logger.info("Publishing new catalog to web server");
             Map<String, ContentProvider> publishedContent = new HashMap<String, ContentProvider>();
 
-            ErrorsPage errors = new ErrorsPage(catalog);
-            addPublishedContent(publishedContent, errors);
-
           RecordingErrorsPage recerrors = new RecordingErrorsPage(recorder);
           addPublishedContent(publishedContent, recerrors);
 
@@ -287,13 +282,38 @@ public class Server implements CatalogPublisher {
 
             logger.info("Published catalog to web server");
         } catch (Exception e) {
-            catalog.addError("FATAL", "Failed to publish to web server " + e.getMessage());
+           Category root = catalog.getRoot();
+          if (root != null) {
+            root.addError("FATAL", "Failed to publish to web server: " + e.getMessage());
+          }
             logger.error("Failed to publish catalog to web server", e);
         } finally {
-            ErrorsPage provider = new ErrorsPage(catalog);
+          Collection<ParseError> errorList = catalog.getErrors();
+          Map<String, Integer> errorSummary = new HashMap<String, Integer>();
+          for (ParseError error : errorList) {
+            String key = error.getLevel() + "|" + error.getMessage().split(":")[0];
+
+            Integer cnt = errorSummary.get(key);
+            if (cnt == null) {
+              cnt = 1;
+            } else {
+              cnt = cnt + 1;
+            }
+            errorSummary.put(key, cnt);
+          }
+            ErrorsPage provider = new ErrorsPage(errorList, errorSummary);
             addPublishedContent(publishedContent, provider);
-            ErrorsPodcast errProvider = new ErrorsPodcast(baseUrl, catalog);
+
+            ErrorsPodcast errProvider = new ErrorsPodcast(baseUrl, htmlUtils, errorSummary);
             addPublishedContent(publishedContent, errProvider);
+
+          for (Map.Entry<String, Integer> entry : errorSummary.entrySet()) {
+            final String key = entry.getKey();
+            final String[] keys = key.split("\\|");
+            ErrorDetailsPodcast errorDetailsPodcast = new ErrorDetailsPodcast(baseUrl, htmlUtils, errorList, keys[1]);
+            addPublishedContent(publishedContent, errorDetailsPodcast);
+          }
+
         }
     }
 

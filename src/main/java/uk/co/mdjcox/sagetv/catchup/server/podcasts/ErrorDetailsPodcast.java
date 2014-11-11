@@ -1,26 +1,28 @@
 package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
-import uk.co.mdjcox.sagetv.model.*;
+import uk.co.mdjcox.sagetv.model.ParseError;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.RssBuilder;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeSet;
 
 /**
  * Created by michael on 07/10/14.
  */
-public class ErrorsPodcast extends AbstractPodcast {
+public class ErrorDetailsPodcast extends AbstractPodcast {
 
   private final HtmlUtilsInterface htmlUtils;
-  private Map<String, Integer> errorSummary = new HashMap<String, Integer>();
+  private Collection<ParseError> errorList = new ArrayList<ParseError>();
+  private String message = null;
     private String page;
 
-    public ErrorsPodcast(String baseUrl, HtmlUtilsInterface htmlUtils, Map<String, Integer> errorSummary) {
+    public ErrorDetailsPodcast(String baseUrl, HtmlUtilsInterface htmlUtils, Collection<ParseError> errorList, String message) {
         super(baseUrl);
-        this.errorSummary = errorSummary;
+        this.errorList = errorList;
+      this.message = message;
       this.htmlUtils = htmlUtils;
         this.page = buildPage();
     }
@@ -33,13 +35,10 @@ public class ErrorsPodcast extends AbstractPodcast {
         RssBuilder builder = new RssBuilder();
         builder.startDocument(title, desc, errorsUrl);
 
-      for (Map.Entry<String, Integer> entry : errorSummary.entrySet()) {
-        final String key = entry.getKey();
-        final String[] keys = key.split("\\|");
-        final String value = entry.getValue().toString();
-        String id = htmlUtils.makeIdSafe(keys[1]);
-        String link = getPodcastBaseUrl() + "/errors?message=" + id+";type=xml";
-        builder.addCategoryItem(keys[1], value + " " + keys[0], link);
+      for (ParseError error : errorList) {
+        if (error.getMessage().split(":")[0].equals(message)) {
+          builder.addTextItem(error.getLevel(), error.getSource() + "<br/>" + error.getType() + " " + error.getId() + "<br/>" + error.getMessage(), "");
+        }
       }
 
         builder.stopDocument();
@@ -49,7 +48,7 @@ public class ErrorsPodcast extends AbstractPodcast {
 
     @Override
     public String getUri() {
-        return "errors?type=xml";
+        return "errors?message=" + htmlUtils.makeIdSafe(message) + ";type=xml";
     }
 
     @Override

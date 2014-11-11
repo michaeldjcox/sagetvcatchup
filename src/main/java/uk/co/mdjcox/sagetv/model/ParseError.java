@@ -76,15 +76,14 @@ public class ParseError implements Comparable<ParseError> {
 
   @Override
   public int compareTo(ParseError o) {
-    int result = getSource().compareTo(o.getSource());
-    if (result != 0) return result;
-    result = getLevel().compareTo(o.getLevel());
-    if (result != 0) return result;
-    result = getType().compareTo(o.getType());
-    if (result != 0) return result;
-    result = getId().compareTo(o.getId());
+    int result = getLevel().compareTo(o.getLevel());
     if (result != 0) return result;
     result = getMessage().compareTo(o.getMessage());
     return result;
+  }
+
+  @Override
+  public String toString() {
+    return level + "|" + message;
   }
 }

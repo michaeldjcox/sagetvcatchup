@@ -16,7 +16,7 @@ for (String site : sites) {
             continue;
         }
     } else {
-        LOG_ERROR(source, "Cannot list programmes for " + site);
+        LOG_ERROR(source, "Cannot list programmes: " + site);
         continue;
     }
 
@@ -30,14 +30,14 @@ for (String site : sites) {
     start = "<li>"
 
     if (str == null) {
-        LOG_ERROR(source, "Cannot list programmes for " + site + " - no programmes block found");
+        LOG_ERROR(source, "Cannot list programmes - no programmes block found: " + site);
     }
 
     while (str != null) {
         str = MOVE_TO(start, str);
         if (str == null) {
             if (programmes.isEmpty()) {
-                LOG_ERROR(source, "Cannot list programmes for " + site + " - no programme block found");
+                LOG_ERROR(source, "Cannot add programme - no programme block found");
             }
             break;
         }
@@ -54,7 +54,7 @@ for (String site : sites) {
         linkName = EXTRACT_TO("<", linkName);
         linkName = REMOVE_HTML_TAGS(linkName);
         if ((linkName == null) || linkName.isEmpty()) {
-            LOG_WARNING(source, "No programme name found - using link");
+            LOG_WARNING(source, "No programme name found");
             linkName = link;
         }
 
