@@ -29,7 +29,7 @@ File file = WAIT_FOR_FILE_OF_SIZE(filename, 1024000, 10000, recording.getStopFla
 
 recording.setPartialFile(file);
 
-TRACK_PROGRESS(".*kB.*sec.*", errors, recording);
+TRACK_PROGRESS(".*kB.*sec.*", "^.*\\(", "\\)", errors, recording);
 
 String completedName = filename.replace("default.partial.mp4.flv", "default.mp4");
 File completedFile = new File(completedName);

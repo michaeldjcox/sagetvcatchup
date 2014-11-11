@@ -58,7 +58,7 @@ public abstract class GroovyScript extends groovy.lang.Script {
     /* From here on down are methods available to the plugin user */
 
     public String GET_WEB_PAGE(String url) throws Exception {
-        return downloadUtils.downloadFileString(url);
+        return downloadUtils.downloadFileString(url, 30000, 2);
     }
 
     public String REPLACE_LINK_PREFIX(String existingUrl, String newPrefix) {
@@ -267,7 +267,7 @@ public abstract class GroovyScript extends groovy.lang.Script {
         return "";
     }
 
-  public void TRACK_PROGRESS(final String regex, final ArrayList<String> output, final Recording recording) {
+  public void TRACK_PROGRESS(final String regex, final String prefix, final String suffix, final ArrayList<String> output, final Recording recording) {
     Runnable runnable = new Runnable() {
 
       public void run() {
@@ -277,6 +277,9 @@ public abstract class GroovyScript extends groovy.lang.Script {
           for (i = last; i < output.size(); i++) {
             String result = output.get(i);
             if (result.matches(regex)) {
+              result = result.replaceAll(prefix, "");
+              result = result.replaceAll(suffix, "");
+
               recording.setProgress(result);
             }
           }
