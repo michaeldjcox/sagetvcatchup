@@ -2,6 +2,7 @@ package uk.co.mdjcox.sagetv.catchup;
 
 import uk.co.mdjcox.utils.LoggerInterface;
 import uk.co.mdjcox.utils.RmiHelper;
+import uk.co.mdjcox.utils.SageUtils;
 
 /**
  * Created by michael on 24/10/14.
@@ -24,6 +25,10 @@ public class CatchupSuicideThread extends Thread {
 
   @Override
   public void run() {
+
+    if (CatchupContext.isRunningInDev()) {
+      return;
+    }
     int tries = 0;
     while (tries < 3) {
       try {
