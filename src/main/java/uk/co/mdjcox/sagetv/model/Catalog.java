@@ -28,9 +28,9 @@ public class Catalog {
    */
   private Map<String, Category> categories = new ConcurrentHashMap<String, Category>();
 
-  private String rootId;
+  private String rootId="Catchup";
 
-    /**
+  /**
    * Default constructor
    */
   public Catalog() {
@@ -42,18 +42,6 @@ public class Catalog {
    */
   public final List<Category> getCategories() {
     return ImmutableList.copyOf(categories.values());
-  }
-
-  /** Allows the media catalog to be initialised with data
-   *
-   * @param categoryMap A map of all metadata indexed by id
-   */
-  public final void setCategories(String rootId, Map<String, Category> categoryMap, Map<String, Episode> episodeMap) {
-      categories = new LinkedHashMap<String, Category>();
-      categories.putAll(categoryMap);
-      episodes.putAll(episodeMap);
-    this.rootId = rootId;
-
   }
 
   /**
@@ -74,13 +62,6 @@ public class Catalog {
     public void addEpisode(Episode episode) {
         checkNotNull(episode);
         this.episodes.put(episode.getId(), episode);
-    }
-
-    public void addError(String level, String error) {
-      Category root = categories.get(rootId);
-        if (root != null) {
-            root.addError(level, error);
-        }
     }
 
     @Override
@@ -120,4 +101,72 @@ public class Catalog {
           }        }
         return errorMap;
     }
+
+  public int getNumberEpisodes() {
+    return episodes.size();
+  }
+
+  public int getNumberProgrammes() {
+    int programmeStats = 0;
+    for (Category category : categories.values()) {
+      if (category.isProgrammeCategory() && category.getParentId().isEmpty()) {
+        programmeStats++;
+      }
+    }
+    return programmeStats;
+  }
+
+  public int getNumberSources() {
+    int sourceStats = 0;
+    for (Category category : categories.values()) {
+      if (category.isSource() && !category.getId().equals("status") && !category.getId().equals("search")) {
+        sourceStats++;
+      }
+    }
+    return sourceStats;
+  }
+
+  public String getStatsSummary() {
+    return getNumberSources() + " sources " + getNumberProgrammes() + " programmes " + getNumberEpisodes() + " episodes";
+  }
+
+  public String getErrorSummary() {
+    Collection<ParseError> errorList = getErrors();
+    HashMap<String, Integer> errorSum = new HashMap<String, Integer>();
+    for (ParseError error : errorList) {
+      Integer count = errorSum.get(error.getLevel());
+      if (count == null) {
+        errorSum.put(error.getLevel(), 1);
+      } else {
+        errorSum.put(error.getLevel(), count + 1);
+      }
+    }
+
+    String errorSummary = "(";
+    for (Map.Entry<String, Integer> entry : errorSum.entrySet()) {
+      errorSummary += entry.getValue() + " " + entry.getKey() + " ";
+    }
+    errorSummary += ")";
+    errorSummary = errorSummary.replace(" )", ")");
+
+    if (errorSummary.equals("()")) {
+      errorSummary = "";
+    }
+    return errorSummary;
+  }
+
+
+  public Category getRoot() {
+    return categories.get(rootId);
+  }
+
+  public Collection<Programme> getProgrammes() {
+    Collection<Programme> programmes = new ArrayList<Programme>();
+    for (Category category : categories.values()) {
+      if (category.isProgrammeCategory() && category.getParentId().isEmpty()) {
+        programmes.add((Programme)category);
+      }
+    }
+    return programmes;
+  }
 }

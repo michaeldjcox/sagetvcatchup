@@ -67,81 +67,10 @@ public class CatalogTest {
 
       Map<String, Episode> episodes= new HashMap<String, Episode>();
 
-      catalog.setCategories(root.getId(), input, episodes);
+      catalog.addCategory(cat);
 
     List<Category> results = catalog.getCategories();
     assertEquals("Results contain one entry", 1, results.size());
-  }
-
-  @Test
-  public void testSetCategories() throws Exception {
-
-    // Test the simple came of inserting one entry
-    Catalog catalog = new Catalog();
-    SubCategory
-        cat =
-        new SubCategory("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
-
-    Map<String, Category> input = new HashMap<String, Category>();
-    input.put(cat.getId(), cat);
-
-      Root root = new Root("rootId", "shortName", "longName", "serviceUrl", "iconUrl");
-
-      Map<String, Episode> episodes= new HashMap<String, Episode>();
-
-      catalog.setCategories(root.getId(), input, episodes);
-
-    List<Category> results = catalog.getCategories();
-    assertEquals("Results contain one entry", 1, results.size());
-  }
-
-  @Test
-  public void testSetCategoriesNull() throws Exception {
-
-    // Test the simple came of inserting one entry
-    Catalog catalog = new Catalog();
-    SubCategory
-        cat =
-        new SubCategory("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
-
-    try {
-      catalog.setCategories(null, null, null);
-    } catch (NullPointerException e) {
-      return;
-    }
-
-    fail("Should have thrown NullPointerException");
-
-  }
-
-  @Test
-  public void testSetCategoriesImmutability() throws Exception {
-
-    Catalog catalog = new Catalog();
-    SubCategory
-        cat =
-        new SubCategory("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
-
-    Map<String, Category> input = new HashMap<String, Category>();
-    input.put(cat.getId(), cat);
-
-      Root root = new Root("rootId", "shortName", "longName", "serviceUrl", "iconUrl");
-
-      Map<String, Episode> episodes= new HashMap<String, Episode>();
-
-      catalog.setCategories(root.getId(), input, episodes);
-
-    List<Category> results = catalog.getCategories();
-    assertEquals("Results contain one entry", 1, results.size());
-
-    SubCategory
-        cat2 =
-        new SubCategory("sourceId", "id2", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
-
-    input.put(cat2.getId(), cat2);
-
-    results = catalog.getCategories();
-    assertEquals("Results should still contain one entry", 1, results.size());
   }
 
   /**

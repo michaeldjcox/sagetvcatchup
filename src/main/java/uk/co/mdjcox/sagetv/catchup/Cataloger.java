@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,7 +31,7 @@ public class Cataloger {
   private static final int EPISODE_THREADS = 20;
   private LoggerInterface logger;
   private PluginManager pluginManager;
-  private String progressString = "Waiting";
+  private AtomicReference<String> progressString = new AtomicReference<String>("Waiting");
   private AtomicBoolean stop = new AtomicBoolean(false);
   private AtomicBoolean catalogRunning = new AtomicBoolean(false);
   private ScheduledExecutorService catalogingScheduler;
@@ -40,14 +40,11 @@ public class Cataloger {
 
   private ScheduledFuture<?> future;
   private List<CatalogPublisher> publishers;
-  private String errorSummary = "";
   private int refreshRate;
   private CatchupContextInterface context;
-  private int sourceStats = 0;
-  private int programmeStats = 0;
-  private int episodeStats = 0;
   private Set<String> favourites = new HashSet<String>();
   private Catalog lastCatalog = new Catalog();
+  private Catalog newCatalog = null;
   private boolean multithreaded=true;
 
   @Inject
@@ -63,18 +60,18 @@ public class Cataloger {
       @Override
       public void run() {
         try {
-          Catalog catalog = null;
+          newCatalog = null;
           try {
             stop.set(false);
             long startTime = System.currentTimeMillis();
 
             catalogRunning.set(true);
             logger.info("Refreshing catalog");
-            catalog = catalog();
-            if (catalog != null) {
+            Catalog completedCatalog = catalog();
+            if (completedCatalog != null) {
               setProgress("Publishing catalog");
-              publish(catalog, publishers);
-              lastCatalog = catalog;
+              publish(completedCatalog, publishers);
+              lastCatalog = completedCatalog;
               int duration = (int)(System.currentTimeMillis() - startTime);
 
               final int millisInHour = 60 * 60 * 1000;
@@ -83,20 +80,21 @@ public class Cataloger {
               int minutes = (int)((duration % millisInHour) / millisInMin);
               int seconds = (int)((duration % millisInMin) / 1000);
 
-              progressString = "Finished in " + hours + "h" + minutes + "m" + seconds + "s";
-              logger.info(progressString);
+              progressString.set(String.format("Finished in %02d:%02d:%02d", hours, minutes, seconds));
+              logger.info(progressString.get());
             }
           } catch (Throwable e) {
-            if (catalog != null) {
-              catalog.addError("FATAL", "Failed to publish to SageTV " + e.getMessage());
+            if (newCatalog != null) {
+              Category root = newCatalog.getRoot();
+              if (root != null) {
+                root.addError("FATAL", "Failed to catalog: " + e.getMessage());
+              }
             }
             logger.error("Failed to refresh catalog", e);
             setProgress("Failed");
           } finally {
-            if (catalog != null) {
-              errorSummary = buildErrorSummary(catalog);
-            }
             catalogRunning.set(false);
+            newCatalog = null;
           }
         } catch (Throwable e) {
           logger.error("Caught Exception during cataloging", e);
@@ -105,24 +103,7 @@ public class Cataloger {
     };
   }
 
-  private void buildStatsSummary(Catalog catalog) {
-    sourceStats = 0;
-    programmeStats = 0;
-    episodeStats = 0;
 
-    for (Category category : catalog.getCategories()) {
-      if (category.isProgrammeCategory() && category.getParentId().isEmpty()) {
-        programmeStats++;
-      }
-
-      if (category.isSource() && !category.getId().equals("Status") && !category.getId().equals("Search")) {
-        sourceStats++;
-      }
-    }
-
-    episodeStats = catalog.getEpisodes().size();
-
-  }
 
   private void publish(Catalog catalog, List<CatalogPublisher> publishers) {
     for (CatalogPublisher publisher : publishers) {
@@ -130,61 +111,32 @@ public class Cataloger {
     }
   }
 
-  private String buildErrorSummary(Catalog catalog) {
-    Collection<ParseError> errorList = catalog.getErrors();
-    HashMap<String, Integer> errorSum = new HashMap<String, Integer>();
-    for (ParseError error : errorList) {
-      Integer count = errorSum.get(error.getLevel());
-      if (count == null) {
-        errorSum.put(error.getLevel(), 1);
-      } else {
-        errorSum.put(error.getLevel(), count + 1);
-      }
-    }
-
-    String errorSummary = "( ";
-    for (Map.Entry<String, Integer> entry : errorSum.entrySet()) {
-      errorSummary += entry.getKey() + " " + entry.getValue() + " ";
-    }
-    errorSummary += ")";
-
-    if (errorSummary.equals("()")) {
-      errorSummary = "";
-    }
-    return errorSummary;
-  }
-
   private Catalog catalog() {
 
-    progressString = "Started";
+    progressString.set("Started");
 
-    Catalog catalog = new Catalog();
-
-    final AtomicInteger sourceStats = new AtomicInteger(0);
-    final AtomicInteger programmeStats = new AtomicInteger(0);
-    final AtomicInteger episodeStats = new AtomicInteger(0);
+    newCatalog = new Catalog();
 
     try {
-      favourites = getCatchupPluginRemote().getFavouriteTitles();
-    } catch (Exception e) {
-      logger.error("Failed to collect favourites", e);
-    }
-
-    try {
-      Map<String, Category> newCategories = new ConcurrentHashMap<String, Category>();
-      final Map<String, Episode> newEpisodes = new ConcurrentHashMap<String, Episode>();
 
       Root root = new Root("Catchup", "Catchup TV", "Catchup TV", "/", "/logo.png");
-      newCategories.put(root.getId(), root);
+      newCatalog.addCategory(root);
 
-      Source statusSource = new Source(root.getId(), "Status", "Status", "Status", "", "");
+      try {
+        favourites = getCatchupPluginRemote().getFavouriteTitles();
+      } catch (Exception e) {
+        root.addError("ERROR", "Failed to list SageTV favourites");
+        logger.error("Failed to collect favourites", e);
+      }
+
+      Source statusSource = new Source(root.getId(), "status", "Status", "Status", "", "");
       statusSource.setPodcastUrl("/category?id=status;type=xml");
-      newCategories.put(statusSource.getId(), statusSource);
+      newCatalog.addCategory(statusSource);
       root.addSubCategory(statusSource);
 
-      Source searchSource = new Source(root.getId(), "Search", "Search", "Search", "", "");
+      Source searchSource = new Source(root.getId(), "search", "Search", "Search", "", "");
       searchSource.setPodcastUrl("/search?type=xml");
-      newCategories.put(searchSource.getId(), searchSource);
+      newCatalog.addCategory(searchSource);
       root.addSubCategory(searchSource);
 
       for (final Plugin plugin : pluginManager.getPlugins()) {
@@ -198,18 +150,14 @@ public class Cataloger {
         final Source sourceCat = plugin.getSource();
         final String pluginName = sourceCat.getId();
 
-        progressString = "Getting " + pluginName + " programme list";
+        progressString.set("Doing " + pluginName + " listing programmes");
 
         ArrayList<String> testProgrammes = context.getTestProgrammes(pluginName);
         int testMaxProgrammes = context.getMaxProgrammes(pluginName);
 
-        newCategories.put(sourceCat.getId(), sourceCat);
-
-        sourceStats.incrementAndGet();
+        newCatalog.addCategory(sourceCat);
 
         logger.info("Found source: " + sourceCat);
-
-        final Map<String, Programme> newProgCategories = new ConcurrentHashMap<String, Programme>();
 
         root.addSubCategory(sourceCat);
         sourceCat.setParentId(root.getId());
@@ -229,8 +177,6 @@ public class Cataloger {
 
           programmeCount++;
 
-          programmeStats.incrementAndGet();
-
           if (programmeCount > testMaxProgrammes) {
             break;
           }
@@ -240,8 +186,8 @@ public class Cataloger {
             if (!testProgrammes.contains(programmeId)) {
               logger.info("Skipping programme " + programmeId);
               programmesLatch.countDown();
-              progressString = "Doing " + pluginName + " programme " + (programmesToDo-programmesLatch.getCount()) + "/" + programmesToDo;
-              logger.info(progressString);
+              progressString.set("Doing " + pluginName + " programme " + (programmesToDo - programmesLatch.getCount()) + "/" + programmesToDo);
+              logger.info(progressString.get());
               continue;
             }
           }
@@ -269,14 +215,12 @@ public class Cataloger {
 
                             episode.setPodcastUrl("/control?id=" + episode.getId() + ";type=xml");
 
-                            newEpisodes.put(episode.getId(), episode);
-
-                            episodeStats.incrementAndGet();
+                            newCatalog.addEpisode(episode);
 
                             programme.addEpisode(episode);
                           } catch (Throwable e) {
                             if (!e.getMessage().equals(STOPPED_ON_REQUEST)) {
-                              episode.addError("ERROR", "Failed to catalog episode " + e.getMessage());
+                              programme.addError("ERROR", "Failed to catalog episode " + episode.getEpisodeTitle());
                             }
                           } finally {
                             episodesLatch.countDown();
@@ -306,27 +250,32 @@ public class Cataloger {
                   }
 
                   if (programme.getEpisodes().size() > 0) {
-                    synchronized (newProgCategories) {
                       logger.info("Programme " + programmeId + " has episodes");
-                      if (newProgCategories.containsKey(programmeId)) {
-                        logger.warn("Programme " + programmeId + " has a duplicate - merging programmes");
-                        Programme existingProg = newProgCategories.get(programmeId);
+                      if (newCatalog.getCategory(programmeId) != null) {
+                        logger.warn("Programme " + programmeId + " has a duplicate - merging episodes");
+                        Programme existingProg = (Programme)newCatalog.getCategory(programmeId);
                         existingProg.addAllEpisodes(programme.getEpisodes());
+                        existingProg.addError("WARNING", "Programme has a duplicate - merging episodes");
                       } else {
-                        newProgCategories.put(programmeId, programme);
+                        newCatalog.addCategory(programme);
                       }
-                    }
                   } else {
                     logger.warn("Programme " + programmeId + " has no episodes");
+                    sourceCat.addError("ERROR", "Programme has no episodes: " + programmeId);
                   }
                 } catch (Throwable e) {
-                  if (!e.getMessage().equals(STOPPED_ON_REQUEST)) {
-                    programme.addError("ERROR", "Failed to catalog programme " + e.getMessage());
+                  String message = e.getMessage();
+                  if (message == null) {
+                    message = e.getClass().getSimpleName();
+                  }
+                  if (!message.equals(STOPPED_ON_REQUEST)) {
+                    sourceCat.addError("ERROR", "Failed to catalog programme: " + programmeId);
+                    logger.error("Failed to catalog programme: " + programmeId, e);
                   }
                 } finally {
                   programmesLatch.countDown();
-                  progressString = "Doing " + pluginName + " programme " + (programmesToDo-programmesLatch.getCount()) + "/" + programmesToDo;
-                  logger.info(progressString);
+                  progressString.set("Doing " + pluginName + " programme " + (programmesToDo-programmesLatch.getCount()) + "/" + programmesToDo);
+                  logger.info(progressString.get());
                 }
               } catch (Throwable e) {
                 e.printStackTrace();
@@ -357,59 +306,44 @@ public class Cataloger {
 
         sourceCat.clearSubCategories();
 
-        logger.info("Found " + newProgCategories.size() + " Programmes");
-        logger.info("Found " + newEpisodes.size() + " Episodes");
+        logger.info("Found " + newCatalog.getStatsSummary());
 
-        Map<String, SubCategory> newSubCategories = new ConcurrentHashMap<String, SubCategory>();
+        progressString.set("Doing " + pluginName + " additional categorisation");
 
-
-        progressString = "Doing " + pluginName + " additional categorisation";
-
-        for (Programme programmeCat : newProgCategories.values()) {
+        for (Programme programmeCat : newCatalog.getProgrammes()) {
 
           checkForStop();
           logger.info("Categorising " + programmeCat);
-          doAtoZcategorisation(sourceCat, programmeCat, newSubCategories);
+          doAtoZcategorisation(sourceCat, programmeCat, newCatalog);
 
           // Favourite
-          doFavouriteCategorisation(sourceCat, programmeCat, newSubCategories);
+          doFavouriteCategorisation(sourceCat, programmeCat, newCatalog);
 
           for (String episodeId : programmeCat.getEpisodes()) {
-            Episode episode = newEpisodes.get(episodeId);
+            Episode episode = newCatalog.getEpisode(episodeId);
             if ((episode == null) || episodeId.isEmpty()) {
               continue;
             }
             // Genre
-            doGenreCategorisation(sourceCat, programmeCat, episode, newSubCategories);
+            doGenreCategorisation(sourceCat, programmeCat, episode, newCatalog);
 
             // Channel
-            doChannelCategorisation(sourceCat, programmeCat, episode, newSubCategories);
+            doChannelCategorisation(sourceCat, programmeCat, episode, newCatalog);
 
             // Air Date
-            doAirDateCategorisation(sourceCat, programmeCat, episode, newSubCategories);
+            doAirDateCategorisation(sourceCat, programmeCat, episode, newCatalog);
 
             // New
-            doNewProgrammeCategorisation(sourceCat, programmeCat, episode, newSubCategories);
+            doNewProgrammeCategorisation(sourceCat, programmeCat, episode, newCatalog);
           }
         }
-
-        newCategories.putAll(newProgCategories);
-        newCategories.putAll(newSubCategories);
-
       }
 
-      catalog.setCategories(root.getId(), newCategories, newEpisodes);
-
-      this.sourceStats = sourceStats.intValue();
-      this.programmeStats = programmeStats.intValue();
-      this.episodeStats = episodeStats.intValue();
-
-      return catalog;
-
+      return newCatalog;
     } catch (Throwable e) {
-      logger.error("Failed to refresh properties file", e);
+      logger.error("Failed to catalog", e);
       if (!e.getMessage().equals(STOPPED_ON_REQUEST)) {
-        progressString = "Failed to catalog";
+        progressString.set("Failed to catalog");
       }
       return null;
     }
@@ -417,23 +351,22 @@ public class Cataloger {
 
   private void checkForStop() {
     if (stop.get()) {
-      progressString = "Stopped";
+      progressString.set("Stopped");
       throw new RuntimeException(STOPPED_ON_REQUEST);
     }
   }
 
-  private void doFavouriteCategorisation(Source sourceCat, Programme programmeCat,
-                                       Map<String, SubCategory> newSubCategories) {
+  private void doFavouriteCategorisation(Source sourceCat, Programme programmeCat, Catalog catalog) {
 
     String sourceId = sourceCat.getId();
     String favouriteId = sourceId + "/Favourite";
-    SubCategory favouriteCat = newSubCategories.get(favouriteId);
+    SubCategory favouriteCat = (SubCategory)catalog.getCategory(favouriteId);
     if (favouriteCat == null) {
       favouriteCat =
               new SubCategory(sourceId, favouriteId, "Favourites", "Favourites", sourceCat.getServiceUrl(),
                       sourceCat.getIconUrl(), sourceId);
       favouriteCat.setPodcastUrl("/category?id=" + favouriteId + ";type=xml");
-      newSubCategories.put(favouriteId, favouriteCat);
+      catalog.addCategory(favouriteCat);
       sourceCat.addSubCategory(favouriteCat);
     }
 
@@ -443,17 +376,16 @@ public class Cataloger {
     }
   }
 
-  private void doNewProgrammeCategorisation(Source sourceCat, Programme programmeCat, Episode episode,
-                                         Map<String, SubCategory> newSubCategories) {
+  private void doNewProgrammeCategorisation(Source sourceCat, Programme programmeCat, Episode episode, Catalog catalog) {
     String sourceId = sourceCat.getId();
     String favouriteId = sourceId + "/New";
-    SubCategory favouriteCat = newSubCategories.get(favouriteId);
+    SubCategory favouriteCat = (SubCategory)catalog.getCategory(favouriteId);
     if (favouriteCat == null) {
       favouriteCat =
               new SubCategory(sourceId, favouriteId, "New", "New", sourceCat.getServiceUrl(),
                       sourceCat.getIconUrl(), sourceId);
       favouriteCat.setPodcastUrl("/category?id=" + favouriteId + ";type=xml");
-      newSubCategories.put(favouriteId, favouriteCat);
+      catalog.addCategory(favouriteCat);
       sourceCat.addSubCategory(favouriteCat);
     }
 
@@ -463,20 +395,20 @@ public class Cataloger {
       Category cat = lastCatalog.getCategory(id);
       Episode ep = lastCatalog.getEpisode(epId);
       if (cat == null) {
-        Programme newProgrammeCat = addNewProgrammeCat("/New/", programmeCat, newSubCategories, sourceId, favouriteId, favouriteCat, id);
+        Programme newProgrammeCat = addNewProgrammeCat("/New/", programmeCat, catalog, sourceId, favouriteId, favouriteCat, id);
         newProgrammeCat.addAllEpisodes(programmeCat.getEpisodes());
       } else
       if (ep == null)
       {
-        Programme newProgrammeCat = addNewProgrammeCat("/New/", programmeCat, newSubCategories, sourceId, favouriteId, favouriteCat, id);
+        Programme newProgrammeCat = addNewProgrammeCat("/New/", programmeCat, catalog, sourceId, favouriteId, favouriteCat, id);
         newProgrammeCat.addEpisode(episode);
       }
     }
   }
 
-  private Programme addNewProgrammeCat(String idInsert, Programme programmeCat, Map<String, SubCategory> newSubCategories, String sourceId, String favouriteId, SubCategory favouriteCat, String id) {
+  private Programme addNewProgrammeCat(String idInsert, Programme programmeCat, Catalog catalog, String sourceId, String favouriteId, SubCategory favouriteCat, String id) {
     String favouriteProgId = sourceId + idInsert + id;
-    Programme newProgCat = (Programme)newSubCategories.get(favouriteProgId);
+    Programme newProgCat = (Programme)catalog.getCategory(favouriteProgId);
     if (newProgCat == null) {
       newProgCat = new Programme(sourceId, favouriteProgId,
               programmeCat.getShortName(),
@@ -484,14 +416,13 @@ public class Cataloger {
               "/programme?id="+ favouriteProgId +";type=html",
               programmeCat.getIconUrl(),
               favouriteId);
-      newSubCategories.put(favouriteProgId, newProgCat);
+      catalog.addCategory(newProgCat);
       favouriteCat.addSubCategory(newProgCat);
     }
     return newProgCat;
   }
 
-  private void doAirDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode,
-                                       Map<String, SubCategory> newSubCategories) {
+  private void doAirDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode, Catalog catalog) {
     String airDateName = episode.getAirDate();
     if (airDateName == null || airDateName.isEmpty()) {
       return;
@@ -499,58 +430,57 @@ public class Cataloger {
 
     String sourceId = sourceCat.getId();
     String airdateId = sourceId + "/AirDate";
-    SubCategory airdateCat = newSubCategories.get(airdateId);
+    SubCategory airdateCat = (SubCategory)catalog.getCategory(airdateId);
     if (airdateCat == null) {
       airdateCat =
               new SubCategory(sourceId, airdateId, "Air Date", "Air Date", sourceCat.getServiceUrl(),
                       sourceCat.getIconUrl(), sourceId);
       airdateCat.setPodcastUrl("/category?id=" + airdateId + ";type=xml");
-      newSubCategories.put(airdateId, airdateCat);
+      catalog.addCategory(airdateCat);
       sourceCat.addSubCategory(airdateCat);
     }
     String
             airDateInstanceId =
             sourceId + "/AirDate/" + airDateName.replace(" ", "").replace(",", "");
-    SubCategory airDateInstanceCat = (SubCategory) newSubCategories.get(airDateInstanceId);
+    SubCategory airDateInstanceCat = (SubCategory) catalog.getCategory(airDateInstanceId);
     if (airDateInstanceCat == null) {
       airDateInstanceCat =
               new SubCategory(sourceId, airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(),
                       sourceCat.getIconUrl(), airdateCat.getId());
       airDateInstanceCat.setPodcastUrl("/category?id=" + airDateInstanceId + ";type=xml");
-      newSubCategories.put(airDateInstanceId, airDateInstanceCat);
+      catalog.addCategory(airDateInstanceCat);
       airdateCat.addSubCategory(airDateInstanceCat);
     }
 
-    Programme newProgrammeCat = addNewProgrammeCat("/AirDate/" + airDateName.replace(" ", "").replace(",", "") + "/", programmeCat, newSubCategories, sourceId, airDateInstanceId, airDateInstanceCat, programmeCat.getId());
+    Programme newProgrammeCat = addNewProgrammeCat("/AirDate/" + airDateName.replace(" ", "").replace(",", "") + "/", programmeCat, catalog, sourceId, airDateInstanceId, airDateInstanceCat, programmeCat.getId());
     newProgrammeCat.addEpisode(episode);
 
     airDateInstanceCat.addSubCategory(newProgrammeCat);
   }
 
-  private void doChannelCategorisation(Source sourceCat, Programme programmeCat, Episode prog,
-                                       Map<String, SubCategory> newSubCategories) {
+  private void doChannelCategorisation(Source sourceCat, Programme programmeCat, Episode prog, Catalog catalog) {
     String channelName = prog.getChannel();
     if (channelName != null && !channelName.isEmpty()) {
 
       String sourceId = sourceCat.getId();
       String channelId = sourceId + "/Channel";
-      SubCategory channelCat = newSubCategories.get(channelId);
+      SubCategory channelCat = (SubCategory)catalog.getCategory(channelId);
       if (channelCat == null) {
         channelCat =
                 new SubCategory(sourceId, channelId, "Channel", "Channel", sourceCat.getServiceUrl(),
                         sourceCat.getIconUrl(), sourceId);
         channelCat.setPodcastUrl("/category?id=" + channelCat.getId() + ";type=xml");
-        newSubCategories.put(channelId, channelCat);
+        catalog.addCategory(channelCat);
         sourceCat.addSubCategory(channelCat);
       }
       String channelInstanceId = sourceId + "/Channel/" + channelName.replace(" ", "");
-      SubCategory channelInstanceCat = newSubCategories.get(channelInstanceId);
+      SubCategory channelInstanceCat = (SubCategory)catalog.getCategory(channelInstanceId);
       if (channelInstanceCat == null) {
         channelInstanceCat =
                 new SubCategory(sourceId, channelInstanceId, channelName, channelName, sourceCat.getServiceUrl(),
                         sourceCat.getIconUrl(), channelCat.getId());
         channelInstanceCat.setPodcastUrl("/category?id=" + channelInstanceCat.getId() + ";type=xml");
-        newSubCategories.put(channelInstanceId, channelInstanceCat);
+        catalog.addCategory(channelInstanceCat);
         channelCat.addSubCategory(channelInstanceCat);
       }
 
@@ -559,30 +489,29 @@ public class Cataloger {
     }
   }
 
-  private void doGenreCategorisation(Source sourceCat, Programme programmeCat, Episode prog,
-                                     Map<String, SubCategory> newSubCategories) {
+  private void doGenreCategorisation(Source sourceCat, Programme programmeCat, Episode prog, Catalog catalog) {
     Set<String> genres = prog.getGenres();
     if (genres != null && !genres.isEmpty()) {
       for (String genreName : genres) {
         String sourceId = sourceCat.getId();
         String genreId = sourceId + "/Genre";
-        SubCategory genreCat = newSubCategories.get(genreId);
+        SubCategory genreCat = (SubCategory)catalog.getCategory(genreId);
         if (genreCat == null) {
           genreCat =
                   new SubCategory(sourceId, genreId, "Genre", "Genre", sourceCat.getServiceUrl(),
                           sourceCat.getIconUrl(), sourceId);
           genreCat.setPodcastUrl("/category?id=" + genreCat.getId() + ";type=xml");
 
-          newSubCategories.put(genreId, genreCat);
+          catalog.addCategory(genreCat);
           sourceCat.addSubCategory(genreCat);
         }
         String genreInstanceId = sourceId + "/Genre/" + genreName.replace(" ", "");
-        SubCategory genreInstanceCat = newSubCategories.get(genreInstanceId);
+        SubCategory genreInstanceCat = (SubCategory)catalog.getCategory(genreInstanceId);
         if (genreInstanceCat == null) {
           genreInstanceCat =
                   new SubCategory(sourceId, genreInstanceId, genreName, genreName, sourceCat.getServiceUrl(),
                           sourceCat.getIconUrl(), genreCat.getId());
-          newSubCategories.put(genreInstanceId, genreInstanceCat);
+          catalog.addCategory(genreInstanceCat);
           genreInstanceCat.setPodcastUrl("/category?id=" + genreInstanceCat.getId() + ";type=xml");
           genreCat.addSubCategory(genreInstanceCat);
         }
@@ -592,8 +521,7 @@ public class Cataloger {
     }
   }
 
-  private void doAtoZcategorisation(Source sourceCat, Programme programmeCat,
-                                    Map<String, SubCategory> newSubCategories) {
+  private void doAtoZcategorisation(Source sourceCat, Programme programmeCat, Catalog catalog) {
     // A to Z
     String azName = programmeCat.getShortName();
     if (azName.startsWith("The ") || azName.startsWith("the ")) {
@@ -609,23 +537,23 @@ public class Cataloger {
 
     String sourceId = sourceCat.getId();
     String atozId = sourceId + "/AtoZ";
-    SubCategory atozCat = newSubCategories.get(atozId);
+    SubCategory atozCat = (SubCategory)catalog.getCategory(atozId);
     if (atozCat == null) {
       atozCat =
               new SubCategory(sourceId, atozId, "A to Z", "A to Z", sourceCat.getServiceUrl(),
                       sourceCat.getIconUrl(), sourceId);
       atozCat.setPodcastUrl("/category?id=" + atozCat.getId() + ";type=xml");
-      newSubCategories.put(atozId, atozCat);
+      catalog.addCategory(atozCat);
       sourceCat.addSubCategory(atozCat);
     }
     String azId = sourceId + "/AtoZ/" + azName;
-    SubCategory azCat = newSubCategories.get(azId);
+    SubCategory azCat = (SubCategory)catalog.getCategory(azId);
     if (azCat == null) {
       azCat =
               new SubCategory(sourceId, azId, azName, azName, sourceCat.getServiceUrl(), sourceCat.getIconUrl(),
                       atozCat.getId());
       azCat.setPodcastUrl("/category?id=" + azCat.getId() + ";type=xml");
-      newSubCategories.put(azId, azCat);
+      catalog.addCategory(azCat);
       atozCat.addSubCategory(azCat);
     }
 
@@ -634,34 +562,56 @@ public class Cataloger {
   }
 
   public String getProgress() {
-    if (progressString.startsWith("Finished") || progressString.startsWith("Failed") ||
-            progressString.startsWith("Waiting") || progressString.startsWith("Stopped")) {
-      if (future == null) {
-        progressString += "";
-      } else {
-        if (!progressString.contains("Next catalog")) {
+    if (progressString.get().startsWith("Finished") || progressString.get().startsWith("Failed") ||
+            progressString.get().startsWith("Waiting") || progressString.get().startsWith("Stopped")) {
+      if (future != null) {
+        if (!progressString.get().contains("Next catalog")) {
           long delay = future.getDelay(TimeUnit.MILLISECONDS);
           delay = System.currentTimeMillis() + delay;
           Date date = new Date(delay);
           SimpleDateFormat format = new SimpleDateFormat("h:mma");
           String dateStr = format.format(date);
-          progressString += ". Next catalog: " + dateStr;
+          progressString.set(progressString.get() + ". Next catalog: " + dateStr);
         }
       }
     }
-    return progressString;
+    return progressString.get();
   }
 
   public String getErrorSummary() {
-    return errorSummary;
+    if (lastCatalog != null) {
+      return lastCatalog.getErrorSummary();
+    } else {
+      return "";
+    }
+  }
+
+  public String getErrorSummaryNew() {
+    if (newCatalog != null) {
+      return newCatalog.getErrorSummary();
+    } else {
+      return "";
+    }
   }
 
   public String getStatsSummary() {
-    return sourceStats + " sources " + programmeStats + " programmes " + episodeStats + " episodes";
+    if (lastCatalog != null) {
+      return lastCatalog.getStatsSummary();
+    } else {
+      return "0 sources 0 programmes 0 episodes";
+    }
+  }
+
+  public String getStatsSummaryNew() {
+    if (newCatalog != null) {
+      return newCatalog.getStatsSummary();
+    } else {
+      return "";
+    }
   }
 
   public void setProgress(String progress) {
-    progressString = progress;
+    progressString.set(progress);
   }
 
   public void start(final List<CatalogPublisher> publishers, final CatalogPersister persister) {
@@ -680,27 +630,17 @@ public class Cataloger {
 
       this.publishers = publishers;
 
+      try {
+        logger.info("Restoring catalog from backup");
+        Catalog initial = persister.load();
+        publish(initial, publishers);
+        lastCatalog = initial;
+        logger.info("Restored catalog from backup");
+      } catch (Exception e) {
+        logger.error("Failed to restore catalog from backup", e);
+      }
 
-      Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-          try {
-            logger.info("Restoring catalog from backup");
-            Catalog initial = persister.load();
-            errorSummary = buildErrorSummary(initial);
-            buildStatsSummary(initial);
-            publish(initial, publishers);
-            lastCatalog = initial;
-            logger.info("Restored catalog from backup");
-          } catch (Exception e) {
-            logger.error("Failed to restore catalog from backup", e);
-          }
-        }
-      };
-
-      catalogingScheduler.schedule(runnable, 0, TimeUnit.MINUTES);
-
-      runnable = getCatalogRunnable(publishers);
+      Runnable runnable = getCatalogRunnable(publishers);
 
       GregorianCalendar cal = new GregorianCalendar();
       cal.set(Calendar.HOUR_OF_DAY, context.getRefreshStartHour());
@@ -714,23 +654,20 @@ public class Cataloger {
 
       long initialDelay = (refreshStartTime - System.currentTimeMillis());
 
-      logger.info("First catalog will be at " + cal.getTime() + " thats in " + (initialDelay / (1000 * 60 * 60)) + " Hours");
+      final int millisInHour = 60 * 60 * 1000;
+      final int millisInMin = 60 * 1000;
+      int hours = (int)(initialDelay / millisInHour) ;
+      int minutes = (int)((initialDelay % millisInHour) / millisInMin);
+      int seconds = (int)((initialDelay % millisInMin) / 1000);
 
-      int threshold = 0;
-      for (String name : pluginManager.getPluginNames()) {
-        if (!context.skipPlugin(name)) {
-          if (context.getMaxProgrammes(name) != Integer.MAX_VALUE) {
-            threshold += context.getMaxProgrammes(name);
-          }
-        }
-      }
-      if (threshold == 0) {
-        threshold = context.getRefreshStartNowProgrammeThreshold();
-      }
+      int threshold = getSparseThreshold();
+      int currentCount = (lastCatalog == null) ? 0 : lastCatalog.getNumberProgrammes();
 
-      if (programmeStats < threshold) {
-        logger.info("Doing early cataloging as catalog looks a bit sparse: " + programmeStats + " programmes when expected at least " + threshold);
-        future = catalogingScheduler.schedule(runnable, 0, TimeUnit.MILLISECONDS);
+      if (currentCount < threshold) {
+        logger.info("Initial catalog looks a bit sparse: " + currentCount + " programmes when expected at least " + threshold + " - cataloging now");
+        catalogingScheduler.schedule(runnable, 0, TimeUnit.MILLISECONDS);
+      } else {
+        logger.info("Initial catalog looks populated - cataloging in " + String.format("Finished in %02d:%02d:%02d", hours, minutes, seconds));
       }
 
       future = catalogingScheduler.scheduleAtFixedRate(runnable, initialDelay, refreshRate * 60 * 60 * 1000, TimeUnit.MILLISECONDS);
@@ -738,6 +675,21 @@ public class Cataloger {
     } catch (Exception e) {
       logger.error("Failed to start the catalog service", e);
     }
+  }
+
+  private int getSparseThreshold() {
+    int threshold = 0;
+    for (String name : pluginManager.getPluginNames()) {
+      if (!context.skipPlugin(name)) {
+        if (context.getMaxProgrammes(name) != Integer.MAX_VALUE) {
+          threshold += context.getMaxProgrammes(name);
+        }
+      }
+    }
+    if (threshold == 0) {
+      threshold = context.getRefreshStartNowProgrammeThreshold();
+    }
+    return threshold;
   }
 
   public void shutdown() {
