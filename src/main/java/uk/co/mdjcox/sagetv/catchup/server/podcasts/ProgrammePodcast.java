@@ -3,6 +3,7 @@ package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 import uk.co.mdjcox.sagetv.model.Catalog;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Programme;
+import uk.co.mdjcox.sagetv.model.SubCategory;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.RssBuilder;
 
@@ -14,11 +15,11 @@ import java.util.*;
 public class ProgrammePodcast extends AbstractPodcast {
 
     private final HtmlUtilsInterface htmlUtils;
-    private final Programme programme;
+    private final SubCategory programme;
     private final Catalog catalog;
     private String page;
 
-    public ProgrammePodcast(String baseUrl, Catalog catalog, Programme category, HtmlUtilsInterface htmlUtils) {
+    public ProgrammePodcast(String baseUrl, Catalog catalog, SubCategory category, HtmlUtilsInterface htmlUtils) {
         super(baseUrl);
         this.htmlUtils = htmlUtils;
         this.catalog = catalog;

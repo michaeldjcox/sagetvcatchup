@@ -146,8 +146,8 @@ public class SageTvPublisher implements CatalogPublisher {
 
           for (Source category : catalog.getSources()) {
             logger.info("Online adding source " + category.getId());
-            boolean isSearch = category.getId().equals("Search");
-            addDynamicSource((Source) category, links, labels, isSearch);
+            boolean isSearch = category.getId().equals("search");
+            addDynamicSource(category, links, labels, isSearch);
 
           }
 

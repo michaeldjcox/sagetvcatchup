@@ -26,6 +26,10 @@ public class SubCategory extends Category {
   private final Set<String> otherParentIds = new CopyOnWriteArraySet<String>();
   /** Set of child {@link Category} ids. */
   private final Set<String> subCategories = new CopyOnWriteArraySet<String>();
+  /**
+   * A set containing all episodes of this programme keyed by id
+   */
+  private Set<String> episodes = new CopyOnWriteArraySet<String>();
 
   public SubCategory() {
   }
@@ -99,7 +103,53 @@ public class SubCategory extends Category {
     return !subCategories.isEmpty();
   }
 
-    @Override
+  /**
+   * Adds an individual episode of the programme with the programme meta data.
+   *
+   * @param episode The episode of the programme
+   *
+   * @throws NullPointerException if the episode provided is <code>null</code>
+   */
+  public final void addEpisode(Episode episode) {
+    checkNotNull(episode);
+    episodes.add(episode.getId());
+  }
+
+  /**
+   * Removes an individual episode of the programme
+   *
+   * @param episode The episode of the programme
+   *
+   * @throws NullPointerException if the episode provided is <code>null</code>
+   */
+  public final void removeEpisode(Episode episode) {
+    checkNotNull(episode);
+    episodes.remove(episode.getId());
+  }
+
+  /**
+   * Gets an immutable list of the episodes of the programme.
+   *
+   * @return an immutable list of the episodes of the programme
+   */
+  public final Set<String> getEpisodes() {
+    return ImmutableSet.copyOf(episodes);
+  }
+
+  public void addAllEpisodes(Set<String> episodes) {
+    this.episodes.addAll(episodes);
+  }
+
+  /**
+   * Indicates if the programme has any episodes
+   *
+   * @return <code>true</code> if the programme has episodes
+   */
+  public final boolean hasEpisodes() {
+    return !episodes.isEmpty();
+  }
+
+  @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -107,7 +157,9 @@ public class SubCategory extends Category {
 
         SubCategory that = (SubCategory) o;
 
-        if (otherParentIds != null ? !otherParentIds.equals(that.otherParentIds) : that.otherParentIds != null)
+    if (episodes != null ? !episodes.equals(that.episodes) : that.episodes != null)
+      return false;
+    if (otherParentIds != null ? !otherParentIds.equals(that.otherParentIds) : that.otherParentIds != null)
             return false;
         if (subCategories != null ? !subCategories.equals(that.subCategories) : that.subCategories != null)
             return false;
@@ -120,6 +172,7 @@ public class SubCategory extends Category {
         int result = super.hashCode();
         result = 31 * result + (otherParentIds != null ? otherParentIds.hashCode() : 0);
         result = 31 * result + (subCategories != null ? subCategories.hashCode() : 0);
+        result = 31 * result + (episodes != null ? episodes.hashCode() : 0);
         return result;
     }
 }

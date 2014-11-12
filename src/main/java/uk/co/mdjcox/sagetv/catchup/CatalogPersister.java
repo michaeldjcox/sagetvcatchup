@@ -45,7 +45,7 @@ public class CatalogPersister implements CatalogPublisher {
       xstream.addImplicitCollection(Episode.class, "errors", "error", ParseError.class);
       xstream.addImplicitCollection(Category.class, "metaUrls", "metaUrl", String.class);
       xstream.addImplicitCollection(Category.class, "errors", "error", ParseError.class);
-      xstream.addImplicitCollection(Programme.class, "episodes", "episode", String.class);
+      xstream.addImplicitCollection(SubCategory.class, "episodes", "episode", String.class);
       xstream.addImplicitCollection(SubCategory.class, "otherParentIds", "otherParentId", String.class);
       xstream.addImplicitCollection(SubCategory.class, "subCategories", "subCategory", String.class);
       xstream.addImplicitMap(Catalog.class, "episodes", "episode", Episode.class, "id");

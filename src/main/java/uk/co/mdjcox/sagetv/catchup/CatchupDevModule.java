@@ -267,7 +267,7 @@ public class CatchupDevModule extends AbstractModule {
 
     @Override
     public int getMaxProgrammes(String pluginName) {
-      return properties.getInt(pluginName + ".maxprogrammes", Integer.MAX_VALUE);
+      return properties.getInt(pluginName + ".maxprogrammes", 0);
     }
 
     @Override

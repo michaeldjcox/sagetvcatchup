@@ -237,13 +237,13 @@ public class Server implements CatalogPublisher {
             addPublishedContent(publishedContent, episodes);
 
             for (Category cat : catalog.getCategories()) {
-                boolean isProgramme =cat.isPrimaryProgrammeCategory();
+                boolean isProgramme =cat.isProgrammeCategory();
                 String title=isProgramme ? "Programme" : "Category";
                 String webpage= isProgramme ? "programme.html" : "category.html";
                 StyledPage provider = new StyledPage(xsltDir, logger, title, webpage, cat.getId(), cat, persister);
                 addPublishedContent(publishedContent, provider);
-                if (cat.isProgrammeCategory()) {
-                    ProgrammePodcast catProvider = new ProgrammePodcast(baseUrl, catalog, (Programme)cat, htmlUtils);
+                if (cat.hasEpisodes()) {
+                    ProgrammePodcast catProvider = new ProgrammePodcast(baseUrl, catalog, (SubCategory)cat, htmlUtils);
                     addPublishedContent(publishedContent, catProvider);
                 } else {
                     CategoryPodcast catProvider = new CategoryPodcast(baseUrl, catalog, cat, htmlUtils);

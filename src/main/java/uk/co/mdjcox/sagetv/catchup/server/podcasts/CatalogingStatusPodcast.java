@@ -29,9 +29,11 @@ public class CatalogingStatusPodcast extends AbstractPodcast {
         RssBuilder builder = new RssBuilder();
         builder.startDocument(title, desc, catstatusUrl);
 
-        final String status = cataloger.getProgress() + "<br/>" + cataloger.getStatsSummaryNew() + "<br/>" + cataloger.getErrorSummaryNew();
+      final String status = cataloger.getProgress() + "<br/>" + cataloger.getStatsSummaryNew() + "<br/>" + cataloger.getErrorSummaryNew();
+      final String oldstatus =  cataloger.getStatsSummary() + "<br/>" + cataloger.getErrorSummary();
+
         builder.addTextItem("CATALOGING STATUS", status, statusUrl);
-        builder.addCategoryItem("LAST CATALOG ERRORS", cataloger.getErrorSummary(), errorsUrl);
+        builder.addCategoryItem("LAST CATALOG", oldstatus, errorsUrl);
         builder.addCategoryItem("START CATALOGING", "Start cataloging", startCatUrl);
         builder.addCategoryItem("STOP CATALOGING", "Stop cataloging", stopCatUrl);
 

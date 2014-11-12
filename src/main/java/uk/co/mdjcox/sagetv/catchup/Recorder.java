@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class Recorder {
 
-  private static final int RECORDING_TIMEOUT = 10000;
+  private static final int RECORDING_TIMEOUT = 30000;
   private final LoggerInterface logger;
   private final OsUtilsInterface osUtils;
   private final CatchupContextInterface context;
