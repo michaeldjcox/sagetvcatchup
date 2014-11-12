@@ -237,7 +237,7 @@ public class Server implements CatalogPublisher {
             addPublishedContent(publishedContent, episodes);
 
             for (Category cat : catalog.getCategories()) {
-                boolean isProgramme =cat.isProgrammeCategory() && cat.getParentId().isEmpty();
+                boolean isProgramme =cat.isPrimaryProgrammeCategory();
                 String title=isProgramme ? "Programme" : "Category";
                 String webpage= isProgramme ? "programme.html" : "category.html";
                 StyledPage provider = new StyledPage(xsltDir, logger, title, webpage, cat.getId(), cat, persister);

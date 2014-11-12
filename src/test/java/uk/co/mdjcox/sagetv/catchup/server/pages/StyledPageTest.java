@@ -243,7 +243,7 @@ public class StyledPageTest {
 
         for (Category cat : sortedCats) {
             String detailStr = buildDetailsFor(cat);
-            if (cat.isProgrammeCategory() && cat.getParentId().isEmpty()) {
+            if (cat.isPrimaryProgrammeCategory()) {
                 webPages.put("programme-" + cat.getId() + ".html", detailStr);
                 Programme prog = (Programme)cat;
                 HtmlBuilder linkBuilder1 = new HtmlBuilder();
@@ -274,7 +274,7 @@ public class StyledPageTest {
 
             }
 
-            if (cat.isProgrammeCategory() && cat.getParentId().isEmpty()) {
+            if (cat.isPrimaryProgrammeCategory()) {
                 for (String episodeId : ((Programme)cat).getEpisodes()) {
                     Episode ep = catalog.getEpisode(episodeId);
                     String detailStr2 = buildDetailsFor(ep);
@@ -398,7 +398,7 @@ public class StyledPageTest {
     }
 
     private String buildDetailsFor(Category cat) {
-        String type = cat.isProgrammeCategory() && cat.getParentId().isEmpty() ? "Programme" : "Category";
+        String type = cat.isPrimaryProgrammeCategory() ? "Programme" : "Category";
         String pageTitle = type + ": " + cat.getLongName();
         HtmlBuilder htmlBuilder = new HtmlBuilder();
         htmlBuilder.startDocument();

@@ -238,6 +238,14 @@ public abstract class Category implements ErrorRecorder {
         return (this instanceof Programme);
     }
 
+    public final boolean isPrimaryProgrammeCategory() {
+      return isProgrammeCategory() && getParentId().isEmpty();
+    }
+
+  public final boolean isSecondaryProgrammeCategory() {
+    return isProgrammeCategory() && !getParentId().isEmpty();
+  }
+
     /**
      * Indicates if this media category is the root of the media tree..
      *
