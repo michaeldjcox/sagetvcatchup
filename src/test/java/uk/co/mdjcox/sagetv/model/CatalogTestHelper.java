@@ -81,11 +81,11 @@ public class CatalogTestHelper {
         ep1.addError("ERROR", "Episode1 Error");
         ep1.addError("ERROR", "Episode2 Error");
 
-        catalog.addCategory(root);
-        catalog.addCategory(source);
-        catalog.addCategory(subCategory1);
-        catalog.addCategory(subCategory2);
-        catalog.addCategory(programme);
+        catalog.addRoot(root);
+        catalog.addSource(source);
+        catalog.addSubCategory(subCategory1);
+        catalog.addSubCategory(subCategory2);
+        catalog.addProgramme(programme);
         catalog.addEpisode(ep1);
         catalog.addEpisode(ep2);
         catalog.getRoot().addError("ERROR", "Catalog Error");

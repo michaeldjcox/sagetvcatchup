@@ -17,7 +17,6 @@ import uk.co.mdjcox.utils.LoggerInterface;
 import uk.co.mdjcox.utils.PropertiesFile;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -130,8 +129,6 @@ public class SageTvPublisher implements CatalogPublisher {
      */
     public void publish(Catalog catalog)  {
         try {
-            Collection<Category> categories = catalog.getCategories();
-
             String linkFile = getLinkFile(qualifier);
             String labelFile = getLabelFile(qualifier);
 
@@ -144,15 +141,15 @@ public class SageTvPublisher implements CatalogPublisher {
             links.clear();
             labels.clear();
 
-            for (Category category : categories) {
-                if (category.isRoot()) {
-                    addSource((Root)category, links, labels);
-                } else if (category.isSource()) {
-                    logger.info("Online adding source " + category.getId());
-                  boolean isSearch = category.getId().equals("Search");
-                    addDynamicSource((Source)category, links, labels, isSearch);
-                }
-            }
+          Root root = catalog.getRoot();
+          addSource(root, links, labels);
+
+          for (Source category : catalog.getSources()) {
+            logger.info("Online adding source " + category.getId());
+            boolean isSearch = category.getId().equals("Search");
+            addDynamicSource((Source) category, links, labels, isSearch);
+
+          }
 
             links.commit(linkFile, new LinksPropertyLayout());
             labels.commit(labelFile, new LabelsPropertyLayout());

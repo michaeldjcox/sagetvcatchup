@@ -15,7 +15,7 @@ import java.util.TreeSet;
 public class CategoryPodcast extends AbstractPodcast {
 
     private final HtmlUtilsInterface htmlUtils;
-    private final Category service;
+    private final Category category;
     private final Catalog catalog;
     private String page;
 
@@ -23,16 +23,16 @@ public class CategoryPodcast extends AbstractPodcast {
         super(baseUrl);
         this.htmlUtils = htmlUtils;
         this.catalog = catalog;
-        this.service = category;
+        this.category = category;
         page = buildPage();
     }
 
     public String buildPage() {
 
-        final String shortName = htmlUtils.makeContentSafe(service.getShortName());
-        final String longName = htmlUtils.makeContentSafe(service.getLongName());
-        String url = service.getServiceUrl();
-        String iconUrl = service.getIconUrl();
+        final String shortName = htmlUtils.makeContentSafe(category.getShortName());
+        final String longName = htmlUtils.makeContentSafe(category.getLongName());
+        String url = category.getServiceUrl();
+        String iconUrl = category.getIconUrl();
         if (iconUrl != null && iconUrl.startsWith("/")) {
           iconUrl = getPodcastBaseUrl() + iconUrl;
         }
@@ -47,14 +47,14 @@ public class CategoryPodcast extends AbstractPodcast {
         builder.addImage(iconUrl, shortName, url);
       }
 
-        Set<String> subCats = ((SubCategory) service).getSubCategories();
-      SubcategoryComparator comparator = new SubcategoryComparator();
-        Set<SubCategory> subCatSet = new TreeSet<SubCategory>(comparator);
+        Set<String> subCats = ((SubCategory) category).getSubCategories();
+      CategoryComparator comparator = new CategoryComparator();
+        Set<Category> subCatSet = new TreeSet<Category>(comparator);
       for (String subCatId : subCats) {
-        SubCategory subCat = (SubCategory) catalog.getCategory(subCatId);
+        Category subCat =  catalog.getCategory(subCatId);
         subCatSet.add(subCat);
       }
-        for (SubCategory subCat: subCatSet) {
+        for (Category subCat: subCatSet) {
             if (subCat.isProgrammeCategory()) {
                         String programmeIconUrl = subCat.getIconUrl();
           if (programmeIconUrl != null && programmeIconUrl.startsWith("/")) {
@@ -73,7 +73,7 @@ public class CategoryPodcast extends AbstractPodcast {
 
     @Override
     public String getUri() {
-        return "category?id=" + service.getId() + ";type=xml";
+        return "category?id=" + category.getId() + ";type=xml";
     }
 
     @Override

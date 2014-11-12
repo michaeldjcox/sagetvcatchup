@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,14 +32,14 @@ public class CatalogTest {
   @Test
   public void testGetCategoriesEmpty() {
     Catalog catalog = new Catalog();
-    List<Category> results = catalog.getCategories();
+    Collection<SubCategory> results = catalog.getSubcategories();
     assertEquals("Results should be empty", 0, results.size());
   }
 
   @Test
   public void testGetCategoriesImmutabilityTest() {
     Catalog catalog = new Catalog();
-    List<Category> results = catalog.getCategories();
+    Collection<Category> results = catalog.getCategories();
 
     SubCategory
         cat =
@@ -67,9 +68,9 @@ public class CatalogTest {
 
       Map<String, Episode> episodes= new HashMap<String, Episode>();
 
-      catalog.addCategory(cat);
+      catalog.addSubCategory(cat);
 
-    List<Category> results = catalog.getCategories();
+    Collection<SubCategory> results = catalog.getSubcategories();
     assertEquals("Results contain one entry", 1, results.size());
   }
 
@@ -85,12 +86,12 @@ public class CatalogTest {
         cat =
         new SubCategory("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
 
-      catalog.addCategory(cat);
+      catalog.addSubCategory(cat);
 
-    List<Category> cats = catalog.getCategories();
+    Collection<SubCategory> cats = catalog.getSubcategories();
 
     assertEquals("testAddCategory - size", 1, cats.size());
 
-    assertEquals("testAddCategory - added element", cat, cats.get(0));
+    assertEquals("testAddCategory - added element", cat, cats.iterator().next());
   }
 }

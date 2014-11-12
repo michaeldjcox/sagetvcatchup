@@ -38,10 +38,7 @@ public class SearchPodcast extends AbstractPodcast {
     RssBuilder builder = new RssBuilder();
     builder.startDocument(title, desc, errorsUrl);
 
-    for (Category cat : catalog.getCategories()) {
-      if (cat.isProgrammeCategory() && cat.getParentId().isEmpty()) {
-        Programme prog  = (Programme)cat;
-
+    for (Programme prog : catalog.getProgrammes()) {
         if (!prog.getLongName().toUpperCase().contains(searchString.toUpperCase()) &&
                 !prog.getShortName().toUpperCase().contains(searchString.toUpperCase())) {
           continue;
@@ -53,17 +50,7 @@ public class SearchPodcast extends AbstractPodcast {
         }
 
         builder.addCategoryItem(prog.getShortName(), prog.getLongName(), url);
-//        if (prog.hasEpisodes()) {
-//          for (String episodeId : ((Programme)cat).getEpisodes()) {
-//            Episode episode = catalog.getEpisode(episodeId);
-//            if (episode.hasErrors()) {
-//              errorList.addAll(episode.getErrors());
-//            }
-//          }
-//        }
       }
-
-    }
 
     builder.stopDocument();
 

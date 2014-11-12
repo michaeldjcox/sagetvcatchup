@@ -146,25 +146,25 @@ public class SageTvPublisherTest {
 
     Catalog catalog = new Catalog();
     Root root = new Root("RootId", "rootShortName", "rootLongName", "rootServiceUrl", "rootIconUrl");
-    catalog.addCategory(root);
+    catalog.addRoot(root);
     Source source = new Source("RootId", "sourceId", "sourceSourceName", "sourceLongName",
                                "sourceServiceUrl", "sourceIconUrl");
       source.setPodcastUrl("podcastUrl");
-    catalog.addCategory(source);
+    catalog.addSource(source);
     SubCategory subcat = new SubCategory("sourceId", "subcatId", "subcatShortName", "subcatLongName",
                                          "subcatServiceUrl", "subcatIconUrl", "sourceId");
-    catalog.addCategory(subcat);
+    catalog.addSubCategory(subcat);
     SubCategory subcat2 = new SubCategory("sourceId", "subcatId2", "subcatShortName2", "subcatLongName2",
                                           "subcatServiceUrl2", "subcatIconUrl2", "sourceId");
-    catalog.addCategory(subcat2);
+    catalog.addSubCategory(subcat2);
 
     Programme programme = new Programme("sourceId", "programmeId", "programmeShortName", "programmeLongName",
                                         "programmeServiceUrl", "programmeIconUdl", "subcatId");
     programme.setPodcastUrl("podcastUrl");
     programme.addOtherParentId("subcatId2");
-    catalog.addCategory(programme);
+    catalog.addProgramme(programme);
 
-    class TestCategory extends Category {
+    class TestCategory extends SubCategory {
 
       TestCategory(String sourceId, String id, String shortName, String longName, String serviceUrl,
                    String iconUrl, String parentId) {
@@ -173,7 +173,7 @@ public class SageTvPublisherTest {
     };
 
     TestCategory unknownCat = new TestCategory("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
-    catalog.addCategory(unknownCat);
+    catalog.addSubCategory(unknownCat);
 
 
     Episode episode = new Episode("sourceId", "episodeId", "programmeTitle", "seriesTitle", "episodeTitle",

@@ -1,4 +1,99 @@
 <catalog>
+  <root>
+    <sourceId></sourceId>
+    <id>rootId</id>
+    <shortName>rootShort</shortName>
+    <longName>rootLong</longName>
+    <serviceUrl>rootServiceUrl</serviceUrl>
+    <iconUrl>iconUrl</iconUrl>
+    <parentId></parentId>
+    <error>
+      <level>ERROR</level>
+      <message>Root Error</message>
+    </error>
+    <error>
+      <level>ERROR</level>
+      <message>Catalog Error</message>
+    </error>
+    <metaUrl>metaUrl1</metaUrl>
+    <metaUrl>metaUrl2</metaUrl>
+    <podcastUrl></podcastUrl>
+    <type>Root</type>
+  </root>
+  <source>
+    <sourceId>sourceId</sourceId>
+    <id>sourceId</id>
+    <shortName>sourceShortName</shortName>
+    <longName>sourceLongName</longName>
+    <serviceUrl>sourceServiceUrl</serviceUrl>
+    <iconUrl>sourceIconUrl</iconUrl>
+    <parentId>rootId</parentId>
+    <error>
+      <level>ERROR</level>
+      <message>Source Error</message>
+    </error>
+    <metaUrl>metaUrl1</metaUrl>
+    <metaUrl>metaUrl2</metaUrl>
+    <podcastUrl></podcastUrl>
+    <type>Source</type>
+    <subCategory>subCatId1</subCategory>
+    <subCategory>subCatId2</subCategory>
+  </source>
+  <subcategory>
+    <sourceId>sourceId</sourceId>
+    <id>subCatId1</id>
+    <shortName>subCatShortName1</shortName>
+    <longName>subCatLongName</longName>
+    <serviceUrl>subcatServiceUrl1</serviceUrl>
+    <iconUrl>subcatIconUrl1</iconUrl>
+    <parentId>sourceId</parentId>
+    <error>
+      <level>ERROR</level>
+      <message>SubCat1 Error</message>
+    </error>
+    <metaUrl>metaUrl1</metaUrl>
+    <metaUrl>metaUrl2</metaUrl>
+    <podcastUrl></podcastUrl>
+    <type>SubCategory</type>
+    <subCategory>subCatId2</subCategory>
+  </subcategory>
+  <subcategory>
+    <sourceId>sourceId</sourceId>
+    <id>subCatId2</id>
+    <shortName>subCatShortName2</shortName>
+    <longName>subCatLongName</longName>
+    <serviceUrl>subcatServiceUrl2</serviceUrl>
+    <iconUrl>subcatIconUrl2</iconUrl>
+    <parentId>sourceId</parentId>
+    <error>
+      <level>ERROR</level>
+      <message>SubCat2 Error</message>
+    </error>
+    <metaUrl>metaUrl1</metaUrl>
+    <metaUrl>metaUrl2</metaUrl>
+    <podcastUrl></podcastUrl>
+    <type>SubCategory</type>
+    <otherParentId>subCatId1</otherParentId>
+  </subcategory>
+  <programme>
+    <sourceId>sourceId</sourceId>
+    <id>programmeId</id>
+    <shortName>programmeShortName</shortName>
+    <longName>programmeLongname</longName>
+    <serviceUrl>programmeServiceUrl</serviceUrl>
+    <iconUrl>programmeIconUrl</iconUrl>
+    <parentId></parentId>
+    <error>
+      <level>ERROR</level>
+      <message>Programme Error</message>
+    </error>
+    <metaUrl>metaUrl1</metaUrl>
+    <metaUrl>metaUrl2</metaUrl>
+    <podcastUrl>/programme?id=programmeId;type=xml</podcastUrl>
+    <type>Programme</type>
+    <episode>episodeId1</episode>
+    <episode>episodeId2</episode>
+  </programme>
   <episode>
     <sourceId>sourceId</sourceId>
     <id>episodeId2</id>
@@ -51,100 +146,4 @@
     <metaUrl>metaUrl2</metaUrl>
     <podcastUrl>podcastUrl1</podcastUrl>
   </episode>
-  <root>
-    <sourceId></sourceId>
-    <id>rootId</id>
-    <shortName>rootShort</shortName>
-    <longName>rootLong</longName>
-    <serviceUrl>rootServiceUrl</serviceUrl>
-    <iconUrl>iconUrl</iconUrl>
-    <parentId></parentId>
-    <error>
-      <level>ERROR</level>
-      <message>Root Error</message>
-    </error>
-    <error>
-      <level>ERROR</level>
-      <message>Catalog Error</message>
-    </error>
-    <metaUrl>metaUrl1</metaUrl>
-    <metaUrl>metaUrl2</metaUrl>
-    <podcastUrl></podcastUrl>
-    <type>Root</type>
-  </root>
-  <subcategory>
-    <sourceId>sourceId</sourceId>
-    <id>subCatId1</id>
-    <shortName>subCatShortName1</shortName>
-    <longName>subCatLongName</longName>
-    <serviceUrl>subcatServiceUrl1</serviceUrl>
-    <iconUrl>subcatIconUrl1</iconUrl>
-    <parentId>sourceId</parentId>
-    <error>
-      <level>ERROR</level>
-      <message>SubCat1 Error</message>
-    </error>
-    <metaUrl>metaUrl1</metaUrl>
-    <metaUrl>metaUrl2</metaUrl>
-    <podcastUrl></podcastUrl>
-    <type>SubCategory</type>
-    <subCategory>subCatId2</subCategory>
-  </subcategory>
-  <source>
-    <sourceId>sourceId</sourceId>
-    <id>sourceId</id>
-    <shortName>sourceShortName</shortName>
-    <longName>sourceLongName</longName>
-    <serviceUrl>sourceServiceUrl</serviceUrl>
-    <iconUrl>sourceIconUrl</iconUrl>
-    <parentId>rootId</parentId>
-    <error>
-      <level>ERROR</level>
-      <message>Source Error</message>
-    </error>
-    <metaUrl>metaUrl1</metaUrl>
-    <metaUrl>metaUrl2</metaUrl>
-    <podcastUrl></podcastUrl>
-    <type>Source</type>
-    <subCategory>subCatId1</subCategory>
-    <subCategory>subCatId2</subCategory>
-  </source>
-  <programme>
-    <sourceId>sourceId</sourceId>
-    <id>programmeId</id>
-    <shortName>programmeShortName</shortName>
-    <longName>programmeLongname</longName>
-    <serviceUrl>programmeServiceUrl</serviceUrl>
-    <iconUrl>programmeIconUrl</iconUrl>
-    <parentId></parentId>
-    <error>
-      <level>ERROR</level>
-      <message>Programme Error</message>
-    </error>
-    <metaUrl>metaUrl1</metaUrl>
-    <metaUrl>metaUrl2</metaUrl>
-    <podcastUrl>/programme?id=programmeId;type=xml</podcastUrl>
-    <type>Programme</type>
-    <episode>episodeId1</episode>
-    <episode>episodeId2</episode>
-  </programme>
-  <subcategory>
-    <sourceId>sourceId</sourceId>
-    <id>subCatId2</id>
-    <shortName>subCatShortName2</shortName>
-    <longName>subCatLongName</longName>
-    <serviceUrl>subcatServiceUrl2</serviceUrl>
-    <iconUrl>subcatIconUrl2</iconUrl>
-    <parentId>sourceId</parentId>
-    <error>
-      <level>ERROR</level>
-      <message>SubCat2 Error</message>
-    </error>
-    <metaUrl>metaUrl1</metaUrl>
-    <metaUrl>metaUrl2</metaUrl>
-    <podcastUrl></podcastUrl>
-    <type>SubCategory</type>
-    <otherParentId>subCatId1</otherParentId>
-  </subcategory>
-  <rootId>rootId</rootId>
 </catalog>

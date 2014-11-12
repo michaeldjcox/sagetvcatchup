@@ -1,5 +1,6 @@
 package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
+import uk.co.mdjcox.sagetv.model.Category;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.SubCategory;
 
@@ -12,18 +13,18 @@ import java.util.TimeZone;
 /**
  * Created by michael on 23/10/14.
  */
-public class SubcategoryComparator implements Comparator<SubCategory> {
+public class CategoryComparator implements Comparator<Category> {
 
   private final SimpleDateFormat format;
 
-  public SubcategoryComparator() {
+  public CategoryComparator() {
     format = new SimpleDateFormat("dd-MM-yyyy");
     format.setTimeZone(TimeZone.getTimeZone("Europe/London"));
 
   }
 
   @Override
-  public int compare(SubCategory o1, SubCategory o2) {
+  public int compare(Category o1, Category o2) {
 
     try {
       String o1Parent = o1.getId() == null ? "" : o1.getId();
