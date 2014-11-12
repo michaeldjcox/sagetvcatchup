@@ -8,7 +8,7 @@
     <appender name="FILE" class="uk.co.mdjcox.utils.PersistentRollingFileAppender">
         <file>logs/sagetvcatchup.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>sagetvcatchup/logs/sagetvcatchup.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>logs/sagetvcatchup.%d{yyyy-MM-dd}.log</FileNamePattern>
         </rollingPolicy>
         <append>true</append>
          <encoder>
