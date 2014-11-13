@@ -57,7 +57,16 @@ public class HomePage extends AbstractHtmlPage {
         htmlBuilder.addLink("Recordings", "/recordings?type=html");
         htmlBuilder.addBreak();
         htmlBuilder.addBreak();
+        htmlBuilder.addHeading3("Catchup server");
+
         htmlBuilder.addLink("Logs", "/logs?type=html");
+
+        long totalMem = Runtime.getRuntime().totalMemory() / 1024000;
+        long freeMem = Runtime.getRuntime().freeMemory() / 1024000;
+        long maxMem = Runtime.getRuntime().maxMemory() / 1024000;
+
+        htmlBuilder.addParagraph("Heap: " + (totalMem -freeMem) + "/" + totalMem + "/" + maxMem + "Mb used <br/>Threads: " + Thread.activeCount());
+
         htmlBuilder.addHeading2("Controls");
         htmlBuilder.addLink("Stop all recording", "/stopall?type=html");
         htmlBuilder.addBreak();

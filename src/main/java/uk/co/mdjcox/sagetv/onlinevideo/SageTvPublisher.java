@@ -129,6 +129,9 @@ public class SageTvPublisher implements CatalogPublisher {
      */
     public void publish(Catalog catalog)  {
         try {
+
+            logger.info("Publishing new catalog to SageTV");
+
             String linkFile = getLinkFile(qualifier);
             String labelFile = getLabelFile(qualifier);
 
@@ -148,11 +151,13 @@ public class SageTvPublisher implements CatalogPublisher {
             logger.info("Online adding source " + category.getId());
             boolean isSearch = category.getId().equals("search");
             addDynamicSource(category, links, labels, isSearch);
-
           }
 
             links.commit(linkFile, new LinksPropertyLayout());
             labels.commit(labelFile, new LabelsPropertyLayout());
+
+            logger.info("Published new catalog to SageTV");
+
         } catch (Exception e) {
           String message = e.getMessage();
           if (message == null) {

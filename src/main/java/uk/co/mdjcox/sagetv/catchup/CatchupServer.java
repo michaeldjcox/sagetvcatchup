@@ -95,6 +95,30 @@ public class CatchupServer {
 
       new CatchupSuicideThread(logger, context).run();
 
+      Thread thread = new Thread(new Runnable() {
+          @Override
+          public void run() {
+                while (true) {
+                    try {
+                        long totalMem = Runtime.getRuntime().totalMemory() / 1024000;
+                        long freeMem = Runtime.getRuntime().freeMemory() / 1024000;
+                        long maxMem = Runtime.getRuntime().maxMemory() / 1024000;
+
+                        logger.info("Heap: " + (totalMem -freeMem) + "/" + totalMem + "/" + maxMem + "Mb used" );
+                    } catch (Exception e) {
+
+                    }
+                    try {
+                        Thread.sleep(60000);
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+          }
+      }, "SystemMonitor");
+        thread.setDaemon(true);
+        thread.start();
+
       started = true;
     } catch (Throwable e) {
       if (logger == null) {

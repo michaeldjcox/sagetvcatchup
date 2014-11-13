@@ -72,12 +72,13 @@ public class CatalogPersister implements CatalogPublisher {
   }
 
     public void publish(Catalog catalog, String fileName) {
-        PrintWriter writer = null;
         try {
+            logger.info("Persisting new catalog to " + fileName);
           FileOutputStream stream = new FileOutputStream(fileName);
             xstream.toXML(catalog, stream);
+            logger.info("Persisted new catalog to " + fileName);
         } catch (Exception e) {
-            logger.error("Failed to persist catalog", e);
+            logger.error("Failed to persist catalog to " + fileName, e);
         }
     }
 
