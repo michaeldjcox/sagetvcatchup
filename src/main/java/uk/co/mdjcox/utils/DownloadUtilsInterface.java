@@ -2,6 +2,7 @@ package uk.co.mdjcox.utils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,11 +16,11 @@ public interface DownloadUtilsInterface {
 
     String sampleFileString(String source, String encoding) throws Exception;
 
-    String downloadFileString(String source) throws Exception;
+    String downloadFileString(String source, AtomicBoolean stopFlag) throws Exception;
 
-    String downloadFileString(String source, String encoding) throws Exception;
+    String downloadFileString(String source, String encoding, AtomicBoolean stopFlag) throws Exception;
 
-    String downloadFileString(String source, int timeout, int attempts) throws Exception;
+    String downloadFileString(String source, int timeout, int attempts, AtomicBoolean stopFlag) throws Exception;
 
     void downloadFile(URL url, String file) throws IOException;
 }

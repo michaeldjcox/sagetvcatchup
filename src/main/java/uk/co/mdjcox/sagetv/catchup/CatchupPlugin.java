@@ -375,7 +375,7 @@ public class CatchupPlugin implements SageTVPlugin {
             String propName = name + ".maxprogrammes";
             types.put(propName, CONFIG_INTEGER);
             labels.put(propName, name + " max programmes");
-            help.put(propName, name + " max programmes");
+            help.put(propName, name + " max programmes. 0 = no maximum");
           }
 
           types.put(PULL_UPGRADE, CONFIG_BUTTON);
@@ -492,7 +492,8 @@ public class CatchupPlugin implements SageTVPlugin {
     for (String name : getPluginNames()) {
       String propName = name + ".maxprogrammes";
       if (property.equals(propName)) {
-        return String.valueOf(props.getInt(propName, Integer.MAX_VALUE));
+        final int maxProgrammes = props.getInt(propName, 0);
+        return String.valueOf(maxProgrammes);
       }
 
       String propNameSkip = name + ".skip";
@@ -558,14 +559,12 @@ public class CatchupPlugin implements SageTVPlugin {
 
     if (property.equals(PORT)) {
       setCatchupProperty(PORT, value);
-      restartCatchupServer();
-
     }
 
     for (String name : getPluginNames()) {
       String propName = name + ".maxprogrammes";
       if (property.equals(propName)) {
-        setCatchupProperty(propName, value);
+          setCatchupProperty(propName, value);
       }
       String propNameSkip = name + ".skip";
       if (property.equals(propNameSkip)) {

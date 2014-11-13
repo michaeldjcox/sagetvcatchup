@@ -654,6 +654,16 @@ public class Recorder {
     return completedRecordings.size();
   }
 
+  public int getStoppingCount() {
+    int count = 0;
+    for (Recording rec : currentRecordings.values()) {
+      if (rec.isStopped()) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   /**
    * Gets a set of errors which occurred during recording
    *

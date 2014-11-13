@@ -1,6 +1,6 @@
 package ITVPlayer
 
-String details = GET_WEB_PAGE(url);
+String details = GET_WEB_PAGE(url, stopFlag);
 
 // PROGRAMME TITLE
 details2 = MOVE_TO("<h2 class=\"title episode-title\">", details)

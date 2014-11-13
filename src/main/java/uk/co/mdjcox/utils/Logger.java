@@ -43,6 +43,11 @@ public class Logger implements LoggerInterface {
   }
 
   @Override
+  public void debug(String s) {
+    logger.debug(s);
+  }
+
+  @Override
   public void flush() {
 
   }

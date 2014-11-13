@@ -34,6 +34,7 @@ public class RecordingStatusPodcast extends AbstractPodcast {
         builder.addCategoryItem("IN PROGRESS", recorder.getRecordingCount() + " in progress", recordingsUrl);
         builder.addCategoryItem("COMPLETED", recorder.getCompletedCount() + " completed", recordingsDoneUrl);
         builder.addCategoryItem("FAILED", recorder.getFailedCount() + " failed", recerrorsUrl);
+        builder.addTextItem("STOPPING", recorder.getStoppingCount() + " stopping", statusUrl);
         builder.addTextItem("PROCESSES", recorder.getProcessCount() + " processes running", statusUrl);
         builder.addCategoryItem("STOP ALL RECORDING", "Abandon all recording", stopUrl);
         builder.stopDocument();

@@ -10,8 +10,8 @@ episode.addMetaUrl(url);
 episode.addMetaUrl(metaurl);
 episode.addMetaUrl(programmeUrl);
 
-String metadetails = GET_WEB_PAGE(metaurl);
-String programmeDetails = GET_WEB_PAGE(programmeUrl);
+String metadetails = GET_WEB_PAGE(metaurl, stopFlag);
+String programmeDetails = GET_WEB_PAGE(programmeUrl, stopFlag);
 
 // EPISODE TITLE
 String details = MOVE_TO("<title>", metadetails)

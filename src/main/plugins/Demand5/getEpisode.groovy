@@ -1,6 +1,6 @@
 package Demand5
 
-String details = GET_WEB_PAGE(url);
+String details = GET_WEB_PAGE(url, stopFlag);
 
 //programmeDetails = MOVE_TO("<meta property=\"fb:app_id", programmeDetails);
 //programmeDetails = EXTRACT_TO("<body class=\"episodes_show_page\">", programmeDetails);

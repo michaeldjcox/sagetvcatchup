@@ -17,4 +17,6 @@ public interface LoggerInterface {
   void error(String s, Throwable throwable);
 
   void flush();
+
+  void debug(String s);
 }

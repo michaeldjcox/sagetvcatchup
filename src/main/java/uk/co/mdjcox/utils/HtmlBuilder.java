@@ -20,7 +20,14 @@ public class HtmlBuilder  {
   }
 
   public void addPageHeader(String pageTitle) {
+    addPageHeader(pageTitle, false, "");
+  }
+
+  public void addPageHeader(String pageTitle, boolean redirect, String redirectTo) {
       html.append("<head>").append(CRLF);
+      if (redirect) {
+        html.append("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url="+redirectTo+"\">");
+      }
       html.append("<title>");
       html.append(pageTitle);
       html.append("</title>").append(CRLF);

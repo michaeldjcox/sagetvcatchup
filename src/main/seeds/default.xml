@@ -1,66 +1,21 @@
 <catalog>
-    <episode>
-        <sourceId>Test</sourceId>
-        <id>TestEpisode</id>
-        <programmeTitle>Test Programme</programmeTitle>
-        <seriesTitle>Test Series</seriesTitle>
-        <episodeTitle>Test Episode</episodeTitle>
-        <podcastTitle>Test Programme - Test Series - Test Episode</podcastTitle>
-        <series>1</series>
-        <episode>1</episode>
-        <description>Test Episode Description</description>
-        <iconUrl>http://upload.wikimedia.org/wikipedia/en/0/02/The_Amazing_Spider-Man_theatrical_poster.jpeg</iconUrl>
-        <serviceUrl>/watch?id=TestEpisode;type=mpeg4</serviceUrl>
-        <airDate>01-09-2014</airDate>
-        <airTime>10:00:00</airTime>
-        <origAirDate>01-10-2014</origAirDate>
-        <origAirTime>12:00:00</origAirTime>
-        <channel>Test</channel>
-        <genre>Factual</genre>
-        <genre>News</genre>
-        <metaUrl>/episode?id=TestEpisode;type=html</metaUrl>
-        <podcastUrl>/control?id=TestEpisode;type=xml</podcastUrl>
-    </episode>
-    <subcategory>
-        <sourceId>Test</sourceId>
-        <id>Test/AirDate</id>
-        <shortName>Air Date</shortName>
-        <longName>Air Date</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Test</parentId>
-        <podcastUrl>/category?id=Test/AirDate;type=xml</podcastUrl>
-        <type>SubCategory</type>
-        <subCategory>Test/AirDate/01-09-2014</subCategory>
-    </subcategory>
-    <subcategory>
-        <sourceId>Test</sourceId>
-        <id>Test/New</id>
-        <shortName>New</shortName>
-        <longName>New</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Test</parentId>
-        <podcastUrl>/category?id=Test/New;type=xml</podcastUrl>
-        <type>SubCategory</type>
-        <subCategory>Test/New/testProgramme</subCategory>
-        <subCategory>testProgramme</subCategory>
-    </subcategory>
-    <programme>
-        <sourceId>Test</sourceId>
-        <id>Test/AirDate/01-09-2014</id>
-        <shortName>01-09-2014</shortName>
-        <longName>01-09-2014</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Test/AirDate</parentId>
-        <podcastUrl>/category?id=Test/AirDate/01-09-2014;type=xml</podcastUrl>
-        <type>Programme</type>
-        <episode>TestEpisode</episode>
-    </programme>
+    <root>
+        <sourceId></sourceId>
+        <id>Catchup</id>
+        <shortName>Catchup TV</shortName>
+        <longName>Catchup TV</longName>
+        <serviceUrl>/</serviceUrl>
+        <iconUrl>/logo.png</iconUrl>
+        <parentId></parentId>
+        <podcastUrl></podcastUrl>
+        <type>Root</type>
+        <subCategory>status</subCategory>
+        <subCategory>search</subCategory>
+        <subCategory>Test</subCategory>
+    </root>
     <source>
-        <sourceId>Status</sourceId>
-        <id>Status</id>
+        <sourceId>status</sourceId>
+        <id>status</id>
         <shortName>Status</shortName>
         <longName>Status</longName>
         <serviceUrl></serviceUrl>
@@ -87,6 +42,64 @@
         <subCategory>Test/AirDate</subCategory>
         <subCategory>Test/New</subCategory>
     </source>
+    <source>
+        <sourceId>search</sourceId>
+        <id>search</id>
+        <shortName>Search</shortName>
+        <longName>Search</longName>
+        <serviceUrl></serviceUrl>
+        <iconUrl></iconUrl>
+        <parentId>Catchup</parentId>
+        <podcastUrl>/search?type=xml</podcastUrl>
+        <type>Source</type>
+    </source>
+    <subcategory>
+        <sourceId>Test</sourceId>
+        <id>Test/AirDate</id>
+        <shortName>Air Date</shortName>
+        <longName>Air Date</longName>
+        <serviceUrl>/category?id=test;type=html</serviceUrl>
+        <iconUrl></iconUrl>
+        <parentId>Test</parentId>
+        <podcastUrl>/category?id=Test/AirDate;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <subCategory>Test/AirDate/01-09-2014</subCategory>
+    </subcategory>
+    <subcategory>
+        <sourceId>Test</sourceId>
+        <id>Test/New</id>
+        <shortName>New</shortName>
+        <longName>New</longName>
+        <serviceUrl>/category?id=test;type=html</serviceUrl>
+        <iconUrl></iconUrl>
+        <parentId>Test</parentId>
+        <podcastUrl>/category?id=Test/New;type=xml</podcastUrl>
+        <type>SubCategory</type>
+    </subcategory>
+    <subcategory>
+        <sourceId>Test</sourceId>
+        <id>Test/AirDate/01-09-2014</id>
+        <shortName>01-09-2014</shortName>
+        <longName>01-09-2014</longName>
+        <serviceUrl>/category?id=test;type=html</serviceUrl>
+        <iconUrl></iconUrl>
+        <parentId>Test/AirDate</parentId>
+        <podcastUrl>/category?id=Test/AirDate/01-09-2014;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <subCategory>Test/AirDate/01-09-2014/testProgramme</subCategory>
+    </subcategory>
+    <subcategory>
+        <sourceId>Test</sourceId>
+        <id>Test/AirDate/01-09-2014/testProgramme</id>
+        <shortName>Test Programme</shortName>
+        <longName>Test Programme</longName>
+        <serviceUrl>/programme?id=Test/AirDate/01-09-2014/testProgramme;type=html</serviceUrl>
+        <iconUrl>http://upload.wikimedia.org/wikipedia/en/0/02/The_Amazing_Spider-Man_theatrical_poster.jpeg</iconUrl>
+        <parentId>Test/AirDate/01-09-2014</parentId>
+        <podcastUrl></podcastUrl>
+        <type>SubCategory</type>
+        <episode>TestEpisode</episode>
+    </subcategory>
     <subcategory>
         <sourceId>Test</sourceId>
         <id>Test/Genre/News</id>
@@ -99,17 +112,6 @@
         <type>SubCategory</type>
         <subCategory>testProgramme</subCategory>
     </subcategory>
-    <programme>
-        <sourceId>Test</sourceId>
-        <id>Test/New/testProgramme</id>
-        <shortName>Test Programme</shortName>
-        <longName>Test Programme</longName>
-        <serviceUrl>/programme?id=testProgramme;type=html</serviceUrl>
-        <iconUrl>http://upload.wikimedia.org/wikipedia/en/0/02/The_Amazing_Spider-Man_theatrical_poster.jpeg</iconUrl>
-        <parentId>Test/New</parentId>
-        <podcastUrl></podcastUrl>
-        <type>Programme</type>
-    </programme>
     <subcategory>
         <sourceId>Test</sourceId>
         <id>Test/Favourite</id>
@@ -120,7 +122,6 @@
         <parentId>Test</parentId>
         <podcastUrl>/category?id=Test/Favourite;type=xml</podcastUrl>
         <type>SubCategory</type>
-        <subCategory>testProgramme</subCategory>
     </subcategory>
     <subcategory>
         <sourceId>Test</sourceId>
@@ -134,17 +135,6 @@
         <type>SubCategory</type>
         <subCategory>Test/Channel/Test</subCategory>
     </subcategory>
-    <source>
-        <sourceId>Search</sourceId>
-        <id>Search</id>
-        <shortName>Search</shortName>
-        <longName>Search</longName>
-        <serviceUrl></serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Catchup</parentId>
-        <podcastUrl>/search?type=xml</podcastUrl>
-        <type>Source</type>
-    </source>
     <subcategory>
         <sourceId>Test</sourceId>
         <id>Test/Channel/Test</id>
@@ -170,37 +160,6 @@
         <subCategory>Test/Genre/Factual</subCategory>
         <subCategory>Test/Genre/News</subCategory>
     </subcategory>
-    <programme>
-        <sourceId>Test</sourceId>
-        <id>testProgramme</id>
-        <shortName>Test Programme</shortName>
-        <longName>Test Programme</longName>
-        <serviceUrl>/programme?id=testProgramme;type=html</serviceUrl>
-        <iconUrl>http://upload.wikimedia.org/wikipedia/en/0/02/The_Amazing_Spider-Man_theatrical_poster.jpeg</iconUrl>
-        <parentId></parentId>
-        <metaUrl>/programme?id=testProgramme;type=html</metaUrl>
-        <podcastUrl>/programme?id=testProgramme;type=xml</podcastUrl>
-        <type>Programme</type>
-        <otherParentId>Test/AtoZ/T</otherParentId>
-        <otherParentId>Test/Genre/Factual</otherParentId>
-        <otherParentId>Test/Genre/News</otherParentId>
-        <otherParentId>Test/Channel/Test</otherParentId>
-        <episode>TestEpisode</episode>
-    </programme>
-    <root>
-        <sourceId></sourceId>
-        <id>Catchup</id>
-        <shortName>Catchup TV</shortName>
-        <longName>Catchup TV</longName>
-        <serviceUrl>/</serviceUrl>
-        <iconUrl>/logo.png</iconUrl>
-        <parentId></parentId>
-        <podcastUrl></podcastUrl>
-        <type>Root</type>
-        <subCategory>Status</subCategory>
-        <subCategory>Search</subCategory>
-        <subCategory>Test</subCategory>
-    </root>
     <subcategory>
         <sourceId>Test</sourceId>
         <id>Test/AtoZ</id>
@@ -237,4 +196,43 @@
         <type>SubCategory</type>
         <subCategory>testProgramme</subCategory>
     </subcategory>
+    <programme>
+        <sourceId>Test</sourceId>
+        <id>testProgramme</id>
+        <shortName>Test Programme</shortName>
+        <longName>Test Programme</longName>
+        <serviceUrl>/programme?id=testProgramme;type=html</serviceUrl>
+        <iconUrl>http://upload.wikimedia.org/wikipedia/en/0/02/The_Amazing_Spider-Man_theatrical_poster.jpeg</iconUrl>
+        <parentId></parentId>
+        <metaUrl>/programme?id=testProgramme;type=html</metaUrl>
+        <podcastUrl>/programme?id=testProgramme;type=xml</podcastUrl>
+        <type>Programme</type>
+        <otherParentId>Test/AtoZ/T</otherParentId>
+        <otherParentId>Test/Genre/Factual</otherParentId>
+        <otherParentId>Test/Genre/News</otherParentId>
+        <otherParentId>Test/Channel/Test</otherParentId>
+        <episode>TestEpisode</episode>
+    </programme>
+    <episode>
+        <sourceId>Test</sourceId>
+        <id>TestEpisode</id>
+        <programmeTitle>Test Programme</programmeTitle>
+        <seriesTitle>Test Series</seriesTitle>
+        <episodeTitle>Test Episode</episodeTitle>
+        <podcastTitle>Test Programme - Test Series - Test Episode</podcastTitle>
+        <series>1</series>
+        <episode>1</episode>
+        <description>Test Episode Description</description>
+        <iconUrl>http://upload.wikimedia.org/wikipedia/en/0/02/The_Amazing_Spider-Man_theatrical_poster.jpeg</iconUrl>
+        <serviceUrl>/watch?id=TestEpisode;type=mpeg4</serviceUrl>
+        <airDate>01-09-2014</airDate>
+        <airTime>10:00:00</airTime>
+        <origAirDate>01-10-2014</origAirDate>
+        <origAirTime>12:00:00</origAirTime>
+        <channel>Test</channel>
+        <genre>Factual</genre>
+        <genre>News</genre>
+        <metaUrl>/episode?id=TestEpisode;type=html</metaUrl>
+        <podcastUrl>/control?id=TestEpisode;type=xml</podcastUrl>
+    </episode>
 </catalog>

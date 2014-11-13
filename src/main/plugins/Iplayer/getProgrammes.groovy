@@ -9,7 +9,7 @@ for (String site : sites) {
 
     String subUrl = url + site;
 
-    String str = GET_WEB_PAGE(subUrl);
+    String str = GET_WEB_PAGE(subUrl, stopFlag);
 
     if (str != null) {
         if (str.contains("There are no programmes available at the moment")) {

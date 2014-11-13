@@ -186,7 +186,7 @@ public class Server implements CatalogPublisher {
             page += name + "=" + request.getParameter(name.toString());
         }
 
-        logger.info("Got http request: " + page);
+        logger.debug("Got http request: " + page);
 
       if (target.contains("stopserver")) {
         logger.info("Calling system exit");
@@ -282,9 +282,13 @@ public class Server implements CatalogPublisher {
 
             logger.info("Published catalog to web server");
         } catch (Exception e) {
+          String message = e.getMessage();
+          if (message == null) {
+            message = e.getClass().getSimpleName();
+          }
            Category root = catalog.getRoot();
           if (root != null) {
-            root.addError("FATAL", "Failed to publish to web server: " + e.getMessage());
+            root.addError("FATAL", "Failed to publish to web server: " + message);
           }
             logger.error("Failed to publish catalog to web server", e);
         } finally {

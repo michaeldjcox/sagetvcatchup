@@ -13,6 +13,7 @@ import uk.co.mdjcox.utils.OsUtilsInterface;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,14 +31,22 @@ public class ProgrammesScript extends Script {
         super(logger, base + File.separator + "getProgrammes.groovy", htmlUtils, downloadUtils, osUtils, context);
     }
 
-    public Collection<Programme> getProgrammes(Source source) {
+    public Collection<Programme> getProgrammes(Source source, AtomicBoolean stopFlag) {
         Collection<Programme> programmes = new ArrayList<Programme>();
         try {
           source.addMetaUrl(source.getServiceUrl());
-            call("source", source,  "url", source.getServiceUrl(), "programmes", programmes);
+            call("source", source,  "url", source.getServiceUrl(), "programmes", programmes, "stopFlag", stopFlag);
         } catch (Throwable e) {
-          source.addError("ERROR", "Unable to get programmes: " + e.getMessage());
-          getLogger().error("Unable to get programmes for: " + source, e);
+          String message = e.getMessage();
+          if (message == null) {
+            message = e.getClass().getSimpleName();
+          }
+          if (message.equals(STOPPED_ON_REQUEST)) {
+            getLogger().info("Stopped on request getting programmes for " + source);
+          } else {
+            source.addError("ERROR", "Unable to get programmes: " + message);
+            getLogger().error("Unable to get programmes for: " + source, e);
+          }
         } finally {
           if (source.hasErrors()) {
             getLogger().warn("Source " + source.getShortName() + " has errors");

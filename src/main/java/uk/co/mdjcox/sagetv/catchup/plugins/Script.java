@@ -21,7 +21,9 @@ import java.io.File;
  */
 public abstract class Script {
 
-    private LoggerInterface logger;
+  protected static final String STOPPED_ON_REQUEST = "Stopped on request";
+
+  private LoggerInterface logger;
     private String script;
     private HtmlUtilsInterface htmlUtils;
     private DownloadUtilsInterface downloadUtils;

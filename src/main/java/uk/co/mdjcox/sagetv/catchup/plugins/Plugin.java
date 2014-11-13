@@ -8,6 +8,7 @@ import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.sagetv.model.Source;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created with IntelliJ IDEA.
@@ -51,16 +52,16 @@ public class Plugin {
         return source;
     }
 
-    public Collection<Programme> getProgrammes() {
-        return programmesScript.getProgrammes(source);
+    public Collection<Programme> getProgrammes(AtomicBoolean stopFlag) {
+        return programmesScript.getProgrammes(source, stopFlag);
     }
 
-    public Collection<Episode> getEpisodes(Source source, Programme programme) {
-        return episodesScript.getEpisodes(source, programme);
+    public Collection<Episode> getEpisodes(Source source, Programme programme, AtomicBoolean stopFlag) {
+        return episodesScript.getEpisodes(source, programme, stopFlag);
     }
 
-    public void getEpisode(Source source, Programme programme, Episode episode) {
-        episodeScript.getEpisode(source, programme, episode);
+    public void getEpisode(Source source, Programme programme, Episode episode, AtomicBoolean stopFlag) {
+        episodeScript.getEpisode(source, programme, episode, stopFlag);
     }
 
     public void playEpisode(Recording recording) {

@@ -5,7 +5,6 @@ import sagex.api.*;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -84,14 +83,14 @@ public class SageUtils implements SageUtilsInterface {
     File recordingFile = new File(file);
 
     if (!recordingFile.exists()) {
-        debug("Add airing to SageTV - recording does not exist: " + recordingFile.getAbsolutePath());
+        debugLog("Add airing to SageTV - recording does not exist: " + recordingFile.getAbsolutePath());
       return;
     }
 
     // Add the MediaFile to the database.
     Object mediaFile = MediaFileAPI.AddMediaFile(recordingFile, "");
     if (mediaFile == null) {
-        debug("Add airing to SageTV - add media file failed: " + recordingFile.getAbsolutePath());
+        debugLog("Add airing to SageTV - add media file failed: " + recordingFile.getAbsolutePath());
         return;
     }
 
@@ -121,10 +120,10 @@ public class SageUtils implements SageUtilsInterface {
 
         originalAirDate = date.getTime();
 
-        debug("Add airing to SageTV - Uploading recording of " + episodeTitle + " to sageTV " + date + " from " + dateTime);
+        debugLog("Add airing to SageTV - Uploading recording of " + episodeTitle + " to sageTV " + date + " from " + dateTime);
 
       } catch (ParseException e) {
-        debug("Add airing to SageTV - Failed to parse original air date " + origAirDate + " " + origAirTime + " into long time");
+        debugLog("Add airing to SageTV - Failed to parse original air date " + origAirDate + " " + origAirTime + " into long time");
       }
     }
 
@@ -145,7 +144,7 @@ public class SageUtils implements SageUtilsInterface {
         isFirstRun = date.getTime() == originalAirDate;
 
       } catch (ParseException e) {
-        debug("Add airing to SageTV - Failed to parse air date " + airDate + " " + airTime + " into long time");
+        debugLog("Add airing to SageTV - Failed to parse air date " + airDate + " " + airTime + " into long time");
       }
     }
 
@@ -176,12 +175,12 @@ public class SageUtils implements SageUtilsInterface {
             episodeNumber);
 
     if (Show == null) {
-      debug("Add airing to SageTV - Failed to add show");
+      debugLog("Add airing to SageTV - Failed to add show");
         return ;
     }
 
     if (!MediaFileAPI.SetMediaFileShow(mediaFile, Show)) {
-      debug("Add airing to SageTV - Failed to set media show");
+      debugLog("Add airing to SageTV - Failed to set media show");
         return ;
     }
 
@@ -195,17 +194,17 @@ public class SageUtils implements SageUtilsInterface {
     Object airing = MediaFileAPI.GetMediaFileAiring(mediaFile);
 
     if (!AiringAPI.IsAiringObject(airing)) {
-      debug("Add airing to SageTV - Object is not an Airing.");
+      debugLog("Add airing to SageTV - Object is not an Airing.");
         return ;
     }
 
-    debug("Add airing to SageTV - Succeeded");
+    debugLog("Add airing to SageTV - Succeeded");
 
   }
 
   @Override
   public void info(String s) {
-    debug("INFO: " + s);
+    debugLog("INFO: " + s);
   }
 
   @Override
@@ -215,7 +214,7 @@ public class SageUtils implements SageUtilsInterface {
 
   @Override
   public void warn(String s) {
-    debug("WARN: " + s);
+    debugLog("WARN: " + s);
   }
 
   @Override
@@ -225,7 +224,7 @@ public class SageUtils implements SageUtilsInterface {
 
   @Override
   public void error(String s) {
-    debug("ERROR: " + s);
+    debugLog("ERROR: " + s);
   }
 
   @Override
@@ -238,7 +237,12 @@ public class SageUtils implements SageUtilsInterface {
 
   }
 
-  private void debug(String message) {
+  @Override
+  public void debug(String s) {
+    debugLog("DEBUG: " + s);
+  }
+
+  private void debugLog(String message) {
     try {
       Global.DebugLog(message);
     } catch (Exception e) {
@@ -249,7 +253,11 @@ public class SageUtils implements SageUtilsInterface {
   private void debug(String message, Throwable ex) {
     try {
       Global.DebugLog(message);
-      Global.DebugLog(ex.getMessage());
+      String exmessage = ex.getMessage();
+      if (exmessage == null) {
+        exmessage = ex.getClass().getSimpleName();
+      }
+      Global.DebugLog(exmessage);
       for (StackTraceElement el : ex.getStackTrace()) {
         Global.DebugLog(el.toString());
       }

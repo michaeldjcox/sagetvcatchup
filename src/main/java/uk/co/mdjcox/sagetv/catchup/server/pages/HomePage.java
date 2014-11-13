@@ -47,6 +47,8 @@ public class HomePage extends AbstractHtmlPage {
         recordingProgress.append(" completed<br/>");
         recordingProgress.append(recorder.getFailedCount());
         recordingProgress.append(" failed<br/>");
+        recordingProgress.append(recorder.getStoppingCount());
+        recordingProgress.append(" stopping<br/>");
         recordingProgress.append(recorder.getProcessCount());
         recordingProgress.append(" processes<br/>");
         htmlBuilder.addParagraph(recordingProgress.toString());

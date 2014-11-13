@@ -1,6 +1,6 @@
 package Channel4OD
 
-String details = GET_WEB_PAGE(url);
+String details = GET_WEB_PAGE(url, stopFlag);
 
 // PROGRAMME TITLE
 details2 = MOVE_TO("<meta name=\"brandTitle\"", details)

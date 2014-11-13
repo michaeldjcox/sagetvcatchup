@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,6 +20,7 @@ import java.nio.charset.Charset;
  */
 public class DownloadUtils implements DownloadUtilsInterface {
 
+  private static final String STOPPED_ON_REQUEST = "Stopped on request";
   private static final int DOWNLOAD_TIMEOUT = 30000;
   private static DownloadUtilsInterface instance;
     private final String DEFAULT_ENCODING = "UTF-8";
@@ -32,31 +34,31 @@ public class DownloadUtils implements DownloadUtilsInterface {
 
     @Override
     public String sampleFileString(String source) throws Exception {
-        return downloadFileString(source, DEFAULT_ENCODING, true, DOWNLOAD_TIMEOUT, 1);
+        return downloadFileString(source, DEFAULT_ENCODING, true, DOWNLOAD_TIMEOUT, 1, null);
 
     }
 
     @Override
     public String sampleFileString(String source, String encoding) throws Exception {
-        return downloadFileString(source, encoding, true, DOWNLOAD_TIMEOUT, 1);
+        return downloadFileString(source, encoding, true, DOWNLOAD_TIMEOUT, 1, null);
     }
 
 
     @Override
-    public String downloadFileString(String source) throws Exception {
-        return downloadFileString(source, DEFAULT_ENCODING);
+    public String downloadFileString(String source, AtomicBoolean stopFlag) throws Exception {
+        return downloadFileString(source, DEFAULT_ENCODING, stopFlag);
     }
 
     @Override
-    public String downloadFileString(String source, String encoding) throws Exception {
-        return downloadFileString(source, encoding, false, DOWNLOAD_TIMEOUT, 1);
+    public String downloadFileString(String source, String encoding, AtomicBoolean stopFlag) throws Exception {
+        return downloadFileString(source, encoding, false, DOWNLOAD_TIMEOUT, 1, stopFlag);
     }
 
-  public String downloadFileString(String source, int timeout, int attempts) throws Exception {
-    return downloadFileString(source, DEFAULT_ENCODING, false, timeout, attempts);
+  public String downloadFileString(String source, int timeout, int attempts, AtomicBoolean stopFlag) throws Exception {
+    return downloadFileString(source, DEFAULT_ENCODING, false, timeout, attempts, stopFlag);
   }
 
-    private String downloadFileString(String source, String encoding, boolean sample, int timeout, int attempts) throws Exception {
+    private String downloadFileString(String source, String encoding, boolean sample, int timeout, int attempts, AtomicBoolean stopFlag) throws Exception {
       for (int i =0 ; i < attempts; i++) {
         String webpage = "";
         InputStream stream = null;
@@ -68,7 +70,7 @@ public class DownloadUtils implements DownloadUtilsInterface {
           conn = url.openConnection();
           conn.setReadTimeout(timeout);
           conn.setConnectTimeout(timeout);
-          new Thread(new InterruptThread(Thread.currentThread(), conn)).start();
+          new Thread(new InterruptThread(Thread.currentThread(), conn, stopFlag)).start();
           conn.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17");
 //            conn.setRequestProperty("Accept-Encoding", "tgzip,deflate,sdch");
           stream = conn.getInputStream();
@@ -78,11 +80,18 @@ public class DownloadUtils implements DownloadUtilsInterface {
           while ((len = bis.read(buf)) > 0) {
             webpage += new String(buf, 0, len, Charset.forName(encoding));
             if (sample) break;
+            if (stopFlag.get()) {
+              throw new RuntimeException(STOPPED_ON_REQUEST);
+            }
           }
           return webpage;
         } catch (Exception ex) {
-          if (!ex.getMessage().contains("Bogus chunk") && !ex.getMessage().contains("missing CR")) {
-            if (i == (attempts-1)) {
+          String message = ex.getMessage();
+          if (message == null) {
+            message = ex.getClass().getSimpleName();
+          }
+          if (!message.contains("Bogus chunk") && !message.contains("missing CR")) {
+            if (message.equals(STOPPED_ON_REQUEST) || (i == (attempts-1))) {
               throw ex;
             } else {
               continue;
@@ -118,19 +127,34 @@ public class DownloadUtils implements DownloadUtilsInterface {
     }
 
   public class InterruptThread implements Runnable {
-    Thread parent;
-    URLConnection con;
-    public InterruptThread(Thread parent, URLConnection con) {
+    private Thread parent;
+    private URLConnection con;
+    private AtomicBoolean stopFlag;
+
+    public InterruptThread(Thread parent, URLConnection con, AtomicBoolean stopFlag) {
       this.parent = parent;
       this.con = con;
+      this.stopFlag = stopFlag;
     }
 
     public void run() {
-      try {
-        Thread.sleep(DOWNLOAD_TIMEOUT);
-      } catch (InterruptedException e) {
+
+      long timeoutAt = System.currentTimeMillis() + DOWNLOAD_TIMEOUT;
+
+      while (System.currentTimeMillis() < timeoutAt) {
+
+        if (stopFlag != null && stopFlag.get()) {
+          break;
+        }
+
+        try {
+          Thread.sleep(2000);
+        } catch (InterruptedException e) {
+          // Ignore
+        }
 
       }
+
       try {
         ((HttpURLConnection)con).disconnect();
       } catch (Exception e) {

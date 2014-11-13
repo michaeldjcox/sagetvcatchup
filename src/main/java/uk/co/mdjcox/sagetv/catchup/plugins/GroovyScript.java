@@ -57,8 +57,8 @@ public abstract class GroovyScript extends groovy.lang.Script {
 
     /* From here on down are methods available to the plugin user */
 
-    public String GET_WEB_PAGE(String url) throws Exception {
-        return downloadUtils.downloadFileString(url, 30000, 2);
+    public String GET_WEB_PAGE(String url, AtomicBoolean stopFlag) throws Exception {
+        return downloadUtils.downloadFileString(url, 30000, 2, stopFlag);
     }
 
     public String REPLACE_LINK_PREFIX(String existingUrl, String newPrefix) {

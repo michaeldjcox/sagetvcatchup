@@ -31,7 +31,7 @@ public class Cataloger {
   private static final int EPISODE_THREADS = 20;
   private LoggerInterface logger;
   private PluginManager pluginManager;
-  private AtomicReference<String> progressString = new AtomicReference<String>("Restoring previous catalog");
+  private AtomicReference<String> progressString = new AtomicReference<String>("");
   private AtomicBoolean stop = new AtomicBoolean(false);
   private AtomicBoolean catalogRunning = new AtomicBoolean(false);
   private ScheduledExecutorService catalogingScheduler;
@@ -61,11 +61,14 @@ public class Cataloger {
       public void run() {
         try {
           newCatalog = null;
+          programmeThreadPool = Executors.newFixedThreadPool(PROGRAMME_THREADS, new NumberedThreadFactory("cataloger-programme"));
+          episodeThreadPool = Executors.newFixedThreadPool(EPISODE_THREADS, new NumberedThreadFactory("cataloger-episode"));
+
+          catalogRunning.set(true);
           try {
             stop.set(false);
             long startTime = System.currentTimeMillis();
 
-            catalogRunning.set(true);
             logger.info("Refreshing catalog");
             Catalog completedCatalog = catalog();
             if (completedCatalog != null) {
@@ -84,20 +87,40 @@ public class Cataloger {
               logger.info(progressString.get());
             }
           } catch (Throwable e) {
+            String message = e.getMessage();
+            if (message == null) {
+              message = e.getClass().getSimpleName();
+            }
             if (newCatalog != null) {
               Category root = newCatalog.getRoot();
               if (root != null) {
-                root.addError("FATAL", "Failed to catalog: " + e.getMessage());
+                root.addError("FATAL", "Failed to catalog: " + message);
               }
             }
             logger.error("Failed to refresh catalog", e);
             setProgress("Failed");
           } finally {
-            catalogRunning.set(false);
             newCatalog = null;
           }
         } catch (Throwable e) {
           logger.error("Caught Exception during cataloging", e);
+        } finally {
+          catalogRunning.set(false);
+          if (programmeThreadPool != null) {
+            try {
+              programmeThreadPool.shutdownNow();
+            } catch (Exception e) {
+              // ignore
+            }
+          }
+          if (episodeThreadPool != null) {
+            try {
+              episodeThreadPool.shutdownNow();
+            } catch (Exception e) {
+              // ignore
+            }
+          }
+
         }
       }
     };
@@ -154,6 +177,9 @@ public class Cataloger {
 
         ArrayList<String> testProgrammes = context.getTestProgrammes(pluginName);
         int testMaxProgrammes = context.getMaxProgrammes(pluginName);
+        if (testMaxProgrammes <=0) {
+          testMaxProgrammes = Integer.MAX_VALUE;
+        }
 
         newCatalog.addSource(sourceCat);
 
@@ -167,7 +193,7 @@ public class Cataloger {
 
         logger.info("Getting programmes found on: " + sourceCat);
         int programmeCount = 0;
-        Collection<Programme> programmes = plugin.getProgrammes();
+        Collection<Programme> programmes = plugin.getProgrammes(stop);
 
         final int programmesToDo = Math.min(testMaxProgrammes, programmes.size());
         final CountDownLatch programmesLatch = new CountDownLatch(programmesToDo);
@@ -198,9 +224,11 @@ public class Cataloger {
                 try {
                   logger.info("Doing programme " + programmeId);
 
+                  checkForStop();
+
                   programme.setPodcastUrl("/programme?id=" + programmeId + ";type=xml");
 
-                  Collection<Episode> episodes = plugin.getEpisodes(sourceCat, programme);
+                  Collection<Episode> episodes = plugin.getEpisodes(sourceCat, programme, stop);
 
                   checkForStop();
 
@@ -215,7 +243,7 @@ public class Cataloger {
                           try {
                             checkForStop();
 
-                            plugin.getEpisode(sourceCat, programme, episode);
+                            plugin.getEpisode(sourceCat, programme, episode, stop);
 
                             checkForStop();
 
@@ -225,7 +253,11 @@ public class Cataloger {
 
                             programme.addEpisode(episode);
                           } catch (Throwable e) {
-                            if (!e.getMessage().equals(STOPPED_ON_REQUEST)) {
+                            String message = e.getMessage();
+                            if (message == null) {
+                              message = e.getClass().getSimpleName();
+                            }
+                            if (!message.equals(STOPPED_ON_REQUEST)) {
                               programme.addError("ERROR", "Failed to catalog episode " + episode.getEpisodeTitle());
                             }
                           } finally {
@@ -355,7 +387,12 @@ public class Cataloger {
 
       return newCatalog;
     } catch (Throwable e) {
-      if (!e.getMessage().equals(STOPPED_ON_REQUEST)) {
+
+      String message = e.getMessage();
+      if (message == null) {
+        message = e.getClass().getSimpleName();
+      }
+      if (!message.equals(STOPPED_ON_REQUEST)) {
         logger.error("Failed to catalog", e);
         progressString.set("Failed to catalog");
       } else {
@@ -368,6 +405,9 @@ public class Cataloger {
 
   private void checkForStop() {
     if (stop.get()) {
+      if (!progressString.get().startsWith("Stopped")) {
+        progressString.set("Stopping");
+      }
       throw new RuntimeException(STOPPED_ON_REQUEST);
     }
   }
@@ -632,7 +672,9 @@ public class Cataloger {
 
   public void start(final List<CatalogPublisher> publishers, final CatalogPersister persister) {
     try {
-      logger.info("Starting the catalog service");
+      String msg = "Starting the catalog service";
+      logger.info(msg);
+      progressString.set(msg);
 
       catalogingScheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
         @Override
@@ -641,19 +683,26 @@ public class Cataloger {
         }
       });
 
-      programmeThreadPool = Executors.newFixedThreadPool(PROGRAMME_THREADS, new NumberedThreadFactory("cataloger-programme"));
-      episodeThreadPool = Executors.newFixedThreadPool(EPISODE_THREADS, new NumberedThreadFactory("cataloger-episode"));
-
       this.publishers = publishers;
 
       try {
-        logger.info("Restoring catalog from backup");
+        msg = "Restoring catalog from backup";
+        logger.info(msg);
+        progressString.set(msg);
+
         Catalog initial = persister.load();
+        msg = "Publishing restored catalog";
+        progressString.set(msg);
         publish(initial, publishers);
         lastCatalog = initial;
-        logger.info("Restored catalog from backup");
+        msg = "Restored catalog from backup";
+        progressString.set(msg);
+        logger.info(msg);
       } catch (Exception e) {
-        logger.error("Failed to restore catalog from backup", e);
+        msg = "Failed to restore catalog from backup";
+        progressString.set(msg);
+        logger.error(msg, e);
+
       }
 
       Runnable runnable = getCatalogRunnable(publishers);
@@ -700,7 +749,7 @@ public class Cataloger {
     int threshold = 0;
     for (String name : pluginManager.getPluginNames()) {
       if (!context.skipPlugin(name)) {
-        if (context.getMaxProgrammes(name) >0 && context.getMaxProgrammes(name) < Integer.MAX_VALUE) {
+        if (context.getMaxProgrammes(name) > 0 && context.getMaxProgrammes(name) < Integer.MAX_VALUE) {
           threshold += context.getMaxProgrammes(name)-(context.getMaxProgrammes(name)/10);
         }
       }
@@ -713,9 +762,27 @@ public class Cataloger {
 
   public void shutdown() {
     stop.set(true);
-    catalogingScheduler.shutdownNow();
-    programmeThreadPool.shutdownNow();
-    episodeThreadPool.shutdownNow();
+    if (catalogingScheduler != null) {
+      try {
+        catalogingScheduler.shutdownNow();
+      } catch (Exception e) {
+        //Ignore
+      }
+    }
+    if (programmeThreadPool != null) {
+      try {
+        programmeThreadPool.shutdownNow();
+      } catch (Exception e) {
+        // Ignore
+      }
+    }
+    if (episodeThreadPool != null) {
+      try {
+        episodeThreadPool.shutdownNow();
+      } catch (Exception e) {
+        // Ignore
+      }
+    }
   }
 
   public boolean isRunning() {
@@ -743,6 +810,9 @@ public class Cataloger {
         return "Already stopped";
       } else {
         stop.set(true);
+        if (!progressString.get().startsWith("Stopped")) {
+          progressString.set("Stopping");
+        }
         return "Stopping catalog";
       }
     } catch (Exception e) {

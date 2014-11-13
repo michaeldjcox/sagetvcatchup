@@ -2,7 +2,7 @@ package Channel4OD
 
 import uk.co.mdjcox.sagetv.model.Programme
 
-String str = GET_WEB_PAGE(url);
+String str = GET_WEB_PAGE(url, stopFlag);
 
 if (str != null) {
     if (str.contains("The programme you're looking for can't be found")) str = null;

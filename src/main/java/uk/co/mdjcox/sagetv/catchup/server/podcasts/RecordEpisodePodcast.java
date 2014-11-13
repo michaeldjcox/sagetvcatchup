@@ -35,7 +35,11 @@ public class RecordEpisodePodcast extends AbstractPodcast {
       try {
         recorder.record(episode, false, true);
       } catch (Exception e) {
-        message = "Recording failed: " + e.getMessage();
+        String exmessage = e.getMessage();
+        if (exmessage == null) {
+          exmessage = e.getClass().getSimpleName();
+        }
+        message = "Recording failed: " + exmessage;
       }
       RssBuilder builder = new RssBuilder();
       final String url = getPodcastBaseUrl() + "/"+ getUri();

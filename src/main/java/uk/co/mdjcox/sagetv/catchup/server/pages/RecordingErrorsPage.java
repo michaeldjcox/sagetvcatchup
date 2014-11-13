@@ -28,12 +28,16 @@ public class RecordingErrorsPage extends AbstractHtmlPage {
         htmlBuilder.startTable();
         htmlBuilder.addTableHeader("Start Time", "Stop Time", "Episode Id", "Error", "Exception");
         for (Recording failedRecording : recorder.getFailedRecordings()) {
+          String message = failedRecording.getFailureException().getMessage();
+          if (message == null) {
+            message = failedRecording.getFailureException().getClass().getSimpleName();
+          }
             htmlBuilder.addTableRow(
                     format.format(failedRecording.getStartTime()),
                     format.format(failedRecording.getStopTime()),
                     failedRecording.getId(),
                     failedRecording.getFailedReason(),
-                    failedRecording.getFailureException().getMessage());
+                    message);
         }
         htmlBuilder.stopTable();
         htmlBuilder.stopBody();

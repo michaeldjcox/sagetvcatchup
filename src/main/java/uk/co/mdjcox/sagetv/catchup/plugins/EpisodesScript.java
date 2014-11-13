@@ -14,6 +14,7 @@ import uk.co.mdjcox.utils.OsUtilsInterface;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,15 +32,23 @@ public class EpisodesScript extends Script {
         super(logger, base + File.separator + "getEpisodes.groovy", htmlUtils, downloadUtils, osUtils, context);
     }
 
-    public Collection<Episode> getEpisodes(Source source, Programme category) {
+    public Collection<Episode> getEpisodes(Source source, Programme category, AtomicBoolean stopFlag) {
         ArrayList<Episode> episodes = new ArrayList<Episode>();
         try {
             getLogger().info("Getting episodes for " + category);
-            call("source", source, "url", category.getServiceUrl(), "category", category, "episodes", episodes);
+            call("source", source, "url", category.getServiceUrl(), "category", category, "episodes", episodes, "stopFlag", stopFlag);
 
         } catch (Throwable e) {
-            category.addError("ERROR", "Unable to get episodes: " + e.getMessage());
+          String message = e.getMessage();
+          if (message == null) {
+            message = e.getClass().getSimpleName();
+          }
+          if (message.equals(STOPPED_ON_REQUEST)) {
+            getLogger().info("Stopped on request getting episodes for " + category);
+          } else {
+            category.addError("ERROR", "Unable to get episodes: " + message);
             getLogger().error("Unable to get episodes for: " + category, e);
+          }
         }finally {
           if (category.hasErrors()) {
             getLogger().warn("Programme " + category.getShortName() + " has errors");

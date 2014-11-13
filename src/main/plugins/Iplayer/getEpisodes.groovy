@@ -5,7 +5,7 @@ import uk.co.mdjcox.sagetv.model.Episode
 
 url = REPLACE_LINK_PREFIX(url, "http://www.bbc.co.uk/iplayer/episodes");
 
-String str = GET_WEB_PAGE(url);
+String str = GET_WEB_PAGE(url, stopFlag);
 
 if (str != null) {
     if (str.contains("The programme you're looking for can't be found")) {
