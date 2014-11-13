@@ -29,7 +29,7 @@ public class StopAllRecordingPage extends AbstractHtmlPage {
         String message = recorder.requestStopAll();
         HtmlBuilder builder = new HtmlBuilder();
         builder.startDocument();
-        builder.addPageHeader("Recording");
+        builder.addPageHeader("Recording", true, "/");
         builder.startBody();
         builder.addHeading1(message);
         builder.stopBody();

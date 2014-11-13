@@ -29,7 +29,7 @@ public class StopCatalogingPage extends AbstractHtmlPage {
         String message = cataloger.stopCataloging();
         HtmlBuilder builder = new HtmlBuilder();
         builder.startDocument();
-        builder.addPageHeader("Cataloging");
+        builder.addPageHeader("Cataloging", true, "/");
         builder.startBody();
         builder.addHeading1(message);
         builder.stopBody();
