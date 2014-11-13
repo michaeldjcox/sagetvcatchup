@@ -108,6 +108,11 @@ public class CatchupTestModule extends AbstractModule {
       catchupServerRmiPort = properties.getInt("catchupServerRmiPort", 1106);
     }
 
+      @Override
+      public void setProperty(String name, String value) {
+          throw new UnsupportedOperationException("Cannot set properties in test context");
+      }
+
     @Override
     public String getDefaultCatalogFileName() {
       return defaultCatalogFileName;

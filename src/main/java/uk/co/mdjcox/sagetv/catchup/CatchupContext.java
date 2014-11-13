@@ -13,8 +13,8 @@ public class CatchupContext implements CatchupContextInterface {
   private final static String workingDir = System.getProperty("user.dir");
   private final static String userHome = System.getProperty("user.home");
 
-  private final String podcastBase;
-  private final int refreshStartHour;
+  private String podcastBase;
+  private int refreshStartHour;
   private String tmpDir;
   private String pluginDir;
   private String cssDir;
@@ -34,42 +34,45 @@ public class CatchupContext implements CatchupContextInterface {
   private int catchupPluginRmiPort;
 
   public CatchupContext(final PropertiesInterface properties) {
-    this.properties = properties;
-
-    xsltDir = workingDir + File.separator + "xslt";
-    cssDir = workingDir + File.separator + "css";
-    logDir = workingDir + File.separator + "logs";
-    pluginDir = workingDir + File.separator + "plugins";
-    configDir = workingDir + File.separator + "config";
-
-    recordingDir = properties.getString("recordingDir");
-    refreshRate = properties.getInt("refreshRateHours");
-    refreshStartHour = properties.getInt("refreshStartHour");
-    refreshStartNowProgrammeThreshold = properties.getInt("refreshStartNowProgrammeThreshold");
-    port = properties.getInt("podcasterPort");
-
-    tmpDir = System.getProperty("java.io.tmpdir", ".");
-    if (!tmpDir.endsWith(File.separator)) {
-      tmpDir += File.separator;
-    }
-    tmpDir += "sagetvcatchup";
-    tmpDir += File.separator;
-
-    File tmpDirFle = new File(tmpDir);
-    tmpDirFle.mkdirs();
-
-    String defaultFileName = tmpDir + "sagetvcatchup.xml";
-    catalogFileName = properties.getString("catalogFileName", defaultFileName);
-    String seedDir = workingDir + File.separator + "seeds";
-    defaultCatalogFileName = seedDir + File.separator + "default.xml";
-    onlineVideoPropsSuffix = properties.getString("onlineVideoPropsSuffix");
-    onlineVideoPropertiesDir = properties.getString("onlineVideoPropertiesDir");
-    podcastBase = "http://localhost:" + port;
-    catchupPluginRmiPort = properties.getInt("catchupPluginRmiPort", 1105);
-    catchupServerRmiPort = properties.getInt("catchupServerRmiPort", 1106);
+      this.properties = properties;
+      init(properties);
   }
 
-  public static boolean isRunningInDev() {
+    private void init(PropertiesInterface properties) {
+        xsltDir = workingDir + File.separator + "xslt";
+        cssDir = workingDir + File.separator + "css";
+        logDir = workingDir + File.separator + "logs";
+        pluginDir = workingDir + File.separator + "plugins";
+        configDir = workingDir + File.separator + "config";
+
+        recordingDir = properties.getString("recordingDir");
+        refreshRate = properties.getInt("refreshRateHours");
+        refreshStartHour = properties.getInt("refreshStartHour");
+        refreshStartNowProgrammeThreshold = properties.getInt("refreshStartNowProgrammeThreshold");
+        port = properties.getInt("podcasterPort");
+
+        tmpDir = System.getProperty("java.io.tmpdir", ".");
+        if (!tmpDir.endsWith(File.separator)) {
+          tmpDir += File.separator;
+        }
+        tmpDir += "sagetvcatchup";
+        tmpDir += File.separator;
+
+        File tmpDirFle = new File(tmpDir);
+        tmpDirFle.mkdirs();
+
+        String defaultFileName = tmpDir + "sagetvcatchup.xml";
+        catalogFileName = properties.getString("catalogFileName", defaultFileName);
+        String seedDir = workingDir + File.separator + "seeds";
+        defaultCatalogFileName = seedDir + File.separator + "default.xml";
+        onlineVideoPropsSuffix = properties.getString("onlineVideoPropsSuffix");
+        onlineVideoPropertiesDir = properties.getString("onlineVideoPropertiesDir");
+        podcastBase = "http://localhost:" + port;
+        catchupPluginRmiPort = properties.getInt("catchupPluginRmiPort", 1105);
+        catchupServerRmiPort = properties.getInt("catchupServerRmiPort", 1106);
+    }
+
+    public static boolean isRunningInDev() {
     File src = new File("src");
     return src.exists();
   }
@@ -190,6 +193,11 @@ public class CatchupContext implements CatchupContextInterface {
   @Override
   public int getCatchupPluginRmiPort() {
     return catchupPluginRmiPort;
+  }
+
+  public void setProperty(String name, String value) {
+    properties.setProperty(name, value);
+    init(properties);
   }
 
   @Override

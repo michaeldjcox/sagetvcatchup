@@ -179,7 +179,12 @@ public class CatchupDevModule extends AbstractModule {
 
     }
 
-    @Override
+      @Override
+      public void setProperty(String name, String value) {
+          throw new UnsupportedOperationException("Cannot set properties in dev context");
+      }
+
+      @Override
     public String getDefaultCatalogFileName() {
       return defaultCatalogFileName;
     }

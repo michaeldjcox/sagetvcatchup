@@ -559,6 +559,7 @@ public class CatchupPlugin implements SageTVPlugin {
 
     if (property.equals(PORT)) {
       setCatchupProperty(PORT, value);
+      restartCatchupServer();
     }
 
     for (String name : getPluginNames()) {
@@ -595,8 +596,11 @@ public class CatchupPlugin implements SageTVPlugin {
       sageUtils.error("Failed to persist property change", e);
     }
 
-    restartCatchupServer();
-
+      try {
+          getCatchupServerRemote().setProperty(propName, value);
+      } catch (Exception e) {
+          sageUtils.error("Failed to set property on catchup server", e);
+      }
   }
 
   private void forceStopRecording() {

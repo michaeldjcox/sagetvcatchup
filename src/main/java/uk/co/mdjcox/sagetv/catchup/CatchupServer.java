@@ -172,7 +172,7 @@ public class CatchupServer {
 
   private void startRmiServer() {
     try {
-      rmiService = new CatchupServerService(cataloger, recorder);
+      rmiService = new CatchupServerService(cataloger, recorder, context);
 
       int rmiRegistryPort = context.getCatchupServerRmiPort();
       logger.info("Offer remote access to server");

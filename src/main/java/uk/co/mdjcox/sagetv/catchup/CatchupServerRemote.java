@@ -20,4 +20,6 @@ public interface CatchupServerRemote extends Remote {
   String stopAllRecording() throws RemoteException;
 
   String shutdown() throws RemoteException;
+
+  void setProperty(String name, String value) throws RemoteException;
 }

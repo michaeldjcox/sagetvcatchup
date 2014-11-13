@@ -12,12 +12,14 @@ import java.util.Map;
  */
 public class CatchupServerService extends UnicastRemoteObject implements CatchupServerRemote {
 
+  private final CatchupContextInterface context;
   private Cataloger cataloger;
   private Recorder recorder;
 
-  public CatchupServerService(Cataloger cataloger, Recorder recorder) throws RemoteException {
+  public CatchupServerService(Cataloger cataloger, Recorder recorder, CatchupContextInterface context) throws RemoteException {
     this.cataloger = cataloger;
     this.recorder = recorder;
+    this.context = context;
   }
 
   @Override
@@ -65,4 +67,9 @@ public class CatchupServerService extends UnicastRemoteObject implements Catchup
   public boolean available() throws RemoteException {
     return true;
   }
+
+    @Override
+    public void setProperty(String name, String value) throws RemoteException {
+        context.setProperty(name, value);
+    }
 }

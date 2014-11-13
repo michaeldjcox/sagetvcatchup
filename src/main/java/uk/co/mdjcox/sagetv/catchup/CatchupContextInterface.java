@@ -8,53 +8,55 @@ import java.util.ArrayList;
  * Created by michael on 13/10/14.
  */
 public interface CatchupContextInterface {
-  String getDefaultCatalogFileName();
+    String getDefaultCatalogFileName();
 
-  String getCatalogFileName();
+    String getCatalogFileName();
 
-  int getRefreshRate();
+    int getRefreshRate();
 
-  int getRefreshStartHour();
+    int getRefreshStartHour();
 
-  int getPort();
+    int getPort();
 
-  String getPodcastBase();
+    String getPodcastBase();
 
-  String getPluginDir();
+    String getPluginDir();
 
-  String getCssDir();
+    String getCssDir();
 
-  String getConfigDir();
+    String getConfigDir();
 
-  String getTmpDir();
+    String getTmpDir();
 
-  String getXsltDir();
+    String getXsltDir();
 
-  String getLogDir();
+    String getLogDir();
 
-  String getRecordingDir();
+    String getRecordingDir();
 
-  String getOnlineVideoPropertiesSuffix();
+    String getOnlineVideoPropertiesSuffix();
 
-  String getOnlineVideoPropertiesDir();
+    String getOnlineVideoPropertiesDir();
 
-  ArrayList<String> getTestProgrammes(String pluginName);
+    ArrayList<String> getTestProgrammes(String pluginName);
 
-  int getMaxProgrammes(String pluginName);
+    int getMaxProgrammes(String pluginName);
 
-  PropertiesInterface getProperties();
+    PropertiesInterface getProperties();
 
-  boolean skipPlugin(String sourceId);
+    boolean skipPlugin(String sourceId);
 
-  String toString();
+    String toString();
 
-  void setPort(int port);
+    void setPort(int port);
 
-  void setRecordingDir(String recordDir);
+    void setRecordingDir(String recordDir);
 
-  int getRefreshStartNowProgrammeThreshold();
+    int getRefreshStartNowProgrammeThreshold();
 
-  int getCatchupServerRmiPort();
+    int getCatchupServerRmiPort();
 
-  int getCatchupPluginRmiPort();
+    int getCatchupPluginRmiPort();
+
+    void setProperty(String name, String value);
 }
