@@ -48,7 +48,7 @@ public class CatchupServer {
             e.printStackTrace();
           }
         }
-      }));
+      }, "catchup-server-shutdown-hook"));
 
 
       PersistentRollingFileAppender.stopped = false;
@@ -215,7 +215,7 @@ public class CatchupServer {
             logger.warn("Failed to stop catchup rmi server", e);
           }
         }
-      }));
+      }, "catchup-rmi-server-shutdown-hook"));
     } catch (Exception e) {
       logger.error("Cannot start catchup rmi server ", e);
     }

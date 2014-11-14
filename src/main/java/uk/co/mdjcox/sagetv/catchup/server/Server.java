@@ -17,12 +17,15 @@ import uk.co.mdjcox.sagetv.catchup.server.podcasts.*;
 import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.utils.LoggerInterface;
+import uk.co.mdjcox.utils.OsUtils;
+import uk.co.mdjcox.utils.OsUtilsInterface;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -40,8 +43,11 @@ public class Server implements CatalogPublisher {
     private final String cssDir;
     private final String xsltDir;
     private final String logDir;
+  private final String htDocsDir;
+  private final String stagingDir;
   private final SocketConnector connector;
   private final CatalogPersister persister;
+  private final OsUtilsInterface osUtils;
   private LoggerInterface logger;
     private org.mortbay.jetty.Server server;
     private int port;
@@ -52,10 +58,12 @@ public class Server implements CatalogPublisher {
     private Map<String, ContentProvider> staticContent = new HashMap<String, ContentProvider>();
 
     @Inject
-    private Server(LoggerInterface logger, CatchupContextInterface context, HtmlUtilsInterface htmlUtils,
+    private Server(LoggerInterface logger, CatchupContextInterface context,
+                   HtmlUtilsInterface htmlUtils, OsUtilsInterface osUtils,
                    Cataloger cataloger, Recorder recorder, CatalogPersister persister) throws Exception {
         this.logger = logger;
         this.htmlUtils = htmlUtils;
+      this.osUtils = osUtils;
       this.persister = persister;
 
         Handler handler = new AbstractHandler() {
@@ -79,6 +87,8 @@ public class Server implements CatalogPublisher {
         logDir = context.getLogDir();
         cssDir = context.getCssDir();
         xsltDir = context.getXsltDir();
+        htDocsDir = context.getTmpDir() + File.separator + "htdocs";
+        stagingDir = context.getTmpDir() + File.separator + "staging";
 
         init(htmlUtils, cataloger, recorder);
     }
@@ -98,6 +108,12 @@ public class Server implements CatalogPublisher {
 
         RecordingStatusPodcast recordingStatusPodcast = new RecordingStatusPodcast(baseUrl, recorder);
         addStaticContent(recordingStatusPodcast);
+
+        RecordingErrorsPage recerrors = new RecordingErrorsPage(recorder);
+        addStaticContent(recerrors);
+
+        RecordingErrorsPodcast recerrorscast = new RecordingErrorsPodcast(htmlUtils, baseUrl, recorder);
+        addStaticContent(recerrorscast);
 
         CatalogingStatusPodcast cataloging = new CatalogingStatusPodcast(baseUrl, cataloger);
         addStaticContent(cataloging);
@@ -141,9 +157,28 @@ public class Server implements CatalogPublisher {
         publishedContent.put(provider.getUri(), provider);
     }
 
-    public void commitPublishedContent(Map<String, ContentProvider> publishedContent) {
+  public void addCachedPublishedContent(Map<String, ContentProvider> publishedContent, ContentProvider provider) {
+    CachedContentProvider cachedContentProvider = new CachedContentProvider(logger, stagingDir, htDocsDir, provider);
+    publishedContent.put(provider.getUri(), cachedContentProvider);
+  }
+
+    public void commitPublishedContent(Map<String, ContentProvider> publishedContent) throws Exception {
+
+      final File currentContent = new File(htDocsDir);
+      final File stagedContent = new File(stagingDir);
+
+      if (currentContent.exists()) {
+        osUtils.deleteFileOrDir(currentContent, true);
+      }
+
+      Files.move(stagedContent.toPath(), currentContent.toPath());
+
+      stagedContent.mkdirs();
+
         this.publishedContent.clear();
         this.publishedContent = publishedContent;
+
+
     }
 
     public void start() throws Exception {
@@ -219,42 +254,37 @@ public class Server implements CatalogPublisher {
     public void publish(Catalog catalog) {
         try {
             logger.info("Publishing new catalog to web server");
+
             Map<String, ContentProvider> publishedContent = new HashMap<String, ContentProvider>();
 
-          RecordingErrorsPage recerrors = new RecordingErrorsPage(recorder);
-          addPublishedContent(publishedContent, recerrors);
-
-          RecordingErrorsPodcast recerrorscast = new RecordingErrorsPodcast(htmlUtils, baseUrl, recorder);
-          addPublishedContent(publishedContent, recerrorscast);
-
             StyledPage programmes = new StyledPage(xsltDir, logger, "Programmes", "programmes.html", null, catalog, persister);
-            addPublishedContent(publishedContent, programmes);
+            addCachedPublishedContent(publishedContent, programmes);
 
             StyledPage categories = new StyledPage(xsltDir, logger, "Categories", "categories.html", null, catalog, persister);
-            addPublishedContent(publishedContent, categories);
+            addCachedPublishedContent(publishedContent, categories);
 
             StyledPage episodes = new StyledPage(xsltDir, logger, "Episodes", "episodes.html", null, catalog, persister);
-            addPublishedContent(publishedContent, episodes);
+            addCachedPublishedContent(publishedContent, episodes);
 
             for (Category cat : catalog.getCategories()) {
                 boolean isProgramme =cat.isProgrammeCategory();
                 String title=isProgramme ? "Programme" : "Category";
                 String webpage= isProgramme ? "programme.html" : "category.html";
                 StyledPage provider = new StyledPage(xsltDir, logger, title, webpage, cat.getId(), cat, persister);
-                addPublishedContent(publishedContent, provider);
+                addCachedPublishedContent(publishedContent, provider);
                 if (cat.hasEpisodes()) {
                     ProgrammePodcast catProvider = new ProgrammePodcast(baseUrl, catalog, (SubCategory)cat, htmlUtils);
-                    addPublishedContent(publishedContent, catProvider);
+                    addCachedPublishedContent(publishedContent, catProvider);
                 } else {
                     CategoryPodcast catProvider = new CategoryPodcast(baseUrl, catalog, cat, htmlUtils);
-                    addPublishedContent(publishedContent, catProvider);
+                    addCachedPublishedContent(publishedContent, catProvider);
                 }
 
             }
 
             for (Episode episode : catalog.getEpisodes()) {
                 StyledPage provider = new StyledPage(xsltDir, logger, "Episode", "episode.html", episode.getId(), episode, persister);
-                addPublishedContent(publishedContent, provider);
+                addCachedPublishedContent(publishedContent, provider);
 
                 ControlPodcast controlPodcastProvider = new ControlPodcast(baseUrl, recorder, episode, htmlUtils);
                 addPublishedContent(publishedContent, controlPodcastProvider);

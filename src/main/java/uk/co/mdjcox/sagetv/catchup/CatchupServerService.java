@@ -59,7 +59,9 @@ public class CatchupServerService extends UnicastRemoteObject implements Catchup
           System.exit(1);
         }
       }
-    });
+    }, "catchup-shutdown-request");
+
+    shutdown.start();
     return "Shutting down";
   }
 

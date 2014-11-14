@@ -274,43 +274,22 @@ public class CatchupPlugin implements SageTVPlugin {
         File recordings = new File(recordingDir);
 
         // SageTV should take care of the root
-        deleteFileOrDir(recordings, false);
+        osUtils.deleteFileOrDir(recordings, false);
 
         File props = new File(propFileName);
         if (props.exists()) {
-          deleteFileOrDir(props, true);
+          osUtils.deleteFileOrDir(props, true);
         }
 
         String logDir = catchupDir + "logs";
         File logs = new File(logDir);
-        deleteFileOrDir(logs, false);
+        osUtils.deleteFileOrDir(logs, false);
       } else {
         sageUtils.info("Destroying as part of an upgrade - leaving files in place");
       }
       sageUtils.info("Destroying catchup plugin enabled = " + enabled);
     } catch (Throwable e) {
       sageUtils.error("Failed to destroy plugin", e);
-    }
-  }
-
-  private boolean deleteFileOrDir(File fileOrDir, boolean deleteRoot) {
-    if (fileOrDir.isDirectory()) {
-      String[] children = fileOrDir.list();
-      for (int i = 0; i < children.length; i++) {
-        boolean success = deleteFileOrDir(new File(fileOrDir, children[i]), true);
-        if (!success) {
-          sageUtils.warn("FAILED deleting " + fileOrDir);
-          return false;
-        } else {
-          sageUtils.info("Deleted " + fileOrDir);
-        }
-      }
-    }
-
-    if (deleteRoot) {
-      return fileOrDir.delete();
-    } else {
-      return false;
     }
   }
 

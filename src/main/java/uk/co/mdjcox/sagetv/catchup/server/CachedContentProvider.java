@@ -1,6 +1,7 @@
 package uk.co.mdjcox.sagetv.catchup.server;
 
 
+import uk.co.mdjcox.sagetv.catchup.CatchupContext;
 import uk.co.mdjcox.utils.LoggerInterface;
 
 import javax.servlet.ServletException;
@@ -14,17 +15,19 @@ public class CachedContentProvider implements ContentProvider {
     private final String htdocsDir;
     private final String encoding;
     private final LoggerInterface logger;
-    private String type;
+  private final String stagingDir;
+  private String type;
     private String uri;
     private String fileName;
 
-    public CachedContentProvider(LoggerInterface logger, String htdocsDir, ContentProvider provider) {
+    public CachedContentProvider(LoggerInterface logger, String stagingDir, String htdocsDir, ContentProvider provider) {
         type = provider.getType();
         uri = provider.getUri();
         this.logger = logger;
         encoding = provider.getEncoding();
+        this.stagingDir = stagingDir;
         this.htdocsDir = htdocsDir;
-        fileName = uri.substring(1).replace("?", "-");
+        fileName = uri.replace("?", "-");
         cacheHtml(fileName, provider.getPage());
     }
 
@@ -105,9 +108,15 @@ public class CachedContentProvider implements ContentProvider {
     }
 
     private void cacheHtml(String name, String content) {
+      File dirFile = new File(stagingDir);
+
+      if (!dirFile.exists()) {
+        dirFile.mkdirs();
+      }
+
         name = name.replace("/", "_");
         name = name.replace("\\", "_");
-        File file = new File(htdocsDir + File.separator + name);
+        File file = new File(stagingDir + File.separator + name);
         FileWriter fwriter = null;
         PrintWriter writer = null;
 

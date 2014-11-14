@@ -178,8 +178,33 @@ public abstract class OsUtils implements OsUtilsInterface {
         }
     }
 
+  public boolean deleteFileOrDir(File fileOrDir, boolean deleteRoot) {
+    if (fileOrDir.isDirectory()) {
+      String[] children = fileOrDir.list();
+      for (int i = 0; i < children.length; i++) {
+        boolean success = deleteFileOrDir(new File(fileOrDir, children[i]), true);
+        final String fileName = fileOrDir + File.separator + children[i];
+        if (!success) {
+          logger.warn("FAILED deleting " + fileName);
+          return false;
+        } else {
+          logger.info("Deleted " + fileName);
+        }
+      }
+    }
 
-    private String[] getEnvAsStrings(String envVar) {
+    if (deleteRoot) {
+      logger.info("Deleted " + fileOrDir);
+      return fileOrDir.delete();
+    } else {
+      return false;
+    }
+  }
+
+
+
+
+  private String[] getEnvAsStrings(String envVar) {
         Map<String, String> envp = new TreeMap(System.getenv());
         if (isWindows()) {
             String userDir = System.getProperty("user.dir");

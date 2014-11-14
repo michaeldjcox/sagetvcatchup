@@ -50,7 +50,7 @@ public class TmpFileManager {
         hkpFiles.addAll(tmpFiles);
         tmpFiles.clear();
 
-        Thread thread = new Thread("TidyThread") {
+        Thread thread = new Thread("tidy-thread") {
 
             public void run() {
                 long sleepTime=1000;

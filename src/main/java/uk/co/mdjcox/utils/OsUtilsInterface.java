@@ -36,4 +36,6 @@ public interface OsUtilsInterface {
 
     void waitFor(long millis);
 
-}
+    boolean deleteFileOrDir(File fileOrDir, boolean deleteRoot);
+
+  }

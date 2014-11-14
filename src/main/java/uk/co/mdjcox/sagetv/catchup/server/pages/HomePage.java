@@ -57,7 +57,7 @@ public class HomePage extends AbstractHtmlPage {
         htmlBuilder.addLink("Recordings", "/recordings?type=html");
         htmlBuilder.addBreak();
         htmlBuilder.addBreak();
-        htmlBuilder.addHeading3("Catchup server");
+        htmlBuilder.addHeading3("Catchup server:");
 
         htmlBuilder.addLink("Logs", "/logs?type=html");
 
