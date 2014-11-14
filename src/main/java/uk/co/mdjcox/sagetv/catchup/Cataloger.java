@@ -195,6 +195,8 @@ public class Cataloger {
         int programmeCount = 0;
         Collection<Programme> programmes = plugin.getProgrammes(stop);
 
+        progressString.set("Doing " + pluginName + " programme cataloging");
+
         final int programmesToDo = Math.min(testMaxProgrammes, programmes.size());
         final CountDownLatch programmesLatch = new CountDownLatch(programmesToDo);
 
