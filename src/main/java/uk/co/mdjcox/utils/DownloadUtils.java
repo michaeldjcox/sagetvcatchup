@@ -22,17 +22,23 @@ public class DownloadUtils implements DownloadUtilsInterface {
 
   private static final String STOPPED_ON_REQUEST = "Stopped on request";
   private static final int DOWNLOAD_TIMEOUT = 30000;
+  private static DownloadInterruptThread interruptThread;
   private static DownloadUtilsInterface instance;
     private final String DEFAULT_ENCODING = "UTF-8";
 
-    public static DownloadUtilsInterface instance() {
+    public static synchronized DownloadUtilsInterface instance() {
         if (instance == null) {
             instance = new DownloadUtils();
         }
         return instance;
     }
 
-    @Override
+  private DownloadUtils() {
+    interruptThread = new DownloadInterruptThread();
+    interruptThread.start();
+  }
+
+  @Override
     public String sampleFileString(String source) throws Exception {
         return downloadFileString(source, DEFAULT_ENCODING, true, DOWNLOAD_TIMEOUT, 1, null);
 
@@ -70,7 +76,7 @@ public class DownloadUtils implements DownloadUtilsInterface {
           conn = url.openConnection();
           conn.setReadTimeout(timeout);
           conn.setConnectTimeout(timeout);
-          new Thread(new InterruptThread(Thread.currentThread(), conn, stopFlag)).start();
+          interruptThread.addDownload(conn, stopFlag, timeout);
           conn.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17");
 //            conn.setRequestProperty("Accept-Encoding", "tgzip,deflate,sdch");
           stream = conn.getInputStream();
@@ -126,44 +132,8 @@ public class DownloadUtils implements DownloadUtilsInterface {
       throw new Exception("Failed to download web page " + source );
     }
 
-  public class InterruptThread implements Runnable {
-    private Thread parent;
-    private URLConnection con;
-    private AtomicBoolean stopFlag;
 
-    public InterruptThread(Thread parent, URLConnection con, AtomicBoolean stopFlag) {
-      this.parent = parent;
-      this.con = con;
-      this.stopFlag = stopFlag;
-    }
-
-    public void run() {
-
-      long timeoutAt = System.currentTimeMillis() + DOWNLOAD_TIMEOUT;
-
-      while (System.currentTimeMillis() < timeoutAt) {
-
-        if (stopFlag != null && stopFlag.get()) {
-          break;
-        }
-
-        try {
-          Thread.sleep(2000);
-        } catch (InterruptedException e) {
-          // Ignore
-        }
-
-      }
-
-      try {
-        ((HttpURLConnection)con).disconnect();
-      } catch (Exception e) {
-        // Ignore
-      }
-    }
-  }
-
-    /**
+  /**
      * Downloads the file at the specfied URL and stores in in the specified
      * path.
      *
