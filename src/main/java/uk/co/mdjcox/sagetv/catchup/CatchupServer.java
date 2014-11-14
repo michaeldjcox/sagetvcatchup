@@ -115,7 +115,7 @@ public class CatchupServer {
                     }
                 }
           }
-      }, "SystemMonitor");
+      }, "catchup-system-monitor");
         thread.setDaemon(true);
         thread.start();
 
