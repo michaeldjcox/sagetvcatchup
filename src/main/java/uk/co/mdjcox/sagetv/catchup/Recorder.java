@@ -130,15 +130,21 @@ public class Recorder {
             long lastChecked = 0;
             while (partialFile.exists() && !(recording.isStopped() || recording.isFailed() || recording.isComplete())) {
               osUtils.waitFor(1000);
-              long currentSize = partialFile.length();
-              if (currentSize > recording.getLastSize()) {
-                recording.setLastSize(currentSize);
-                lastChecked = System.currentTimeMillis();
-              } else {
-                if ((System.currentTimeMillis() - lastChecked) > RECORDING_TIMEOUT) {
-                  if (!(recording.isComplete() || recording.isStopped() || recording.isFailed())) {
-                    recording.setStalled();
-                    throw new Exception("Recording of " + episode + " stalled");
+              if (partialFile.exists()) {
+                long currentSize = partialFile.length();
+                if (currentSize < recording.getLastSize()) {
+                  // length() may return zero if the file is not there
+                  break;
+                } else
+                if (currentSize > recording.getLastSize()) {
+                  recording.setLastSize(currentSize);
+                  lastChecked = System.currentTimeMillis();
+                } else {
+                  if ((System.currentTimeMillis() - lastChecked) > RECORDING_TIMEOUT) {
+                    if (!(recording.isComplete() || recording.isStopped() || recording.isFailed())) {
+                      recording.setStalled();
+                      throw new Exception("Recording of " + episode + " stalled");
+                    }
                   }
                 }
               }
@@ -146,12 +152,12 @@ public class Recorder {
 
             File completedFile = recording.getCompletedFile();
 
-            if (completedFile.exists()) {
-              try {
-                recording.setLastSize(completedFile.length());
-              } catch (Exception e) {
-                // Ignore
-              }
+            long timeout = System.currentTimeMillis() + RECORDING_TIMEOUT;
+
+            while (!completedFile.exists() && System.currentTimeMillis() < timeout) {
+              logger.info("Waiting for completed file for " + recording + " to appear");
+              osUtils.waitFor(1000);
+
             }
 
             logger.info("Done recording " + recording + " isStopped=" + recording.isStopped() + " isFailed=" + recording.isFailed() + " isComplete=" + recording.isComplete());
@@ -159,6 +165,11 @@ public class Recorder {
 
             if (completedFile.exists()) {
               setCompleted(recording);
+              try {
+                recording.setLastSize(completedFile.length());
+              } catch (Exception e) {
+                // Ignore
+              }
             } else {
               if (!(recording.isToWatch() && !recording.isToKeep())) {
                 logger.error("No completed recording file found for " + episode);
