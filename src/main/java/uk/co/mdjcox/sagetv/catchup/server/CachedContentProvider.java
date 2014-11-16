@@ -1,7 +1,6 @@
 package uk.co.mdjcox.sagetv.catchup.server;
 
 
-import uk.co.mdjcox.sagetv.catchup.CatchupContext;
 import uk.co.mdjcox.utils.LoggerInterface;
 
 import javax.servlet.ServletException;
@@ -61,34 +60,30 @@ public class CachedContentProvider implements ContentProvider {
         try {
             response.setCharacterEncoding(getEncoding());
             response.setContentType(getType());
-            String message = getFromCache(htdocsDir, fileName);
-            response.getWriter().println(message);
+            getFromCache(response.getWriter(), htdocsDir, fileName);
         } catch (Exception e) {
-            throw new ServletException("Failed to find page", e);
+            throw new ServletException("Failed to get page", e);
         }
     }
 
-    private String getFromCache(String dir, String name) throws Exception {
+    private void getFromCache(Writer writer, String dir, String name) throws Exception {
         name = name.replace("/", "_");
         name = name.replace("\\", "_");
 
         File file = new File(dir + File.separator + name);
         FileReader reader = null;
         BufferedReader breader = null;
+
         try {
             reader = new FileReader(file);
-            breader = new BufferedReader(reader);
-            String result = "";
-            String line = "";
-            while ((line = breader.readLine()) != null) {
-                result+=line;
-                result+="\n";
-            }
+            breader = new BufferedReader(reader, 4096);
 
-            if (result.isEmpty()) {
-                throw new Exception("No data found in page " + name);
+          char[] chars = new char[4096];
+
+          int len = -1;
+          while( (len = breader.read(chars)) != -1 ) {
+              writer.write(chars, 0, len);
             }
-            return result;
         } finally {
             if (breader != null) {
                 try {
