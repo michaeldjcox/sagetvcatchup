@@ -12,19 +12,17 @@ import java.util.TreeSet;
 /**
  * Created by michael on 07/10/14.
  */
-public class CategoryPodcast extends AbstractPodcast {
+public class CategoryPodcast extends OnDemandPodcast {
 
     private final HtmlUtilsInterface htmlUtils;
     private final Category category;
     private final Catalog catalog;
-    private String page;
 
     public CategoryPodcast(String baseUrl, Catalog catalog, Category category, HtmlUtilsInterface htmlUtils) {
         super(baseUrl);
         this.htmlUtils = htmlUtils;
         this.catalog = catalog;
         this.category = category;
-        page = buildPage();
     }
 
     public String buildPage() {
@@ -75,11 +73,4 @@ public class CategoryPodcast extends AbstractPodcast {
     public String getUri() {
         return "category?id=" + category.getId() + ";type=xml";
     }
-
-    @Override
-    public String getPage() {
-        return page;
-    }
-
-
 }

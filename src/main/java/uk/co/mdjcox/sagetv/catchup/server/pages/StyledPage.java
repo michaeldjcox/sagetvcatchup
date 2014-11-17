@@ -22,14 +22,13 @@ import java.io.StringWriter;
 /**
  * Created by michael on 06/10/14.
  */
-public class StyledPage extends AbstractHtmlPage {
+public class StyledPage extends OnDemandHtmlPage {
 
     private final LoggerInterface logger;
     private final String title;
     private final String stylesheet;
     private final Object object;
     private final String id;
-    private final String page;
     private final String xsltDir;
     private final CatalogPersister persister;
 
@@ -41,7 +40,6 @@ public class StyledPage extends AbstractHtmlPage {
         this.id = id;
         this.xsltDir = xsltDir;
       this.persister = persister;
-        page = buildPage();
     }
 
     private String parseIntoXML(Object catalog) {
@@ -85,11 +83,6 @@ public class StyledPage extends AbstractHtmlPage {
         } else {
             return stylesheet.replace(".html", "") + "?type=html";
         }
-    }
-
-    @Override
-    public String getPage() {
-        return page;
     }
 
     public String buildPage() {

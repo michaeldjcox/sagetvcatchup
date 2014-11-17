@@ -46,8 +46,8 @@ public class Server implements CatalogPublisher {
     private final String xsltDir;
     private final String logDir;
     private final String tmpDir;
-    private final String htDocsDir;
-  private final String stagingDir;
+//    private final String htDocsDir;
+//  private final String stagingDir;
   private final SocketConnector connector;
   private final CatalogPersister persister;
   private final OsUtilsInterface osUtils;
@@ -60,7 +60,7 @@ public class Server implements CatalogPublisher {
     private Map<String, ContentProvider> publishedContent = new HashMap<String, ContentProvider>();
     private Map<String, ContentProvider> staticContent = new HashMap<String, ContentProvider>();
 
-    private ScheduledExecutorService tidyExecutor;
+//    private ScheduledExecutorService tidyExecutor;
 
     @Inject
     private Server(LoggerInterface logger, CatchupContextInterface context,
@@ -92,8 +92,8 @@ public class Server implements CatalogPublisher {
         logDir = context.getLogDir();
         cssDir = context.getCssDir();
         xsltDir = context.getXsltDir();
-        htDocsDir = context.getTmpDir() + File.separator + "htdocs";
-        stagingDir = context.getTmpDir() + File.separator + "staging";
+//        htDocsDir = context.getTmpDir() + File.separator + "htdocs";
+//        stagingDir = context.getTmpDir() + File.separator + "staging";
         tmpDir = context.getTmpDir();
         init(htmlUtils, cataloger, recorder);
     }
@@ -163,23 +163,27 @@ public class Server implements CatalogPublisher {
     }
 
   public void addCachedPublishedContent(Map<String, ContentProvider> publishedContent, ContentProvider provider) {
-    CachedContentProvider cachedContentProvider = new CachedContentProvider(logger, stagingDir, htDocsDir, provider);
-    publishedContent.put(provider.getUri(), cachedContentProvider);
+// The cache is too slow
+//    CachedContentProvider cachedContentProvider = new CachedContentProvider(logger, stagingDir, htDocsDir, provider);
+//    publishedContent.put(provider.getUri(), cachedContentProvider);
+
+    addPublishedContent(publishedContent, provider);
   }
 
     public void commitPublishedContent(Map<String, ContentProvider> publishedContent) throws Exception {
 
-      final File currentContent = new File(htDocsDir);
-      final File stagedContent = new File(stagingDir);
-      final File oldContent = new File(htDocsDir + "." + System.currentTimeMillis());
-
-      if (currentContent.exists()) {
-        Files.move(currentContent.toPath(), oldContent.toPath());
-      }
-
-      Files.move(stagedContent.toPath(), currentContent.toPath());
-
-      stagedContent.mkdirs();
+// The cache is too slow
+//      final File currentContent = new File(htDocsDir);
+//      final File stagedContent = new File(stagingDir);
+//      final File oldContent = new File(htDocsDir + "." + System.currentTimeMillis());
+//
+//      if (currentContent.exists()) {
+//        Files.move(currentContent.toPath(), oldContent.toPath());
+//      }
+//
+//      Files.move(stagedContent.toPath(), currentContent.toPath());
+//
+//      stagedContent.mkdirs();
 
         this.publishedContent.clear();
         this.publishedContent = publishedContent;
@@ -196,29 +200,29 @@ public class Server implements CatalogPublisher {
         logger.warn("Failed to start the podcast server", e);
       }
 
-        tidyExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("oldcontent-tidy"));
-
-        tidyExecutor.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                File tmp = new File(tmpDir);
-                File[] oldContentDirs = tmp.listFiles(new FilenameFilter() {
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        return name.startsWith("htdocs.");
-                    }
-                });
-
-                for (File oldContent : oldContentDirs) {
-                    try {
-                        logger.info("Deleting old cached server content " + oldContent);
-                        osUtils.deleteFileOrDir(oldContent, true);
-                    } catch (Exception e) {
-                        logger.info("Failed to deleted old content directory " + oldContent);
-                    }
-                }
-            }
-        }, 1, 1, TimeUnit.MINUTES);
+//        tidyExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("oldcontent-tidy"));
+//
+//        tidyExecutor.scheduleAtFixedRate(new Runnable() {
+//            @Override
+//            public void run() {
+//                File tmp = new File(tmpDir);
+//                File[] oldContentDirs = tmp.listFiles(new FilenameFilter() {
+//                    @Override
+//                    public boolean accept(File dir, String name) {
+//                        return name.startsWith("htdocs.");
+//                    }
+//                });
+//
+//                for (File oldContent : oldContentDirs) {
+//                    try {
+//                        logger.info("Deleting old cached server content " + oldContent);
+//                        osUtils.deleteFileOrDir(oldContent, true);
+//                    } catch (Exception e) {
+//                        logger.info("Failed to deleted old content directory " + oldContent);
+//                    }
+//                }
+//            }
+//        }, 1, 1, TimeUnit.MINUTES);
     }
 
     public void shutdown() {
@@ -230,7 +234,7 @@ public class Server implements CatalogPublisher {
             logger.warn("Failed to stop the podcast server", e);
         }
 
-        tidyExecutor.shutdown();
+//        tidyExecutor.shutdown();
     }
 
     private void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch)

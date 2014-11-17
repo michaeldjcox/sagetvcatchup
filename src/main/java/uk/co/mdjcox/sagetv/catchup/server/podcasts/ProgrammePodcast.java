@@ -12,19 +12,17 @@ import java.util.*;
 /**
  * Created by michael on 07/10/14.
  */
-public class ProgrammePodcast extends AbstractPodcast {
+public class ProgrammePodcast extends OnDemandPodcast {
 
     private final HtmlUtilsInterface htmlUtils;
     private final SubCategory programme;
     private final Catalog catalog;
-    private String page;
 
     public ProgrammePodcast(String baseUrl, Catalog catalog, SubCategory category, HtmlUtilsInterface htmlUtils) {
         super(baseUrl);
         this.htmlUtils = htmlUtils;
         this.catalog = catalog;
         this.programme = category;
-        page = buildPage();
     }
 
     public String buildPage() {
@@ -105,11 +103,5 @@ public class ProgrammePodcast extends AbstractPodcast {
     public String getUri() {
         return "programme?id=" + programme.getId() + ";type=xml";
     }
-
-    @Override
-    public String getPage() {
-        return page;
-    }
-
 
 }
