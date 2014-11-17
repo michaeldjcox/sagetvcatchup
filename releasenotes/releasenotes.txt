@@ -1,38 +1,60 @@
 <![CDATA[
 0.3.3 - Second beta release.
 
-        Correct SageTV plugin xml to pass SageTV tests.
-        Fix Demand5 meta data (but demand5 no longer works possible due to encryption).
-        Add Type column to category and programmes web page.
-        Add "Watch and Keep mode" as SageTV only lets you record if fully downloaded.
-        Add better recording outcome reporting.
-        Add enable/disable of individual sources in plugin configuration screen.
-        Allow catchup server port and recording directory to be configured from SageTV
-        Remove the catchup server host and port from podcast URLs from the catalog
-        Move the catchup server to its own JVM to limit the plugins impact on SageTV classpath
-        Add a catalog start hour so cataloging always starts at a set hour of day and occurs every X hours
-        On plugin startup only start cataloging if the catalog looks sparse otherwise wait to scheduled time
-        Reverse order sorting of categories and episodes by orig air date
-        Add seed properties for 32bit windows e.g. windows XP
-        Set up RMI servers in plugin and now separate server for better control and feedback
-        Made record and watch much more resilient to different outcomes
+        Online services menu:
+
         Recording and catalog status are now a further click away as cannot stop SageTV caching downloads at top level
+        Reverse order sorting of categories and episodes by orig air date
         Added a search podcast to allow programme search from SageTV
-        Improved visibility of meta-data in online services
         Moved show icons to programme level from episode level to facilitate better meta-data visibility
-        Deal with duplicate programme entries in iplayer
-        Reduce cataloging time to 10 mins - previously took hours
+        Improved visibility of meta-data at episode level
         Added a "New" category for programmes added since the last catalog
         Added a "Favourite" category for programmes which are also SageTV favourites
         Added recording status messages to recordings podcast including percent done
-        Improvements to cataloging status reporting
-        Made web page downloads interruptable so that cataloging can be more quickly terminated
-        Made web page downloads retry
-        Added indication of time taken to produce catalog
-        Increased maximum heap size to 500Mb
-        Catalog error podcast now grouped by message
+        Added grouping of recordings by outcome e.g. in progress, failed, completed
+        Made improvements to catalog status reporting including time taken to catalog
+        Catalog errors are now grouped by message
+
+        Recording:
+
+        Add "Watch and Keep mode" as SageTV only lets you record if fully downloaded.
+        Made recording and streaming much more resilient to different outcomes
+
+        SageTV plugin:
+
+        Add enable/disable of individual sources in plugin configuration screen.
+        Allow catchup server port and recording directory to be configured from SageTV
+
+        Cataloging:
+
+        Reduce cataloging time to 10 mins - previously took hours
+        Remove the catchup server host and port from podcast URLs from the catalog
+        Add a catalog start hour so cataloging always starts at a set hour of day and occurs every X hours
+        Only start cataloging on startup if the catalog looks sparse otherwise wait to scheduled time
+        Deal with duplicate programme entries in iplayer
+        Made catalog downloads interruptable so that cataloging can be more quickly terminated
+        Made catalog downloads retry on failure
+
+        Web page:
+
+        Add Type column to category web page
+        Add Type column to programmes web page
+        Add error summary to catalog error web page
         Control links in web server home page redirect back to home page rather than present message web page
         Home page now shows active thread count and heap stats
+        Home page now shows growing size of catalog in progress and size of last catalog
+
+        General:
+
+        Moved the catchup server to its own JVM to limit the plugins impact on SageTV classpath
+        Set up RMI servers in plugin and the now separate server for better control and feedback
+        Add seed properties for 32bit windows e.g. windows XP
+        Increased maximum heap size to 500Mb
+
+        Media sources:
+
+        Fix Demand5 meta data (but demand5 no longer works possible due to encryption)
+        Fix Iplayer series and episode number parsing errors
 
 0.2.7 - First beta release. Contains Iplayer catalog, watch and record to TV recordings
 ]]>
