@@ -6,6 +6,7 @@ import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.utils.LoggerInterface;
+import uk.co.mdjcox.utils.NamedThreadFactory;
 import uk.co.mdjcox.utils.NumberedThreadFactory;
 import uk.co.mdjcox.utils.RmiHelper;
 
@@ -679,12 +680,7 @@ public class Cataloger {
       logger.info(msg);
       progressString.set(msg);
 
-      catalogingScheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-          return new Thread(r, "cataloging-scheduler");
-        }
-      });
+      catalogingScheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("cataloging-scheduler"));
 
       this.publishers = publishers;
 

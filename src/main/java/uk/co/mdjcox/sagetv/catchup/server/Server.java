@@ -15,21 +15,23 @@ import uk.co.mdjcox.sagetv.catchup.server.media.WatchEpisode;
 import uk.co.mdjcox.sagetv.catchup.server.pages.*;
 import uk.co.mdjcox.sagetv.catchup.server.podcasts.*;
 import uk.co.mdjcox.sagetv.model.*;
-import uk.co.mdjcox.utils.HtmlUtilsInterface;
-import uk.co.mdjcox.utils.LoggerInterface;
-import uk.co.mdjcox.utils.OsUtils;
-import uk.co.mdjcox.utils.OsUtilsInterface;
+import uk.co.mdjcox.utils.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The web server.
@@ -43,7 +45,8 @@ public class Server implements CatalogPublisher {
     private final String cssDir;
     private final String xsltDir;
     private final String logDir;
-  private final String htDocsDir;
+    private final String tmpDir;
+    private final String htDocsDir;
   private final String stagingDir;
   private final SocketConnector connector;
   private final CatalogPersister persister;
@@ -56,6 +59,8 @@ public class Server implements CatalogPublisher {
 
     private Map<String, ContentProvider> publishedContent = new HashMap<String, ContentProvider>();
     private Map<String, ContentProvider> staticContent = new HashMap<String, ContentProvider>();
+
+    private ScheduledExecutorService tidyExecutor;
 
     @Inject
     private Server(LoggerInterface logger, CatchupContextInterface context,
@@ -89,7 +94,7 @@ public class Server implements CatalogPublisher {
         xsltDir = context.getXsltDir();
         htDocsDir = context.getTmpDir() + File.separator + "htdocs";
         stagingDir = context.getTmpDir() + File.separator + "staging";
-
+        tmpDir = context.getTmpDir();
         init(htmlUtils, cataloger, recorder);
     }
 
@@ -166,9 +171,10 @@ public class Server implements CatalogPublisher {
 
       final File currentContent = new File(htDocsDir);
       final File stagedContent = new File(stagingDir);
+      final File oldContent = new File(htDocsDir + "." + System.currentTimeMillis());
 
       if (currentContent.exists()) {
-        osUtils.deleteFileOrDir(currentContent, true);
+        Files.move(currentContent.toPath(), oldContent.toPath());
       }
 
       Files.move(stagedContent.toPath(), currentContent.toPath());
@@ -189,6 +195,30 @@ public class Server implements CatalogPublisher {
       } catch (Exception e) {
         logger.warn("Failed to start the podcast server", e);
       }
+
+        tidyExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("oldcontent-tidy"));
+
+        tidyExecutor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                File tmp = new File(tmpDir);
+                File[] oldContentDirs = tmp.listFiles(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        return name.startsWith("htdocs.");
+                    }
+                });
+
+                for (File oldContent : oldContentDirs) {
+                    try {
+                        logger.info("Deleting old cached server content " + oldContent);
+                        osUtils.deleteFileOrDir(oldContent, true);
+                    } catch (Exception e) {
+                        logger.info("Failed to deleted old content directory " + oldContent);
+                    }
+                }
+            }
+        }, 1, 1, TimeUnit.MINUTES);
     }
 
     public void shutdown() {
@@ -199,6 +229,8 @@ public class Server implements CatalogPublisher {
         } catch (Exception e) {
             logger.warn("Failed to stop the podcast server", e);
         }
+
+        tidyExecutor.shutdown();
     }
 
     private void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch)

@@ -6,6 +6,8 @@ import uk.co.mdjcox.utils.LoggerInterface;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 
 /**
  * Created by michael on 07/10/14.
@@ -27,7 +29,7 @@ public class CachedContentProvider implements ContentProvider {
         this.stagingDir = stagingDir;
         this.htdocsDir = htdocsDir;
         fileName = uri.replace("?", "-");
-        cacheHtml(fileName, provider.getPage());
+        storeInCache(fileName, provider.getPage());
     }
 
     @Override
@@ -102,7 +104,7 @@ public class CachedContentProvider implements ContentProvider {
         }
     }
 
-    private void cacheHtml(String name, String content) {
+    private void storeInCache(String name, String content) {
       File dirFile = new File(stagingDir);
 
       if (!dirFile.exists()) {
@@ -112,13 +114,14 @@ public class CachedContentProvider implements ContentProvider {
         name = name.replace("/", "_");
         name = name.replace("\\", "_");
         File file = new File(stagingDir + File.separator + name);
-        FileWriter fwriter = null;
-        PrintWriter writer = null;
+
+        Charset charset = Charset.forName("utf-8");
+        BufferedWriter writer = null;
 
         try  {
-            fwriter = new FileWriter(file);
-            writer = new PrintWriter(fwriter);
-            writer.println(content);
+            writer = Files.newBufferedWriter(file.toPath(), charset);
+            writer.write(content);
+            writer.newLine();
             writer.flush();
         } catch (Exception ex) {
             logger.error("Failed to cache " + fileName, ex);
@@ -126,13 +129,6 @@ public class CachedContentProvider implements ContentProvider {
             if (writer != null) {
                 try {
                     writer.close();
-                } catch (Exception e) {
-                    // Ignore
-                }
-            }
-            if (fwriter != null) {
-                try {
-                    fwriter.close();
                 } catch (Exception e) {
                     // Ignore
                 }

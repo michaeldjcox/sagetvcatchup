@@ -1,11 +1,11 @@
 <![CDATA[
-0.3.1 - Second beta release.
+0.3.3 - Second beta release.
 
         Correct SageTV plugin xml to pass SageTV tests.
         Fix Demand5 meta data (but demand5 no longer works possible due to encryption).
         Add Type column to category and programmes web page.
         Add "Watch and Keep mode" as SageTV only lets you record if fully downloaded.
-        Add recording errors better recording outcome reporting.
+        Add better recording outcome reporting.
         Add enable/disable of individual sources in plugin configuration screen.
         Allow catchup server port and recording directory to be configured from SageTV
         Remove the catchup server host and port from podcast URLs from the catalog
@@ -21,10 +21,18 @@
         Improved visibility of meta-data in online services
         Moved show icons to programme level from episode level to facilitate better meta-data visibility
         Deal with duplicate programme entries in iplayer
-        Reduce cataloging time to 15 mins - previously took hours
+        Reduce cataloging time to 10 mins - previously took hours
         Added a "New" category for programmes added since the last catalog
-        Added a "Favourite" category for programmes which are also SageTV favourite series
-        Added recording status messages to recordings podcast
+        Added a "Favourite" category for programmes which are also SageTV favourites
+        Added recording status messages to recordings podcast including percent done
+        Improvements to cataloging status reporting
+        Made web page downloads interruptable so that cataloging can be more quickly terminated
+        Made web page downloads retry
+        Added indication of time taken to produce catalog
+        Increased maximum heap size to 500Mb
+        Catalog error podcast now grouped by message
+        Control links in web server home page redirect back to home page rather than present message web page
+        Home page now shows active thread count and heap stats
 
 0.2.7 - First beta release. Contains Iplayer catalog, watch and record to TV recordings
 ]]>
