@@ -1,4 +1,6 @@
 sagetvcatchup.iws
+sagetvcatchup.ipr
+sagetvcatchup.iml
 target/
 buildNumber.properties
 iplayerExtract.xml
