@@ -1,4 +1,6 @@
 <![CDATA[
+0.4.0 - First official release
+
 0.3.3 - Second beta release.
 
         Online services menu:
