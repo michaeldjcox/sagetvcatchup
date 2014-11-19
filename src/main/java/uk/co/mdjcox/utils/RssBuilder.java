@@ -18,13 +18,13 @@ public class RssBuilder {
       resultStr.append(CRLF);
       resultStr.append("<channel>");
       resultStr.append(CRLF);
-      resultStr.append("<title>");
+      resultStr.append("<title><![CDATA[");
       resultStr.append(title);
-      resultStr.append("</title>");
+      resultStr.append("]]></title>");
       resultStr.append(CRLF);
-      resultStr.append("<description>");
+      resultStr.append("<description><![CDATA[");
       resultStr.append(message);
-      resultStr.append("</description>");
+      resultStr.append("]]></description>");
       resultStr.append(CRLF);
       resultStr.append("<link>");
       resultStr.append(url);
@@ -42,9 +42,9 @@ public class RssBuilder {
         resultStr.append(iconUrl);
         resultStr.append("</url> ");
         resultStr.append(CRLF);
-        resultStr.append("<title>");
+        resultStr.append("<title><![CDATA[");
         resultStr.append(name);
-        resultStr.append("</title>");
+        resultStr.append("]]></title>");
         resultStr.append(CRLF);
         resultStr.append("<link>");
         resultStr.append(url);
@@ -81,9 +81,9 @@ public class RssBuilder {
     private void addItem(String title, String message, String url, String type, String iconUrl) {
         resultStr.append("<item>");
         resultStr.append(CRLF);
-        resultStr.append("<title>");
+        resultStr.append("<title><![CDATA[");
         resultStr.append(title);
-        resultStr.append("</title>");
+        resultStr.append("]]></title>");
         resultStr.append(CRLF);
         resultStr.append("<description><![CDATA[");
         resultStr.append(message);
@@ -105,9 +105,9 @@ public class RssBuilder {
         resultStr.append(url);
         resultStr.append("\" type = \"" + type + "\">");
         resultStr.append(CRLF);
-        resultStr.append("<media:title>");
+        resultStr.append("<media:title><![CDATA[");
         resultStr.append(title);
-        resultStr.append("</media:title>");
+        resultStr.append("]]></media:title>");
         resultStr.append(CRLF);
         resultStr.append("<media:description><![CDATA[");
         resultStr.append(message);
