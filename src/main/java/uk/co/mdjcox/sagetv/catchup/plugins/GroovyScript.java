@@ -214,20 +214,10 @@ public abstract class GroovyScript extends groovy.lang.Script {
       }
     }
 
-    public File WAIT_FOR_FILE(String filename, long timeoutMillis, AtomicBoolean stopFlag) {
-        logger.info("Waiting for existence of " + filename);
-        long stopTime = System.currentTimeMillis() + timeoutMillis;
-        File file = new File(filename);
-        while (!file.exists() || (System.currentTimeMillis() > stopTime)) {
-            if (stopFlag.get()) {
-                break;
-            }
-            WAIT_FOR(1000);
-        }
-        return file;
-    }
+    public File WAIT_FOR_PARTIAL_CONTENT(String filename, AtomicBoolean stopFlag) {
+      long timeoutMillis = context.getPartialSizeForStreamingTimeout();
+      long atLeastSize = context.getPartialSizeForStreaming();
 
-    public File WAIT_FOR_FILE_OF_SIZE(String filename, long atLeastSize, long timeoutMillis, AtomicBoolean stopFlag) {
         logger.info("Waiting for " + filename + " to attain size of " + atLeastSize);
         long stopTime = System.currentTimeMillis() + timeoutMillis;
         File file = new File(filename);
@@ -241,8 +231,13 @@ public abstract class GroovyScript extends groovy.lang.Script {
         return file;
     }
 
-    public String WAIT_FOR_OUTPUT(String prefix, ArrayList<String> output, long timeoutMillis, AtomicBoolean stopFlag) {
+    public String WAIT_FOR_PARTIAL_FILE(String prefix, ArrayList<String> output, AtomicBoolean stopFlag) throws Exception {
+        long timeoutMillis = context.getPartialFileNameConfirmationTimeout();
+
         long stopTime = System.currentTimeMillis() + timeoutMillis;
+
+        LOG_INFO("Waiting for " + timeoutMillis + "ms for '" + prefix + "' in job output");
+
         out:
         while (System.currentTimeMillis() < stopTime) {
             for (String result : output) {
@@ -252,7 +247,8 @@ public abstract class GroovyScript extends groovy.lang.Script {
                 }
 
                 if (result.startsWith(prefix)) {
-                    return result;
+                  LOG_INFO("Partial file name prefix will be " + result);
+                  return result;
                 }
             }
 
@@ -260,11 +256,10 @@ public abstract class GroovyScript extends groovy.lang.Script {
                 break;
             }
 
-            LOG_INFO("Waiting for '" + prefix + "' in job output");
-
             WAIT_FOR(1000);
         }
-        return "";
+
+        throw new Exception("get_iplayer returned no file after timeout");
     }
 
   public void TRACK_PROGRESS(final String regex, final String prefix, final String suffix, final ArrayList<String> output, final Recording recording) {

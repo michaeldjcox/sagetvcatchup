@@ -14,18 +14,12 @@ ArrayList<String> output = new ArrayList<String>();
 ArrayList<String> errors = new ArrayList<String>();
 Process proc = EXECUTE(command, "get_iplayer", output, errors);
 
-long TIMEOUT = 30000;
-
 String prefix = "INFO: File name prefix = "
-String filename = WAIT_FOR_OUTPUT(prefix, output, TIMEOUT, recording.getStopFlag())
-
-if (filename == null || filename.trim().isEmpty()) {
-    throw new Exception("get_iplayer returned no file after " + TIMEOUT);
-}
+String filename = WAIT_FOR_PARTIAL_FILE(prefix, output, recording.getStopFlag())
 
 filename = recording.getRecordingDir() + File.separator + filename.substring(prefix.length()).trim() + ".partial.mp4.flv";
 
-File file = WAIT_FOR_FILE_OF_SIZE(filename, 1024000, 10000, recording.getStopFlag())
+File file = WAIT_FOR_PARTIAL_CONTENT(filename, recording.getStopFlag())
 
 recording.setPartialFile(file);
 

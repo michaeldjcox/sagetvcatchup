@@ -36,7 +36,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class Recorder {
 
-  private static final int RECORDING_TIMEOUT = 30000;
   private final LoggerInterface logger;
   private final OsUtilsInterface osUtils;
   private final CatchupContextInterface context;
@@ -142,9 +141,10 @@ public class Recorder {
                   recording.setLastSize(currentSize);
                   lastChecked = System.currentTimeMillis();
                 } else {
-                  if ((System.currentTimeMillis() - lastChecked) > RECORDING_TIMEOUT) {
+                  if ((System.currentTimeMillis() - lastChecked) > context.getRecordingTimeout()) {
                     if (!(recording.isComplete() || recording.isStopped() || recording.isFailed())) {
                       recording.setStalled();
+                      logger.info("Recording of " + episode + " stalled for " + context.getRecordingTimeout() + "ms after recording " + currentSize);
                       throw new Exception("Recording of " + episode + " stalled");
                     }
                   }
@@ -154,7 +154,7 @@ public class Recorder {
 
             File completedFile = recording.getCompletedFile();
 
-            long timeout = System.currentTimeMillis() + RECORDING_TIMEOUT;
+            long timeout = System.currentTimeMillis() + context.getRecordingTimeout();
 
             while (!completedFile.exists() && System.currentTimeMillis() < timeout) {
               logger.info("Waiting for completed file for " + recording + " to appear");
@@ -232,7 +232,7 @@ public class Recorder {
       if (file == null || !file.exists()) {
         synchronized (recording) {
           try {
-            recording.wait(50000);
+            recording.wait(context.getStreamingTimeout());
           } catch (InterruptedException e) {
             // Ignore
           }
@@ -279,8 +279,8 @@ public class Recorder {
               lastStreamed = streamed;
               lastChecked = System.currentTimeMillis();
             } else {
-              if ((System.currentTimeMillis() - lastChecked) > RECORDING_TIMEOUT) {
-                logger.info("Streaming of " + id + " stalled after serving " + streamed + "/" + recording.getLastSize());
+              if ((System.currentTimeMillis() - lastChecked) > context.getStreamingTimeout()) {
+                logger.info("Streaming of " + id + " stalled for " + context.getStreamingTimeout() + " after serving " + streamed + "/" + recording.getLastSize());
               }
             }
           }
