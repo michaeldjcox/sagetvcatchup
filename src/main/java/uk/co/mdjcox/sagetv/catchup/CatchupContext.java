@@ -260,7 +260,6 @@ public class CatchupContext implements CatchupContextInterface {
             "partialSizeForStreamingTimeout='" + partialSizeForStreamingTimeout + '\'' + "\n" +
             "streamingTimeout='" + streamingTimeout + '\'' + "\n" +
             "recordingTimeout='" + recordingTimeout + '\'' + "\n" +
-            "properties=" + properties +"\n" +
             '}';
   }
 }

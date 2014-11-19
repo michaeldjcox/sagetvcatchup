@@ -70,8 +70,9 @@ public class CatchupServer {
       PropertiesInterface props = injector.getInstance(PropertiesInterface.class);
       context = injector.getInstance(CatchupContextInterface.class);
 
-      logger.info("Properties: " + props.toString());
-      logger.info("Context:    " + context.toString());
+      logger.info("Java properties: " + System.getProperties());
+      logger.info("Catchup Properties: " + props.toString());
+      logger.info("Catchup Context:    " + context.toString());
 
       pluginManager = injector.getInstance(PluginManager.class);
       server = injector.getInstance(Server.class);

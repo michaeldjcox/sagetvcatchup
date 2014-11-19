@@ -349,7 +349,6 @@ public class CatchupDevModule extends AbstractModule {
               "onlineVideoPropsSuffix='" + onlineVideoPropsSuffix + '\'' + "\n" +
               "catchupServerRmiPort='" + catchupServerRmiPort + '\'' + "\n" +
               "catchupPluginRmiPort='" + catchupPluginRmiPort + '\'' + "\n" +
-              "properties=" + properties + "\n" +
               '}';
     }
   }

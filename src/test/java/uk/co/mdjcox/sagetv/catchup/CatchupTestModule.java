@@ -284,7 +284,6 @@ public class CatchupTestModule extends AbstractModule {
               ", onlineVideoPropertiesDir='" + onlineVideoPropertiesDir + '\'' +
               ", catchupServerRmiPort='" + catchupServerRmiPort + '\'' +
               ", catchupPluginRmiPort='" + catchupPluginRmiPort + '\'' +
-              ", properties=" + properties +
               '}';
     }
   }
