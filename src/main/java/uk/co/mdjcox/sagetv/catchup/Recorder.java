@@ -71,15 +71,17 @@ public class Recorder {
     logger.info("Starting recorder service");
     try {
       String recordingDir = context.getRecordingDir();
+      logger.info("Recording to " + recordingDir);
       File dir = new File(recordingDir);
       if (!dir.exists()) {
+        logger.warn("Recording directory does not exist - creating...");
         Files.createDirectories(dir.toPath());
       }
 
       service = Executors.newScheduledThreadPool(5, new NumberedThreadFactory("catchup-recorder"));
       logger.info("Started recorder service");
     } catch (Exception ex) {
-      logger.error("Failed to start the recorder service");
+      logger.error("Failed to start the recorder service", ex);
     }
 
   }
