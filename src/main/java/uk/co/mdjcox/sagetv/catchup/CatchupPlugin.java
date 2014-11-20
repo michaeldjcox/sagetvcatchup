@@ -868,6 +868,35 @@ public class CatchupPlugin implements SageTVPlugin {
 
       props = new PropertiesFile(propFileName, true);
 
+      upgradeProperties();
+
+  }
+
+  private void upgradeProperties() throws Exception {
+
+    // Upgrade
+    final String iPlayerScriptDirProp = "Iplayer.scriptDir";
+    final String iPlayerCommandProp= "Iplayer.command";
+    String iPlayerScriptDir = props.getString(iPlayerScriptDirProp);
+    if (iPlayerScriptDir != null && !iPlayerScriptDir.isEmpty()) {
+
+      PropertiesFile seed = new PropertiesFile(seedFileName, true);
+
+      sageUtils.info("Clearing old property " + iPlayerScriptDirProp);
+      props.clearProperty(iPlayerScriptDirProp);
+
+      String iplayerCommand = seed.getString(iPlayerCommandProp);
+      String oldCommand = iplayerCommand;
+
+      iplayerCommand = iplayerCommand.replace("/usr/bin/", iPlayerScriptDir);
+      iplayerCommand = iplayerCommand.replace("C:\\Program Files (x86)\\get_iplayer\\", iPlayerScriptDir);
+      iplayerCommand = iplayerCommand.replace("C:\\Program Files\\get_iplayer\\", iPlayerScriptDir);
+
+      sageUtils.info("Changing " + iPlayerCommandProp + " from " + oldCommand + " to " + iplayerCommand);
+      props.setProperty(iPlayerCommandProp, iplayerCommand);
+
+      props.commit(propFileName, new CatchupPropertiesFileLayout());
+    }
   }
 
   public static void main(String[] args) {
