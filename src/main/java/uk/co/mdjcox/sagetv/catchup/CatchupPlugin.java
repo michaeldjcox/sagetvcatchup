@@ -878,25 +878,45 @@ public class CatchupPlugin implements SageTVPlugin {
     final String iPlayerScriptDirProp = "Iplayer.scriptDir";
     final String iPlayerCommandProp= "Iplayer.command";
     String iPlayerScriptDir = props.getString(iPlayerScriptDirProp);
-    if (iPlayerScriptDir != null && !iPlayerScriptDir.isEmpty()) {
-
       PropertiesFile seed = new PropertiesFile(seedFileName, true);
-
-      sageUtils.info("Clearing old property " + iPlayerScriptDirProp);
-      props.clearProperty(iPlayerScriptDirProp);
-
       String iplayerCommand = seed.getString(iPlayerCommandProp);
       String oldCommand = iplayerCommand;
+    if (iPlayerScriptDir != null && !iPlayerScriptDir.isEmpty()) {
+        sageUtils.info("Clearing old property " + iPlayerScriptDirProp);
+        props.clearProperty(iPlayerScriptDirProp);
 
-      iplayerCommand = iplayerCommand.replace("/usr/bin/", iPlayerScriptDir);
-      iplayerCommand = iplayerCommand.replace("C:\\Program Files (x86)\\get_iplayer\\", iPlayerScriptDir);
-      iplayerCommand = iplayerCommand.replace("C:\\Program Files\\get_iplayer\\", iPlayerScriptDir);
+        iplayerCommand = iplayerCommand.replace("/usr/bin/", iPlayerScriptDir);
+        iplayerCommand = iplayerCommand.replace("C:\\Program Files (x86)\\get_iplayer\\", iPlayerScriptDir);
+        iplayerCommand = iplayerCommand.replace("C:\\Program Files\\get_iplayer\\", iPlayerScriptDir);
+        iplayerCommand = iplayerCommand.replace("C:\\Progra~2\\get_iplayer\\", iPlayerScriptDir);
+        iplayerCommand = iplayerCommand.replace("C:\\Progra~1\\get_iplayer\\", iPlayerScriptDir);
+    }
+
+        iplayerCommand = iplayerCommand.replace("Program Files (x86)\\", "Progra~2\\");
+        iplayerCommand = iplayerCommand.replace("Program Files\\", "Progra~1\\");
 
       sageUtils.info("Changing " + iPlayerCommandProp + " from " + oldCommand + " to " + iplayerCommand);
       props.setProperty(iPlayerCommandProp, iplayerCommand);
 
+        String onlineVideoPropertiesDirProp = "onlineVideoPropertiesDir";
+        String onlineVideoPropertiesDir =  props.getString(onlineVideoPropertiesDirProp);
+        oldCommand = onlineVideoPropertiesDir;
+        onlineVideoPropertiesDir = onlineVideoPropertiesDir.replace("Program Files (x86)\\", "Progra~2\\");
+        onlineVideoPropertiesDir = onlineVideoPropertiesDir.replace("Program Files\\", "Progra~1\\");
+        sageUtils.info("Changing " + onlineVideoPropertiesDirProp + " from " + oldCommand + " to " + onlineVideoPropertiesDir);
+        props.setProperty(onlineVideoPropertiesDirProp, onlineVideoPropertiesDir);
+
+        String recordDirProp = "recordingDir";
+        String recordingDir =  props.getString(onlineVideoPropertiesDirProp);
+        oldCommand = recordingDir;
+        recordingDir = recordingDir.replace("Program Files (x86)\\", "Progra~2\\");
+        recordingDir = recordingDir.replace("Program Files\\", "Progra~1\\");
+        sageUtils.info("Changing " + recordDirProp + " from " + oldCommand + " to " + recordingDir);
+
+        props.setProperty(recordDirProp, recordingDir);
+
       props.commit(propFileName, new CatchupPropertiesFileLayout());
-    }
+
   }
 
   public static void main(String[] args) {

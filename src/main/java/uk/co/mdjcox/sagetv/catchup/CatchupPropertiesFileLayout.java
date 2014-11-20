@@ -27,9 +27,9 @@ public class CatchupPropertiesFileLayout extends OrderedPropertiesFileLayout {
     ORDER.add("refreshRateHours");
     ORDER.add("refreshStartHour");
     ORDER.add("refreshStartNowProgrammeThreshold");
+    ORDER.add("Iplayer.skip");
     ORDER.add("Iplayer.scriptDir");
     ORDER.add("Iplayer.command");
-    ORDER.add("Iplayer.skip");
     ORDER.add("Iplayer.programmes");
     ORDER.add("Iplayer.maxprogrammes");
     ORDER.add("Channel4OD.skip");
@@ -62,9 +62,9 @@ public class CatchupPropertiesFileLayout extends OrderedPropertiesFileLayout {
   public HashMap<String, String> getPrePropComments() {
     HashMap<String, String> prepropComments = new HashMap<String, String>();
 
-    prepropComments.put("onlineVideoPropertiesDir", EMPTY+"# Directory used by sageTV for custom online video properties"+EMPTY2);
+    prepropComments.put("onlineVideoPropertiesDir", EMPTY+"# Directory used by sageTV for custom online video properties - use windows 8 char folder/file names"+EMPTY2);
     prepropComments.put("onlineVideoPropsSuffix", EMPTY+"# Suffix to add the the properties files to distinguish from others"+EMPTY2);
-    prepropComments.put("recordingDir", EMPTY+"# Directory used by the plugin to temporaily place recordings"+EMPTY2);
+    prepropComments.put("recordingDir", EMPTY+"# Directory used by the plugin to temporaily place recordings - use windows 8 char names"+EMPTY2);
     prepropComments.put("partialSizeForStreamingTimeout", EMPTY + "# How long to wait for recording file to be big enough to stream (ms)" + EMPTY2);
     prepropComments.put("partialSizeForStreaming", EMPTY + "# How large the recording file needs to be to stream (bytes)" + EMPTY2);
     prepropComments.put("partialFileNameConfirmationTimeout", EMPTY + "# How long to wait the partial recording file to appear (ms)" + EMPTY2);
@@ -75,7 +75,7 @@ public class CatchupPropertiesFileLayout extends OrderedPropertiesFileLayout {
     prepropComments.put("refreshRateHours", EMPTY+"# Catalog refresh period in hours"+EMPTY2);
     prepropComments.put("refreshStartHour", EMPTY+"# Which hour of day 0-23 to start the periodic refresh"+EMPTY2 );
     prepropComments.put("refreshStartNowProgrammeThreshold", EMPTY+"# Minimum number of programmes in startup catalog size required to stop instant catalog run"+EMPTY2);
-    prepropComments.put("Iplayer.scriptDir", EMPTY+"# BBC IPlayer"+EMPTY2);
+    prepropComments.put("Iplayer.skip", EMPTY+"# BBC IPlayer - use windows 8 char folder/file names"+EMPTY2);
     prepropComments.put("Channel4OD.skip", EMPTY+"# Channel 4 OD"+EMPTY2);
     prepropComments.put("Demand5.skip", EMPTY+"# Channel 5 Demand5"+EMPTY2);
     prepropComments.put("ITVPlayer.skip", EMPTY+"# ITV Player"+EMPTY2);
