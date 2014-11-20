@@ -202,7 +202,7 @@ public class CatchupServer {
       int rmiRegistryPort = context.getCatchupServerRmiPort();
       logger.info("Offer remote access to server");
       RmiHelper.startupLocalRmiRegistry(rmiRegistryPort);
-      String name =RmiHelper.rebind("localhost", rmiRegistryPort, "CatchupServer", rmiService);
+      String name =RmiHelper.rebind("127.0.0.1", rmiRegistryPort, "CatchupServer", rmiService);
       logger.info("Bound name >" + name +"<");
 
       Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -226,7 +226,7 @@ public class CatchupServer {
     try {
       logger.info("Discontinue rmi access to catchup server");
       int rmiRegistryPort = context.getCatchupServerRmiPort();
-      RmiHelper.unbind("localhost", rmiRegistryPort, "CatchupServer");
+      RmiHelper.unbind("127.0.0.1", rmiRegistryPort, "CatchupServer");
     } catch (NotBoundException nb) {
       // Ignore
     }

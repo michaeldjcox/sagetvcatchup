@@ -533,7 +533,7 @@ public class Recorder {
   private CatchupPluginRemote getCatchupPluginRemote() throws Exception {
     int rmiRegistryPort = context.getCatchupPluginRmiPort();
 
-    return (CatchupPluginRemote) RmiHelper.lookup("localhost", rmiRegistryPort, "CatchupPlugin");
+    return (CatchupPluginRemote) RmiHelper.lookup("127.0.0.1", rmiRegistryPort, "CatchupPlugin");
   }
 
 

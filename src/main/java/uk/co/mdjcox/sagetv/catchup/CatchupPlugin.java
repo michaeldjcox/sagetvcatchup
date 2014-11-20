@@ -104,7 +104,7 @@ public class CatchupPlugin implements SageTVPlugin {
       int rmiRegistryPort = props.getInt("catchupPluginRmiPort", 1105);
       sageUtils.info("Offer remote access to plugin");
       RmiHelper.startupLocalRmiRegistry(rmiRegistryPort);
-      String name =RmiHelper.rebind("localhost", rmiRegistryPort, "CatchupPlugin", rmiService);
+      String name =RmiHelper.rebind("127.0.0.1", rmiRegistryPort, "CatchupPlugin", rmiService);
       sageUtils.info("Bound name >" + name +"<");
 
       Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -128,7 +128,7 @@ public class CatchupPlugin implements SageTVPlugin {
     try {
       sageUtils.info("Discontinue rmi access to catchup plugin");
       int rmiRegistryPort = props.getInt("catchupPluginRmiPort", 1105);
-      RmiHelper.unbind("localhost", rmiRegistryPort, "CatchupPlugin");
+      RmiHelper.unbind("127.0.0.1", rmiRegistryPort, "CatchupPlugin");
     } catch (NotBoundException nb) {
       // Ignore
     } catch (Exception e) {
