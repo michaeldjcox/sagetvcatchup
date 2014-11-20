@@ -79,6 +79,14 @@ public abstract class GroovyScript extends groovy.lang.Script {
     return existingUrl + newSuffix;
   }
 
+  public String BUILD_RECORDING_COMMAND(Recording recording) {
+    final String sourceId = recording.getSourceId();
+    String command = context.getProperties().getString(sourceId +".command");
+    command = command.replace("<URL>", recording.getUrl());
+    command = command.replace("<DIR>", recording.getRecordingDir());
+    return command;
+  }
+
     public String SAMPLE_WEB_PAGE(String url) throws Exception {
         return downloadUtils.sampleFileString(url);
     }
