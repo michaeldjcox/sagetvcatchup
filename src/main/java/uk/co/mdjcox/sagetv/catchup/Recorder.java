@@ -135,6 +135,7 @@ public class Recorder {
                 long currentSize = partialFile.length();
                 if (currentSize < recording.getLastSize()) {
                   // length() may return zero if the file is not there
+                  logger.info("Current size "+ currentSize+ "seems to be less than last size " + recording.getLastSize());
                   break;
                 } else
                 if (currentSize > recording.getLastSize()) {
@@ -152,6 +153,8 @@ public class Recorder {
               }
             }
 
+            logger.info("Done recording " + recording + " isStopped=" + recording.isStopped() + " isFailed=" + recording.isFailed() + " isComplete=" + recording.isComplete());
+
             File completedFile = recording.getCompletedFile();
 
             long timeout = System.currentTimeMillis() + context.getRecordingTimeout();
@@ -162,7 +165,6 @@ public class Recorder {
 
             }
 
-            logger.info("Done recording " + recording + " isStopped=" + recording.isStopped() + " isFailed=" + recording.isFailed() + " isComplete=" + recording.isComplete());
             logger.info("Done recording " + recording+ " File " + completedFile + " exists=" + completedFile.exists());
 
             if (completedFile.exists()) {
