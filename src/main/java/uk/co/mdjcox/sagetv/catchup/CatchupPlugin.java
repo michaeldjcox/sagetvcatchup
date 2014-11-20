@@ -99,7 +99,7 @@ public class CatchupPlugin implements SageTVPlugin {
 
   private void startRmiServer() {
     try {
-      rmiService = new CatchupPluginService(sageUtils);
+      rmiService = new CatchupPluginService(sageUtils, osUtils);
 
       int rmiRegistryPort = props.getInt("catchupPluginRmiPort", 1105);
       sageUtils.info("Offer remote access to plugin");
