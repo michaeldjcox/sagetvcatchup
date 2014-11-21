@@ -41,7 +41,7 @@ public class RecordingsPage extends AbstractHtmlPage {
             int hours = (int)(duration / millisInHour) ;
             int minutes = (int)((duration % millisInHour) / millisInMin);
             int seconds = (int)((duration % millisInMin) / 1000);
-            String durationStr = String.format("After: %02d:%02d:%02d", hours, minutes, seconds);
+            String durationStr = String.format("%02d:%02d:%02d", hours, minutes, seconds);
             double size = recording.getLastSize() / 1024000;
             String sizeStr = size + "Mb";
 
@@ -59,6 +59,7 @@ public class RecordingsPage extends AbstractHtmlPage {
         String stopLink = "/stopall?type=html";
         htmlBuilder.addLink("Stop all recordings", stopLink);
 
+        htmlBuilder.addBreak();
         htmlBuilder.addBreak();
 
         htmlBuilder.addHeading1("Failed");
