@@ -76,6 +76,16 @@ public class RecordingsCompletePodcast extends AbstractPodcast {
           descBuilder.append(" at: ");
           descBuilder.append(format.format(new Date(recording.getStopTime())));
 
+            int duration = (int)(recording.getStopTime() - recording.getStartTime());
+
+            final int millisInHour = 60 * 60 * 1000;
+            final int millisInMin = 60 * 1000;
+            int hours = (int)(duration / millisInHour) ;
+            int minutes = (int)((duration % millisInHour) / millisInMin);
+            int seconds = (int)((duration % millisInMin) / 1000);
+            descBuilder.append("<br/>");
+            descBuilder.append(String.format("After: %02d:%02d:%02d", hours, minutes, seconds));
+
             final String episodeTitle = htmlUtils.makeContentSafe("" + episode.getProgrammeTitle());
           final String episodeDesc = htmlUtils.makeContentSafe(descBuilder.toString());
 
