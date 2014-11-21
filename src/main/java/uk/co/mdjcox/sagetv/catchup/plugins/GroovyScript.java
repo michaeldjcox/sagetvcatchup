@@ -283,12 +283,14 @@ public abstract class GroovyScript extends groovy.lang.Script {
               result = result.replaceAll(prefix, "");
               result = result.replaceAll(suffix, "");
 
+              recording.setPercentRecorded(result);
+            } else {
               recording.setProgress(result);
             }
           }
           last = i;
           try {
-            Thread.sleep(5000);
+            Thread.sleep(1000);
           } catch (InterruptedException e) {
             // Ignore
           }
