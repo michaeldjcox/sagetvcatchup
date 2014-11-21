@@ -2,4 +2,6 @@
 Plugin to integrate UK catchup TV sources into SageTV for UK users.
 
 Requires separate installation of get_iplayer.
+
+Version 2.90 of get_iplayer is recommended as this allows download of programmes older than 7 days.
 ]]>
