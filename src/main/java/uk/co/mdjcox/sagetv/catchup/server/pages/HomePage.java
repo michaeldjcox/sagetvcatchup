@@ -52,8 +52,6 @@ public class HomePage extends AbstractHtmlPage {
         recordingProgress.append(recorder.getProcessCount());
         recordingProgress.append(" processes<br/>");
         htmlBuilder.addParagraph(recordingProgress.toString());
-        htmlBuilder.addLink("Recording Errors", "/recerrors?type=html");
-        htmlBuilder.addBreak();
         htmlBuilder.addLink("Recordings", "/recordings?type=html");
         htmlBuilder.addBreak();
         htmlBuilder.addBreak();
