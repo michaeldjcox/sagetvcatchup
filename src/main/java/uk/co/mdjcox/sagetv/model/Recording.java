@@ -291,7 +291,7 @@ public class Recording {
   }
 
   public String getRecordingStatus() {
-      String status = "Started";
+      String status = "Waiting";
       if (isFailed()) {
         status = "Failed";
       } else

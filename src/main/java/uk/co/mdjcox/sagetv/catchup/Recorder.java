@@ -6,10 +6,7 @@ import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
-import uk.co.mdjcox.utils.LoggerInterface;
-import uk.co.mdjcox.utils.NumberedThreadFactory;
-import uk.co.mdjcox.utils.OsUtilsInterface;
-import uk.co.mdjcox.utils.RmiHelper;
+import uk.co.mdjcox.utils.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,7 +42,8 @@ public class Recorder {
   private ConcurrentHashMap<String, Recording> failedRecordings = new ConcurrentHashMap<String, Recording>();
   private ConcurrentHashMap<String, Recording> completedRecordings = new ConcurrentHashMap<String, Recording>();
 
-  private ScheduledExecutorService service;
+  private ExecutorService recordToKeepService;
+  private ExecutorService recordToWatchService;
 
   private AtomicInteger processCount = new AtomicInteger(0);
   private long lastChecked = 0;
@@ -77,7 +75,9 @@ public class Recorder {
         Files.createDirectories(dir.toPath());
       }
 
-      service = Executors.newScheduledThreadPool(5, new NumberedThreadFactory("catchup-recorder"));
+      recordToKeepService = Executors.newSingleThreadExecutor(new NamedThreadFactory("catchup-keep-recorder"));
+      recordToWatchService = Executors.newFixedThreadPool(2, new NumberedThreadFactory("catchup-watch-recorder"));
+
       logger.info("Started recorder service");
     } catch (Exception ex) {
       logger.error("Failed to start the recorder service", ex);
@@ -92,7 +92,8 @@ public class Recorder {
     logger.info("Stopping the recorder service");
     try {
       requestStopAll();
-      service.shutdownNow();
+      recordToKeepService.shutdownNow();
+      recordToWatchService.shutdownNow();
       logger.info("Stopped the recorder service");
     } catch (Exception ex) {
       logger.error("Failed to stop the recorder service");
@@ -201,7 +202,11 @@ public class Recorder {
           }
         }
       };
-      service.schedule(runnable, 0, TimeUnit.SECONDS);
+      if (toKeep) {
+        recordToKeepService.submit(runnable);
+      } else {
+        recordToWatchService.submit(runnable);
+      }
 
       return recording;
     }
