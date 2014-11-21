@@ -125,6 +125,8 @@ public class Recorder {
         @Override
         public void run() {
           try {
+
+            recording.setProgress("In progress");
             File partialFile = callPlayScript(recording);
 
             logger.info("Wait for recording "+ recording+ " to stop or complete");
@@ -136,8 +138,9 @@ public class Recorder {
                 long currentSize = partialFile.length();
                 if (currentSize < recording.getLastSize()) {
                   // length() may return zero if the file is not there
-                  logger.info("Current size "+ currentSize+ "seems to be less than last size " + recording.getLastSize());
-                  break;
+                  logger.info("Current size "+ currentSize+ "seems to be less than last size " + recording.getLastSize() + " assuming resume");
+                  recording.setLastSize(currentSize);
+                  lastChecked = System.currentTimeMillis();
                 } else
                 if (currentSize > recording.getLastSize()) {
                   recording.setLastSize(currentSize);
@@ -160,9 +163,12 @@ public class Recorder {
 
             long timeout = System.currentTimeMillis() + context.getRecordingTimeout();
 
-            while (!completedFile.exists() && System.currentTimeMillis() < timeout) {
-              logger.info("Waiting for completed file for " + recording + " to appear");
-              osUtils.waitFor(1000);
+            if (!recording.isFailed() && !recording.isStopped()) {
+
+              while (!completedFile.exists() && System.currentTimeMillis() < timeout) {
+                logger.info("Waiting for completed file for " + recording + " to appear");
+                osUtils.waitFor(1000);
+              }
 
             }
 
@@ -202,10 +208,10 @@ public class Recorder {
           }
         }
       };
-      if (toKeep) {
-        recordToKeepService.submit(runnable);
-      } else {
+      if (toWatch) {
         recordToWatchService.submit(runnable);
+      } else {
+        recordToKeepService.submit(runnable);
       }
 
       return recording;
