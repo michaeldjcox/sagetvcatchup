@@ -43,10 +43,44 @@ public class RecordingsPodcast extends AbstractPodcast {
         Collection<Recording> recordings = recorder.getCurrentRecordings();
         for (Recording recording : recordings) {
             final Episode episode = recording.getEpisode();
-            final String episodeTitle = htmlUtils.makeContentSafe(episode.getPodcastTitle());
 
-            String status = recording.getRecordingStatus();
-            final String statusDesc = htmlUtils.makeContentSafe(status);
+
+          StringBuilder descBuilder = new StringBuilder("");
+
+          if (!episode.getSeries().isEmpty() && !episode.getSeries().equals("0")) {
+            descBuilder.append(episode.getSeries());
+          }
+          if (!episode.getEpisode().isEmpty() && !episode.getEpisode().equals("0")) {
+            if (descBuilder.length() != 0) {
+              descBuilder.append(".");
+            }
+            descBuilder.append(episode.getEpisode());
+            descBuilder.append(": ");
+          } else {
+            if (descBuilder.length() != 0) {
+              descBuilder.append(": ");
+            }
+          }
+          descBuilder.append(episode.getEpisodeTitle());
+
+          descBuilder.append("<br/>");
+          descBuilder.append("<i>");
+          descBuilder.append(episode.getOrigAirDate());
+          descBuilder.append(' ');
+          descBuilder.append(episode.getOrigAirTime());
+          descBuilder.append("</i>");
+
+          descBuilder.append("<br/>");
+          descBuilder.append("<b>");
+          descBuilder.append(recording.getRecordingStatus());
+          descBuilder.append("</b>");
+          descBuilder.append("<br/>");
+          descBuilder.append("<b>");
+          descBuilder.append(recording.getPercentRecorded());
+          descBuilder.append("</b>");
+
+          final String episodeTitle = htmlUtils.makeContentSafe("" + episode.getProgrammeTitle());
+          final String statusDesc = htmlUtils.makeContentSafe(descBuilder.toString());
 
             final String controlUrl = getPodcastBaseUrl() + "/control?id=" + episode.getId() + ";type=xml";
 

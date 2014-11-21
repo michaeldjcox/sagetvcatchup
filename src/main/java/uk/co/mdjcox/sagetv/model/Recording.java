@@ -46,8 +46,9 @@ public class Recording {
     private long lastSize = 0;
     private final AtomicBoolean finishedStreaming = new AtomicBoolean(false);
     private final AtomicBoolean finishedRecording = new AtomicBoolean(false);
-    private String progress = "Started";
+    private String progress;
     private boolean completed = false;
+    private String percentRecorded = "0.0%";
 
   /**
      * Constructor of the recording object which details a recording in progress
@@ -59,6 +60,11 @@ public class Recording {
         this.episode = checkNotNull(episode);
         this.toWatch = toWatch;
         this.toKeep = toKeep;
+      if (toWatch) {
+        progress = "In progress";
+      } else {
+        progress = "Queued";
+      }
     }
 
     public boolean isToWatch() {
@@ -282,11 +288,19 @@ public class Recording {
         finishedRecording.set(true);
     }
 
+  public String getPercentRecorded() {
+    return percentRecorded;
+  }
+
+  public void setPercentRecorded(String percentRecorded) {
+    this.percentRecorded = percentRecorded;
+  }
+
   public void setProgress(String progress) {
     this.progress = progress;
   }
 
-  public String getProgress() {
+  private String getProgress() {
     return progress;
   }
 
@@ -306,6 +320,9 @@ public class Recording {
       } else
       if (isInProgress()) {
         status = getProgress();
+        if (status == null || status.isEmpty()) {
+          status = "In progress";
+        }
 
       }
       return status;

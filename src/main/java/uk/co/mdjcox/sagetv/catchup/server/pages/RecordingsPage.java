@@ -25,14 +25,14 @@ public class RecordingsPage extends AbstractHtmlPage {
         htmlBuilder.addHeading1("Recordings");
         Collection<Recording> recordings = recorder.getCurrentRecordings();
         htmlBuilder.startTable();
-        htmlBuilder.addTableHeader("Source", "Episode", "Status", "Stop");
+        htmlBuilder.addTableHeader("Source", "Episode", "Status", "Percent", "Stop");
         for (Recording recording : recordings) {
             HtmlBuilder linkBuilder = new HtmlBuilder();
             String stopLink = "/stop?id=" + recording.getId()+";type=html";
             linkBuilder.addLink("stop", stopLink);
 
           String status = recording.getRecordingStatus();
-          htmlBuilder.addTableRow(recording.getSourceId(), recording.getId(), status, linkBuilder.toString());
+          htmlBuilder.addTableRow(recording.getSourceId(), recording.getId(), status, recording.getPercentRecorded(), linkBuilder.toString());
         }
         htmlBuilder.stopTable();
 
