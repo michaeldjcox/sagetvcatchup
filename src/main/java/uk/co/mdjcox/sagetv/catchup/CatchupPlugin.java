@@ -394,6 +394,14 @@ public class CatchupPlugin implements SageTVPlugin {
             help.put(propName, name + " max programmes. 0 = no maximum");
           }
 
+
+          for (String name : getPluginNames()) {
+            String propName = name + ".command";
+            types.put(propName, CONFIG_TEXT);
+            labels.put(propName, name + " recording command");
+            help.put(propName, name + " recording command");
+          }
+
           types.put(PULL_UPGRADE, CONFIG_BUTTON);
           labels.put(PULL_UPGRADE, "Check for upgrade");
           help.put(PULL_UPGRADE, "Get SageTV to pull a new dev version");
@@ -542,6 +550,11 @@ public class CatchupPlugin implements SageTVPlugin {
       if (property.equals(propNameSkip)) {
         return String.valueOf(!props.getBoolean(propNameSkip, Boolean.FALSE));
       }
+
+      String propNameCommand  = name + ".command";
+      if (property.equals(propNameCommand)) {
+        return String.valueOf(props.getString(propNameCommand, ""));
+      }
     }
 
     return "";
@@ -637,6 +650,10 @@ public class CatchupPlugin implements SageTVPlugin {
       if (property.equals(propNameSkip)) {
 
         setCatchupProperty(propNameSkip, (value.equals("true") ? "false" : "true"));
+      }
+      String propNameCommand = name + ".command";
+      if (property.equals(propNameCommand)) {
+        setCatchupProperty(propNameCommand, value);
       }
     }
   }
