@@ -28,7 +28,7 @@ public class RecordingsPage extends AbstractHtmlPage {
         htmlBuilder.addHeading1("In progress");
         Collection<Recording> recordings = recorder.getCurrentRecordings();
         htmlBuilder.startTable();
-        htmlBuilder.addTableHeader("Source", "Episode", "Start Time", "Stop Time", "Duration", "Size", "Percent", "Status", "Stop");
+        htmlBuilder.addTableHeader("Source", "Episode", "Start Time", "Stop Time", "Time to download", "Size", "Percent", "Status", "Stop");
         for (Recording recording : recordings) {
             HtmlBuilder linkBuilder = new HtmlBuilder();
             String stopLink = "/stop?id=" + recording.getId()+";type=html";
@@ -64,7 +64,7 @@ public class RecordingsPage extends AbstractHtmlPage {
 
         htmlBuilder.addHeading1("Failed");
         htmlBuilder.startTable();
-        htmlBuilder.addTableHeader("Source", "Episode", "Start Time", "Stop Time", "Duration", "Size", "Error", "Exception");
+        htmlBuilder.addTableHeader("Source", "Episode", "Start Time", "Stop Time", "Time to download", "Size", "Error", "Exception");
         for (Recording failedRecording : recorder.getFailedRecordings()) {
             String message = failedRecording.getFailureException().getMessage();
             if (message == null) {
@@ -97,7 +97,7 @@ public class RecordingsPage extends AbstractHtmlPage {
 
         htmlBuilder.addHeading1("Completed");
         htmlBuilder.startTable();
-        htmlBuilder.addTableHeader("Source", "Episode", "Start Time", "Stop Time", "Duration", "Size");
+        htmlBuilder.addTableHeader("Source", "Episode", "Start Time", "Stop Time", "Time to download", "Size");
         for (Recording completedRecording : recorder.getCompletedRecordings()) {
 
             int duration = (int)(completedRecording.getStopTime() - completedRecording.getStartTime());
