@@ -381,6 +381,13 @@ public class CatchupPlugin implements SageTVPlugin {
         help.put(propName, name + " enabled");
       }
 
+      for (String name : getPluginNames()) {
+        String propName = name + ".command";
+        types.put(propName, CONFIG_TEXT);
+        labels.put(propName, name + " recording command");
+        help.put(propName, name + " recording command");
+      }
+
       File sageTvDevPlugins = new File(sageHomeDir, "SageTVPluginsDev.xml");
       if (sageTvDevPlugins.exists()) {
         boolean isDevSite = fileContainsLine(sageTvDevPlugins, "sagetvcatchup");
@@ -392,14 +399,6 @@ public class CatchupPlugin implements SageTVPlugin {
             types.put(propName, CONFIG_INTEGER);
             labels.put(propName, name + " max programmes");
             help.put(propName, name + " max programmes. 0 = no maximum");
-          }
-
-
-          for (String name : getPluginNames()) {
-            String propName = name + ".command";
-            types.put(propName, CONFIG_TEXT);
-            labels.put(propName, name + " recording command");
-            help.put(propName, name + " recording command");
           }
 
           types.put(PULL_UPGRADE, CONFIG_BUTTON);
