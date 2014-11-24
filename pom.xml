@@ -172,6 +172,7 @@
                                 <replacement>
                                     <token>_DESCRIPTION_</token>
                                     <valueFile>releasenotes/description.txt</valueFile>
+                                    <unescape>true</unescape>
                                 </replacement>
                                 <replacement>
                                     <token>_ID_</token>
@@ -200,6 +201,7 @@
                                 <replacement>
                                     <token>_RELEASENOTES_</token>
                                     <valueFile>releasenotes/releasenotes.txt</valueFile>
+                                    <unescape>true</unescape>
                                 </replacement>
                                 <replacement>
                                     <token>_AUTHOR_</token>
@@ -252,6 +254,7 @@
                                 <replacement>
                                     <token>_DESCRIPTION_</token>
                                     <valueFile>releasenotes/description.txt</valueFile>
+                                    <unescape>true</unescape>
                                 </replacement>
                                 <replacement>
                                     <token>_ID_</token>
@@ -280,6 +283,7 @@
                                 <replacement>
                                     <token>_RELEASENOTES_</token>
                                     <valueFile>releasenotes/releasenotes.txt</valueFile>
+                                    <unescape>true</unescape>
                                 </replacement>
                                 <replacement>
                                     <token>_AUTHOR_</token>
