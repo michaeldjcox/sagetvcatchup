@@ -1,6 +1,10 @@
 <![CDATA[
 0.4.0 - First official release
 
+0.3.5 - Fourth beta release.
+
+        SageTV Plugin: Fix issue with configurability of recording commands
+
 0.3.4 - Third beta release.
 
         Online services menu: some lists not fully populated due to incorrect escaping of podcast titles

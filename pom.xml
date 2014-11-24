@@ -219,7 +219,7 @@
                                 </replacement>
                                 <replacement>
                                     <token>-SNAPSHOT</token>
-                                    <value>-${buildNumber}</value>
+                                    <value>.${buildNumber}</value>
                                 </replacement>
                                 <replacement>
                                     <token>_LOCATION_</token>
@@ -299,7 +299,7 @@
                                 </replacement>
                                 <replacement>
                                     <token>-SNAPSHOT</token>
-                                    <value>-${buildNumber}</value>
+                                    <value>.${buildNumber}</value>
                                 </replacement>
                                 <replacement>
                                     <token>_LOCATION_</token>
