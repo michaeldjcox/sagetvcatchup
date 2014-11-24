@@ -731,7 +731,7 @@ public class Cataloger {
         logger.info("Initial catalog looks a bit sparse: " + currentCount + " programmes when expected at least " + threshold + " - cataloging now");
         catalogingScheduler.schedule(runnable, 0, TimeUnit.MILLISECONDS);
       } else {
-        logger.info("Initial catalog looks populated - next catalog in " + String.format("Finished in %02d:%02d:%02d", hours, minutes, seconds));
+        logger.info("Initial catalog looks populated - next catalog in " + String.format("%02d:%02d:%02d", hours, minutes, seconds));
       }
 
       future = catalogingScheduler.scheduleAtFixedRate(runnable, initialDelay, refreshRate * 60 * 60 * 1000, TimeUnit.MILLISECONDS);
@@ -823,6 +823,6 @@ public class Cataloger {
   private CatchupPluginRemote getCatchupPluginRemote() throws Exception {
     int rmiRegistryPort = context.getCatchupPluginRmiPort();
 
-    return (CatchupPluginRemote) RmiHelper.lookup("localhost", rmiRegistryPort, "CatchupPlugin");
+    return (CatchupPluginRemote) RmiHelper.lookup("127.0.0.1", rmiRegistryPort, "CatchupPlugin");
   }
 }

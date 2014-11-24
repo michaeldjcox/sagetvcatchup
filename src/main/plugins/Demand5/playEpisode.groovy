@@ -8,7 +8,7 @@ Process proc = EXECUTE(command, "record", output, null);
 
 LOG_INFO("Recording to " + filename);
 
-File file = WAIT_FOR_FILE_OF_SIZE(filename, 1024000, 10000, recording.getStopFlag())
+File file = WAIT_FOR_PARTIAL_CONTENT(filename, recording.getStopFlag())
 
 recording.setPartialFile(file);
 

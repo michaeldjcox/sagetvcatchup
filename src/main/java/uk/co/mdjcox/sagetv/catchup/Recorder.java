@@ -6,10 +6,7 @@ import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
-import uk.co.mdjcox.utils.LoggerInterface;
-import uk.co.mdjcox.utils.NumberedThreadFactory;
-import uk.co.mdjcox.utils.OsUtilsInterface;
-import uk.co.mdjcox.utils.RmiHelper;
+import uk.co.mdjcox.utils.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,7 +33,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class Recorder {
 
-  private static final int RECORDING_TIMEOUT = 30000;
   private final LoggerInterface logger;
   private final OsUtilsInterface osUtils;
   private final CatchupContextInterface context;
@@ -46,7 +42,8 @@ public class Recorder {
   private ConcurrentHashMap<String, Recording> failedRecordings = new ConcurrentHashMap<String, Recording>();
   private ConcurrentHashMap<String, Recording> completedRecordings = new ConcurrentHashMap<String, Recording>();
 
-  private ScheduledExecutorService service;
+  private ExecutorService recordToKeepService;
+  private ExecutorService recordToWatchService;
 
   private AtomicInteger processCount = new AtomicInteger(0);
   private long lastChecked = 0;
@@ -71,15 +68,19 @@ public class Recorder {
     logger.info("Starting recorder service");
     try {
       String recordingDir = context.getRecordingDir();
+      logger.info("Recording to " + recordingDir);
       File dir = new File(recordingDir);
       if (!dir.exists()) {
+        logger.warn("Recording directory does not exist - creating...");
         Files.createDirectories(dir.toPath());
       }
 
-      service = Executors.newScheduledThreadPool(5, new NumberedThreadFactory("catchup-recorder"));
+      recordToKeepService = Executors.newSingleThreadExecutor(new NamedThreadFactory("catchup-keep-recorder"));
+      recordToWatchService = Executors.newFixedThreadPool(2, new NumberedThreadFactory("catchup-watch-recorder"));
+
       logger.info("Started recorder service");
     } catch (Exception ex) {
-      logger.error("Failed to start the recorder service");
+      logger.error("Failed to start the recorder service", ex);
     }
 
   }
@@ -91,7 +92,8 @@ public class Recorder {
     logger.info("Stopping the recorder service");
     try {
       requestStopAll();
-      service.shutdownNow();
+      recordToKeepService.shutdownNow();
+      recordToWatchService.shutdownNow();
       logger.info("Stopped the recorder service");
     } catch (Exception ex) {
       logger.error("Failed to stop the recorder service");
@@ -123,6 +125,8 @@ public class Recorder {
         @Override
         public void run() {
           try {
+
+            recording.setProgress("In progress");
             File partialFile = callPlayScript(recording);
 
             logger.info("Wait for recording "+ recording+ " to stop or complete");
@@ -134,15 +138,18 @@ public class Recorder {
                 long currentSize = partialFile.length();
                 if (currentSize < recording.getLastSize()) {
                   // length() may return zero if the file is not there
-                  break;
+                  logger.info("Current size "+ currentSize+ "seems to be less than last size " + recording.getLastSize() + " assuming resume");
+                  recording.setLastSize(currentSize);
+                  lastChecked = System.currentTimeMillis();
                 } else
                 if (currentSize > recording.getLastSize()) {
                   recording.setLastSize(currentSize);
                   lastChecked = System.currentTimeMillis();
                 } else {
-                  if ((System.currentTimeMillis() - lastChecked) > RECORDING_TIMEOUT) {
+                  if ((System.currentTimeMillis() - lastChecked) > context.getRecordingTimeout()) {
                     if (!(recording.isComplete() || recording.isStopped() || recording.isFailed())) {
                       recording.setStalled();
+                      logger.info("Recording of " + episode + " stalled for " + context.getRecordingTimeout() + "ms after recording " + currentSize);
                       throw new Exception("Recording of " + episode + " stalled");
                     }
                   }
@@ -150,17 +157,21 @@ public class Recorder {
               }
             }
 
+            logger.info("Done recording " + recording + " isStopped=" + recording.isStopped() + " isFailed=" + recording.isFailed() + " isComplete=" + recording.isComplete());
+
             File completedFile = recording.getCompletedFile();
 
-            long timeout = System.currentTimeMillis() + RECORDING_TIMEOUT;
+            long timeout = System.currentTimeMillis() + context.getRecordingTimeout();
 
-            while (!completedFile.exists() && System.currentTimeMillis() < timeout) {
-              logger.info("Waiting for completed file for " + recording + " to appear");
-              osUtils.waitFor(1000);
+            if (!recording.isFailed() && !recording.isStopped()) {
+
+              while (!completedFile.exists() && System.currentTimeMillis() < timeout) {
+                logger.info("Waiting for completed file for " + recording + " to appear");
+                osUtils.waitFor(1000);
+              }
 
             }
 
-            logger.info("Done recording " + recording + " isStopped=" + recording.isStopped() + " isFailed=" + recording.isFailed() + " isComplete=" + recording.isComplete());
             logger.info("Done recording " + recording+ " File " + completedFile + " exists=" + completedFile.exists());
 
             if (completedFile.exists()) {
@@ -197,7 +208,11 @@ public class Recorder {
           }
         }
       };
-      service.schedule(runnable, 0, TimeUnit.SECONDS);
+      if (toWatch) {
+        recordToWatchService.submit(runnable);
+      } else {
+        recordToKeepService.submit(runnable);
+      }
 
       return recording;
     }
@@ -230,7 +245,7 @@ public class Recorder {
       if (file == null || !file.exists()) {
         synchronized (recording) {
           try {
-            recording.wait(50000);
+            recording.wait(context.getStreamingTimeout());
           } catch (InterruptedException e) {
             // Ignore
           }
@@ -277,8 +292,8 @@ public class Recorder {
               lastStreamed = streamed;
               lastChecked = System.currentTimeMillis();
             } else {
-              if ((System.currentTimeMillis() - lastChecked) > RECORDING_TIMEOUT) {
-                logger.info("Streaming of " + id + " stalled after serving " + streamed + "/" + recording.getLastSize());
+              if ((System.currentTimeMillis() - lastChecked) > context.getStreamingTimeout()) {
+                logger.info("Streaming of " + id + " stalled for " + context.getStreamingTimeout() + " after serving " + streamed + "/" + recording.getLastSize());
               }
             }
           }
@@ -529,7 +544,7 @@ public class Recorder {
   private CatchupPluginRemote getCatchupPluginRemote() throws Exception {
     int rmiRegistryPort = context.getCatchupPluginRmiPort();
 
-    return (CatchupPluginRemote) RmiHelper.lookup("localhost", rmiRegistryPort, "CatchupPlugin");
+    return (CatchupPluginRemote) RmiHelper.lookup("127.0.0.1", rmiRegistryPort, "CatchupPlugin");
   }
 
 

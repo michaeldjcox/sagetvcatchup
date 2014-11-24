@@ -1,6 +1,18 @@
 <![CDATA[
 0.4.0 - First official release
 
+0.3.4 - Third beta release.
+
+        Online services menu: some lists not fully populated due to incorrect escaping of podcast titles
+        SageTV Plugin: Configurability of ports and timeouts and recording commands
+        Recording: Better status reporting
+        Recording: Two threads for watching and one for queued recordings
+        Recording: Configurable timeouts
+        Recording: upload to SageTV will now retry move of recording as sometimes get_iplayer has not finished with file
+        Recording: recording will not wait for a completed file if the recording was stopped or failed
+        Recording: get_iplayer command line is now configurable
+        Recording: got rid of relative path from get_iplayer to recording directory as this failed when they are on multiple hard drives
+        General: RMI services made to survive suspend/resume of host
 0.3.3 - Second beta release.
 
         Online services menu:

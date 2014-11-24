@@ -35,19 +35,45 @@ public class RecordingErrorsPodcast extends AbstractPodcast {
 
       for (Recording failedRecording : recorder.getFailedRecordings()) {
         final Episode episode = failedRecording.getEpisode();
-        final String episodeTitle = htmlUtils.makeContentSafe(episode.getPodcastTitle());
 
-        String error =
-                    format.format(failedRecording.getStopTime()) + "<br/>" +
-                    failedRecording.getId() + "<br/>" +
-                    failedRecording.getFailedReason() + "<br/>" +
-                    failedRecording.getFailureException();
+        StringBuilder descBuilder = new StringBuilder("");
+
+        if (!episode.getSeries().isEmpty() && !episode.getSeries().equals("0")) {
+          descBuilder.append(episode.getSeries());
+        }
+        if (!episode.getEpisode().isEmpty() && !episode.getEpisode().equals("0")) {
+          if (descBuilder.length() != 0) {
+            descBuilder.append(".");
+          }
+          descBuilder.append(episode.getEpisode());
+          descBuilder.append(": ");
+        } else {
+          if (descBuilder.length() != 0) {
+            descBuilder.append(": ");
+          }
+        }
+        descBuilder.append(episode.getEpisodeTitle());
+        descBuilder.append("<br/>");
+        descBuilder.append("<i>");
+        descBuilder.append(episode.getOrigAirDate());
+        descBuilder.append(' ');
+        descBuilder.append(episode.getOrigAirTime());
+        descBuilder.append("</i>");
+        descBuilder.append("<br/>");
+        descBuilder.append(failedRecording.getRecordingStatus());
+        descBuilder.append(" at: ");
+        descBuilder.append(format.format(failedRecording.getStopTime()));
+        descBuilder.append("<br/>");
+        descBuilder.append(failedRecording.getFailedReason());
+        descBuilder.append("<br/>");
+        descBuilder.append(failedRecording.getFailureException());
+
+        final String episodeTitle = htmlUtils.makeContentSafe("" + episode.getProgrammeTitle());
+        final String episodeDesc = htmlUtils.makeContentSafe(descBuilder.toString());
 
         final String controlUrl = getPodcastBaseUrl() + "/control?id=" + episode.getId() + ";type=xml";
 
-        final String errorDesc = htmlUtils.makeContentSafe(error);
-
-        builder.addCategoryItem(episodeTitle, errorDesc, controlUrl);
+        builder.addCategoryItem(episodeTitle, episodeDesc, controlUrl);
 
       }
         builder.stopDocument();

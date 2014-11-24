@@ -209,7 +209,7 @@ public class SageUtils implements SageUtilsInterface {
 
   @Override
   public void info(String s, Throwable throwable) {
-    debug("INFO: " + s, throwable);
+    debugLog("INFO: " + s, throwable);
   }
 
   @Override
@@ -219,7 +219,7 @@ public class SageUtils implements SageUtilsInterface {
 
   @Override
   public void warn(String s, Throwable throwable) {
-    debug("WARN: " + s, throwable);
+    debugLog("WARN: " + s, throwable);
   }
 
   @Override
@@ -229,7 +229,7 @@ public class SageUtils implements SageUtilsInterface {
 
   @Override
   public void error(String s, Throwable throwable) {
-    debug("ERROR: " + s, throwable);
+    debugLog("ERROR: " + s, throwable);
   }
 
   @Override
@@ -245,12 +245,13 @@ public class SageUtils implements SageUtilsInterface {
   private void debugLog(String message) {
     try {
       Global.DebugLog(message);
-    } catch (Exception e) {
+    } catch (Throwable e) {
+      System.err.println(message);
       // Ignore
     }
   }
 
-  private void debug(String message, Throwable ex) {
+  private void debugLog(String message, Throwable ex) {
     try {
       Global.DebugLog(message);
       String exmessage = ex.getMessage();
@@ -261,7 +262,10 @@ public class SageUtils implements SageUtilsInterface {
       for (StackTraceElement el : ex.getStackTrace()) {
         Global.DebugLog(el.toString());
       }
-    } catch (Exception e) {
+    } catch (Throwable e) {
+      System.err.println(message);
+      ex.printStackTrace();
+
       // Ignore
     }
   }

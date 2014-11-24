@@ -240,6 +240,31 @@ public class CatchupTestModule extends AbstractModule {
     }
 
     @Override
+    public long getPartialSizeForStreamingTimeout() {
+      return 60000;
+    }
+
+    @Override
+    public long getPartialSizeForStreaming() {
+      return 1024000;
+    }
+
+    @Override
+    public long getPartialFileNameConfirmationTimeout() {
+      return 60000;
+    }
+
+    @Override
+    public long getStreamingTimeout() {
+      return 30000;
+    }
+
+    @Override
+    public long getRecordingTimeout() {
+      return 30000;
+    }
+
+    @Override
     public String toString() {
       return "TestCatchupContext{" +
               "workingDir='" + workingDir + '\'' +
@@ -259,7 +284,6 @@ public class CatchupTestModule extends AbstractModule {
               ", onlineVideoPropertiesDir='" + onlineVideoPropertiesDir + '\'' +
               ", catchupServerRmiPort='" + catchupServerRmiPort + '\'' +
               ", catchupPluginRmiPort='" + catchupPluginRmiPort + '\'' +
-              ", properties=" + properties +
               '}';
     }
   }

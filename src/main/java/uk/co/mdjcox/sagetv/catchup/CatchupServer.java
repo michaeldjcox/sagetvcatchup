@@ -70,8 +70,9 @@ public class CatchupServer {
       PropertiesInterface props = injector.getInstance(PropertiesInterface.class);
       context = injector.getInstance(CatchupContextInterface.class);
 
-      logger.info("Properties: " + props.toString());
-      logger.info("Context:    " + context.toString());
+      logger.info("Java properties: " + System.getProperties());
+      logger.info("Catchup Properties: " + props.toString());
+      logger.info("Catchup Context:    " + context.toString());
 
       pluginManager = injector.getInstance(PluginManager.class);
       server = injector.getInstance(Server.class);
@@ -201,7 +202,7 @@ public class CatchupServer {
       int rmiRegistryPort = context.getCatchupServerRmiPort();
       logger.info("Offer remote access to server");
       RmiHelper.startupLocalRmiRegistry(rmiRegistryPort);
-      String name =RmiHelper.rebind("localhost", rmiRegistryPort, "CatchupServer", rmiService);
+      String name =RmiHelper.rebind("127.0.0.1", rmiRegistryPort, "CatchupServer", rmiService);
       logger.info("Bound name >" + name +"<");
 
       Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -225,7 +226,7 @@ public class CatchupServer {
     try {
       logger.info("Discontinue rmi access to catchup server");
       int rmiRegistryPort = context.getCatchupServerRmiPort();
-      RmiHelper.unbind("localhost", rmiRegistryPort, "CatchupServer");
+      RmiHelper.unbind("127.0.0.1", rmiRegistryPort, "CatchupServer");
     } catch (NotBoundException nb) {
       // Ignore
     }

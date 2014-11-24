@@ -59,4 +59,14 @@ public interface CatchupContextInterface {
     int getCatchupPluginRmiPort();
 
     void setProperty(String name, String value);
+
+  long getPartialSizeForStreamingTimeout();
+
+  long getPartialSizeForStreaming();
+
+  long getPartialFileNameConfirmationTimeout();
+
+  long getStreamingTimeout();
+
+  long getRecordingTimeout();
 }

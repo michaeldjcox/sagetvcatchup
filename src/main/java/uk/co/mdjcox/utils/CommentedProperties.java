@@ -119,7 +119,7 @@ public class CommentedProperties extends Properties {
                     for (Map.Entry<String,String> entry : prePropComments.entrySet()) {
                         String prop = entry.getKey();
                         String value = entry.getValue();
-                        if (key.matches(prop)) {
+                        if (key.matches(prop) || key.equals(prop)) {
                             propKey = prop;
                             propComment = value;
                             break;

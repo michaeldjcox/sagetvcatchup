@@ -45,6 +45,17 @@ public class CatchupPlugin implements SageTVPlugin {
 
   private static final String PORT = "podcasterPort";
 
+  private static final String CATCHUP_PLUGIN_RMI_PORT = "catchupPluginRmiPort";
+  private static final String CATCHUP_SERVER_RMI_PORT = "catchupServerRmiPort";
+
+
+  private static final String PARTIAL_SIZE_FOR_STREAMING_TIMEOUT ="partialSizeForStreamingTimeout";
+  private static final String PARTIAL_SIZE_FOR_STREAMING="partialSizeForStreaming";
+  private static final String PARTIAL_FILE_TIMEOUT="partialFileNameConfirmationTimeout";
+
+  private static final String STREAMING_TIMEOUT="streamingTimeout";
+  private static final String RECORDING_TIMEOUT="recordingTimeout";
+
   private String pullUpgradeValue = "Click here";
   private String startCatalogValue = "Click here";
   private String stopCatalogValue = "Click here";
@@ -88,12 +99,12 @@ public class CatchupPlugin implements SageTVPlugin {
 
   private void startRmiServer() {
     try {
-      rmiService = new CatchupPluginService(sageUtils);
+      rmiService = new CatchupPluginService(sageUtils, osUtils);
 
       int rmiRegistryPort = props.getInt("catchupPluginRmiPort", 1105);
       sageUtils.info("Offer remote access to plugin");
       RmiHelper.startupLocalRmiRegistry(rmiRegistryPort);
-      String name =RmiHelper.rebind("localhost", rmiRegistryPort, "CatchupPlugin", rmiService);
+      String name =RmiHelper.rebind("127.0.0.1", rmiRegistryPort, "CatchupPlugin", rmiService);
       sageUtils.info("Bound name >" + name +"<");
 
       Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -117,7 +128,7 @@ public class CatchupPlugin implements SageTVPlugin {
     try {
       sageUtils.info("Discontinue rmi access to catchup plugin");
       int rmiRegistryPort = props.getInt("catchupPluginRmiPort", 1105);
-      RmiHelper.unbind("localhost", rmiRegistryPort, "CatchupPlugin");
+      RmiHelper.unbind("127.0.0.1", rmiRegistryPort, "CatchupPlugin");
     } catch (NotBoundException nb) {
       // Ignore
     } catch (Exception e) {
@@ -332,14 +343,49 @@ public class CatchupPlugin implements SageTVPlugin {
       help.put(RECORDING_DIR, "Change temporary recording dir");
 
       types.put(PORT, CONFIG_INTEGER);
-      labels.put(PORT, "Server port");
-      help.put(PORT, "Change the server port if it conflicts with one in use");
+      labels.put(PORT, "Web server port");
+      help.put(PORT, "Change the web server port if it conflicts with one in use");
+
+      types.put(CATCHUP_PLUGIN_RMI_PORT, CONFIG_INTEGER);
+      labels.put(CATCHUP_PLUGIN_RMI_PORT, "Catchup plugin port");
+      help.put(CATCHUP_PLUGIN_RMI_PORT, "Change the catchup plugin port if it conflicts with one in use (Disable/Enable plugin after this)");
+
+      types.put(CATCHUP_SERVER_RMI_PORT, CONFIG_INTEGER);
+      labels.put(CATCHUP_SERVER_RMI_PORT, "Catchup Server port");
+      help.put(CATCHUP_SERVER_RMI_PORT, "Change the catchup server port if it conflicts with one in use (Disable/Enable plugin after this)");
+
+      types.put(PARTIAL_SIZE_FOR_STREAMING_TIMEOUT, CONFIG_INTEGER);
+      labels.put(PARTIAL_SIZE_FOR_STREAMING_TIMEOUT, "Min size for streaming timeout");
+      help.put(PARTIAL_SIZE_FOR_STREAMING_TIMEOUT, "How long to wait for recording file to be big enough to stream (ms)");
+
+      types.put(PARTIAL_SIZE_FOR_STREAMING, CONFIG_INTEGER);
+      labels.put(PARTIAL_SIZE_FOR_STREAMING, "Min size for streaming");
+      help.put(PARTIAL_SIZE_FOR_STREAMING, "How large the recording file needs to be to stream (bytes)");
+
+      types.put(PARTIAL_FILE_TIMEOUT, CONFIG_INTEGER);
+      labels.put(PARTIAL_FILE_TIMEOUT, "Partial file name timeout");
+      help.put(PARTIAL_FILE_TIMEOUT, "How long to wait the partial recording file to appear (ms)");
+
+      types.put(STREAMING_TIMEOUT, CONFIG_INTEGER);
+      labels.put(STREAMING_TIMEOUT, "Streaming timeout");
+      help.put(STREAMING_TIMEOUT, "If the content stops how long to wait before giving up streaming (ms)");
+
+      types.put(RECORDING_TIMEOUT, CONFIG_INTEGER);
+      labels.put(RECORDING_TIMEOUT, "Recording timeout");
+      help.put(RECORDING_TIMEOUT, "If the content stops how long to wait before given up recording (ms)");
 
       for (String name : getPluginNames()) {
         String propName = name + ".skip";
         types.put(propName, CONFIG_BOOL);
         labels.put(propName, name + " enabled");
         help.put(propName, name + " enabled");
+      }
+
+      for (String name : getPluginNames()) {
+        String propName = name + ".command";
+        types.put(propName, CONFIG_TEXT);
+        labels.put(propName, name + " recording command");
+        help.put(propName, name + " recording command");
       }
 
       File sageTvDevPlugins = new File(sageHomeDir, "SageTVPluginsDev.xml");
@@ -447,6 +493,32 @@ public class CatchupPlugin implements SageTVPlugin {
     if (property.equals(PORT)) {
       return props.getString(PORT);
     }
+    if (property.equals(CATCHUP_PLUGIN_RMI_PORT)) {
+      return props.getString(CATCHUP_PLUGIN_RMI_PORT);
+    }
+    if (property.equals(CATCHUP_SERVER_RMI_PORT)) {
+      return props.getString(CATCHUP_SERVER_RMI_PORT);
+    }
+
+    if (property.equals(PARTIAL_FILE_TIMEOUT)) {
+      return props.getString(PARTIAL_FILE_TIMEOUT);
+    }
+
+    if (property.equals(PARTIAL_SIZE_FOR_STREAMING)) {
+      return props.getString(PARTIAL_SIZE_FOR_STREAMING);
+    }
+
+    if (property.equals(PARTIAL_SIZE_FOR_STREAMING_TIMEOUT)) {
+      return props.getString(PARTIAL_SIZE_FOR_STREAMING_TIMEOUT);
+    }
+
+    if (property.equals(STREAMING_TIMEOUT)) {
+      return props.getString(STREAMING_TIMEOUT);
+    }
+
+    if (property.equals(RECORDING_TIMEOUT)) {
+      return props.getString(RECORDING_TIMEOUT);
+    }
 
     if (property.equals(RECORDINGS_IN_PROGRESS)) {
       String status = statii.get("Recording Progress");
@@ -476,6 +548,11 @@ public class CatchupPlugin implements SageTVPlugin {
       String propNameSkip = name + ".skip";
       if (property.equals(propNameSkip)) {
         return String.valueOf(!props.getBoolean(propNameSkip, Boolean.FALSE));
+      }
+
+      String propNameCommand  = name + ".command";
+      if (property.equals(propNameCommand)) {
+        return String.valueOf(props.getString(propNameCommand, ""));
       }
     }
 
@@ -534,9 +611,33 @@ public class CatchupPlugin implements SageTVPlugin {
       setCatchupProperty(RECORDING_DIR, value);
     }
 
+    if (property.equals(PARTIAL_SIZE_FOR_STREAMING_TIMEOUT)) {
+      setCatchupProperty(PARTIAL_SIZE_FOR_STREAMING_TIMEOUT, value);
+    }
+    if (property.equals(PARTIAL_SIZE_FOR_STREAMING)) {
+      setCatchupProperty(PARTIAL_SIZE_FOR_STREAMING, value);
+    }
+    if (property.equals(PARTIAL_FILE_TIMEOUT)) {
+      setCatchupProperty(PARTIAL_FILE_TIMEOUT, value);
+    }
+
+    if (property.equals(STREAMING_TIMEOUT)) {
+      setCatchupProperty(STREAMING_TIMEOUT, value);
+    }
+    if (property.equals(RECORDING_TIMEOUT)) {
+      setCatchupProperty(RECORDING_TIMEOUT, value);
+    }
     if (property.equals(PORT)) {
       setCatchupProperty(PORT, value);
       restartCatchupServer();
+    }
+
+    if (property.equals(CATCHUP_PLUGIN_RMI_PORT)) {
+      setCatchupProperty(CATCHUP_PLUGIN_RMI_PORT, value);
+    }
+
+    if (property.equals(CATCHUP_SERVER_RMI_PORT)) {
+      setCatchupProperty(CATCHUP_SERVER_RMI_PORT, value);
     }
 
     for (String name : getPluginNames()) {
@@ -548,6 +649,10 @@ public class CatchupPlugin implements SageTVPlugin {
       if (property.equals(propNameSkip)) {
 
         setCatchupProperty(propNameSkip, (value.equals("true") ? "false" : "true"));
+      }
+      String propNameCommand = name + ".command";
+      if (property.equals(propNameCommand)) {
+        setCatchupProperty(propNameCommand, value);
       }
     }
   }
@@ -779,6 +884,61 @@ public class CatchupPlugin implements SageTVPlugin {
 
       props = new PropertiesFile(propFileName, true);
 
+      upgradeProperties();
+
+  }
+
+  private void upgradeProperties() throws Exception {
+
+    // Upgrade
+    final String iPlayerScriptDirProp = "Iplayer.scriptDir";
+    final String iPlayerCommandProp= "Iplayer.command";
+    String iPlayerScriptDir = props.getString(iPlayerScriptDirProp);
+      PropertiesFile seed = new PropertiesFile(seedFileName, true);
+      String iplayerCommand = seed.getString(iPlayerCommandProp);
+      String oldCommand = iplayerCommand;
+    if (iPlayerScriptDir != null && !iPlayerScriptDir.isEmpty()) {
+        sageUtils.info("Clearing old property " + iPlayerScriptDirProp);
+        props.clearProperty(iPlayerScriptDirProp);
+
+        iplayerCommand = iplayerCommand.replace("/usr/bin/", iPlayerScriptDir);
+        iplayerCommand = iplayerCommand.replace("C:\\Program Files (x86)\\get_iplayer\\", iPlayerScriptDir);
+        iplayerCommand = iplayerCommand.replace("C:\\Program Files\\get_iplayer\\", iPlayerScriptDir);
+        iplayerCommand = iplayerCommand.replace("C:\\Progra~2\\get_iplayer\\", iPlayerScriptDir);
+        iplayerCommand = iplayerCommand.replace("C:\\Progra~1\\get_iplayer\\", iPlayerScriptDir);
+    }
+
+        iplayerCommand = iplayerCommand.replace("Program Files (x86)\\", "Progra~2\\");
+        iplayerCommand = iplayerCommand.replace("Program Files\\", "Progra~1\\");
+
+      sageUtils.info("Changing " + iPlayerCommandProp + " from " + oldCommand + " to " + iplayerCommand);
+      props.setProperty(iPlayerCommandProp, iplayerCommand);
+
+        String onlineVideoPropertiesDirProp = "onlineVideoPropertiesDir";
+        String onlineVideoPropertiesDir =  props.getString(onlineVideoPropertiesDirProp);
+        oldCommand = onlineVideoPropertiesDir;
+        onlineVideoPropertiesDir = onlineVideoPropertiesDir.replace("Program Files (x86)\\", "Progra~2\\");
+        onlineVideoPropertiesDir = onlineVideoPropertiesDir.replace("Program Files\\", "Progra~1\\");
+        sageUtils.info("Changing " + onlineVideoPropertiesDirProp + " from " + oldCommand + " to " + onlineVideoPropertiesDir);
+        props.setProperty(onlineVideoPropertiesDirProp, onlineVideoPropertiesDir);
+
+        String recordDirProp = "recordingDir";
+        String recordingDir =  props.getString(onlineVideoPropertiesDirProp);
+        oldCommand = recordingDir;
+        recordingDir = recordingDir.replace("Program Files (x86)\\", "Progra~2\\");
+        recordingDir = recordingDir.replace("Program Files\\", "Progra~1\\");
+        sageUtils.info("Changing " + recordDirProp + " from " + oldCommand + " to " + recordingDir);
+
+        props.setProperty(recordDirProp, recordingDir);
+
+      props.commit(propFileName, new CatchupPropertiesFileLayout());
+
+  }
+
+  public static void main(String[] args) {
+    CatchupPlugin plugin = new CatchupPlugin(null);
+    plugin.start();
+    plugin.stop();
   }
 
 }

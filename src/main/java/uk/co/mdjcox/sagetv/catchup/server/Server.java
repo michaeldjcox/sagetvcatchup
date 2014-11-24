@@ -114,9 +114,6 @@ public class Server implements CatalogPublisher {
         RecordingStatusPodcast recordingStatusPodcast = new RecordingStatusPodcast(baseUrl, recorder);
         addStaticContent(recordingStatusPodcast);
 
-        RecordingErrorsPage recerrors = new RecordingErrorsPage(recorder);
-        addStaticContent(recerrors);
-
         RecordingErrorsPodcast recerrorscast = new RecordingErrorsPodcast(htmlUtils, baseUrl, recorder);
         addStaticContent(recerrorscast);
 

@@ -1,10 +1,13 @@
 package uk.co.mdjcox.sagetv.catchup;
 
 import sagex.api.FavoriteAPI;
+import uk.co.mdjcox.utils.OsUtils;
+import uk.co.mdjcox.utils.OsUtilsInterface;
 import uk.co.mdjcox.utils.SageUtils;
 import uk.co.mdjcox.utils.SageUtilsInterface;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.rmi.RemoteException;
@@ -18,17 +21,18 @@ import java.util.Set;
  */
 public class CatchupPluginService extends UnicastRemoteObject implements CatchupPluginRemote {
 
+  private final OsUtilsInterface osUtils;
+  private final SageUtilsInterface sageUtils;
   private File sageRecordingDir;
-  private SageUtilsInterface sageUtils;
 
-  public CatchupPluginService(SageUtilsInterface sageUtils) throws RemoteException {
+  public CatchupPluginService(SageUtilsInterface sageUtils, OsUtilsInterface osUtils) throws RemoteException {
     this.sageUtils = sageUtils;
+    this.osUtils = osUtils;
     File[] dirs = sageUtils.getRecordingDirectories();
 
     if (dirs.length > 0) {
       sageRecordingDir = dirs[0];
     }
-
   }
 
   @Override
@@ -48,7 +52,18 @@ public class CatchupPluginService extends UnicastRemoteObject implements Catchup
 
       File completedFile = new File(file);
       File savedFile = new File(sageRecordingDir, episodeId + ".mp4");
-      Files.move(completedFile.toPath(), savedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+      long timeout = System.currentTimeMillis() + 60000;
+
+      do {
+        try {
+          Files.move(completedFile.toPath(), savedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+          break;
+        } catch (Exception e) {
+          sageUtils.warn("Failed to copy recording " + completedFile + " to " + savedFile, e);
+          osUtils.waitFor(1000);
+        }
+      } while (completedFile.exists() && !savedFile.exists() && System.currentTimeMillis() < timeout);
 
       sageUtils.addRecordingToSageTV(
               savedFile.getAbsolutePath(),

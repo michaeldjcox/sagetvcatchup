@@ -304,6 +304,32 @@ public class CatchupDevModule extends AbstractModule {
     }
 
     @Override
+    public long getPartialSizeForStreamingTimeout() {
+      return 60000;
+    }
+
+    @Override
+    public long getPartialSizeForStreaming() {
+      return 1024000;
+    }
+
+    @Override
+    public long getPartialFileNameConfirmationTimeout() {
+      return 60000;
+    }
+
+
+    @Override
+    public long getStreamingTimeout() {
+      return 30000;
+    }
+
+    @Override
+    public long getRecordingTimeout() {
+      return 30000;
+    }
+
+    @Override
     public String toString() {
       return "DevCatchupContext{" +"\n" +
               "tmpDir='" + tmpDir + '\'' + "\n" +
@@ -323,7 +349,6 @@ public class CatchupDevModule extends AbstractModule {
               "onlineVideoPropsSuffix='" + onlineVideoPropsSuffix + '\'' + "\n" +
               "catchupServerRmiPort='" + catchupServerRmiPort + '\'' + "\n" +
               "catchupPluginRmiPort='" + catchupPluginRmiPort + '\'' + "\n" +
-              "properties=" + properties + "\n" +
               '}';
     }
   }

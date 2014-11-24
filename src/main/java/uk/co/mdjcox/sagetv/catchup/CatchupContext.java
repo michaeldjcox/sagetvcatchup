@@ -32,6 +32,11 @@ public class CatchupContext implements CatchupContextInterface {
   private int refreshStartNowProgrammeThreshold;
   private int catchupServerRmiPort;
   private int catchupPluginRmiPort;
+  private long partialSizeForStreamingTimeout;
+  private long partialSizeForStreaming;
+  private long partialFileNameConfirmationTimeout;
+  private long streamingTimeout;
+  private long recordingTimeout;
 
   public CatchupContext(final PropertiesInterface properties) {
       this.properties = properties;
@@ -70,6 +75,12 @@ public class CatchupContext implements CatchupContextInterface {
         podcastBase = "http://localhost:" + port;
         catchupPluginRmiPort = properties.getInt("catchupPluginRmiPort", 1105);
         catchupServerRmiPort = properties.getInt("catchupServerRmiPort", 1106);
+        partialSizeForStreamingTimeout = properties.getInt("partialSizeForStreamingTimeout", 60000);
+        partialSizeForStreaming = properties.getInt("partialSizeForStreaming", 1024000);
+        partialFileNameConfirmationTimeout = properties.getInt("partialFileNameConfirmationTimeout", 60000);
+        streamingTimeout = properties.getInt("streamingTimeout", 30000);
+        recordingTimeout = properties.getInt("recordingTimeout", 30000);
+
     }
 
     public static boolean isRunningInDev() {
@@ -201,6 +212,32 @@ public class CatchupContext implements CatchupContextInterface {
   }
 
   @Override
+  public long getPartialSizeForStreamingTimeout() {
+    return partialSizeForStreamingTimeout;
+  }
+
+  @Override
+  public long getPartialSizeForStreaming() {
+    return partialSizeForStreaming;
+  }
+
+  @Override
+  public long getPartialFileNameConfirmationTimeout() {
+    return partialFileNameConfirmationTimeout;
+  }
+
+  @Override
+  public long getStreamingTimeout() {
+    return streamingTimeout;
+  }
+
+  @Override
+  public long getRecordingTimeout() {
+    return recordingTimeout;
+  }
+
+
+  @Override
   public String toString() {
     return "CatchupContext{" + "\n" +
             "podcastBase='" + podcastBase + '\'' + "\n" +
@@ -218,7 +255,11 @@ public class CatchupContext implements CatchupContextInterface {
             "onlineVideoPropsSuffix='" + onlineVideoPropsSuffix + '\'' +"\n" +
             "catchupServerRmiPort='" + catchupServerRmiPort + '\'' + "\n" +
             "catchupPluginRmiPort='" + catchupPluginRmiPort + '\'' + "\n" +
-            "properties=" + properties +"\n" +
+            "partialFileNameConfirmationTimeout='" + partialFileNameConfirmationTimeout + '\'' + "\n" +
+            "partialSizeForStreaming='" + partialSizeForStreaming + '\'' + "\n" +
+            "partialSizeForStreamingTimeout='" + partialSizeForStreamingTimeout + '\'' + "\n" +
+            "streamingTimeout='" + streamingTimeout + '\'' + "\n" +
+            "recordingTimeout='" + recordingTimeout + '\'' + "\n" +
             '}';
   }
 }
