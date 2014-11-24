@@ -156,7 +156,7 @@
                 <version>1.5.2</version>
                 <executions>
                     <execution>
-                        <id>dev-plugin-xml</id>
+                        <id>dev-plugin-xml-latest</id>
                         <phase>install</phase>
                         <goals>
                             <goal>replace</goal>
@@ -184,7 +184,7 @@
                                 </replacement>
                                 <replacement>
                                     <token>_WEBPAGE_</token>
-                                    <value />
+                                    <value/>
                                 </replacement>
                                 <replacement>
                                     <token>_MAINCLASS_</token>
@@ -192,11 +192,93 @@
                                 </replacement>
                                 <replacement>
                                     <token>_SCREENSHOTNAME_</token>
-                                    <value />
+                                    <value/>
                                 </replacement>
                                 <replacement>
                                     <token>_SCREENSHOTLINK_</token>
-                                    <value />
+                                    <value/>
+                                </replacement>
+                                <replacement>
+                                    <token>_RELEASENOTES_</token>
+                                    <valueFile>releasenotes/releasenotes.txt</valueFile>
+                                    <unescape>true</unescape>
+                                </replacement>
+                                <replacement>
+                                    <token>_AUTHOR_</token>
+                                    <value>michaeldjcox</value>
+                                </replacement>
+                                <replacement>
+                                    <token>_MODDATE_</token>
+                                    <value>${maven.build.timestamp}</value>
+                                </replacement>
+                                <replacement>
+                                    <token>_CREATEDATE_</token>
+                                    <value>2013.04.01</value>
+                                </replacement>
+                                <replacement>
+                                    <token>_VERSION_</token>
+                                    <value>${project.version}</value>
+                                </replacement>
+                                <replacement>
+                                    <token>-SNAPSHOT</token>
+                                    <value>.${buildNumber}</value>
+                                </replacement>
+                                <replacement>
+                                    <token>_LOCATION_</token>
+                                    <value>
+                                        <![CDATA[http://mintpad/sagetvcatchup/download/${project.version}/${project.artifactId}-${project.version}-plugin.zip]]></value>
+                                </replacement>
+                                <replacement>
+                                    <token>_MD5_</token>
+                                    <valueFile>
+                                        ${downloaddir}/${project.version}/${project.artifactId}-${project.version}-plugin.zip.md5
+                                    </valueFile>
+                                </replacement>
+                            </replacements>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>dev-plugin-xml</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                        <configuration>
+                            <file>${basedir}/src/main/assembly/SageTVPlugins.template</file>
+                            <outputFile>${basedir}/target/SageTVPluginsDev.xml</outputFile>
+                            <replacements>
+                                <replacement>
+                                    <token>_NAME_</token>
+                                    <value>SageTV Catchup</value>
+                                </replacement>
+                                <replacement>
+                                    <token>_DESCRIPTION_</token>
+                                    <valueFile>releasenotes/description.txt</valueFile>
+                                    <unescape>true</unescape>
+                                </replacement>
+                                <replacement>
+                                    <token>_ID_</token>
+                                    <value>${project.artifactId}</value>
+                                </replacement>
+                                <replacement>
+                                    <token>_PATH_</token>
+                                    <value>${project.artifactId}</value>
+                                </replacement>
+                                <replacement>
+                                    <token>_WEBPAGE_</token>
+                                    <value/>
+                                </replacement>
+                                <replacement>
+                                    <token>_MAINCLASS_</token>
+                                    <value>uk.co.mdjcox.sagetv.catchup.CatchupPlugin</value>
+                                </replacement>
+                                <replacement>
+                                    <token>_SCREENSHOTNAME_</token>
+                                    <value/>
+                                </replacement>
+                                <replacement>
+                                    <token>_SCREENSHOTLINK_</token>
+                                    <value/>
                                 </replacement>
                                 <replacement>
                                     <token>_RELEASENOTES_</token>
@@ -239,7 +321,7 @@
                     </execution>
                     <execution>
                         <id>plugin-xml</id>
-                        <phase>install</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>replace</goal>
                         </goals>
@@ -266,7 +348,7 @@
                                 </replacement>
                                 <replacement>
                                     <token>_WEBPAGE_</token>
-                                    <value />
+                                    <value/>
                                 </replacement>
                                 <replacement>
                                     <token>_MAINCLASS_</token>
@@ -274,11 +356,11 @@
                                 </replacement>
                                 <replacement>
                                     <token>_SCREENSHOTNAME_</token>
-                                    <value />
+                                    <value/>
                                 </replacement>
                                 <replacement>
                                     <token>_SCREENSHOTLINK_</token>
-                                    <value />
+                                    <value/>
                                 </replacement>
                                 <replacement>
                                     <token>_RELEASENOTES_</token>
@@ -405,6 +487,34 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-artifacts</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>target/SageTVPluginsDev.xml</file>
+                                    <type>xml</type>
+                                    <classifier>sagetvplugincdev</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>target/SageTVPlugins.xml</file>
+                                    <type>xml</type>
+                                    <classifier>sagetvplugin</classifier>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
