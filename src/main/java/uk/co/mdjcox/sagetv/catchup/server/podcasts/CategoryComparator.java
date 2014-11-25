@@ -15,12 +15,15 @@ import java.util.TimeZone;
  */
 public class CategoryComparator implements Comparator<Category> {
 
-  private final SimpleDateFormat format;
+  private final SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEEdMMM");
+  private final SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM");
+  private final SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+
 
   public CategoryComparator() {
-    format = new SimpleDateFormat("dd-MM-yyyy");
-    format.setTimeZone(TimeZone.getTimeZone("Europe/London"));
-
+    dayOfWeekFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    monthFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    yearFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
   }
 
   @Override
@@ -33,8 +36,9 @@ public class CategoryComparator implements Comparator<Category> {
       if (o1Parent.contains("/AirDate/") && o2Parent.contains("/AirDate/")) {
         String dateTime1 = o1Parent.replaceFirst(".*/AirDate/", "");
         String dateTime2 = o2Parent.replaceFirst(".*/AirDate/", "");
-        Date date1 = format.parse(dateTime1);
-        Date date2 = format.parse(dateTime2);
+
+        Date date1 = parseDateStr(dateTime1);
+        Date date2 = parseDateStr(dateTime2);
 
         int compare = date2.compareTo(date1);
 
@@ -48,6 +52,33 @@ public class CategoryComparator implements Comparator<Category> {
     }
 
     return o1.getShortName().compareTo(o2.getShortName());
+  }
+
+  private Date parseDateStr(String dateTime1) throws ParseException {
+    try {
+      Date date = dayOfWeekFormat.parse(dateTime1);
+      return date;
+    } catch (ParseException e) {
+      try {
+        Date date = monthFormat.parse(dateTime1);
+        return date;
+      } catch (ParseException e1) {
+        try {
+          Date date = yearFormat.parse(dateTime1);
+          return date;
+        } catch (ParseException e2) {
+          if (dateTime1.equals("00s")) {
+            return yearFormat.parse("2000");
+          }
+          if (dateTime1.matches("[0-9][0-9]s")) {
+            dateTime1 = "19" + dateTime1.replace("s", "");
+            return yearFormat.parse(dateTime1);
+          }
+        }
+      }
+
+    }
+    return new Date();
   }
 }
 

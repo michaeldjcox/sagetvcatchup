@@ -2,6 +2,7 @@ package uk.co.mdjcox.sagetv.catchup;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.ocpsoft.prettytime.PrettyTime;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.*;
@@ -10,6 +11,7 @@ import uk.co.mdjcox.utils.NamedThreadFactory;
 import uk.co.mdjcox.utils.NumberedThreadFactory;
 import uk.co.mdjcox.utils.RmiHelper;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
@@ -30,6 +32,8 @@ public class Cataloger {
   private static final String STOPPED_ON_REQUEST = "Stopped on request";
   private static final int PROGRAMME_THREADS = 20;
   private static final int EPISODE_THREADS = 20;
+  private static final int MILLIS_IN_A_DAY = 24 * 60 * 60 * 1000;
+  private static final int MILLIS_IN_A_WEEK = MILLIS_IN_A_DAY * 7;
   private LoggerInterface logger;
   private PluginManager pluginManager;
   private AtomicReference<String> progressString = new AtomicReference<String>("");
@@ -247,8 +251,6 @@ public class Cataloger {
 
         logger.info("Found " + newCatalog.getStatsSummary());
 
-        progressString.set("Doing " + pluginName + " additional categorisation");
-
         additionalCategorisation(sourceCat, newProgrammes);
       }
 
@@ -284,6 +286,9 @@ public class Cataloger {
   }
 
   private void additionalCategorisation(Source sourceCat, ConcurrentHashMap<String, Programme> newProgrammes) {
+
+    progressString.set("Doing " + sourceCat.getId() + " additional categorisation");
+
     for (Programme programmeCat : newProgrammes.values()) {
 
       checkForStop();
@@ -514,6 +519,21 @@ public class Cataloger {
       return;
     }
 
+    SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+
+    Date date = null;
+
+    try {
+      date = format.parse(airDateName);
+    } catch (ParseException e) {
+      logger.warn("Failed to categorise by airDate=" + airDateName + " id="+ episode.getId());
+      return;
+    }
+
+    System.err.println("Turning " + airDateName);
+    airDateName = getRelativeTime(date);
+    System.err.println("Into    " + airDateName);
+
     String sourceId = sourceCat.getId();
     String airdateId = sourceId + "/AirDate";
     SubCategory airdateCat = catalog.getSubcategory(airdateId);
@@ -542,6 +562,62 @@ public class Cataloger {
     newProgrammeCat.addEpisode(episode);
 
     airDateInstanceCat.addSubCategory(newProgrammeCat);
+  }
+
+  private String getRelativeTime(Date date) {
+    SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEE d MMM");
+    SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM");
+    SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+
+    dayOfWeekFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    monthFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    yearFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+
+    Calendar cal = GregorianCalendar.getInstance();
+    cal.setTime(new Date());
+    cal.set(Calendar.HOUR_OF_DAY, 0);
+    cal.set(Calendar.MINUTE, 0);
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
+    cal.add(Calendar.MONTH, -1);
+
+    Date aMonthAgo = cal.getTime();
+
+    if (date.after(aMonthAgo)) {
+      return dayOfWeekFormat.format(date);
+    }
+
+
+    cal.setTime(new Date());
+    cal.set(Calendar.HOUR_OF_DAY, 0);
+    cal.set(Calendar.MINUTE, 0);
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
+    cal.add(Calendar.YEAR, -1);
+
+    Date aYearAgo = cal.getTime();
+
+    if (date.after(aYearAgo)) {
+      return monthFormat.format(date);
+    }
+
+    cal.setTime(new Date());
+    cal.set(Calendar.HOUR_OF_DAY, 0);
+    cal.set(Calendar.MINUTE, 0);
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
+    cal.add(Calendar.YEAR, -10);
+
+    Date aDecadeAgo = cal.getTime();
+
+    if (date.after(aDecadeAgo)) {
+      return yearFormat.format(date);
+    }
+
+    String year = yearFormat.format(date);
+    year = year.charAt(2) + "0s";
+
+    return year;
   }
 
   private void doChannelCategorisation(Source sourceCat, Programme programmeCat, Episode prog, Catalog catalog) {
