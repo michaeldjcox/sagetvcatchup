@@ -207,7 +207,7 @@ public class CatchupDevModule extends AbstractModule {
 
     @Override
     public int getRefreshStartNowProgrammeThreshold() {
-      return 10000;
+      return 1;
     }
 
     @Override
