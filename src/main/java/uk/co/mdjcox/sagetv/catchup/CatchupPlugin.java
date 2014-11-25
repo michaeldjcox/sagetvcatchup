@@ -923,7 +923,7 @@ public class CatchupPlugin implements SageTVPlugin {
         props.setProperty(onlineVideoPropertiesDirProp, onlineVideoPropertiesDir);
 
         String recordDirProp = "recordingDir";
-        String recordingDir =  props.getString(onlineVideoPropertiesDirProp);
+        String recordingDir =  props.getString(recordDirProp);
         oldCommand = recordingDir;
         recordingDir = recordingDir.replace("Program Files (x86)\\", "Progra~2\\");
         recordingDir = recordingDir.replace("Program Files\\", "Progra~1\\");
