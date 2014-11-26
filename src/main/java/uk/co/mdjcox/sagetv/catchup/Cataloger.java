@@ -565,12 +565,14 @@ public class Cataloger {
   }
 
   private String getRelativeTime(Date date) {
-    SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEE d MMM");
-    SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM");
+    SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEE dd MMM");
+    SimpleDateFormat monthFormatThisYear = new SimpleDateFormat("MMMM");
+    SimpleDateFormat monthFormatLastYear = new SimpleDateFormat("MMMM yyyy");
     SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
 
     dayOfWeekFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
-    monthFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    monthFormatThisYear.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    monthFormatLastYear.setTimeZone(TimeZone.getTimeZone("Europe/London"));
     yearFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
 
     Calendar cal = GregorianCalendar.getInstance();
@@ -582,6 +584,7 @@ public class Cataloger {
     cal.add(Calendar.MONTH, -1);
 
     Date aMonthAgo = cal.getTime();
+    aMonthAgo.setDate(1);
 
     if (date.after(aMonthAgo)) {
       return dayOfWeekFormat.format(date);
@@ -593,12 +596,19 @@ public class Cataloger {
     cal.set(Calendar.MINUTE, 0);
     cal.set(Calendar.SECOND, 0);
     cal.set(Calendar.MILLISECOND, 0);
-    cal.add(Calendar.YEAR, -1);
+    cal.add(Calendar.MONTH, -12);
 
     Date aYearAgo = cal.getTime();
+    aYearAgo.setDate(1);
+    aYearAgo.setMonth(1);
 
     if (date.after(aYearAgo)) {
-      return monthFormat.format(date);
+      Date now = new Date();
+      if (date.getYear() == now.getYear()) {
+        return monthFormatThisYear.format(date);
+      } else {
+        return monthFormatLastYear.format(date);
+      }
     }
 
     cal.setTime(new Date());
@@ -609,6 +619,8 @@ public class Cataloger {
     cal.add(Calendar.YEAR, -10);
 
     Date aDecadeAgo = cal.getTime();
+    aDecadeAgo.setDate(1);
+    aDecadeAgo.setMonth(1);
 
     if (date.after(aDecadeAgo)) {
       return yearFormat.format(date);

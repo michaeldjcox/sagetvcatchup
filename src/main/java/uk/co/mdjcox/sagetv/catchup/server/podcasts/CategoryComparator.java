@@ -15,14 +15,19 @@ import java.util.TimeZone;
  */
 public class CategoryComparator implements Comparator<Category> {
 
-  private final SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEEdMMM");
-  private final SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM");
+  private final SimpleDateFormat format=new SimpleDateFormat("dd-MM-yyyy");
+  private final SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEEddMMM");
+  private final SimpleDateFormat monthFormatThisYear = new SimpleDateFormat("MMMM");
+  private final SimpleDateFormat monthFormatLastYear = new SimpleDateFormat("MMMMyyyy");
+
   private final SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
 
 
   public CategoryComparator() {
+    format.setTimeZone(TimeZone.getTimeZone("Europe/London"));
     dayOfWeekFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
-    monthFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    monthFormatThisYear.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    monthFormatLastYear.setTimeZone(TimeZone.getTimeZone("Europe/London"));
     yearFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
   }
 
@@ -40,6 +45,9 @@ public class CategoryComparator implements Comparator<Category> {
         Date date1 = parseDateStr(dateTime1);
         Date date2 = parseDateStr(dateTime2);
 
+        System.err.println("Comparing " + dateTime1 + " with " + dateTime2 + "=" + date2.compareTo(date1));
+        System.err.println("Comparing " + date1 + " with " + date2 + "=" + date2.compareTo(date1));
+
         int compare = date2.compareTo(date1);
 
         if (compare != 0) {
@@ -55,28 +63,42 @@ public class CategoryComparator implements Comparator<Category> {
   }
 
   private Date parseDateStr(String dateTime1) throws ParseException {
+    Date now = new Date();
+    if (dateTime1.equals("00s")) {
+      return yearFormat.parse("2000");
+    }
+    if (dateTime1.matches("[0-9][0-9]s")) {
+      dateTime1 = "19" + dateTime1.replace("s", "");
+      return yearFormat.parse(dateTime1);
+    }
     try {
-      Date date = dayOfWeekFormat.parse(dateTime1);
+      Date date = format.parse(dateTime1);
+      date.setYear(now.getYear());
       return date;
     } catch (ParseException e) {
+    try {
+      Date date = dayOfWeekFormat.parse(dateTime1);
+      date.setYear(now.getYear());
+      return date;
+    } catch (ParseException e1) {
       try {
-        Date date = monthFormat.parse(dateTime1);
+        Date date = monthFormatLastYear.parse(dateTime1);
         return date;
-      } catch (ParseException e1) {
+      } catch (ParseException e4) {
+      try {
+        Date date = monthFormatThisYear.parse(dateTime1);
+        date.setYear(now.getYear());
+        return date;
+      } catch (ParseException e2) {
         try {
           Date date = yearFormat.parse(dateTime1);
           return date;
-        } catch (ParseException e2) {
-          if (dateTime1.equals("00s")) {
-            return yearFormat.parse("2000");
-          }
-          if (dateTime1.matches("[0-9][0-9]s")) {
-            dateTime1 = "19" + dateTime1.replace("s", "");
-            return yearFormat.parse(dateTime1);
-          }
+        } catch (ParseException e3) {
+
         }
       }
-
+      }
+    }
     }
     return new Date();
   }
