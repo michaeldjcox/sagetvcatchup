@@ -3,7 +3,7 @@
 
     <groupId>uk.co.mdjcox.sagetvcatchup</groupId>
     <artifactId>sagetvcatchup</artifactId>
-    <version>0.3.6-SNAPSHOT</version>
+    <version>0.3.6</version>
     <packaging>jar</packaging>
 
     <name>SageTV Catchup TV</name>
