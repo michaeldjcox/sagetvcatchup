@@ -1,5 +1,15 @@
 <![CDATA[
 
+0.3.6 - Fifth beta release.
+
+        SageTV Plugin: Fix issue with recordingDir property being overridden with online props dir
+        SageTV Plugin: Make online video property file dir and suffix configurable
+        Cataloging: Fix issue where Iplayer programmes get into lists for the Test source
+
+0.3.5 - Fourth beta release.
+
+        SageTV Plugin: Fix issue with configurability of recording commands
+
 0.3.4 - Third beta release.
 
         Online services menu: some lists not fully populated due to incorrect escaping of podcast titles
