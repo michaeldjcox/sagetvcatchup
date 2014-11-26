@@ -586,7 +586,7 @@ public class Cataloger {
     Date aMonthAgo = cal.getTime();
     aMonthAgo.setDate(1);
 
-    if (date.after(aMonthAgo)) {
+    if (date.after(aMonthAgo) || date.equals(aMonthAgo)) {
       return dayOfWeekFormat.format(date);
     }
 
@@ -600,9 +600,9 @@ public class Cataloger {
 
     Date aYearAgo = cal.getTime();
     aYearAgo.setDate(1);
-    aYearAgo.setMonth(1);
+    aYearAgo.setMonth(0);
 
-    if (date.after(aYearAgo)) {
+    if (date.after(aYearAgo) || date.equals(aYearAgo)) {
       Date now = new Date();
       if (date.getYear() == now.getYear()) {
         return monthFormatThisYear.format(date);
@@ -620,9 +620,9 @@ public class Cataloger {
 
     Date aDecadeAgo = cal.getTime();
     aDecadeAgo.setDate(1);
-    aDecadeAgo.setMonth(1);
+    aDecadeAgo.setMonth(0);
 
-    if (date.after(aDecadeAgo)) {
+    if (date.after(aDecadeAgo) || date.equals(aDecadeAgo)) {
       return yearFormat.format(date);
     }
 
