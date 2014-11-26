@@ -201,6 +201,8 @@ public class Cataloger {
         final int programmesToDo = Math.min(testMaxProgrammes, programmes.size());
         final CountDownLatch programmesLatch = new CountDownLatch(programmesToDo);
 
+        final ConcurrentHashMap<String, Programme> newProgrammes = new ConcurrentHashMap<String, Programme>();
+
         for (final Programme programme : programmes) {
           checkForStop();
 
@@ -301,6 +303,7 @@ public class Cataloger {
                         existingProg.addError("WARNING", "Programme has a duplicate - merging episodes");
                       } else {
                         newCatalog.addProgramme(programme);
+                        newProgrammes.put(programme.getId(), programme);
                       }
                   } else {
                     logger.warn("Programme " + programmeId + " has no episodes");
@@ -359,7 +362,7 @@ public class Cataloger {
 
         progressString.set("Doing " + pluginName + " additional categorisation");
 
-        for (Programme programmeCat : newCatalog.getProgrammes()) {
+        for (Programme programmeCat : newProgrammes.values()) {
 
           checkForStop();
           logger.info("Categorising " + programmeCat);
