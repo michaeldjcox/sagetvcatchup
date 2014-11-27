@@ -507,7 +507,7 @@ public class Recorder {
       }
       if (!episode.getEpisode().isEmpty()) {
         try {
-          episodeNumber = Integer.parseInt(episode.getSeries());
+          episodeNumber = Integer.parseInt(episode.getEpisode());
         } catch (NumberFormatException e) {
 
         }
