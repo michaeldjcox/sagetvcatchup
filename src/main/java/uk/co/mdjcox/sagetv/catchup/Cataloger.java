@@ -2,7 +2,6 @@ package uk.co.mdjcox.sagetv.catchup;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.ocpsoft.prettytime.PrettyTime;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.*;
@@ -772,7 +771,7 @@ public class Cataloger {
     if (lastCatalog != null) {
       return lastCatalog.getStatsSummary();
     } else {
-      return "0 sources 0 programmes 0 episodes";
+      return "0 sources 0 categories 0 programmes 0 episodes";
     }
   }
 

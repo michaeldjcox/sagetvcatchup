@@ -229,7 +229,7 @@ public class Catalog {
   }
 
   public String getStatsSummary() {
-    return getNumberSources() + " sources " + getNumberProgrammes() + " programmes " + getNumberEpisodes() + " episodes";
+    return getNumberSources() + " sources " + getNumberSubCategories() + " categories " + getNumberProgrammes() + " programmes " + getNumberEpisodes() + " episodes";
   }
 
   public String getErrorSummary() {
