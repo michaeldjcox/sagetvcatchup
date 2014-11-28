@@ -55,9 +55,9 @@ public class RecordingErrorsPodcast extends AbstractPodcast {
         descBuilder.append(episode.getEpisodeTitle());
         descBuilder.append("<br/>");
         descBuilder.append("<i>");
-        descBuilder.append(episode.getOrigAirDate());
+        descBuilder.append(episode.getAirDate());
         descBuilder.append(' ');
-        descBuilder.append(episode.getOrigAirTime());
+        descBuilder.append(episode.getAirTime());
         descBuilder.append("</i>");
         descBuilder.append("<br/>");
         descBuilder.append(failedRecording.getRecordingStatus());
