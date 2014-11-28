@@ -58,6 +58,8 @@ public class Episode implements ErrorRecorder {
   private final Set<String> metaUrls = new CopyOnWriteArraySet<String>();
   /** The "control" podcast URL */
   private String podcastUrl;
+  /** The duration in seconds */
+  private String duration;
 
   public Episode() {
   }
@@ -576,7 +578,15 @@ public class Episode implements ErrorRecorder {
         this.podcastUrl = podcastUrl;
     }
 
-    /**
+  public String getDuration() {
+    return duration;
+  }
+
+  public void setDuration(String durationInSeconds) {
+    this.duration = durationInSeconds;
+  }
+
+  /**
    * Returns a string representation of the episode - its title.
    *
    * @return the string representation of the episode
@@ -616,6 +626,7 @@ public class Episode implements ErrorRecorder {
             return false;
         if (serviceUrl != null ? !serviceUrl.equals(episode1.serviceUrl) : episode1.serviceUrl != null) return false;
         if (sourceId != null ? !sourceId.equals(episode1.sourceId) : episode1.sourceId != null) return false;
+      if (duration != null ? !duration.equals(episode1.duration) : episode1.duration != null) return false;
 
         return true;
     }
@@ -641,6 +652,7 @@ public class Episode implements ErrorRecorder {
         result = 31 * result + (errors != null ? errors.hashCode() : 0);
         result = 31 * result + (metaUrls != null ? metaUrls.hashCode() : 0);
         result = 31 * result + (podcastUrl != null ? podcastUrl.hashCode() : 0);
-        return result;
+        result = 31 * result + (duration != null ? duration.hashCode() : 0);
+      return result;
     }
 }

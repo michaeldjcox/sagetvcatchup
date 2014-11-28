@@ -1,13 +1,11 @@
 package uk.co.mdjcox.sagetv.catchup;
 
 import sagex.api.FavoriteAPI;
-import uk.co.mdjcox.utils.OsUtils;
-import uk.co.mdjcox.utils.OsUtilsInterface;
-import uk.co.mdjcox.utils.SageUtils;
-import uk.co.mdjcox.utils.SageUtilsInterface;
+import uk.co.mdjcox.utils.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.rmi.RemoteException;
@@ -15,19 +13,28 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Created by michael on 24/10/14.
  */
 public class CatchupPluginService extends UnicastRemoteObject implements CatchupPluginRemote {
 
+  private final HtmlUtilsInterface htmlUtils;
   private final OsUtilsInterface osUtils;
   private final SageUtilsInterface sageUtils;
+  private final DownloadUtilsInterface downloadUtils;
   private File sageRecordingDir;
+  private ExecutorService downloadService = Executors.newSingleThreadExecutor();
 
-  public CatchupPluginService(SageUtilsInterface sageUtils, OsUtilsInterface osUtils) throws RemoteException {
+  public CatchupPluginService(SageUtilsInterface sageUtils, OsUtilsInterface osUtils,
+                              DownloadUtilsInterface downloadUtils, HtmlUtilsInterface htmlUtils) throws RemoteException {
     this.sageUtils = sageUtils;
+    this.htmlUtils = htmlUtils;
     this.osUtils = osUtils;
+    this.downloadUtils = downloadUtils;
     File[] dirs = sageUtils.getRecordingDirectories();
 
     if (dirs.length > 0) {
@@ -40,9 +47,10 @@ public class CatchupPluginService extends UnicastRemoteObject implements Catchup
     return true;
   }
 
-  public void addRecordingToSageTV(String episodeId, String file, String programmeTitle, String episodeTitle, String description,
+  public void addRecordingToSageTV(final String episodeId, String file, String programmeTitle, String episodeTitle, String description,
                                    List<String> categories, String origAirDate, String origAirTime, String airDate,
-                                   String airTime, int seriesNumber, int episodeNumber) throws RemoteException {
+                                   String airTime, int seriesNumber, int episodeNumber, final String episodeIcon,
+                                   final int durationInSeconds) throws RemoteException {
 
     try {
       if (sageRecordingDir == null) {
@@ -51,7 +59,11 @@ public class CatchupPluginService extends UnicastRemoteObject implements Catchup
       }
 
       File completedFile = new File(file);
-      File savedFile = new File(sageRecordingDir, episodeId + ".mp4");
+      String safeProgrammeTitle = htmlUtils.makeIdSafe(programmeTitle);
+      String safeEpisodeTitle = htmlUtils.makeIdSafe(episodeTitle);
+
+      String recordingName = safeProgrammeTitle + "-" + safeEpisodeTitle+ ".mp4";
+      File savedFile = new File(sageRecordingDir, recordingName);
 
       long timeout = System.currentTimeMillis() + 60000;
 
@@ -76,10 +88,44 @@ public class CatchupPluginService extends UnicastRemoteObject implements Catchup
               airDate,
               airTime,
               seriesNumber,
-              episodeNumber);
+              episodeNumber,
+              durationInSeconds*1000);
+
+
+      final String fileName = recordingName.replace(".mp4", ".jpg");
+      Runnable runnable = new Runnable() {
+        public void run() {
+          try {
+            File file = new File(sageRecordingDir, fileName);
+            if (file.exists()) {
+              file.delete();
+            }
+            downloadUtils.downloadFile(new URL(episodeIcon), file.getAbsolutePath());
+          } catch (Exception e) {
+            sageUtils.error("Failed to download episode fanart for " + episodeId, e);
+          }
+        }
+      };
+
+      if (episodeIcon != null) {
+        downloadService.submit(runnable);
+      }
+
     } catch (Exception e) {
       sageUtils.error("Failed to add catchup tv recording " + episodeId, e);
       throw new RemoteException("Catchup Plugin unable to add recording to SageTV", e);
+    }
+  }
+
+  public void start() {
+    downloadService = Executors.newSingleThreadScheduledExecutor();
+  }
+
+  public void stop() {
+    try {
+      downloadService.shutdownNow();
+    } catch (Exception e) {
+      // Ignore
     }
   }
 

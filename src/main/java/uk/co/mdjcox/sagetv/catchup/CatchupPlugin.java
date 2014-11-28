@@ -85,6 +85,8 @@ public class CatchupPlugin implements SageTVPlugin {
   private String devDownloadUrl = "http://mintpad/sagetvcatchup/download/SageTVPluginsDev.xml";
   private PropertiesInterface props;
   private CatchupPluginService rmiService;
+  private DownloadUtilsInterface downloadUtils;
+  private HtmlUtilsInterface htmlUtils;
 
   public CatchupPlugin(sage.SageTVPluginRegistry registry) {
     this.registry = registry;
@@ -102,7 +104,9 @@ public class CatchupPlugin implements SageTVPlugin {
 
   private void startRmiServer() {
     try {
-      rmiService = new CatchupPluginService(sageUtils, osUtils);
+      rmiService = new CatchupPluginService(sageUtils, osUtils, downloadUtils, htmlUtils);
+
+      rmiService.start();
 
       int rmiRegistryPort = props.getInt("catchupPluginRmiPort", 1105);
       sageUtils.info("Offer remote access to plugin");
@@ -136,6 +140,8 @@ public class CatchupPlugin implements SageTVPlugin {
       // Ignore
     } catch (Exception e) {
       sageUtils.error("Cannot stop server ", e);
+    } finally {
+      rmiService.stop();
     }
   }
 
@@ -150,6 +156,10 @@ public class CatchupPlugin implements SageTVPlugin {
       getProperties();
 
       osUtils = OsUtils.instance(sageUtils);
+
+      downloadUtils = DownloadUtils.instance();
+
+      htmlUtils = HtmlUtils.instance();
 
       startRmiServer();
 

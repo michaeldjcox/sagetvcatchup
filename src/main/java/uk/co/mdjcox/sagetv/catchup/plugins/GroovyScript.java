@@ -327,7 +327,7 @@ public abstract class GroovyScript extends groovy.lang.Script {
       try {
         Date parseDate = sourceFormatter.parse(date);
         return catchupFormatter.format(parseDate);
-      } catch (ParseException e) {
+      } catch (Exception e) {
         return null;
       }
 
@@ -342,9 +342,22 @@ public abstract class GroovyScript extends groovy.lang.Script {
     try {
       Date parseTime = sourceFormatter.parse(time);
       return catchupFormatter.format(parseTime);
-    } catch (ParseException e) {
+    } catch (Exception e) {
       return null;
     }
 
+  }
+
+  public boolean DATE_AFTER(String oldDate, String oldTime, String newDate, String newTime) {
+    SimpleDateFormat catchupFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    catchupFormatter.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    try {
+      Date oldDateTime = catchupFormatter.parse(oldDate + " " + oldTime);
+      Date newDateTime = catchupFormatter.parse(newDate + " " + newTime);
+      return newDateTime.after(oldDateTime);
+    } catch (Exception e) {
+      logger.warn("Failed to parse comparison dates: " + oldDate + " " + oldTime + " and " + newDate + " " + newTime);
+      return false;
+    }
   }
 }

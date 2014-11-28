@@ -496,18 +496,32 @@ public class Recorder {
       String origAirTime = episode.getOrigAirTime();
       String airDate = episode.getAirDate();
       String airTime = episode.getAirTime();
+      String icon = episode.getIconUrl();
+      String durationStr = episode.getDuration();
+      final String seriesStr = episode.getSeries();
+      final String episodeStr = episode.getEpisode();
       int seriesNumber = 0;
       int episodeNumber = 0;
-      if (!episode.getSeries().isEmpty()) {
+      int duration = 0;
+
+      if (seriesStr != null && !seriesStr.isEmpty()) {
         try {
-          seriesNumber = Integer.parseInt(episode.getSeries());
+          seriesNumber = Integer.parseInt(seriesStr);
         } catch (NumberFormatException e) {
 
         }
       }
-      if (!episode.getEpisode().isEmpty()) {
+      if (episodeStr != null && !episodeStr.isEmpty()) {
         try {
-          episodeNumber = Integer.parseInt(episode.getSeries());
+          episodeNumber = Integer.parseInt(episodeStr);
+        } catch (NumberFormatException e) {
+
+        }
+      }
+
+      if (durationStr != null && !durationStr.isEmpty()) {
+        try {
+          duration = Integer.parseInt(durationStr);
         } catch (NumberFormatException e) {
 
         }
@@ -516,6 +530,15 @@ public class Recorder {
       List<String> categoriesList = new ArrayList<String>();
       for (String category : categories) {
         categoriesList.add(category);
+      }
+
+      if (seriesNumber != 0 && episodeNumber != 0) {
+        if (episodeTitle == null || episodeTitle.isEmpty()) {
+          episodeTitle = "Season" + seriesNumber + " - Episode" + episodeNumber;
+
+        } else {
+          episodeTitle = episodeTitle + " - Season" + seriesNumber + " - Episode" + episodeNumber;
+        }
       }
 
       getCatchupPluginRemote().addRecordingToSageTV(
@@ -530,7 +553,9 @@ public class Recorder {
               airDate,
               airTime,
               seriesNumber,
-              episodeNumber
+              episodeNumber,
+              icon,
+              duration
       );
 
         logger.info("Completed uploading " + recording + " to SageTV");

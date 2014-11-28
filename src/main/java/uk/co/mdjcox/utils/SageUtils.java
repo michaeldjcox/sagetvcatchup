@@ -79,7 +79,7 @@ public class SageUtils implements SageUtilsInterface {
 
     }
 
-  public void addRecordingToSageTV(String file, String programmeTitle, String episodeTitle, String description, List<String> categories, String origAirDate, String origAirTime, String airDate, String airTime, int seriesNumber, int episodeNumber) {
+  public void addRecordingToSageTV(String file, String programmeTitle, String episodeTitle, String description, List<String> categories, String origAirDate, String origAirTime, String airDate, String airTime, int seriesNumber, int episodeNumber, int duration) {
     File recordingFile = new File(file);
 
     if (!recordingFile.exists()) {
@@ -95,7 +95,6 @@ public class SageUtils implements SageUtilsInterface {
     }
 
 
-    long duration = 1000;
     String peopleList[] = {};
     String rolesList[] = {};
     String rated = null;
@@ -152,7 +151,6 @@ public class SageUtils implements SageUtilsInterface {
     if (categories != null) {
       categoryArray = categories.toArray(new String[categories.size()]);
     }
-
 
     Object Show = ShowAPI.AddShow(
             programmeTitle,

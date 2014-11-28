@@ -19,7 +19,9 @@ public interface SageUtilsInterface extends LoggerInterface {
 
     String printShow(Object show);
 
-    void addRecordingToSageTV(String recordingFile, String programmeTitle, String episodeTitle, String description, List<String> category, String origAirDate, String origAirTime, String airDate, String airTime, int seriesNumber, int episodeNumber);
+    void addRecordingToSageTV(String recordingFile, String programmeTitle, String episodeTitle, String description,
+                              List<String> category, String origAirDate, String origAirTime, String airDate, String airTime,
+                              int seriesNumber, int episodeNumber, int duration);
 
     File[] getRecordingDirectories();
 

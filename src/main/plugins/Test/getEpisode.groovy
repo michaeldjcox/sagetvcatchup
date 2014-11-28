@@ -16,5 +16,6 @@ episode.setAirDate("01-09-2014")
 episode.setAirTime("10:00:00");
 episode.setOrigAirDate("01-10-2014")
 episode.setOrigAirTime("12:00:00");
+episode.setDuration("60");
 episode.setId("TestEpisode")
 return episode;

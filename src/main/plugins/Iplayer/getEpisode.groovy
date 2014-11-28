@@ -176,15 +176,6 @@ if (details != null && !details.startsWith("/>")) {
     seriesNumber = REMOVE_HTML_TAGS(seriesNumber);
 }
 
-if (seriesNumber != null) {
-    if (!seriesNumber.matches("[0-9]*")) {
-        LOG_WARNING(episode, "Series number is not a number: " + seriesNumber);
-    }
-    episode.setSeries(seriesNumber);
-} else {
-    LOG_WARNING(episode, "Series number not found");
-}
-
 // EPISODE
 String episodeNo = null;
 details = MOVE_TO("<position", metadetails);
@@ -199,15 +190,27 @@ if (episodeNo != null) {
         LOG_WARNING(episode, "Episode number is not a number: " + episodeNo);
     }
     episode.setEpisode(episodeNo);
+    if (seriesNumber == null) {
+        seriesNumber = "1"
+    }
 } else {
     LOG_WARNING(episode, "Episode number not found");
+}
+
+if (seriesNumber != null) {
+    if (!seriesNumber.matches("[0-9]*")) {
+        LOG_WARNING(episode, "Series number is not a number: " + seriesNumber);
+    }
+    episode.setSeries(seriesNumber);
+} else {
+    LOG_WARNING(episode, "Series number not found");
 }
 
 //AIRING DATE AND TIME
 details = MOVE_TO("<first_broadcast_date", metadetails)
 
 // If empty tag is present then there is no data to parse otherwise...
-if (details == null || !details.startsWith("/>")) {
+if (details != null && !details.startsWith("/>")) {
     details = MOVE_TO(">", details);
     details = EXTRACT_TO("</first_broadcast_date>", details)
 
@@ -229,29 +232,160 @@ if (details == null || !details.startsWith("/>")) {
     if (date != null) {
         String newDate = FIX_DATE("yyyy-MM-dd", date);
         if (newDate == null) {
-            LOG_ERROR(episode, "Failed to parse air date: " + date);
+            LOG_ERROR(episode, "Failed to parse original air date: " + date);
             newDate = date;
         }
 
-        episode.setAirDate(newDate);
+        episode.setAirDate(newDate); // Default
         episode.setOrigAirDate(newDate);
     } else {
-        LOG_WARNING(episode, "Air date not found");
+        LOG_WARNING(episode, "Original Air date not found");
     }
 
     if (time != null) {
         String newTime = FIX_TIME("HH:mm:ss", time);
         if (newTime == null) {
-            LOG_ERROR(episode, "Failed to parse air time: " + time);
+            LOG_ERROR(episode, "Failed to parse original air time: " + time);
             newTime = time;
         }
 
-        episode.setAirTime(newTime);
+        episode.setAirTime(newTime); // Default
         episode.setOrigAirTime(newTime); 
     } else {
-        LOG_WARNING(episode, "Air time not found");
+        LOG_WARNING(episode, "Original Air time not found");
     }
 
+}
+
+// Issues here - there are many versions of programmes and there are many regional/channel broadcasts of each version
+// which do I use to populate the last aired date and time. I don't want to download all these pages
+// It could be irrelvant - just take the last broadcasted anywhere
+
+
+details = MOVE_TO("<versions", metadetails);
+details = MOVE_TO("<version canonical=\"1\"", details)
+String version = EXTRACT_TO("</version", details)
+String versionId = null
+String duration = null
+boolean originalVersion = false
+while (version != null && versionId == null && !originalVersion) {
+    originalVersion = version.contains("<type>Original version</type>");
+
+        version = MOVE_TO("<pid>", version);
+        versionId = EXTRACT_TO("</pid>", version)
+        durationDetails = MOVE_TO("<duration>", version)
+        duration = EXTRACT_TO("</duration>", durationDetails)
+        if (duration != null) {
+            episode.setDuration(duration)
+        }
+
+    details = MOVE_TO("<version canonical=\"1\"", details)
+    version = EXTRACT_TO("</version ", details)
+}
+
+if (versionId == null) {
+    details = MOVE_TO("<versions", metadetails);
+    details = MOVE_TO("<version canonical=\"0\"", details)
+    version = EXTRACT_TO("</version", details)
+    versionId = null
+    duration = null
+    while (version != null && versionId == null && !originalVersion) {
+        originalVersion = version.contains("<type>Original version</type>");
+
+        version = MOVE_TO("<pid>", version);
+        versionId = EXTRACT_TO("</pid>", version)
+        durationDetails = MOVE_TO("<duration>", version)
+        duration = EXTRACT_TO("</duration>", durationDetails)
+        if (duration != null) {
+            episode.setDuration(duration)
+        }
+        details = MOVE_TO("<version canonical=\"1\"", details)
+        version = EXTRACT_TO("</version ", details)
+    }
+
+}
+
+// TODO duration is unreliable at top of version html
+
+if (versionId != null) {
+    String versionUrl = "http://www.bbc.co.uk/programmes/" + versionId + ".xml";
+    episode.addMetaUrl(versionUrl)
+    String versionDetails = GET_WEB_PAGE(versionUrl, stopFlag);
+
+    durationDetails = MOVE_TO("<duration>", versionDetails)
+    duration = EXTRACT_TO("</duration>", durationDetails)
+    if (duration != null) {
+        episode.setDuration(duration)
+    } else {
+
+    }
+
+    versionDetails = MOVE_TO("<broadcast", versionDetails);
+    versionDetails = MOVE_TO("<start", versionDetails);
+
+    while (versionDetails != null && !versionDetails.startsWith("/>")) {
+
+        durationDetails = MOVE_TO("<duration>", versionDetails)
+        duration = EXTRACT_TO("</duration>", durationDetails)
+        if (duration != null) {
+            episode.setDuration(duration)
+        }
+
+        String airDateDetails = MOVE_TO(">", versionDetails);
+        airDateDetails = EXTRACT_TO("</start>", airDateDetails)
+
+        String time=null;
+        String date = null;
+
+        if (airDateDetails != null) {
+            date = EXTRACT_TO("T", airDateDetails);
+            date = REMOVE_HTML_TAGS(date);
+            time = MOVE_TO("T", airDateDetails);
+            String time2 = EXTRACT_TO("+", time);
+            if (time2 == null) {
+                time2 = EXTRACT_TO("Z", time);
+            }
+            time = REMOVE_HTML_TAGS(time2);
+        }
+
+        String newDate = null;
+        if (date != null) {
+            newDate = FIX_DATE("yyyy-MM-dd", date);
+            if (newDate == null) {
+                LOG_ERROR(episode, "Failed to parse air date: " + date);
+                newDate = date;
+            }
+        } else {
+            LOG_WARNING(episode, "Air date not found");
+        }
+
+        String newTime = null
+        if (time != null) {
+            newTime = FIX_TIME("HH:mm:ss", time);
+            if (newTime == null) {
+                LOG_ERROR(episode, "Failed to parse air time: " + time);
+                newTime = time;
+            }
+
+        } else {
+            LOG_WARNING(episode, "Air time not found");
+        }
+
+        if (DATE_AFTER(episode.getAirDate(), episode.getAirTime(), newDate, newTime)) {
+            LOG_INFO(episode.getPodcastTitle() + "Repeat date " + newDate + " " + newTime + " is after " + episode.getAirDate() + " " + episode.getAirTime());
+            episode.setAirDate(newDate);
+            episode.setAirTime(newTime);
+        }
+
+        versionDetails = MOVE_TO("<broadcast", versionDetails);
+        versionDetails = MOVE_TO("<start", versionDetails);
+    }
+} else {
+    LOG_WARNING(episode, "No default versionId found for programme");
+}
+
+if (episode.getDuration() == null || episode.getDuration().isEmpty()) {
+    LOG_WARNING(episode, "No episode duration found");
 }
 
 episode.setId(MAKE_ID(episode.getPodcastTitle()))

@@ -54,6 +54,11 @@
                         <td><xsl:value-of select="episodeTitle"/></td>
                     </tr>
                     <tr>
+                        <td>PodcastTitle</td>
+                        <xsl:text>&#10;</xsl:text>
+                        <td><xsl:value-of select="podcastTitle"/></td>
+                    </tr>
+                    <tr>
                         <td>Description</td>
                         <xsl:text>&#10;</xsl:text>
                         <td><xsl:value-of select="description"/></td>
@@ -98,9 +103,9 @@
                         <td><xsl:value-of select="origAirTime"/></td>
                     </tr>
                     <tr>
-                        <td>PodcastTitle</td>
+                        <td>Duration</td>
                         <xsl:text>&#10;</xsl:text>
-                        <td><xsl:value-of select="podcastTitle"/></td>
+                        <td><xsl:value-of select="duration"/></td>
                     </tr>
                     <tr>
                         <td>IconUrl</td>
