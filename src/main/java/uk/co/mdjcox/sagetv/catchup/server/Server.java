@@ -262,22 +262,22 @@ public class Server implements CatalogPublisher {
       }
 
       if (target.endsWith(".css")) {
-        new CssPage(logger, cssDir, target).serve(response);
+        new CssPage(logger, cssDir, target).serve(request, response);
       } else if (staticContent.containsKey(page)) {
-        staticContent.get(page).serve(response);
+        staticContent.get(page).serve(request, response);
       } else
       if (page.contains("search?text=")) {
         SearchPodcast searchPodcast = (SearchPodcast)publishedContent.get(page.replaceAll("text=.*;type=xml", "type=xml"));
         searchPodcast.setSearchString(page.replaceAll("search\\?text=", "").replaceAll(";type=xml", ""));
-        searchPodcast.serve(response);
+        searchPodcast.serve(request, response);
       } else
         if (publishedContent.containsKey(page)) {
-            publishedContent.get(page).serve(response);
+            publishedContent.get(page).serve(request, response);
         } else {
             if (page.contains(";type=xml")) {
-                new MessagePodcast(baseUrl, "Podcast not found " + page).serve(response);
+                new MessagePodcast(baseUrl, "Podcast not found " + page).serve(request, response);
             } else {
-                new MessagePage("Page not found " + page).serve(response);
+                new MessagePage("Page not found " + page).serve(request, response);
             }
         }
 

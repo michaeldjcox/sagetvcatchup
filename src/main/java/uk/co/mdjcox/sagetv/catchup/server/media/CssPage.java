@@ -5,6 +5,7 @@ import uk.co.mdjcox.sagetv.catchup.server.ContentProvider;
 import uk.co.mdjcox.utils.LoggerInterface;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.File;
@@ -52,7 +53,7 @@ public class CssPage implements ContentProvider {
     }
 
     @Override
-    public void serve(HttpServletResponse response) throws ServletException, IOException {
+    public void serve(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             response.setCharacterEncoding(getEncoding());
             response.setContentType(getType());

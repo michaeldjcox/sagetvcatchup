@@ -4,6 +4,7 @@ import uk.co.mdjcox.sagetv.catchup.server.ContentProvider;
 import uk.co.mdjcox.sagetv.catchup.server.Server;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,7 +56,7 @@ public class LogoImage implements ContentProvider {
     }
 
     @Override
-    public void serve(HttpServletResponse response) throws ServletException, IOException {
+    public void serve(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final ClassLoader cl = Server.class.getClassLoader();
         InputStream in = cl.getResourceAsStream("logo.png");
         int fileSize = findResourceLength(in);

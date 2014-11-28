@@ -7,6 +7,7 @@ import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.utils.LoggerInterface;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,7 +38,7 @@ public class WatchEpisode implements ContentProvider {
     }
 
     @Override
-    public void serve(HttpServletResponse response) throws ServletException, IOException {
+    public void serve(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         OutputStream out = null;
 
