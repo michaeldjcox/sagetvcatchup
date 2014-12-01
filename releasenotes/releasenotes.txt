@@ -2,6 +2,17 @@
  \n
 0.4.0 First official release.
  \n
+      - Online Services menu. Show the last air date rather than original air date in episode detail
+      - Online Services menu. Cataloging status - add a count of subcategories
+      - Web Page: Fix issue where podcasts cannot be navigated from remote machine
+      - Cataloging: extract duration and actual last air date from iplayer meta data
+      - Cataloging: reduce air date categories by going from day to month to year to decade for older content
+      - Recording: add duration, and last air date to SageTV airing meta data
+      - Recording: download the episode fanart to the recording directory.
+      - Recording: fix episode title so it has the SageTVs title - SeasonNr - EpisodeNr format
+      - Recording: fix episode number which was being set to same value as series number
+      - Test: reduce size of the test video to reduce upload times
+ \n
 0.3.6 - Fifth beta release.
  \n
       - SageTV Plugin: Fix issue with recordingDir property being overridden with online props dir
