@@ -12,9 +12,9 @@ import com.google.inject.Singleton;
 import uk.co.mdjcox.sagetv.catchup.CatalogPublisher;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.model.*;
-import uk.co.mdjcox.utils.HtmlUtilsInterface;
-import uk.co.mdjcox.utils.LoggerInterface;
-import uk.co.mdjcox.utils.PropertiesFile;
+import uk.co.mdjcox.sagetv.utils.HtmlUtilsInterface;
+import uk.co.mdjcox.sagetv.utils.LoggerInterface;
+import uk.co.mdjcox.sagetv.utils.PropertiesFile;
 
 import java.io.File;
 import java.util.HashSet;

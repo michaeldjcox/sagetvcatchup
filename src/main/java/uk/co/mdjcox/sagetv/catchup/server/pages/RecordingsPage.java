@@ -2,7 +2,7 @@ package uk.co.mdjcox.sagetv.catchup.server.pages;
 
 import uk.co.mdjcox.sagetv.catchup.Recorder;
 import uk.co.mdjcox.sagetv.model.Recording;
-import uk.co.mdjcox.utils.HtmlBuilder;
+import uk.co.mdjcox.sagetv.utils.HtmlBuilder;
 
 import java.text.SimpleDateFormat;
 import java.util.Collection;

@@ -9,7 +9,7 @@ import org.junit.Test;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.catchup.CatchupTestModule;
 import uk.co.mdjcox.sagetv.model.*;
-import uk.co.mdjcox.utils.PropertiesFile;
+import uk.co.mdjcox.sagetv.utils.PropertiesFile;
 
 import java.io.File;
 import java.lang.reflect.Method;

@@ -2,7 +2,7 @@ package uk.co.mdjcox.sagetv.catchup;
 
 import sage.SageTVPlugin;
 import sage.SageTVPluginRegistry;
-import uk.co.mdjcox.utils.*;
+import uk.co.mdjcox.sagetv.utils.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -166,6 +166,10 @@ public class CatchupPlugin implements SageTVPlugin {
       startCatchupServer();
 
       initConfig();
+
+      Map<String, Integer> channels = sageUtils.getChannels();
+
+      sageUtils.info("Channels are " + channels);
 
       sageUtils.info("Started catchup plugin");
 

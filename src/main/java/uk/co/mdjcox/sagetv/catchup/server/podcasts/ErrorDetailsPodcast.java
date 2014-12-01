@@ -1,13 +1,11 @@
 package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
 import uk.co.mdjcox.sagetv.model.ParseError;
-import uk.co.mdjcox.utils.HtmlUtilsInterface;
-import uk.co.mdjcox.utils.RssBuilder;
+import uk.co.mdjcox.sagetv.utils.HtmlUtilsInterface;
+import uk.co.mdjcox.sagetv.utils.RssBuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by michael on 07/10/14.

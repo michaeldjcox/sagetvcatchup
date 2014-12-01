@@ -1,13 +1,13 @@
-package uk.co.mdjcox.utils;
+package uk.co.mdjcox.sagetv.utils;
 
+import sage.SageTV;
 import sagex.api.*;
 
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 /**
@@ -83,6 +83,130 @@ public class SageUtils implements SageUtilsInterface {
     File recordingFile = new File(file);
 
     if (!recordingFile.exists()) {
+      debugLog("Add airing to SageTV - recording does not exist: " + recordingFile.getAbsolutePath());
+      return;
+    }
+
+    // Add the MediaFile to the database.
+    Object mediaFile = MediaFileAPI.AddMediaFile(recordingFile, "");
+    if (mediaFile == null) {
+      debugLog("Add airing to SageTV - add media file failed: " + recordingFile.getAbsolutePath());
+      return;
+    }
+
+
+    String peopleList[] = {};
+    String rolesList[] = {};
+    String rated = null;
+    String expandedRatedList[] = null;
+    String parentalRating = null;
+    String miscList[] = new String[0];
+    Long now = Utility.Time();
+    String nowString = now.toString();
+    String externalID = "ONL" + nowString;
+    String airingExternalID = "EP" + nowString;
+    String language = "English";
+
+
+    long originalAirDate = now;
+
+    if ((origAirDate != null) && (origAirTime != null)) {
+      try {
+        String dateTime = origAirDate + " " + origAirTime;
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        format.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+        Date date = format.parse(dateTime);
+
+        originalAirDate = date.getTime();
+
+        debugLog("Add airing to SageTV - Uploading recording of " + episodeTitle + " to sageTV " + date + " from " + dateTime);
+
+      } catch (ParseException e) {
+        debugLog("Add airing to SageTV - Failed to parse original air date " + origAirDate + " " + origAirTime + " into long time");
+      }
+    }
+
+    SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+    yearFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    String year = yearFormat.format(new Date(originalAirDate));
+
+    boolean isFirstRun = true;
+
+    long actualAirDate = originalAirDate;
+    if ((airDate != null) && (airTime != null)) {
+      try {
+        String dateTime = airDate + " " + airTime;
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        format.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+        Date date = format.parse(dateTime);
+        actualAirDate = date.getTime();
+
+        isFirstRun = date.getTime() == originalAirDate;
+
+      } catch (ParseException e) {
+        debugLog("Add airing to SageTV - Failed to parse air date " + airDate + " " + airTime + " into long time");
+      }
+    }
+
+    String[] categoryArray = new String[0];
+    if (categories != null) {
+      categoryArray = categories.toArray(new String[categories.size()]);
+    }
+
+    Object Show = ShowAPI.AddShow(
+            programmeTitle,
+            isFirstRun,
+            episodeTitle,
+            description,
+            duration,
+            categoryArray,
+            peopleList,
+            rolesList,
+            rated,
+            expandedRatedList,
+            year,
+            parentalRating,
+            miscList,
+            externalID,
+            language,
+            originalAirDate,
+            seriesNumber,
+            episodeNumber);
+
+    if (Show == null) {
+      debugLog("Add airing to SageTV - Failed to add show");
+      return ;
+    }
+
+    if (!MediaFileAPI.SetMediaFileShow(mediaFile, Show)) {
+      debugLog("Add airing to SageTV - Failed to set media show");
+      return ;
+    }
+
+    // Change the ExternalID metadata to something that starts with "EP" to turn the Imported video
+    // file into an archived TV recording.
+    MediaFileAPI.SetMediaFileMetadata(mediaFile, "ExternalID", airingExternalID);
+
+    // TODO need to expand this to all channels
+    Object airing = AiringAPI.AddAiring(airingExternalID, 1, actualAirDate, duration );
+
+    if (!AiringAPI.IsAiringObject(airing)) {
+      debugLog("Add airing to SageTV - Object is not an Airing.");
+      return ;
+    }
+
+    MediaFileAPI.SetMediaFileAiring(mediaFile, airing);
+
+    // Clear the Archived flag.
+    MediaFileAPI.MoveTVFileOutOfLibrary(mediaFile);
+
+    debugLog("Add airing to SageTV - Succeeded");
+  }
+
+  public void addRecordingToSageTV_old(String file, String programmeTitle, String episodeTitle, String description, List<String> categories, String origAirDate, String origAirTime, String airDate, String airTime, int seriesNumber, int episodeNumber, int duration) {
+    File recordingFile = new File(file);
+
+    if (!recordingFile.exists()) {
         debugLog("Add airing to SageTV - recording does not exist: " + recordingFile.getAbsolutePath());
       return;
     }
@@ -135,7 +259,7 @@ public class SageUtils implements SageUtilsInterface {
 
     if ((airDate != null) && (airTime != null)) {
       try {
-        String dateTime = airDate + " " + airDate;
+        String dateTime = airDate + " " + airTime;
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         format.setTimeZone(TimeZone.getTimeZone("Europe/London"));
         Date date = format.parse(dateTime);
@@ -198,6 +322,23 @@ public class SageUtils implements SageUtilsInterface {
 
     debugLog("Add airing to SageTV - Succeeded");
 
+  }
+
+  public Map<String, Integer> getChannels() {
+    Map<String, Integer> channelsList = new TreeMap<String, Integer>();
+    try {
+      Object[] channels = ChannelAPI.GetAllChannels();
+      for (Object chan : channels) {
+        if (ChannelAPI.IsChannelObject(chan)) {
+          String name = ChannelAPI.GetChannelDescription(chan);
+          int stationId = ChannelAPI.GetStationID(chan);
+          channelsList.put(name, stationId);
+        }
+      }
+    } catch (Exception e) {
+      error("Cannot establish channels", e);
+    }
+    return channelsList;
   }
 
   @Override

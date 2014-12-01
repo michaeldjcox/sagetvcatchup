@@ -2,7 +2,7 @@ package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
 import uk.co.mdjcox.sagetv.catchup.Recorder;
 import uk.co.mdjcox.sagetv.model.Episode;
-import uk.co.mdjcox.utils.RssBuilder;
+import uk.co.mdjcox.sagetv.utils.RssBuilder;
 
 /**
  * Created by michael on 07/10/14.

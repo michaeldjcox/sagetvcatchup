@@ -1,4 +1,4 @@
-package uk.co.mdjcox.utils;
+package uk.co.mdjcox.sagetv.utils;
 
 import sun.net.www.protocol.http.HttpURLConnection;
 

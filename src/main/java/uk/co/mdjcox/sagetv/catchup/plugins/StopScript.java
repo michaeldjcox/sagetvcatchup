@@ -4,10 +4,10 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.model.Recording;
-import uk.co.mdjcox.utils.DownloadUtilsInterface;
-import uk.co.mdjcox.utils.HtmlUtilsInterface;
-import uk.co.mdjcox.utils.LoggerInterface;
-import uk.co.mdjcox.utils.OsUtilsInterface;
+import uk.co.mdjcox.sagetv.utils.DownloadUtilsInterface;
+import uk.co.mdjcox.sagetv.utils.HtmlUtilsInterface;
+import uk.co.mdjcox.sagetv.utils.LoggerInterface;
+import uk.co.mdjcox.sagetv.utils.OsUtilsInterface;
 
 import java.io.File;
 

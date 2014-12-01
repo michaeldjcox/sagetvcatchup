@@ -1,6 +1,6 @@
 package uk.co.mdjcox.sagetv.catchup;
 
-import uk.co.mdjcox.utils.OrderedPropertiesFileLayout;
+import uk.co.mdjcox.sagetv.utils.OrderedPropertiesFileLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;

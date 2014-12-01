@@ -5,10 +5,10 @@ import com.google.inject.Singleton;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.*;
-import uk.co.mdjcox.utils.LoggerInterface;
-import uk.co.mdjcox.utils.NamedThreadFactory;
-import uk.co.mdjcox.utils.NumberedThreadFactory;
-import uk.co.mdjcox.utils.RmiHelper;
+import uk.co.mdjcox.sagetv.utils.LoggerInterface;
+import uk.co.mdjcox.sagetv.utils.NamedThreadFactory;
+import uk.co.mdjcox.sagetv.utils.NumberedThreadFactory;
+import uk.co.mdjcox.sagetv.utils.RmiHelper;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

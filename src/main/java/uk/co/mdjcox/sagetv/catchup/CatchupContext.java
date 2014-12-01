@@ -1,6 +1,6 @@
 package uk.co.mdjcox.sagetv.catchup;
 
-import uk.co.mdjcox.utils.PropertiesInterface;
+import uk.co.mdjcox.sagetv.utils.PropertiesInterface;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -1,14 +1,11 @@
-package uk.co.mdjcox.utils;
+package uk.co.mdjcox.sagetv.utils;
 
 import sun.net.www.protocol.http.HttpURLConnection;
 
 import java.net.URLConnection;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**

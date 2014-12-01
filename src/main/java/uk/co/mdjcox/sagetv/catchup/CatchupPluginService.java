@@ -1,10 +1,9 @@
 package uk.co.mdjcox.sagetv.catchup;
 
 import sagex.api.FavoriteAPI;
-import uk.co.mdjcox.utils.*;
+import uk.co.mdjcox.sagetv.utils.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Created by michael on 24/10/14.

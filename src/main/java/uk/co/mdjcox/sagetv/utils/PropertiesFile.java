@@ -6,7 +6,7 @@
  */
 
 
-package uk.co.mdjcox.utils;
+package uk.co.mdjcox.sagetv.utils;
 
 import com.google.inject.Inject;
 

@@ -15,23 +15,17 @@ import uk.co.mdjcox.sagetv.catchup.server.media.WatchEpisode;
 import uk.co.mdjcox.sagetv.catchup.server.pages.*;
 import uk.co.mdjcox.sagetv.catchup.server.podcasts.*;
 import uk.co.mdjcox.sagetv.model.*;
-import uk.co.mdjcox.utils.*;
+import uk.co.mdjcox.sagetv.utils.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * The web server.

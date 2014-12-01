@@ -1,8 +1,7 @@
 package uk.co.mdjcox.sagetv.catchup;
 
-import uk.co.mdjcox.utils.LoggerInterface;
-import uk.co.mdjcox.utils.RmiHelper;
-import uk.co.mdjcox.utils.SageUtils;
+import uk.co.mdjcox.sagetv.utils.LoggerInterface;
+import uk.co.mdjcox.sagetv.utils.RmiHelper;
 
 /**
  * Created by michael on 24/10/14.

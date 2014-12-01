@@ -1,4 +1,4 @@
-package uk.co.mdjcox.utils;
+package uk.co.mdjcox.sagetv.utils;
 
 import java.io.IOException;
 import java.util.ArrayList;

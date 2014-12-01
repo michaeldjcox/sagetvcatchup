@@ -2,7 +2,6 @@ package uk.co.mdjcox.sagetv.catchup.server.pages;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -10,7 +9,7 @@ import org.xml.sax.SAXException;
 import uk.co.mdjcox.sagetv.catchup.CatalogPersister;
 import uk.co.mdjcox.sagetv.catchup.CatchupTestModule;
 import uk.co.mdjcox.sagetv.model.*;
-import uk.co.mdjcox.utils.HtmlBuilder;
+import uk.co.mdjcox.sagetv.utils.HtmlBuilder;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

@@ -6,7 +6,7 @@ import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
-import uk.co.mdjcox.utils.*;
+import uk.co.mdjcox.sagetv.utils.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -338,7 +338,7 @@ public class Recorder {
           stop(recording);
         }
       // TODO take this out!
-      if (false) {
+      if (true) {
         final File completedFile = recording.getCompletedFile();
         if (!completedFile.exists()) {
           File testFile = new File(context.getPluginDir() + File.separator + "Test" + File.separator + "TestEpisode.mp4");

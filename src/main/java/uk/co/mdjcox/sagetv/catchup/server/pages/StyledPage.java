@@ -1,11 +1,10 @@
 package uk.co.mdjcox.sagetv.catchup.server.pages;
 
-import com.thoughtworks.xstream.XStream;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import uk.co.mdjcox.sagetv.catchup.CatalogPersister;
-import uk.co.mdjcox.utils.HtmlBuilder;
-import uk.co.mdjcox.utils.LoggerInterface;
+import uk.co.mdjcox.sagetv.utils.HtmlBuilder;
+import uk.co.mdjcox.sagetv.utils.LoggerInterface;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

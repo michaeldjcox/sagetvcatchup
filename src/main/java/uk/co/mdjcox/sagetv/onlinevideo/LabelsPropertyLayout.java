@@ -9,7 +9,7 @@
 package uk.co.mdjcox.sagetv.onlinevideo;
 
 
-import uk.co.mdjcox.utils.PropertiesFileLayout;
+import uk.co.mdjcox.sagetv.utils.PropertiesFileLayout;
 
 import java.util.Comparator;
 import java.util.HashMap;

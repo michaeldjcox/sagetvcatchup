@@ -3,7 +3,7 @@ package uk.co.mdjcox.sagetv.catchup.plugins;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
-import uk.co.mdjcox.utils.LoggerInterface;
+import uk.co.mdjcox.sagetv.utils.LoggerInterface;
 
 import java.io.File;
 import java.io.FileFilter;

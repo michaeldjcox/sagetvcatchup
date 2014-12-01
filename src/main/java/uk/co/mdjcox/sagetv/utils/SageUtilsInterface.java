@@ -1,7 +1,8 @@
-package uk.co.mdjcox.utils;
+package uk.co.mdjcox.sagetv.utils;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by michael on 24/09/14.
@@ -26,4 +27,6 @@ public interface SageUtilsInterface extends LoggerInterface {
     File[] getRecordingDirectories();
 
     void setClientProperty(String name, String value);
+
+   Map<String, Integer> getChannels();
 }
