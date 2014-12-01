@@ -47,74 +47,74 @@ public class CatchupPluginService extends UnicastRemoteObject implements Catchup
     return true;
   }
 
-  public void addRecordingToSageTV(final String episodeId, String file, String programmeTitle, String episodeTitle, String description,
-                                   List<String> categories, String origAirDate, String origAirTime, String airDate,
-                                   String airTime, int seriesNumber, int episodeNumber, final String episodeIcon,
+  public void addRecordingToSageTV(final String episodeId, final String file, final String programmeTitle, final String episodeTitle,
+                                   final String description, final List<String> categories, final String origAirDate,
+                                   final String origAirTime, final String airDate, final String airTime,
+                                   final int seriesNumber, final int episodeNumber, final String episodeIcon,
                                    final int durationInSeconds) throws RemoteException {
 
-    try {
-      if (sageRecordingDir == null) {
-        sageUtils.error("No sageTV recording directory found");
-        return;
+    long timeout = System.currentTimeMillis() + 60000;
+
+    if (sageRecordingDir == null) {
+      sageUtils.error("No sageTV recording directory found");
+      return;
+    }
+
+    String safeProgrammeTitle = htmlUtils.makeIdSafe(programmeTitle);
+    String safeEpisodeTitle = htmlUtils.makeIdSafe(episodeTitle);
+
+    final String recordingName = safeProgrammeTitle + "-" + safeEpisodeTitle+ ".mp4";
+
+    final File completedFile = new File(file);
+    final File savedFile = new File(sageRecordingDir, recordingName);
+
+    do {
+      try {
+        Files.move(completedFile.toPath(), savedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        break;
+      } catch (Exception e) {
+        sageUtils.warn("Failed to copy recording " + completedFile + " to " + savedFile, e);
+        osUtils.waitFor(1000);
       }
+    } while (completedFile.exists() && !savedFile.exists() && System.currentTimeMillis() < timeout);
 
-      File completedFile = new File(file);
-      String safeProgrammeTitle = htmlUtils.makeIdSafe(programmeTitle);
-      String safeEpisodeTitle = htmlUtils.makeIdSafe(episodeTitle);
-
-      String recordingName = safeProgrammeTitle + "-" + safeEpisodeTitle+ ".mp4";
-      File savedFile = new File(sageRecordingDir, recordingName);
-
-      long timeout = System.currentTimeMillis() + 60000;
-
-      do {
+    Runnable runnable = new Runnable() {
+      public void run() {
         try {
-          Files.move(completedFile.toPath(), savedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-          break;
-        } catch (Exception e) {
-          sageUtils.warn("Failed to copy recording " + completedFile + " to " + savedFile, e);
-          osUtils.waitFor(1000);
-        }
-      } while (completedFile.exists() && !savedFile.exists() && System.currentTimeMillis() < timeout);
-
-      sageUtils.addRecordingToSageTV(
-              savedFile.getAbsolutePath(),
-              programmeTitle,
-              episodeTitle,
-              description,
-              categories,
-              origAirDate,
-              origAirTime,
-              airDate,
-              airTime,
-              seriesNumber,
-              episodeNumber,
-              durationInSeconds*1000);
 
 
-      final String fileName = recordingName.replace(".mp4", ".jpg");
-      Runnable runnable = new Runnable() {
-        public void run() {
+          final String imageFileName = recordingName.replace(".mp4", ".jpg");
           try {
-            File file = new File(sageRecordingDir, fileName);
-            if (file.exists()) {
-              file.delete();
+            File imageFile = new File(sageRecordingDir, imageFileName);
+            if (imageFile.exists()) {
+              imageFile.delete();
             }
-            downloadUtils.downloadFile(new URL(episodeIcon), file.getAbsolutePath());
+            downloadUtils.downloadFile(new URL(episodeIcon), imageFile.getAbsolutePath());
           } catch (Exception e) {
             sageUtils.error("Failed to download episode fanart for " + episodeId, e);
           }
+
+          sageUtils.addRecordingToSageTV(
+                  savedFile.getAbsolutePath(),
+                  programmeTitle,
+                  episodeTitle,
+                  description,
+                  categories,
+                  origAirDate,
+                  origAirTime,
+                  airDate,
+                  airTime,
+                  seriesNumber,
+                  episodeNumber,
+                  durationInSeconds*1000);
+        } catch (Exception e) {
+          sageUtils.error("Failed to add catchup tv recording " + episodeId, e);
         }
-      };
 
-      if (episodeIcon != null) {
-        downloadService.submit(runnable);
       }
+    };
 
-    } catch (Exception e) {
-      sageUtils.error("Failed to add catchup tv recording " + episodeId, e);
-      throw new RemoteException("Catchup Plugin unable to add recording to SageTV", e);
-    }
+    downloadService.submit(runnable);
   }
 
   public void start() {
