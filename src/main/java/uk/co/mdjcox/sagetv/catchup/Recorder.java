@@ -337,6 +337,20 @@ public class Recorder {
         if (!recording.isStopped()) {
           stop(recording);
         }
+      // TODO take this out!
+      if (false) {
+        final File completedFile = recording.getCompletedFile();
+        if (!completedFile.exists()) {
+          File testFile = new File(context.getPluginDir() + File.separator + "Test" + File.separator + "TestEpisode.mp4");
+          try {
+            logger.info("Copy test programme in from " + testFile + " to " + completedFile);
+            Files.copy(testFile.toPath(), completedFile.toPath());
+          } catch (Exception e) {
+            logger.error("Failed to copy in substitute completed file", e);
+            e.printStackTrace();
+          }
+        }
+      }
         if (recording.isToKeep() && recording.hasCompletedFile()) {
                 uploadToSageTv(recording);
         }
