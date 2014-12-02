@@ -182,7 +182,7 @@ public class Recording {
         } catch (IllegalThreadStateException e) {
             return true;
         }
-        return !completed;
+        return !(completed || failed);
     }
 
     public boolean hasCompletedFile() {
