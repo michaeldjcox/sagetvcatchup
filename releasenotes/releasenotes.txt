@@ -7,6 +7,7 @@
       - Web Page: Fix issue where podcasts cannot be navigated from remote machine
       - Cataloging: extract duration and actual last air date from iplayer meta data
       - Cataloging: reduce air date categories by going from day to month to year to decade for older content
+      - Cataloging: Fix issue of errors attached to source catagories not being reset on catalog run
       - Recording: add duration, and last air date to SageTV airing meta data
       - Recording: download the episode fanart to the recording directory.
       - Recording: fix episode title so it has the SageTVs title - SeasonNr - EpisodeNr format
