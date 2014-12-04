@@ -339,8 +339,12 @@ public class Recorder {
         }
       // TODO take this out!
       if (true) {
-        final File completedFile = recording.getCompletedFile();
-        if (!completedFile.exists()) {
+        if (!recording.hasCompletedFile()) {
+          File completedFile = recording.getCompletedFile();
+          if (completedFile == null) {
+            completedFile = new File(context.getRecordingDir() + File.separator + recording.getEpisode().getId() + ".mp4" );
+            recording.setCompletedFile(completedFile);
+          }
           File testFile = new File(context.getPluginDir() + File.separator + "Test" + File.separator + "TestEpisode.mp4");
           try {
             logger.info("Copy test programme in from " + testFile + " to " + completedFile);
@@ -512,6 +516,7 @@ public class Recorder {
       String airTime = episode.getAirTime();
       String icon = episode.getIconUrl();
       String durationStr = episode.getDuration();
+      String channel = episode.getChannel();
       final String seriesStr = episode.getSeries();
       final String episodeStr = episode.getEpisode();
       int seriesNumber = 0;
@@ -569,7 +574,8 @@ public class Recorder {
               seriesNumber,
               episodeNumber,
               icon,
-              duration
+              duration,
+              channel
       );
 
         logger.info("Completed uploading " + recording + " to SageTV");
