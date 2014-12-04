@@ -139,13 +139,11 @@ public class Cataloger {
   }
 
   private Catalog catalog() {
-
     progressString.set("Started");
 
     newCatalog = new Catalog();
 
     try {
-
       Root root = new Root("Catchup", "Catchup TV", "Catchup TV", "/", "/logo.png");
       newCatalog.addRoot(root);
 
@@ -197,7 +195,7 @@ public class Cataloger {
 
         logger.info("Getting programmes found on: " + sourceCat);
         int programmeCount = 0;
-        Collection<Programme> programmes = plugin.getProgrammes(stop);
+        Collection<Programme> programmes = plugin.getProgrammes(sourceCat, stop);
 
         progressString.set("Doing " + pluginName + " programme cataloging");
 

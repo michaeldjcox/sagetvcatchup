@@ -27,7 +27,6 @@ public class Plugin {
     private EpisodeScript episodeScript;
     private PlayScript playScript;
     private StopScript stopScript;
-    private Source source;
 
     @Inject
     private ScriptFactory scriptFactory;
@@ -45,14 +44,13 @@ public class Plugin {
         episodeScript = scriptFactory.createEpisodeScript(base);
         playScript = scriptFactory.createPlayScript(base);
         stopScript = scriptFactory.createStopScript(base);
-        source = sourceScript.getSource();
     }
 
     public Source getSource() {
-        return source;
+        return sourceScript.getSource();
     }
 
-    public Collection<Programme> getProgrammes(AtomicBoolean stopFlag) {
+    public Collection<Programme> getProgrammes(Source source, AtomicBoolean stopFlag) {
         return programmesScript.getProgrammes(source, stopFlag);
     }
 
@@ -74,7 +72,7 @@ public class Plugin {
 
     @Override
     public String toString() {
-        return "Plugin:" + source;
+        return "Plugin:" + sourceScript.getSource();
     }
 
 
