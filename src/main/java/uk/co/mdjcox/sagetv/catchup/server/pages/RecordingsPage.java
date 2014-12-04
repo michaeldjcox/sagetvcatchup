@@ -30,6 +30,10 @@ public class RecordingsPage extends AbstractHtmlPage {
         htmlBuilder.startTable();
         htmlBuilder.addTableHeader("Source", "Episode", "Start Time", "Stop Time", "Time to download", "Size", "Percent", "Status", "Stop");
         for (Recording recording : recordings) {
+            if (recording.isFailed() || recording.isComplete()) {
+              continue;
+            }
+
             HtmlBuilder linkBuilder = new HtmlBuilder();
             String stopLink = "/stop?id=" + recording.getId()+";type=html";
             linkBuilder.addLink("stop", stopLink);

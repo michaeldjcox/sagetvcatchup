@@ -42,6 +42,11 @@ public class RecordingsPodcast extends AbstractPodcast {
 
         Collection<Recording> recordings = recorder.getCurrentRecordings();
         for (Recording recording : recordings) {
+
+          if (recording.isFailed() || recording.isComplete()) {
+            continue;
+          }
+
             final Episode episode = recording.getEpisode();
 
 
