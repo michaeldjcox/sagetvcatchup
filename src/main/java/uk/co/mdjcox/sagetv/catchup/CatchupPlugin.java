@@ -12,12 +12,6 @@ import java.net.URL;
 import java.rmi.NotBoundException;
 import java.util.*;
 
-
-//TODO multithreaded plugin can get stuck on socket reads downloading web pages
-//TODO cataloging times
-//TODO data leakage between episodes?
-//TODO heap size of catchup server
-
 /**
  * Created with IntelliJ IDEA.
  * User: michael
@@ -153,7 +147,7 @@ public class CatchupPlugin implements SageTVPlugin {
 
       sageUtils.info("Starting catchup plugin");
 
-      getProperties();
+      initProperties();
 
       osUtils = OsUtils.instance(sageUtils);
 
@@ -166,10 +160,6 @@ public class CatchupPlugin implements SageTVPlugin {
       startCatchupServer();
 
       initConfig();
-
-      Map<String, Integer> channels = sageUtils.getChannels();
-
-      sageUtils.info("Channels are " + channels);
 
       sageUtils.info("Started catchup plugin");
 
@@ -852,7 +842,7 @@ public class CatchupPlugin implements SageTVPlugin {
 
   @Override
   public String[] getConfigOptions(String s) {
-    return new String[0];  //To change body of implemented methods use File | Settings | File Templates.
+    return new String[0];
   }
 
   @Override
@@ -899,7 +889,7 @@ public class CatchupPlugin implements SageTVPlugin {
     return pluginNames;
   }
 
-  private void getProperties() throws Exception {
+  private void initProperties() throws Exception {
       File backupFile = new File(backupFileName);
       File runFile = new File(propFileName);
 
