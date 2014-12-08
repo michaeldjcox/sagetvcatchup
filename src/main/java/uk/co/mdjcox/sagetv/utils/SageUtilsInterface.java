@@ -10,23 +10,11 @@ import java.util.Map;
 public interface SageUtilsInterface extends LoggerInterface {
     String getSageTVProperty(String property, String defaultValue) throws Exception;
 
-    String[] findTitlesWithName(String regex);
-
-    Object[] findAiringsByText(String name);
-
-    String printAiring(Object airing);
-
-    Object findShowForAiring(Object airing);
-
-    String printShow(Object show);
-
-    void addRecordingToSageTV(String recordingFile, String programmeTitle, String episodeTitle, String description,
+    void addRecordingToSageTV(String source, String recordingFile, String programmeTitle, String episodeTitle, String description,
                               List<String> category, String origAirDate, String origAirTime, String airDate, String airTime,
-                              int seriesNumber, int episodeNumber, int duration);
+                              int seriesNumber, int episodeNumber, int duration, String channel);
 
     File[] getRecordingDirectories();
 
     void setClientProperty(String name, String value);
-
-   Map<String, Integer> getChannels();
 }

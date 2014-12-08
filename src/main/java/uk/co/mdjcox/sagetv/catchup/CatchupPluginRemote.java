@@ -12,9 +12,9 @@ public interface CatchupPluginRemote extends Remote {
 
   boolean available() throws RemoteException;
 
-  void addRecordingToSageTV(String episodeId, String recordingFile, String programmeTitle, String episodeTitle, String description,
+  void addRecordingToSageTV(String source, String episodeId, String recordingFile, String programmeTitle, String episodeTitle, String description,
                             List<String> category, String origAirDate, String origAirTime, String airDate, String airTime,
-                            int seriesNumber, int episodeNumber, String episodeIcon, int durationInSeconds) throws RemoteException;
+                            int seriesNumber, int episodeNumber, String episodeIcon, int durationInSeconds, String channel) throws RemoteException;
 
   Set<String> getFavouriteTitles() throws RemoteException;
 

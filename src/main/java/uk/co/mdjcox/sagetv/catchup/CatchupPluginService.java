@@ -9,9 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -45,11 +43,11 @@ public class CatchupPluginService extends UnicastRemoteObject implements Catchup
     return true;
   }
 
-  public void addRecordingToSageTV(final String episodeId, final String file, final String programmeTitle, final String episodeTitle,
+  public void addRecordingToSageTV(final String source, final String episodeId, final String file, final String programmeTitle, final String episodeTitle,
                                    final String description, final List<String> categories, final String origAirDate,
                                    final String origAirTime, final String airDate, final String airTime,
                                    final int seriesNumber, final int episodeNumber, final String episodeIcon,
-                                   final int durationInSeconds) throws RemoteException {
+                                   final int durationInSeconds, final String channel) throws RemoteException {
 
     long timeout = System.currentTimeMillis() + 60000;
 
@@ -93,6 +91,7 @@ public class CatchupPluginService extends UnicastRemoteObject implements Catchup
           }
 
           sageUtils.addRecordingToSageTV(
+                  source,
                   savedFile.getAbsolutePath(),
                   programmeTitle,
                   episodeTitle,
@@ -104,7 +103,8 @@ public class CatchupPluginService extends UnicastRemoteObject implements Catchup
                   airTime,
                   seriesNumber,
                   episodeNumber,
-                  durationInSeconds*1000);
+                  durationInSeconds*1000,
+                  channel);
         } catch (Exception e) {
           sageUtils.error("Failed to add catchup tv recording " + episodeId, e);
         }

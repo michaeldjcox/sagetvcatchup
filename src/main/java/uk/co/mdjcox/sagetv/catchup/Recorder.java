@@ -12,7 +12,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -338,7 +340,15 @@ public class Recorder {
           stop(recording);
         }
       // TODO take this out!
-      if (true) {
+      String hostname = "NONE";
+      try {
+        hostname = InetAddress.getLocalHost().getHostName();
+      } catch (UnknownHostException e) {
+
+      }
+
+      // Only on mintpad dev machine will we use a substitute recording
+      if (hostname.equals("mintpad")) {
         if (!recording.hasCompletedFile()) {
           File completedFile = recording.getCompletedFile();
           if (completedFile == null) {
@@ -506,6 +516,7 @@ public class Recorder {
       File recordingFile = recording.getCompletedFile();
       String id = recording.getId();
       Episode episode = recording.getEpisode();
+      String sourceId = recording.getSourceId();
       String programmeTitle = episode.getProgrammeTitle();
       String episodeTitle = episode.getEpisodeTitle();
       String description = episode.getDescription();
@@ -561,6 +572,7 @@ public class Recorder {
       }
 
       getCatchupPluginRemote().addRecordingToSageTV(
+              sourceId,
               id,
               recordingFile.getAbsolutePath(),
               programmeTitle,
