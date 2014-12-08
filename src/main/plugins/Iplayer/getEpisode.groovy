@@ -311,6 +311,7 @@ if (versionId != null) {
     String versionUrl = "http://www.bbc.co.uk/programmes/" + versionId + ".xml";
     episode.addMetaUrl(versionUrl)
     String versionDetails = GET_WEB_PAGE(versionUrl, stopFlag);
+    String origVersionDetails = versionDetails;
 
     durationDetails = MOVE_TO("<duration>", versionDetails)
     duration = EXTRACT_TO("</duration>", durationDetails)
@@ -372,13 +373,72 @@ if (versionId != null) {
         }
 
         if (DATE_AFTER(episode.getAirDate(), episode.getAirTime(), newDate, newTime)) {
-            LOG_INFO(episode.getPodcastTitle() + "Repeat date " + newDate + " " + newTime + " is after " + episode.getAirDate() + " " + episode.getAirTime());
+            LOG_INFO(episode.getPodcastTitle() + " Repeat date " + newDate + " " + newTime + " is after " + episode.getAirDate() + " " + episode.getAirTime());
             episode.setAirDate(newDate);
             episode.setAirTime(newTime);
         }
 
         versionDetails = MOVE_TO("<broadcast", versionDetails);
         versionDetails = MOVE_TO("<start", versionDetails);
+    }
+
+
+    versionDetails = MOVE_TO("<availability>", origVersionDetails);
+
+    while (versionDetails != null) {
+
+        String availDetails = MOVE_TO("<end", versionDetails);
+        if (availDetails != null && !availDetails.startsWith("/>")) {
+            availDetails = MOVE_TO(">", availDetails);
+            availDetails = EXTRACT_TO("</end>", availDetails)
+
+            String time = null;
+            String date = null;
+
+            if (availDetails != null) {
+                date = EXTRACT_TO("T", availDetails);
+                date = REMOVE_HTML_TAGS(date);
+                time = MOVE_TO("T", availDetails);
+                String time2 = EXTRACT_TO("+", time);
+                if (time2 == null) {
+                    time2 = EXTRACT_TO("Z", time);
+                }
+                time = REMOVE_HTML_TAGS(time2);
+            }
+
+            String newDate = null;
+            if (date != null) {
+                newDate = FIX_DATE("yyyy-MM-dd", date);
+                if (newDate == null) {
+                    LOG_ERROR(episode, "Failed to parse available until date: " + date);
+                    newDate = date;
+                }
+            } else {
+                LOG_WARNING(episode, "Available until date not found");
+            }
+
+            String newTime = null
+            if (time != null) {
+                newTime = FIX_TIME("HH:mm:ss", time);
+                if (newTime == null) {
+                    LOG_ERROR(episode, "Failed to parse available until time: " + time);
+                    newTime = time;
+                }
+
+            } else {
+                LOG_WARNING(episode, "Available until time not found");
+            }
+
+            if (DATE_AFTER(episode.getAvailableUntilDate(), episode.getAvailableUntilTime(), newDate, newTime)) {
+                LOG_INFO(episode.getPodcastTitle() + " available date " + newDate + " " + newTime + " is after " + episode.getAvailableUntilDate() + " " + episode.getAvailableUntilTime());
+                episode.setAvailableUntilDate(newDate);
+                episode.setAvailableUntilTime(newTime);
+            } else {
+                LOG_INFO(episode.getAvailableUntilDate() + " " + episode.getAvailableUntilTime() + "prevails over " + newDate + " " + newTime);
+            }
+        }
+
+        versionDetails = MOVE_TO("<availability>", versionDetails);
     }
 } else {
     LOG_WARNING(episode, "No default versionId found for programme");

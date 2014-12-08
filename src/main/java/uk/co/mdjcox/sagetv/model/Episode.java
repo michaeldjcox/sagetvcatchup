@@ -48,6 +48,10 @@ public class Episode implements ErrorRecorder {
   private String origAirDate = "";
   /** The time at which the media file originally aired */
   private String origAirTime = "";
+  /** The date on which the media file will no longer be available */
+  private String availableUntilDate = "";
+  /** The time at which the media file will no longer be available */
+  private String availableUntilTime = "";
   /** The TV channel on which the media file last aired */
   private String channel = "";
   /** The category of programme this media file falls into */
@@ -228,6 +232,46 @@ public class Episode implements ErrorRecorder {
    */
   public void setOrigAirTime(String origAirTime) {
     this.origAirTime = origAirTime;
+  }
+
+  /**
+   * Gets the available until date of this episode of the programme.
+   *
+   * @return the available until date of this episode of the programme
+   */
+  public String getAvailableUntilDate() {
+    return availableUntilDate;
+  }
+
+  /**
+   * Sets the available until date string of this media file
+   *
+   * @param  availableUntilDate available until date string of the media file
+   *
+   * @throws NullPointerException if a <code>null</code> value is provided
+   */
+  public void setAvailableUntilDate(String availableUntilDate) {
+    this.availableUntilDate = availableUntilDate;
+  }
+
+  /**
+   * Gets the available until time of this episode of the programme.
+   *
+   * @return the available until time of this episode of the programme
+   */
+  public String getAvailableUntilTime() {
+    return availableUntilTime;
+  }
+
+  /**
+   * Sets the available until time string of this media file
+   *
+   * @param  availableUntilTime available until time string of the media file
+   *
+   * @throws NullPointerException if a <code>null</code> value is provided
+   */
+  public void setAvailableUntilTime(String availableUntilTime) {
+    this.availableUntilTime = availableUntilTime;
   }
 
   /**

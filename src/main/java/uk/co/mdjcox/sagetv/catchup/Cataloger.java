@@ -311,6 +311,10 @@ public class Cataloger {
 
         // New
         doNewProgrammeCategorisation(sourceCat, programmeCat, episode, newCatalog);
+
+        // Air Date
+        doAvailablityDateCategorisation(sourceCat, programmeCat, episode, newCatalog);
+
       }
     }
   }
@@ -527,9 +531,7 @@ public class Cataloger {
       return;
     }
 
-    System.err.println("Turning " + airDateName);
     airDateName = getRelativeTime(date);
-    System.err.println("Into    " + airDateName);
 
     String sourceId = sourceCat.getId();
     String airdateId = sourceId + "/AirDate";
@@ -556,6 +558,55 @@ public class Cataloger {
     }
 
     SubCategory newProgrammeCat = addNewProgrammeCat("/AirDate/" + airDateName.replace(" ", "").replace(",", "") + "/", programmeCat, catalog, sourceId, airDateInstanceId, airDateInstanceCat, programmeCat.getId());
+    newProgrammeCat.addEpisode(episode);
+
+    airDateInstanceCat.addSubCategory(newProgrammeCat);
+  }
+
+  private void doAvailablityDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode, Catalog catalog) {
+    String airDateName = episode.getAvailableUntilDate();
+    if (airDateName == null || airDateName.isEmpty()) {
+      return;
+    }
+
+    SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+
+    Date date = null;
+
+    try {
+      date = format.parse(airDateName);
+    } catch (ParseException e) {
+      logger.warn("Failed to categorise by airDate=" + airDateName + " id="+ episode.getId());
+      return;
+    }
+
+    airDateName = getFutureRelativeTime(date);
+
+    String sourceId = sourceCat.getId();
+    String airdateId = sourceId + "/AvailableUntilDate";
+    SubCategory airdateCat = catalog.getSubcategory(airdateId);
+    if (airdateCat == null) {
+      airdateCat =
+              new SubCategory(sourceId, airdateId, "Available Until", "Available Until", sourceCat.getServiceUrl(),
+                      sourceCat.getIconUrl(), sourceId);
+      airdateCat.setPodcastUrl("/category?id=" + airdateId + ";type=xml");
+      catalog.addSubCategory(airdateCat);
+      sourceCat.addSubCategory(airdateCat);
+    }
+    String
+            airDateInstanceId =
+            sourceId + "/AvailableUntilDate/" + airDateName.replace(" ", "").replace(",", "");
+    SubCategory airDateInstanceCat =  catalog.getSubcategory(airDateInstanceId);
+    if (airDateInstanceCat == null) {
+      airDateInstanceCat =
+              new SubCategory(sourceId, airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(),
+                      sourceCat.getIconUrl(), airdateCat.getId());
+      airDateInstanceCat.setPodcastUrl("/category?id=" + airDateInstanceId + ";type=xml");
+      catalog.addSubCategory(airDateInstanceCat);
+      airdateCat.addSubCategory(airDateInstanceCat);
+    }
+
+    SubCategory newProgrammeCat = addNewProgrammeCat("/AvailableUntilDate/" + airDateName.replace(" ", "").replace(",", "") + "/", programmeCat, catalog, sourceId, airDateInstanceId, airDateInstanceCat, programmeCat.getId());
     newProgrammeCat.addEpisode(episode);
 
     airDateInstanceCat.addSubCategory(newProgrammeCat);
@@ -620,6 +671,74 @@ public class Cataloger {
     aDecadeAgo.setMonth(0);
 
     if (date.after(aDecadeAgo) || date.equals(aDecadeAgo)) {
+      return yearFormat.format(date);
+    }
+
+    String year = yearFormat.format(date);
+    year = year.charAt(2) + "0s";
+
+    return year;
+  }
+
+  private String getFutureRelativeTime(Date date) {
+    SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEE dd MMM");
+    SimpleDateFormat monthFormatThisYear = new SimpleDateFormat("MMMM");
+    SimpleDateFormat monthFormatLastYear = new SimpleDateFormat("MMMM yyyy");
+    SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+
+    dayOfWeekFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    monthFormatThisYear.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    monthFormatLastYear.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+    yearFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+
+    Calendar cal = GregorianCalendar.getInstance();
+    cal.setTime(new Date());
+    cal.set(Calendar.HOUR_OF_DAY, 0);
+    cal.set(Calendar.MINUTE, 0);
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
+    cal.add(Calendar.MONTH, +1);
+
+    Date aMonthFromNow = cal.getTime();
+    aMonthFromNow.setDate(1);
+
+    if (date.before(aMonthFromNow) ) {
+      return dayOfWeekFormat.format(date);
+    }
+
+
+    cal.setTime(new Date());
+    cal.set(Calendar.HOUR_OF_DAY, 0);
+    cal.set(Calendar.MINUTE, 0);
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
+    cal.add(Calendar.MONTH, +12);
+
+    Date aYearFromNow = cal.getTime();
+    aYearFromNow.setDate(1);
+    aYearFromNow.setMonth(0);
+
+    if (date.before(aYearFromNow)) {
+      Date now = new Date();
+      if (date.getYear() == now.getYear()) {
+        return monthFormatThisYear.format(date);
+      } else {
+        return monthFormatLastYear.format(date);
+      }
+    }
+
+    cal.setTime(new Date());
+    cal.set(Calendar.HOUR_OF_DAY, 0);
+    cal.set(Calendar.MINUTE, 0);
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
+    cal.add(Calendar.YEAR, +10);
+
+    Date aDecadeFromNow = cal.getTime();
+    aDecadeFromNow.setDate(1);
+    aDecadeFromNow.setMonth(0);
+
+    if (date.before(aDecadeFromNow)) {
       return yearFormat.format(date);
     }
 

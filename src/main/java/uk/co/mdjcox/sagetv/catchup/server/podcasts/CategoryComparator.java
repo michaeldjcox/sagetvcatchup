@@ -42,8 +42,8 @@ public class CategoryComparator implements Comparator<Category> {
         String dateTime1 = o1Parent.replaceFirst(".*/AirDate/", "");
         String dateTime2 = o2Parent.replaceFirst(".*/AirDate/", "");
 
-        Date date1 = parseDateStr(dateTime1);
-        Date date2 = parseDateStr(dateTime2);
+        Date date1 = parseDateStr(dateTime1, false);
+        Date date2 = parseDateStr(dateTime2, false);
 
         System.err.println("Comparing " + dateTime1 + " with " + dateTime2 + "=" + date2.compareTo(date1));
         System.err.println("Comparing " + date1 + " with " + date2 + "=" + date2.compareTo(date1));
@@ -55,6 +55,24 @@ public class CategoryComparator implements Comparator<Category> {
         }
       }
 
+      if (o1Parent.contains("/AvailableUntilDate/") && o2Parent.contains("/AvailableUntilDate/")) {
+        String dateTime1 = o1Parent.replaceFirst(".*/AvailableUntilDate/", "");
+        String dateTime2 = o2Parent.replaceFirst(".*/AvailableUntilDate/", "");
+
+        Date date1 = parseDateStr(dateTime1, true);
+        Date date2 = parseDateStr(dateTime2, true);
+
+        System.err.println("Comparing " + dateTime1 + " with " + dateTime2 + "=" + date1.compareTo(date2));
+        System.err.println("Comparing " + date1 + " with " + date2 + "=" + date1.compareTo(date2));
+
+        int compare = date1.compareTo(date2);
+
+        if (compare != 0) {
+          return compare;
+        }
+      }
+
+
     } catch (ParseException e) {
 
     }
@@ -62,13 +80,20 @@ public class CategoryComparator implements Comparator<Category> {
     return o1.getShortName().compareTo(o2.getShortName());
   }
 
-  private Date parseDateStr(String dateTime1) throws ParseException {
+  private Date parseDateStr(String dateTime1, boolean future) throws ParseException {
     Date now = new Date();
     if (dateTime1.equals("00s")) {
+      if (future) {
+        return yearFormat.parse("2100");
+      }
       return yearFormat.parse("2000");
     }
     if (dateTime1.matches("[0-9][0-9]s")) {
-      dateTime1 = "19" + dateTime1.replace("s", "");
+      if (future) {
+        dateTime1 = "20" + dateTime1.replace("s", "");
+      } else {
+        dateTime1 = "19" + dateTime1.replace("s", "");
+      }
       return yearFormat.parse(dateTime1);
     }
     try {

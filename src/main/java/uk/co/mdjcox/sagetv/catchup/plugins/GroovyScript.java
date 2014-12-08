@@ -350,13 +350,44 @@ public abstract class GroovyScript extends groovy.lang.Script {
   public boolean DATE_AFTER(String oldDate, String oldTime, String newDate, String newTime) {
     SimpleDateFormat catchupFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
     catchupFormatter.setTimeZone(TimeZone.getTimeZone("Europe/London"));
-    try {
-      Date oldDateTime = catchupFormatter.parse(oldDate + " " + oldTime);
-      Date newDateTime = catchupFormatter.parse(newDate + " " + newTime);
-      return newDateTime.after(oldDateTime);
-    } catch (Exception e) {
-      logger.warn("Failed to parse comparison dates: " + oldDate + " " + oldTime + " and " + newDate + " " + newTime);
-      return false;
+
+    if (oldDate == null) {
+      oldDate = "";
     }
+    if (oldTime == null) {
+      oldTime = "";
+    }
+    if (newDate == null) {
+      newDate = "";
+    }
+    if (newTime == null) {
+      newTime = "";
+    }
+    String oldString = oldDate + " " + oldTime;
+
+    Date oldDateTime = new Date(0);
+    try {
+      oldString = oldString.trim();
+      if (!oldString.isEmpty()) {
+        oldDateTime = catchupFormatter.parse(oldString);
+      }
+    } catch (Exception e) {
+      logger.warn("Failed to parse old date: " + oldString);
+    }
+
+    String newString = newDate + " " + newTime;
+
+    Date newDateTime = new Date(0);
+    try {
+      newString = newString.trim();
+      if (!newString.isEmpty()) {
+        newDateTime = catchupFormatter.parse(newString);
+      }
+    } catch (Exception e) {
+      logger.warn("Failed to parse new date: " + newString);
+    }
+
+    return newDateTime.after(oldDateTime);
+
   }
 }

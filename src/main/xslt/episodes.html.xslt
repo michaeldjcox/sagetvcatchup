@@ -37,6 +37,10 @@
                         <xsl:text>&#10;</xsl:text>
                         <th>OrigAirTime</th>
                         <xsl:text>&#10;</xsl:text>
+                        <th>AvailableUntilDate</th>
+                        <xsl:text>&#10;</xsl:text>
+                        <th>AvailableUntilTime</th>
+                        <xsl:text>&#10;</xsl:text>
                         <th>Duration</th>
                         <xsl:text>&#10;</xsl:text>
                         <th>ServiceUrl</th>
@@ -101,6 +105,14 @@
                             <xsl:text>&#10;</xsl:text>
                             <td>
                                 <xsl:value-of select="origAirTime"/>
+                            </td>
+                            <xsl:text>&#10;</xsl:text>
+                            <td>
+                                <xsl:value-of select="availableUntilDate"/>
+                            </td>
+                            <xsl:text>&#10;</xsl:text>
+                            <td>
+                                <xsl:value-of select="availableUntilTime"/>
                             </td>
                             <xsl:text>&#10;</xsl:text>
                             <td>
