@@ -53,7 +53,18 @@ public class ControlPodcast extends AbstractPodcast {
         RssBuilder builder = new RssBuilder();
         builder.startDocument(title, desc, url);
         if (isRecording) {
-            builder.addCategoryItem("STOP", "Stop recording", stopUrl);
+            String stopDesc = "Stop recording";
+          String status = recorder.getRecordingStatus(episode.getId());
+          if (status != null && !status.isEmpty()) {
+            stopDesc += "<br/>";
+            stopDesc += status;
+          }
+          String percent = recorder.getPercentRecorded(episode.getId());
+          if (percent != null && !percent.isEmpty()) {
+            stopDesc += "<br/>";
+            stopDesc += percent;
+          }
+            builder.addCategoryItem("STOP", stopDesc, stopUrl);
         } else {
           builder.addVideoItem("WATCH", "Watch now", watchUrl, "");
           builder.addVideoItem("WATCH AND KEEP", "Watch now and keep", watchAndKeepUrl, "");

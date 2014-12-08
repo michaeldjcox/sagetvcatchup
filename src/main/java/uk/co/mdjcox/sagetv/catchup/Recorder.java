@@ -787,4 +787,28 @@ public class Recorder {
   public Collection<Recording> getCompletedRecordings() {
     return completedRecordings.values();
   }
+
+  public String getRecordingStatus(String id) {
+    Recording recording = currentRecordings.get(id);
+
+    if (recording != null) {
+      logger.info("Checking recording " + id + " is in progress");
+
+      return recording.getRecordingStatus();
+    }
+
+    return "";
+  }
+
+  public String getPercentRecorded(String id) {
+    Recording recording = currentRecordings.get(id);
+
+    if (recording != null) {
+      logger.info("Checking recording " + id + " percent recorded");
+
+      return recording.getPercentRecorded();
+    }
+
+    return "";
+  }
 }
