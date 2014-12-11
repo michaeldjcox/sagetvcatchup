@@ -73,20 +73,14 @@ public class ProgrammePodcast extends OnDemandPodcast {
           descBuilder.append(' ');
           descBuilder.append(episode.getAirTime());
           descBuilder.append("</i>");
+          final String availDate = episode.getRemovalDate();
+          if (availDate != null && !availDate.isEmpty()) {
+            descBuilder.append("Until: ");
+            descBuilder.append(availDate);
+          }
           descBuilder.append("<br/>");
           descBuilder.append(episode.getDescription());
           descBuilder.append("<br/>");
-          final String availDate = episode.getAvailableUntilDate();
-          final String availTime = episode.getAvailableUntilTime();
-          if (availDate != null && !availDate.isEmpty()) {
-            descBuilder.append("Available until: ");
-            descBuilder.append(availDate);
-            if (availTime != null && !availTime.isEmpty()) {
-              descBuilder.append(' ');
-              descBuilder.append(availTime);
-            }
-          }
-
 
 // TODO forget this for now
 //          if (!episode.getSeriesTitle().isEmpty()) {

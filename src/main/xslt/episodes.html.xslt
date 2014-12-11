@@ -37,7 +37,7 @@
                         <xsl:text>&#10;</xsl:text>
                         <th>OrigAirTime</th>
                         <xsl:text>&#10;</xsl:text>
-                        <th>AvailableUntilDate</th>
+                        <th>RemovalDate</th>
                         <xsl:text>&#10;</xsl:text>
                         <th>AvailableUntilTime</th>
                         <xsl:text>&#10;</xsl:text>
@@ -108,11 +108,11 @@
                             </td>
                             <xsl:text>&#10;</xsl:text>
                             <td>
-                                <xsl:value-of select="availableUntilDate"/>
+                                <xsl:value-of select="removalDate"/>
                             </td>
                             <xsl:text>&#10;</xsl:text>
                             <td>
-                                <xsl:value-of select="availableUntilTime"/>
+                                <xsl:value-of select="removalTime"/>
                             </td>
                             <xsl:text>&#10;</xsl:text>
                             <td>

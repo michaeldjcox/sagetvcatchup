@@ -564,7 +564,7 @@ public class Cataloger {
   }
 
   private void doAvailablityDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode, Catalog catalog) {
-    String airDateName = episode.getAvailableUntilDate();
+    String airDateName = episode.getRemovalDate();
     if (airDateName == null || airDateName.isEmpty()) {
       return;
     }
@@ -583,11 +583,11 @@ public class Cataloger {
     airDateName = getFutureRelativeTime(date);
 
     String sourceId = sourceCat.getId();
-    String airdateId = sourceId + "/AvailableUntilDate";
+    String airdateId = sourceId + "/RemovalDate";
     SubCategory airdateCat = catalog.getSubcategory(airdateId);
     if (airdateCat == null) {
       airdateCat =
-              new SubCategory(sourceId, airdateId, "Available Until", "Available Until", sourceCat.getServiceUrl(),
+              new SubCategory(sourceId, airdateId, "Removal date","Removal date", sourceCat.getServiceUrl(),
                       sourceCat.getIconUrl(), sourceId);
       airdateCat.setPodcastUrl("/category?id=" + airdateId + ";type=xml");
       catalog.addSubCategory(airdateCat);
@@ -595,7 +595,7 @@ public class Cataloger {
     }
     String
             airDateInstanceId =
-            sourceId + "/AvailableUntilDate/" + airDateName.replace(" ", "").replace(",", "");
+            sourceId + "/RemovalDate/" + airDateName.replace(" ", "").replace(",", "");
     SubCategory airDateInstanceCat =  catalog.getSubcategory(airDateInstanceId);
     if (airDateInstanceCat == null) {
       airDateInstanceCat =
@@ -606,7 +606,7 @@ public class Cataloger {
       airdateCat.addSubCategory(airDateInstanceCat);
     }
 
-    SubCategory newProgrammeCat = addNewProgrammeCat("/AvailableUntilDate/" + airDateName.replace(" ", "").replace(",", "") + "/", programmeCat, catalog, sourceId, airDateInstanceId, airDateInstanceCat, programmeCat.getId());
+    SubCategory newProgrammeCat = addNewProgrammeCat("/RemovalDate/" + airDateName.replace(" ", "").replace(",", "") + "/", programmeCat, catalog, sourceId, airDateInstanceId, airDateInstanceCat, programmeCat.getId());
     newProgrammeCat.addEpisode(episode);
 
     airDateInstanceCat.addSubCategory(newProgrammeCat);

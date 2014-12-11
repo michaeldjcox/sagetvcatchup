@@ -55,9 +55,9 @@ public class CategoryComparator implements Comparator<Category> {
         }
       }
 
-      if (o1Parent.contains("/AvailableUntilDate/") && o2Parent.contains("/AvailableUntilDate/")) {
-        String dateTime1 = o1Parent.replaceFirst(".*/AvailableUntilDate/", "");
-        String dateTime2 = o2Parent.replaceFirst(".*/AvailableUntilDate/", "");
+      if (o1Parent.contains("/RemovalDate/") && o2Parent.contains("/RemovalDate/")) {
+        String dateTime1 = o1Parent.replaceFirst(".*/RemovalDate/", "");
+        String dateTime2 = o2Parent.replaceFirst(".*/RemovalDate/", "");
 
         Date date1 = parseDateStr(dateTime1, true);
         Date date2 = parseDateStr(dateTime2, true);
