@@ -5,10 +5,7 @@ import com.google.inject.Singleton;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.*;
-import uk.co.mdjcox.sagetv.utils.LoggerInterface;
-import uk.co.mdjcox.sagetv.utils.NamedThreadFactory;
-import uk.co.mdjcox.sagetv.utils.NumberedThreadFactory;
-import uk.co.mdjcox.sagetv.utils.RmiHelper;
+import uk.co.mdjcox.sagetv.utils.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,6 +30,7 @@ public class Cataloger {
   private static final int EPISODE_THREADS = 20;
   private static final int MILLIS_IN_A_DAY = 24 * 60 * 60 * 1000;
   private static final int MILLIS_IN_A_WEEK = MILLIS_IN_A_DAY * 7;
+  private final HtmlUtilsInterface htmlUtils;
   private LoggerInterface logger;
   private PluginManager pluginManager;
   private AtomicReference<String> progressString = new AtomicReference<String>("");
@@ -52,11 +50,12 @@ public class Cataloger {
   private boolean multithreaded=true;
 
   @Inject
-  private Cataloger(LoggerInterface logger, CatchupContextInterface context, PluginManager pluginManager) {
+  private Cataloger(LoggerInterface logger, CatchupContextInterface context, PluginManager pluginManager, HtmlUtilsInterface htmlUtils) {
     this.logger = logger;
     this.pluginManager = pluginManager;
     this.refreshRate = context.getRefreshRate();
     this.context = context;
+    this.htmlUtils = htmlUtils;
   }
 
   private Runnable getCatalogRunnable(final List<CatalogPublisher> publishers) {
@@ -192,6 +191,11 @@ public class Cataloger {
 
         sourceCat.setPodcastUrl("/category?id=" + sourceCat.getId() + ";type=xml");
 
+        logger.info("Getting categories found on: " + sourceCat);
+
+        Map<String, List<String>> specialCategories = new LinkedHashMap<String, List<String>>();
+
+        plugin.getCategories(sourceCat, specialCategories, stop);
 
         logger.info("Getting programmes found on: " + sourceCat);
         int programmeCount = 0;
@@ -246,9 +250,9 @@ public class Cataloger {
 
         sourceCat.clearSubCategories();
 
-        logger.info("Found " + newCatalog.getStatsSummary());
+        additionalCategorisation(sourceCat, newProgrammes, specialCategories);
 
-        additionalCategorisation(sourceCat, newProgrammes);
+        logger.info("Found " + newCatalog.getStatsSummary());
       }
 
       return newCatalog;
@@ -282,7 +286,9 @@ public class Cataloger {
     }
   }
 
-  private void additionalCategorisation(Source sourceCat, ConcurrentHashMap<String, Programme> newProgrammes) {
+  private void additionalCategorisation(Source sourceCat, ConcurrentHashMap<String, Programme> newProgrammes, Map<String, List<String>> specialCategories) {
+
+    logger.info("Doing " + sourceCat.getId() + " additional categorisation");
 
     progressString.set("Doing " + sourceCat.getId() + " additional categorisation");
 
@@ -300,6 +306,12 @@ public class Cataloger {
         if ((episode == null) || episodeId.isEmpty()) {
           continue;
         }
+
+        // Special
+        for (Map.Entry<String, List<String>> entry : specialCategories.entrySet()) {
+          doSpecialCategorisation(sourceCat, programmeCat, episode, entry.getKey(), entry.getValue(), newCatalog);
+        }
+
         // Genre
         doGenreCategorisation(sourceCat, programmeCat, episode, newCatalog);
 
@@ -313,7 +325,7 @@ public class Cataloger {
         doNewProgrammeCategorisation(sourceCat, programmeCat, episode, newCatalog);
 
         // Air Date
-        doAvailablityDateCategorisation(sourceCat, programmeCat, episode, newCatalog);
+        doRemovalDateCategorisation(sourceCat, programmeCat, episode, newCatalog);
 
       }
     }
@@ -563,7 +575,7 @@ public class Cataloger {
     airDateInstanceCat.addSubCategory(newProgrammeCat);
   }
 
-  private void doAvailablityDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode, Catalog catalog) {
+  private void doRemovalDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode, Catalog catalog) {
     String airDateName = episode.getRemovalDate();
     if (airDateName == null || airDateName.isEmpty()) {
       return;
@@ -587,7 +599,7 @@ public class Cataloger {
     SubCategory airdateCat = catalog.getSubcategory(airdateId);
     if (airdateCat == null) {
       airdateCat =
-              new SubCategory(sourceId, airdateId, "Removal date","Removal date", sourceCat.getServiceUrl(),
+              new SubCategory(sourceId, airdateId, "Removal Date","Removal Date", sourceCat.getServiceUrl(),
                       sourceCat.getIconUrl(), sourceId);
       airdateCat.setPodcastUrl("/category?id=" + airdateId + ";type=xml");
       catalog.addSubCategory(airdateCat);
@@ -777,6 +789,38 @@ public class Cataloger {
       programmeCat.addOtherParentId(channelInstanceId);
       channelInstanceCat.addSubCategory(programmeCat);
     }
+  }
+
+  private void doSpecialCategorisation(Source sourceCat, Programme programmeCat, Episode episode, String categoryName, List<String> urls, Catalog catalog) {
+    if (!urls.contains(episode.getServiceUrl())) {
+      boolean found = false;
+      for (String meta : episode.getMetaUrls()) {
+        found = found || urls.contains(meta);
+      }
+      if (!found) {
+        return;
+      }
+    }
+
+    String sourceId = sourceCat.getId();
+    final String insert = htmlUtils.makeIdSafe(categoryName);
+    String categoryId = sourceId + "/" + insert;
+
+    SubCategory airdateCat = catalog.getSubcategory(categoryId);
+    if (airdateCat == null) {
+      airdateCat =
+              new SubCategory(sourceId, categoryId, categoryName, categoryName, sourceCat.getServiceUrl(),
+                      sourceCat.getIconUrl(), sourceId);
+      airdateCat.setPodcastUrl("/category?id=" +categoryId + ";type=xml");
+      catalog.addSubCategory(airdateCat);
+      sourceCat.addSubCategory(airdateCat);
+    }
+
+    SubCategory newProgrammeCat = addNewProgrammeCat("/"+insert+"/", programmeCat, catalog, sourceId, categoryId, airdateCat, programmeCat.getId());
+    newProgrammeCat.addEpisode(episode);
+
+    airdateCat.addSubCategory(newProgrammeCat);
+
   }
 
   private void doGenreCategorisation(Source sourceCat, Programme programmeCat, Episode prog, Catalog catalog) {

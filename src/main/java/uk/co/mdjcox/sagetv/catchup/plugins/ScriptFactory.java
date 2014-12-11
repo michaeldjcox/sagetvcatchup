@@ -18,6 +18,8 @@ public interface ScriptFactory {
 
     EpisodeScript createEpisodeScript(String base);
 
+    CategoriesScript createCategoriesScript(String base);
+
     PlayScript createPlayScript(String base);
 
     StopScript createStopScript(String base);

@@ -373,9 +373,11 @@ if (versionId != null) {
         }
 
         if (DATE_AFTER(episode.getAirDate(), episode.getAirTime(), newDate, newTime)) {
-            LOG_INFO(episode.getPodcastTitle() + " Repeat date " + newDate + " " + newTime + " is after " + episode.getAirDate() + " " + episode.getAirTime());
+            LOG_INFO(episode.getPodcastTitle() + " repeat date " + newDate + " " + newTime + " is after " + episode.getAirDate() + " " + episode.getAirTime());
             episode.setAirDate(newDate);
             episode.setAirTime(newTime);
+        } else {
+            LOG_INFO(episode.getPodcastTitle() + " repeat " + episode.getRemovalDate() + " " + episode.getRemovalTime() + " prevails over " + newDate + " " + newTime);
         }
 
         versionDetails = MOVE_TO("<broadcast", versionDetails);
@@ -429,12 +431,12 @@ if (versionId != null) {
                 LOG_WARNING(episode, "Available until time not found");
             }
 
-            if (DATE_BEFORE(episode.getRemovalDate(), episode.getAvailableUntilTime(), newDate, newTime)) {
-                LOG_INFO(episode.getPodcastTitle() + " available date " + newDate + " " + newTime + " is after " + episode.getRemovalDate() + " " + episode.getAvailableUntilTime());
+            if (DATE_BEFORE(episode.getRemovalDate(), episode.getRemovalTime(), newDate, newTime)) {
+                LOG_INFO(episode.getPodcastTitle() + " available date " + newDate + " " + newTime + " is before " + episode.getRemovalDate() + " " + episode.getRemovalTime());
                 episode.setRemovalDate(newDate);
-                episode.setAvailableUntilTime(newTime);
+                episode.setRemovalTime(newTime);
             } else {
-                LOG_INFO(episode.getRemovalDate() + " " + episode.getAvailableUntilTime() + "prevails over " + newDate + " " + newTime);
+                LOG_INFO(episode.getPodcastTitle() + " available date " + episode.getRemovalDate() + " " + episode.getRemovalTime() + " prevails over " + newDate + " " + newTime);
             }
         }
 

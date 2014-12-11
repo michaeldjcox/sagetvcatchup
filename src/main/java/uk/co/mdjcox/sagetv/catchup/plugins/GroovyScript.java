@@ -348,7 +348,58 @@ public abstract class GroovyScript extends groovy.lang.Script {
   }
 
   public boolean DATE_BEFORE(String oldDate, String oldTime, String newDate, String newTime) {
-    return !DATE_AFTER(oldDate, oldTime, newDate, newTime);
+    SimpleDateFormat catchupFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    catchupFormatter.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+
+    if (oldDate == null) {
+      oldDate = "";
+    }
+    if (oldTime == null) {
+      oldTime = "";
+    }
+    if (newDate == null) {
+      newDate = "";
+    }
+    if (newTime == null) {
+      newTime = "";
+    }
+    String oldString = oldDate + " " + oldTime;
+
+    Date oldDateTime = null;
+    try {
+      oldString = oldString.trim();
+      if (!oldString.isEmpty()) {
+        oldDateTime = catchupFormatter.parse(oldString);
+      }
+    } catch (Exception e) {
+      logger.warn("Failed to parse old date: " + oldString);
+    }
+
+    String newString = newDate + " " + newTime;
+
+    Date newDateTime = null;
+    try {
+      newString = newString.trim();
+      if (!newString.isEmpty()) {
+        newDateTime = catchupFormatter.parse(newString);
+      }
+    } catch (Exception e) {
+      logger.warn("Failed to parse new date: " + newString);
+    }
+
+    if (oldDateTime == null && newDateTime != null) {
+      return true;
+    }
+    if (oldDateTime != null && newDateTime == null) {
+      return false;
+    }
+    if (oldDateTime == null && newDateTime == null) {
+      return false;
+    }
+
+
+    return newDateTime.before(oldDateTime);
+
   }
 
     public boolean DATE_AFTER(String oldDate, String oldTime, String newDate, String newTime) {
@@ -369,7 +420,7 @@ public abstract class GroovyScript extends groovy.lang.Script {
     }
     String oldString = oldDate + " " + oldTime;
 
-    Date oldDateTime = new Date(0);
+    Date oldDateTime = null;
     try {
       oldString = oldString.trim();
       if (!oldString.isEmpty()) {
@@ -381,7 +432,7 @@ public abstract class GroovyScript extends groovy.lang.Script {
 
     String newString = newDate + " " + newTime;
 
-    Date newDateTime = new Date(0);
+    Date newDateTime = null;
     try {
       newString = newString.trim();
       if (!newString.isEmpty()) {
@@ -390,6 +441,17 @@ public abstract class GroovyScript extends groovy.lang.Script {
     } catch (Exception e) {
       logger.warn("Failed to parse new date: " + newString);
     }
+
+      if (oldDateTime == null && newDateTime != null) {
+        return true;
+      }
+      if (oldDateTime != null && newDateTime == null) {
+        return false;
+      }
+      if (oldDateTime == null && newDateTime == null) {
+        return false;
+      }
+
 
     return newDateTime.after(oldDateTime);
 

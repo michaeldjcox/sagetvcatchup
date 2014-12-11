@@ -8,6 +8,8 @@ import uk.co.mdjcox.sagetv.model.Recording;
 import uk.co.mdjcox.sagetv.model.Source;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -25,6 +27,7 @@ public class Plugin {
     private ProgrammesScript programmesScript;
     private EpisodesScript episodesScript;
     private EpisodeScript episodeScript;
+    private CategoriesScript categoriesScript;
     private PlayScript playScript;
     private StopScript stopScript;
 
@@ -42,6 +45,7 @@ public class Plugin {
         programmesScript = scriptFactory.createProgrammesScript(base);
         episodesScript = scriptFactory.createEpisodesScript(base);
         episodeScript = scriptFactory.createEpisodeScript(base);
+        categoriesScript = scriptFactory.createCategoriesScript(base);
         playScript = scriptFactory.createPlayScript(base);
         stopScript = scriptFactory.createStopScript(base);
     }
@@ -60,6 +64,10 @@ public class Plugin {
 
     public void getEpisode(Source source, Programme programme, Episode episode, AtomicBoolean stopFlag) {
         episodeScript.getEpisode(source, programme, episode, stopFlag);
+    }
+
+    public void getCategories(Source source, Map<String, List<String>> categories, AtomicBoolean stopFlag) {
+      categoriesScript.getCategories(source, categories, stopFlag);
     }
 
     public void playEpisode(Recording recording) {

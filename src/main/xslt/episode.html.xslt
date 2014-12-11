@@ -108,7 +108,7 @@
                         <td><xsl:value-of select="removalDate"/></td>
                     </tr>
                     <tr>
-                        <td>AvailableUntilTime</td>
+                        <td>RemovalTime</td>
                         <xsl:text>&#10;</xsl:text>
                         <td><xsl:value-of select="removalTime"/></td>
                     </tr>

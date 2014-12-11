@@ -39,7 +39,7 @@
                         <xsl:text>&#10;</xsl:text>
                         <th>RemovalDate</th>
                         <xsl:text>&#10;</xsl:text>
-                        <th>AvailableUntilTime</th>
+                        <th>RemovalTime</th>
                         <xsl:text>&#10;</xsl:text>
                         <th>Duration</th>
                         <xsl:text>&#10;</xsl:text>
