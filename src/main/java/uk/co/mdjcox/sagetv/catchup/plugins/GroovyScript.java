@@ -347,7 +347,11 @@ public abstract class GroovyScript extends groovy.lang.Script {
 
   }
 
-  public boolean DATE_AFTER(String oldDate, String oldTime, String newDate, String newTime) {
+  public boolean DATE_BEFORE(String oldDate, String oldTime, String newDate, String newTime) {
+    return !DATE_AFTER(oldDate, oldTime, newDate, newTime);
+  }
+
+    public boolean DATE_AFTER(String oldDate, String oldTime, String newDate, String newTime) {
     SimpleDateFormat catchupFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
     catchupFormatter.setTimeZone(TimeZone.getTimeZone("Europe/London"));
 

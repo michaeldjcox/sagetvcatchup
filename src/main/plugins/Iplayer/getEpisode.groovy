@@ -429,7 +429,7 @@ if (versionId != null) {
                 LOG_WARNING(episode, "Available until time not found");
             }
 
-            if (DATE_AFTER(episode.getAvailableUntilDate(), episode.getAvailableUntilTime(), newDate, newTime)) {
+            if (DATE_BEFORE(episode.getAvailableUntilDate(), episode.getAvailableUntilTime(), newDate, newTime)) {
                 LOG_INFO(episode.getPodcastTitle() + " available date " + newDate + " " + newTime + " is after " + episode.getAvailableUntilDate() + " " + episode.getAvailableUntilTime());
                 episode.setAvailableUntilDate(newDate);
                 episode.setAvailableUntilTime(newTime);
