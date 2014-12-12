@@ -416,6 +416,13 @@ public class CatchupPlugin implements SageTVPlugin {
             help.put(propName, name + " max programmes. 0 = no maximum");
           }
 
+          for (String name : getPluginNames()) {
+            String propName = name + ".showRoot";
+            types.put(propName, CONFIG_BOOL);
+            labels.put(propName, name + " show root node in online services");
+            help.put(propName, name + " set to true to show the iplayer root category");
+          }
+
           types.put(PULL_UPGRADE, CONFIG_BUTTON);
           labels.put(PULL_UPGRADE, "Check for upgrade");
           help.put(PULL_UPGRADE, "Get SageTV to pull a new dev version");
@@ -568,6 +575,12 @@ public class CatchupPlugin implements SageTVPlugin {
         return String.valueOf(maxProgrammes);
       }
 
+      String propNameRoot = name + ".showRoot";
+      if (property.equals(propNameRoot)) {
+        final boolean showRoot = props.getBoolean(propNameRoot, true);
+        return String.valueOf(showRoot);
+      }
+
       String propNameSkip = name + ".skip";
       if (property.equals(propNameSkip)) {
         return String.valueOf(!props.getBoolean(propNameSkip, Boolean.FALSE));
@@ -678,11 +691,17 @@ public class CatchupPlugin implements SageTVPlugin {
       if (property.equals(propName)) {
           setCatchupProperty(propName, value);
       }
+
+      String propNameRoot = name + ".showRoot";
+      if (property.equals(propNameRoot)) {
+        setCatchupProperty(propName, value);
+      }
+
       String propNameSkip = name + ".skip";
       if (property.equals(propNameSkip)) {
-
         setCatchupProperty(propNameSkip, (value.equals("true") ? "false" : "true"));
       }
+
       String propNameCommand = name + ".command";
       if (property.equals(propNameCommand)) {
         setCatchupProperty(propNameCommand, value);

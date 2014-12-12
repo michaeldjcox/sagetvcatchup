@@ -212,6 +212,11 @@ public class CatchupTestModule extends AbstractModule {
     }
 
     @Override
+    public boolean getShowRoot(String pluginName) {
+      return properties.getBoolean(pluginName + ".showRoot", true);
+    }
+
+    @Override
     public PropertiesInterface getProperties() {
       return properties;
     }

@@ -32,6 +32,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class SageTvPublisher implements CatalogPublisher {
 
+    // Catchup context containing settings
+    private final CatchupContextInterface context;
     /** The logger to be used for debug output */
     private LoggerInterface logger;
     /** The utilities used to perform some string manipulation */
@@ -55,6 +57,7 @@ public class SageTvPublisher implements CatalogPublisher {
     {
         this.qualifier = context.getOnlineVideoPropertiesSuffix();
         this.onlineVideoPropertiesDir = context.getOnlineVideoPropertiesDir();
+      this.context = context;
         this.podcastBaseUrl = context.getPodcastBase();
         checkNotNull(qualifier);
         checkNotNull(onlineVideoPropertiesDir);
@@ -148,9 +151,19 @@ public class SageTvPublisher implements CatalogPublisher {
           addSource(root, links, labels);
 
           for (Source category : catalog.getSources()) {
-            logger.info("Online adding source " + category.getId());
-            boolean isSearch = category.getId().equals("search");
-            addDynamicSource(category, links, labels, isSearch);
+            if (context.getShowRoot(category.getId())) {
+              logger.info("Online adding source " + category.getId());
+              boolean isSearch = category.getId().equals("search");
+              addDynamicSource(category, links, labels, isSearch);
+            } else {
+              for (String subCatId : category.getSubCategories()) {
+                Category subCat = catalog.getCategory(subCatId);
+                if (subCat != null) {
+                  logger.info("Online adding source " + subCat.getId());
+                  addDynamicSubcategory(category, subCat, links, labels);
+                }
+              }
+            }
           }
 
             links.commit(linkFile, new LinksPropertyLayout());
@@ -222,13 +235,13 @@ public class SageTvPublisher implements CatalogPublisher {
         }
     }
 
-    private void addDynamicSubcategory(Category programme, PropertiesFile links, PropertiesFile labels) {
+    private void addDynamicSubcategory(Source source, Category programme, PropertiesFile links, PropertiesFile labels) {
         String id = programme.getId();
-        String parentId = programme.getParentId();
+        String parentId = source.getParentId();
         String name = programme.getShortName();
         String description = programme.getLongName();
         String iconUrl = programme.getIconUrl();
-        String url = programme.getServiceUrl();
+        String url = programme.getPodcastUrl();
 //        Set<String> otherParentIds = programme.getOtherParentIds();
 
       if (iconUrl != null && iconUrl.startsWith("/")) {

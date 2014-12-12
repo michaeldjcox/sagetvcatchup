@@ -65,9 +65,9 @@ public class Episode implements ErrorRecorder {
   /** The metadata URLs used to populate this item */
   private final Set<String> metaUrls = new CopyOnWriteArraySet<String>();
   /** The "control" podcast URL */
-  private String podcastUrl;
+  private String podcastUrl="";
   /** The duration in seconds */
-  private String duration;
+  private String duration="";
 
   public Episode() {
   }

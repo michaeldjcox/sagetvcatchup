@@ -110,10 +110,15 @@
     <airTime>airTime2</airTime>
     <origAirDate>origAirDate2</origAirDate>
     <origAirTime>origAirTime2</origAirTime>
+    <additionDate></additionDate>
+    <additionTime></additionTime>
+    <removalDate></removalDate>
+    <removalTime></removalTime>
     <channel>channel2</channel>
     <genre>genre3</genre>
     <genre>genre4</genre>
     <podcastUrl>podcastUrl1</podcastUrl>
+    <duration></duration>
   </episode>
   <episode>
     <sourceId>sourceId</sourceId>
@@ -131,6 +136,10 @@
     <airTime>airTime1</airTime>
     <origAirDate>origAirDate1</origAirDate>
     <origAirTime>origAirTime1</origAirTime>
+    <additionDate></additionDate>
+    <additionTime></additionTime>
+    <removalDate></removalDate>
+    <removalTime></removalTime>
     <channel>channel1</channel>
     <genre>genre2</genre>
     <genre>genre1</genre>
@@ -145,5 +154,6 @@
     <metaUrl>metaUrl1</metaUrl>
     <metaUrl>metaUrl2</metaUrl>
     <podcastUrl>podcastUrl1</podcastUrl>
+    <duration></duration>
   </episode>
 </catalog>

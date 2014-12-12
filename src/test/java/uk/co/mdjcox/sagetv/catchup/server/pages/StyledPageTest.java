@@ -229,7 +229,7 @@ public class StyledPageTest {
         episodesBuilder.startBody();
         episodesBuilder.addHeading1("Episodes");
         episodesBuilder.startTable();
-        episodesBuilder.addTableHeader("SourceId", "Id", "Channel", "ProgrammeTitle", "Series", "SeriesTitle", "Episode", "EpisodeTitle", "PodcastTitle", "AirDate", "AirTime", "OrigAirDate", "OrigAirTime", "ServiceUrl", "IconUrl", "PodcastUrl" );
+        episodesBuilder.addTableHeader("SourceId", "Id", "Channel", "ProgrammeTitle", "Series", "SeriesTitle", "Episode", "EpisodeTitle", "PodcastTitle", "AirDate", "AirTime", "OrigAirDate", "OrigAirTime",  "AdditionDate", "AdditionTime",  "RemovalDate", "RemovalTime", "Duration", "ServiceUrl", "IconUrl", "PodcastUrl" );
 
 
         TreeSet<Category> sortedCats = new TreeSet<Category>(new Comparator<Category>() {
@@ -289,7 +289,7 @@ public class StyledPageTest {
                     String link = "/episode?id=" + ep.getId() + ";type=html";
                     linkBuilder4.addLink(ep.getId(), link);
 
-                    episodesBuilder.addTableRow(ep.getSourceId(), linkBuilder4.toString(), ep.getChannel(), ep.getProgrammeTitle(), ep.getSeries(), ep.getSeriesTitle(), ep.getEpisode(), ep.getEpisodeTitle(), ep.getPodcastTitle(), ep.getAirDate(), ep.getAirTime(), ep.getOrigAirDate(), ep.getOrigAirTime(), linkBuilder1.toString(), linkBuilder2.toString(), linkBuilder3.toString() );
+                    episodesBuilder.addTableRow(ep.getSourceId(), linkBuilder4.toString(), ep.getChannel(), ep.getProgrammeTitle(), ep.getSeries(), ep.getSeriesTitle(), ep.getEpisode(), ep.getEpisodeTitle(), ep.getPodcastTitle(), ep.getAirDate(), ep.getAirTime(), ep.getOrigAirDate(), ep.getOrigAirTime(), ep.getAdditionDate(), ep.getAdditionTime(), ep.getRemovalDate(), ep.getRemovalTime(), ep.getDuration(), linkBuilder1.toString(), linkBuilder2.toString(), linkBuilder3.toString() );
                 }
             }
         }
@@ -340,6 +340,7 @@ public class StyledPageTest {
         data.put("ProgrammeTitle", cat.getProgrammeTitle());
         data.put("SeriesTitle", cat.getSeriesTitle());
         data.put("EpisodeTitle", cat.getEpisodeTitle());
+        data.put("PodcastTitle", cat.getEpisodeTitle());
         data.put("Description", cat.getDescription());
         data.put("Series", cat.getSeries());
         data.put("Episode", cat.getEpisode());
@@ -354,6 +355,11 @@ public class StyledPageTest {
         data.put("AirTime", cat.getAirTime());
         data.put("OrigAirDate", cat.getOrigAirDate());
         data.put("OrigAirTime", cat.getOrigAirTime());
+        data.put("AdditionDate", cat.getAdditionDate());
+        data.put("AdditionTime", cat.getAdditionTime());
+        data.put("RemovalDate", cat.getRemovalDate());
+        data.put("RemovalTime", cat.getRemovalTime());
+        data.put("Duration", cat.getDuration());
         data.put("PodcastTitle", cat.getPodcastTitle());
         HtmlBuilder linkBuilder1 = new HtmlBuilder();
         linkBuilder1.addLink(cat.getIconUrl(), cat.getIconUrl());
