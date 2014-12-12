@@ -456,4 +456,71 @@ public abstract class GroovyScript extends groovy.lang.Script {
     return newDateTime.after(oldDateTime);
 
   }
+
+  public boolean FUTURE_DATE(String oldDate, String oldTime) {
+    SimpleDateFormat catchupFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    catchupFormatter.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+
+    if (oldDate == null) {
+      oldDate = "";
+    }
+    if (oldTime == null) {
+      oldTime = "";
+    }
+
+    String oldString = oldDate + " " + oldTime;
+
+    Date oldDateTime = null;
+    try {
+      oldString = oldString.trim();
+      if (!oldString.isEmpty()) {
+        oldDateTime = catchupFormatter.parse(oldString);
+      }
+    } catch (Exception e) {
+      logger.warn("Failed to parse old date: " + oldString);
+    }
+
+    Date newDateTime = new Date();
+
+    if (oldDateTime == null ) {
+      return false;
+    }
+
+    return oldDateTime.after(newDateTime);
+
+  }
+
+  public boolean PAST_DATE(String oldDate, String oldTime) {
+    SimpleDateFormat catchupFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    catchupFormatter.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+
+    if (oldDate == null) {
+      oldDate = "";
+    }
+    if (oldTime == null) {
+      oldTime = "";
+    }
+
+    String oldString = oldDate + " " + oldTime;
+
+    Date oldDateTime = null;
+    try {
+      oldString = oldString.trim();
+      if (!oldString.isEmpty()) {
+        oldDateTime = catchupFormatter.parse(oldString);
+      }
+    } catch (Exception e) {
+      logger.warn("Failed to parse old date: " + oldString);
+    }
+
+    Date newDateTime = new Date();
+
+    if (oldDateTime == null ) {
+      return false;
+    }
+
+    return oldDateTime.before(newDateTime);
+
+  }
+
 }

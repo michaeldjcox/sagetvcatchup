@@ -305,8 +305,6 @@ if (versionId == null) {
 
 }
 
-// TODO duration is unreliable at top of version html
-
 if (versionId != null) {
     String versionUrl = "http://www.bbc.co.uk/programmes/" + versionId + ".xml";
     episode.addMetaUrl(versionUrl)
@@ -372,12 +370,13 @@ if (versionId != null) {
             LOG_WARNING(episode, "Air time not found");
         }
 
-        if (DATE_AFTER(episode.getAirDate(), episode.getAirTime(), newDate, newTime)) {
+        if (PAST_DATE(newDate, newTime) &&
+            DATE_AFTER(episode.getAirDate(), episode.getAirTime(), newDate, newTime)) {
             LOG_INFO(episode.getPodcastTitle() + " repeat date " + newDate + " " + newTime + " is after " + episode.getAirDate() + " " + episode.getAirTime());
             episode.setAirDate(newDate);
             episode.setAirTime(newTime);
         } else {
-            LOG_INFO(episode.getPodcastTitle() + " repeat " + episode.getRemovalDate() + " " + episode.getRemovalTime() + " prevails over " + newDate + " " + newTime);
+            LOG_INFO(episode.getPodcastTitle() + " repeat " + episode.getAirTime() + " " + episode.getAirTime() + " prevails over " + newDate + " " + newTime);
         }
 
         versionDetails = MOVE_TO("<broadcast", versionDetails);
@@ -389,7 +388,59 @@ if (versionId != null) {
 
     while (versionDetails != null) {
 
-        String availDetails = MOVE_TO("<end", versionDetails);
+        String availDetails = MOVE_TO("<start", versionDetails);
+        if (availDetails != null && !availDetails.startsWith("/>")) {
+            availDetails = MOVE_TO(">", availDetails);
+            availDetails = EXTRACT_TO("</start>", availDetails)
+
+            String time = null;
+            String date = null;
+
+            if (availDetails != null) {
+                date = EXTRACT_TO("T", availDetails);
+                date = REMOVE_HTML_TAGS(date);
+                time = MOVE_TO("T", availDetails);
+                String time2 = EXTRACT_TO("+", time);
+                if (time2 == null) {
+                    time2 = EXTRACT_TO("Z", time);
+                }
+                time = REMOVE_HTML_TAGS(time2);
+            }
+
+            String newDate = null;
+            if (date != null) {
+                newDate = FIX_DATE("yyyy-MM-dd", date);
+                if (newDate == null) {
+                    LOG_ERROR(episode, "Failed to parse addition date: " + date);
+                    newDate = date;
+                }
+            } else {
+                LOG_WARNING(episode, "Addition date not found");
+            }
+
+            String newTime = null
+            if (time != null) {
+                newTime = FIX_TIME("HH:mm:ss", time);
+                if (newTime == null) {
+                    LOG_ERROR(episode, "Failed to parse addition time: " + time);
+                    newTime = time;
+                }
+
+            } else {
+                LOG_WARNING(episode, "Addition time not found");
+            }
+
+            if (PAST_DATE(newDate, newTime) &&
+                DATE_BEFORE(episode.getAdditionDate(), episode.getAdditionTime(), newDate, newTime)) {
+                LOG_INFO(episode.getPodcastTitle() + " addition date " + newDate + " " + newTime + " is before " + episode.getAdditionDate() + " " + episode.getAdditionTime());
+                episode.setAdditionDate(newDate);
+                episode.setAdditionTime(newTime);
+            } else {
+                LOG_INFO(episode.getPodcastTitle() + " addition date " + episode.getAdditionDate() + " " + episode.getAdditionTime() + " prevails over " + newDate + " " + newTime);
+            }
+        }
+
+        availDetails = MOVE_TO("<end", versionDetails);
         if (availDetails != null && !availDetails.startsWith("/>")) {
             availDetails = MOVE_TO(">", availDetails);
             availDetails = EXTRACT_TO("</end>", availDetails)
@@ -412,31 +463,32 @@ if (versionId != null) {
             if (date != null) {
                 newDate = FIX_DATE("yyyy-MM-dd", date);
                 if (newDate == null) {
-                    LOG_ERROR(episode, "Failed to parse available until date: " + date);
+                    LOG_ERROR(episode, "Failed to parse removal date: " + date);
                     newDate = date;
                 }
             } else {
-                LOG_WARNING(episode, "Available until date not found");
+                LOG_WARNING(episode, "Removal date not found");
             }
 
             String newTime = null
             if (time != null) {
                 newTime = FIX_TIME("HH:mm:ss", time);
                 if (newTime == null) {
-                    LOG_ERROR(episode, "Failed to parse available until time: " + time);
+                    LOG_ERROR(episode, "Failed to parse removal time: " + time);
                     newTime = time;
                 }
 
             } else {
-                LOG_WARNING(episode, "Available until time not found");
+                LOG_WARNING(episode, "Removal time not found");
             }
 
-            if (DATE_BEFORE(episode.getRemovalDate(), episode.getRemovalTime(), newDate, newTime)) {
-                LOG_INFO(episode.getPodcastTitle() + " available date " + newDate + " " + newTime + " is before " + episode.getRemovalDate() + " " + episode.getRemovalTime());
+            if (FUTURE_DATE(newDate, newTime) &&
+                DATE_BEFORE(episode.getRemovalDate(), episode.getRemovalTime(), newDate, newTime)) {
+                LOG_INFO(episode.getPodcastTitle() + " removal date " + newDate + " " + newTime + " is before " + episode.getRemovalDate() + " " + episode.getRemovalTime());
                 episode.setRemovalDate(newDate);
                 episode.setRemovalTime(newTime);
             } else {
-                LOG_INFO(episode.getPodcastTitle() + " available date " + episode.getRemovalDate() + " " + episode.getRemovalTime() + " prevails over " + newDate + " " + newTime);
+                LOG_INFO(episode.getPodcastTitle() + " removal date " + episode.getRemovalDate() + " " + episode.getRemovalTime() + " prevails over " + newDate + " " + newTime);
             }
         }
 

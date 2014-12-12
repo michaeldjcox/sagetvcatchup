@@ -325,7 +325,7 @@ public class Cataloger {
         doNewProgrammeCategorisation(sourceCat, programmeCat, episode, newCatalog);
 
         // Air Date
-        doRemovalDateCategorisation(sourceCat, programmeCat, episode, newCatalog);
+        doLastChanceCategorisation(sourceCat, programmeCat, episode, newCatalog);
 
       }
     }
@@ -481,32 +481,46 @@ public class Cataloger {
   }
 
   private void doNewProgrammeCategorisation(Source sourceCat, Programme programmeCat, Episode episode, Catalog catalog) {
-    String sourceId = sourceCat.getId();
-    String favouriteId = sourceId + "/New";
-    SubCategory favouriteCat = catalog.getSubcategory(favouriteId);
-    if (favouriteCat == null) {
-      favouriteCat =
-              new SubCategory(sourceId, favouriteId, "New", "New", sourceCat.getServiceUrl(),
-                      sourceCat.getIconUrl(), sourceId);
-      favouriteCat.setPodcastUrl("/category?id=" + favouriteId + ";type=xml");
-      catalog.addSubCategory(favouriteCat);
-      sourceCat.addSubCategory(favouriteCat);
+
+    String airDateName = episode.getAdditionDate();
+    if (airDateName == null || airDateName.isEmpty()) {
+      airDateName = episode.getOrigAirDate();
+    }
+    if (airDateName == null || airDateName.isEmpty()) {
+      return;
+    }
+    SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+
+    Date date = null;
+
+    try {
+      date = format.parse(airDateName);
+    } catch (ParseException e) {
+      logger.warn("Failed to categorise by additionDate=" + airDateName + " id="+ episode.getId());
+      return;
     }
 
-    if (lastCatalog != null) {
+    Date now = new Date();
+
+    long diff = now.getTime() - date.getTime();
+
+    if (diff < MILLIS_IN_A_DAY*2) {
+
+      String sourceId = sourceCat.getId();
+      String favouriteId = sourceId + "/New";
+      SubCategory favouriteCat = catalog.getSubcategory(favouriteId);
+      if (favouriteCat == null) {
+        favouriteCat =
+                new SubCategory(sourceId, favouriteId, "New", "New", sourceCat.getServiceUrl(),
+                        sourceCat.getIconUrl(), sourceId);
+        favouriteCat.setPodcastUrl("/category?id=" + favouriteId + ";type=xml");
+        catalog.addSubCategory(favouriteCat);
+        sourceCat.addSubCategory(favouriteCat);
+      }
+
       String id = programmeCat.getId();
-      String epId = episode.getId();
-      Programme cat = lastCatalog.getProgramme(id);
-      Episode ep = lastCatalog.getEpisode(epId);
-      if (cat == null) {
-        SubCategory newProgrammeCat = addNewProgrammeCat("/New/", programmeCat, catalog, sourceId, favouriteId, favouriteCat, id);
-        newProgrammeCat.addAllEpisodes(programmeCat.getEpisodes());
-      } else
-      if (ep == null)
-      {
         SubCategory newProgrammeCat = addNewProgrammeCat("/New/", programmeCat, catalog, sourceId, favouriteId, favouriteCat, id);
         newProgrammeCat.addEpisode(episode);
-      }
     }
   }
 
@@ -575,12 +589,11 @@ public class Cataloger {
     airDateInstanceCat.addSubCategory(newProgrammeCat);
   }
 
-  private void doRemovalDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode, Catalog catalog) {
+  private void doLastChanceCategorisation(Source sourceCat, Programme programmeCat, Episode episode, Catalog catalog) {
     String airDateName = episode.getRemovalDate();
     if (airDateName == null || airDateName.isEmpty()) {
       return;
     }
-
     SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
 
     Date date = null;
@@ -588,40 +601,32 @@ public class Cataloger {
     try {
       date = format.parse(airDateName);
     } catch (ParseException e) {
-      logger.warn("Failed to categorise by airDate=" + airDateName + " id="+ episode.getId());
+      logger.warn("Failed to categorise by removal Date=" + airDateName + " id="+ episode.getId());
       return;
     }
 
-    airDateName = getFutureRelativeTime(date);
+    Date now = new Date();
 
-    String sourceId = sourceCat.getId();
-    String airdateId = sourceId + "/RemovalDate";
-    SubCategory airdateCat = catalog.getSubcategory(airdateId);
-    if (airdateCat == null) {
-      airdateCat =
-              new SubCategory(sourceId, airdateId, "Removal Date","Removal Date", sourceCat.getServiceUrl(),
-                      sourceCat.getIconUrl(), sourceId);
-      airdateCat.setPodcastUrl("/category?id=" + airdateId + ";type=xml");
-      catalog.addSubCategory(airdateCat);
-      sourceCat.addSubCategory(airdateCat);
+    long diff = date.getTime() - now.getTime();
+
+    if (diff < MILLIS_IN_A_DAY*2) {
+
+      String sourceId = sourceCat.getId();
+      String favouriteId = sourceId + "/LastChance";
+      SubCategory favouriteCat = catalog.getSubcategory(favouriteId);
+      if (favouriteCat == null) {
+        favouriteCat =
+                new SubCategory(sourceId, favouriteId, "Last Chance", "Last Chance", sourceCat.getServiceUrl(),
+                        sourceCat.getIconUrl(), sourceId);
+        favouriteCat.setPodcastUrl("/category?id=" + favouriteId + ";type=xml");
+        catalog.addSubCategory(favouriteCat);
+        sourceCat.addSubCategory(favouriteCat);
+      }
+
+      String id = programmeCat.getId();
+      SubCategory newProgrammeCat = addNewProgrammeCat("/LastChance/", programmeCat, catalog, sourceId, favouriteId, favouriteCat, id);
+      newProgrammeCat.addEpisode(episode);
     }
-    String
-            airDateInstanceId =
-            sourceId + "/RemovalDate/" + airDateName.replace(" ", "").replace(",", "");
-    SubCategory airDateInstanceCat =  catalog.getSubcategory(airDateInstanceId);
-    if (airDateInstanceCat == null) {
-      airDateInstanceCat =
-              new SubCategory(sourceId, airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(),
-                      sourceCat.getIconUrl(), airdateCat.getId());
-      airDateInstanceCat.setPodcastUrl("/category?id=" + airDateInstanceId + ";type=xml");
-      catalog.addSubCategory(airDateInstanceCat);
-      airdateCat.addSubCategory(airDateInstanceCat);
-    }
-
-    SubCategory newProgrammeCat = addNewProgrammeCat("/RemovalDate/" + airDateName.replace(" ", "").replace(",", "") + "/", programmeCat, catalog, sourceId, airDateInstanceId, airDateInstanceCat, programmeCat.getId());
-    newProgrammeCat.addEpisode(episode);
-
-    airDateInstanceCat.addSubCategory(newProgrammeCat);
   }
 
   private String getRelativeTime(Date date) {

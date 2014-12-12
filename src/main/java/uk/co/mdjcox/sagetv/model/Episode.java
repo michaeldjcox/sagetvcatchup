@@ -48,6 +48,10 @@ public class Episode implements ErrorRecorder {
   private String origAirDate = "";
   /** The time at which the media file originally aired */
   private String origAirTime = "";
+  /** The date from which the media file was available */
+  private String additionDate = "";
+  /** The time from which the media file was available */
+  private String additionTime = "";
   /** The date on which the media file will no longer be available */
   private String removalDate = "";
   /** The time at which the media file will no longer be available */
@@ -232,6 +236,22 @@ public class Episode implements ErrorRecorder {
    */
   public void setOrigAirTime(String origAirTime) {
     this.origAirTime = origAirTime;
+  }
+
+  public String getAdditionDate() {
+    return additionDate;
+  }
+
+  public void setAdditionDate(String additionDate) {
+    this.additionDate = additionDate;
+  }
+
+  public String getAdditionTime() {
+    return additionTime;
+  }
+
+  public void setAdditionTime(String additionTime) {
+    this.additionTime = additionTime;
   }
 
   /**

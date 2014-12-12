@@ -37,6 +37,10 @@
                         <xsl:text>&#10;</xsl:text>
                         <th>OrigAirTime</th>
                         <xsl:text>&#10;</xsl:text>
+                        <th>AdditionDate</th>
+                        <xsl:text>&#10;</xsl:text>
+                        <th>AdditionTime</th>
+                        <xsl:text>&#10;</xsl:text>
                         <th>RemovalDate</th>
                         <xsl:text>&#10;</xsl:text>
                         <th>RemovalTime</th>
@@ -105,6 +109,14 @@
                             <xsl:text>&#10;</xsl:text>
                             <td>
                                 <xsl:value-of select="origAirTime"/>
+                            </td>
+                            <xsl:text>&#10;</xsl:text>
+                            <td>
+                                <xsl:value-of select="additionDate"/>
+                            </td>
+                            <xsl:text>&#10;</xsl:text>
+                            <td>
+                                <xsl:value-of select="additionTime"/>
                             </td>
                             <xsl:text>&#10;</xsl:text>
                             <td>

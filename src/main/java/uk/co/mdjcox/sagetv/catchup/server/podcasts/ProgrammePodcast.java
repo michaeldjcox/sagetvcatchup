@@ -75,7 +75,7 @@ public class ProgrammePodcast extends OnDemandPodcast {
           descBuilder.append("</i>");
           final String availDate = episode.getRemovalDate();
           if (availDate != null && !availDate.isEmpty()) {
-            descBuilder.append("Until: ");
+            descBuilder.append(" Until: ");
             descBuilder.append(availDate);
           }
           descBuilder.append("<br/>");
