@@ -88,17 +88,17 @@ public class SubCategoryTest {
 
   }
 
-  @Test
-  public void testCreateNullIconUrl() {
-    try {
-      SubCategory category = new SubCategory("0", "1", "2", "3", "4", null, "5");
-    } catch (NullPointerException e) {
-      return;
-    }
-
-    fail("Should have thrown NullPointerException");
-
-  }
+//  @Test
+//  public void testCreateNullIconUrl() {
+//    try {
+//      SubCategory category = new SubCategory("0", "1", "2", "3", "4", null, "5");
+//    } catch (NullPointerException e) {
+//      return;
+//    }
+//
+//    fail("Should have thrown NullPointerException");
+//
+//  }
 
   @Test
   public void testCreateNullParentId() {

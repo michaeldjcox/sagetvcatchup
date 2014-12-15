@@ -467,7 +467,7 @@ public class Cataloger {
     if (favouriteCat == null) {
       favouriteCat =
               new SubCategory(sourceId, favouriteId, "Favourites", "Favourites", sourceCat.getServiceUrl(),
-                      sourceCat.getIconUrl(), sourceId);
+                      null, sourceId);
       favouriteCat.setPodcastUrl("/category?id=" + favouriteId + ";type=xml");
       catalog.addSubCategory(favouriteCat);
       sourceCat.addSubCategory(favouriteCat);
@@ -512,7 +512,7 @@ public class Cataloger {
       if (favouriteCat == null) {
         favouriteCat =
                 new SubCategory(sourceId, favouriteId, "New", "New", sourceCat.getServiceUrl(),
-                        sourceCat.getIconUrl(), sourceId);
+                        null, sourceId);
         favouriteCat.setPodcastUrl("/category?id=" + favouriteId + ";type=xml");
         catalog.addSubCategory(favouriteCat);
         sourceCat.addSubCategory(favouriteCat);
@@ -565,7 +565,7 @@ public class Cataloger {
     if (airdateCat == null) {
       airdateCat =
               new SubCategory(sourceId, airdateId, "Air Date", "Air Date", sourceCat.getServiceUrl(),
-                      sourceCat.getIconUrl(), sourceId);
+                      null, sourceId);
       airdateCat.setPodcastUrl("/category?id=" + airdateId + ";type=xml");
       catalog.addSubCategory(airdateCat);
       sourceCat.addSubCategory(airdateCat);
@@ -577,7 +577,7 @@ public class Cataloger {
     if (airDateInstanceCat == null) {
       airDateInstanceCat =
               new SubCategory(sourceId, airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(),
-                      sourceCat.getIconUrl(), airdateCat.getId());
+                      null, airdateCat.getId());
       airDateInstanceCat.setPodcastUrl("/category?id=" + airDateInstanceId + ";type=xml");
       catalog.addSubCategory(airDateInstanceCat);
       airdateCat.addSubCategory(airDateInstanceCat);
@@ -617,7 +617,7 @@ public class Cataloger {
       if (favouriteCat == null) {
         favouriteCat =
                 new SubCategory(sourceId, favouriteId, "Last Chance", "Last Chance", sourceCat.getServiceUrl(),
-                        sourceCat.getIconUrl(), sourceId);
+                        null, sourceId);
         favouriteCat.setPodcastUrl("/category?id=" + favouriteId + ";type=xml");
         catalog.addSubCategory(favouriteCat);
         sourceCat.addSubCategory(favouriteCat);
@@ -775,7 +775,7 @@ public class Cataloger {
       if (channelCat == null) {
         channelCat =
                 new SubCategory(sourceId, channelId, "Channel", "Channel", sourceCat.getServiceUrl(),
-                        sourceCat.getIconUrl(), sourceId);
+                        null, sourceId);
         channelCat.setPodcastUrl("/category?id=" + channelCat.getId() + ";type=xml");
         catalog.addSubCategory(channelCat);
         sourceCat.addSubCategory(channelCat);
@@ -785,7 +785,7 @@ public class Cataloger {
       if (channelInstanceCat == null) {
         channelInstanceCat =
                 new SubCategory(sourceId, channelInstanceId, channelName, channelName, sourceCat.getServiceUrl(),
-                        sourceCat.getIconUrl(), channelCat.getId());
+                        null, channelCat.getId());
         channelInstanceCat.setPodcastUrl("/category?id=" + channelInstanceCat.getId() + ";type=xml");
         catalog.addSubCategory(channelInstanceCat);
         channelCat.addSubCategory(channelInstanceCat);
@@ -815,7 +815,7 @@ public class Cataloger {
     if (airdateCat == null) {
       airdateCat =
               new SubCategory(sourceId, categoryId, categoryName, categoryName, sourceCat.getServiceUrl(),
-                      sourceCat.getIconUrl(), sourceId);
+                      null, sourceId);
       airdateCat.setPodcastUrl("/category?id=" +categoryId + ";type=xml");
       catalog.addSubCategory(airdateCat);
       sourceCat.addSubCategory(airdateCat);
@@ -838,7 +838,7 @@ public class Cataloger {
         if (genreCat == null) {
           genreCat =
                   new SubCategory(sourceId, genreId, "Genre", "Genre", sourceCat.getServiceUrl(),
-                          sourceCat.getIconUrl(), sourceId);
+                          null, sourceId);
           genreCat.setPodcastUrl("/category?id=" + genreCat.getId() + ";type=xml");
 
           catalog.addSubCategory(genreCat);
@@ -849,7 +849,7 @@ public class Cataloger {
         if (genreInstanceCat == null) {
           genreInstanceCat =
                   new SubCategory(sourceId, genreInstanceId, genreName, genreName, sourceCat.getServiceUrl(),
-                          sourceCat.getIconUrl(), genreCat.getId());
+                          null, genreCat.getId());
           catalog.addSubCategory(genreInstanceCat);
           genreInstanceCat.setPodcastUrl("/category?id=" + genreInstanceCat.getId() + ";type=xml");
           genreCat.addSubCategory(genreInstanceCat);
@@ -880,7 +880,7 @@ public class Cataloger {
     if (atozCat == null) {
       atozCat =
               new SubCategory(sourceId, atozId, "A to Z", "A to Z", sourceCat.getServiceUrl(),
-                      sourceCat.getIconUrl(), sourceId);
+                      null, sourceId);
       atozCat.setPodcastUrl("/category?id=" + atozCat.getId() + ";type=xml");
       catalog.addSubCategory(atozCat);
       sourceCat.addSubCategory(atozCat);
@@ -889,7 +889,7 @@ public class Cataloger {
     SubCategory azCat = catalog.getSubcategory(azId);
     if (azCat == null) {
       azCat =
-              new SubCategory(sourceId, azId, azName, azName, sourceCat.getServiceUrl(), sourceCat.getIconUrl(),
+              new SubCategory(sourceId, azId, azName, azName, sourceCat.getServiceUrl(), null,
                       atozCat.getId());
       azCat.setPodcastUrl("/category?id=" + azCat.getId() + ";type=xml");
       catalog.addSubCategory(azCat);

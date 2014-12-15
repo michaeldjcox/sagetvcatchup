@@ -68,7 +68,7 @@ public abstract class Category implements ErrorRecorder {
         this.shortName = checkNotNull(shortName);
         this.longName = checkNotNull(longName);
         this.serviceUrl = checkNotNull(serviceUrl);
-        this.iconUrl = checkNotNull(iconUrl);
+        this.iconUrl = iconUrl;
         this.parentId = checkNotNull(parentId);
         this.type = getClass().getSimpleName();
     }

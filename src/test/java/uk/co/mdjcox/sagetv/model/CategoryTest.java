@@ -95,17 +95,17 @@ public class CategoryTest {
 
   }
 
-  @Test
-  public void testCreateNullIconUrl() {
-    try {
-      Category category = new MyCategory("0", "1", "2", "3", "4", null, "5");
-    } catch (NullPointerException e) {
-      return;
-    }
-
-    fail("Should have thrown NullPointerException");
-
-  }
+//  @Test
+//  public void testCreateNullIconUrl() {
+//    try {
+//      Category category = new MyCategory("0", "1", "2", "3", "4", null, "5");
+//    } catch (NullPointerException e) {
+//      return;
+//    }
+//
+//    fail("Should have thrown NullPointerException");
+//
+//  }
 
   @Test
   public void testCreateNullParentId() {
