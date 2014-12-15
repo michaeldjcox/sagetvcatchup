@@ -339,7 +339,6 @@ public class Recorder {
         if (!recording.isStopped()) {
           stop(recording);
         }
-      // TODO take this out!
       String hostname = "NONE";
       try {
         hostname = InetAddress.getLocalHost().getHostName();

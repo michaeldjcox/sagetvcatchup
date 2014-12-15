@@ -4,15 +4,23 @@
  \n
       - Online Services menu. Show the last air date rather than original air date in episode detail
       - Online Services menu. Cataloging status - add a count of subcategories
+      - Online Services menu. Add recording progress to stop button on episode control menu
+      - Online Services menu. Add "Last chance" category for soon to be removed episodes
+      - Online Services menu. Add "Most popular" category based on BBC web site
+      - Online Services menu. Rework "New" category to be best on availability dates.
+      - Online Services menu. Remove the Iplayer root node so main categories appear at top level
       - Web Page: Fix issue where podcasts cannot be navigated from remote machine
-      - Cataloging: extract duration and actual last air date from iplayer meta data
+      - Web Page: Duration, last air date, available and removal dates added to episode views.
+      - Cataloging: extract duration, actual last air date, available and removal dates from iplayer meta data
       - Cataloging: reduce air date categories by going from day to month to year to decade for older content
-      - Cataloging: Fix issue of errors attached to source catagories not being reset on catalog run
-      - Recording: add duration, and last air date to SageTV airing meta data
+      - Cataloging: Fix issue of errors attached to source categories not being reset on catalog run
+      - Recording: add channel, duration, and last air date to SageTV airing meta data
       - Recording: download the episode fanart to the recording directory.
       - Recording: fix episode title so it has the SageTVs title - SeasonNr - EpisodeNr format
       - Recording: fix episode number which was being set to same value as series number
-      - Test: reduce size of the test video to reduce upload times
+      - Recording: upload to sagetv asynchronously from the server so as to not block recording
+      - Recording: fix issue where some failed recordings gets listed as still in progress
+      - Test: reduce size of the test video to reduce deployment upload times
  \n
 0.3.6 - Fifth beta release.
  \n
