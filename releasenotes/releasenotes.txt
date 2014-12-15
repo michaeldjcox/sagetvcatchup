@@ -8,12 +8,13 @@
       - Online Services menu. Add "Last chance" category for soon to be removed episodes
       - Online Services menu. Add "Most popular" category based on BBC web site
       - Online Services menu. Rework "New" category to be best on availability dates.
-      - Online Services menu. Remove the Iplayer root node so main categories appear at top level
+      - Online Services menu. Remove Iplayer root so main categories appear at top level
       - Web Page: Fix issue where podcasts cannot be navigated from remote machine
       - Web Page: Duration, last air date, available and removal dates added to episode views.
-      - Cataloging: extract duration, actual last air date, available and removal dates from iplayer meta data
-      - Cataloging: reduce air date categories by going from day to month to year to decade for older content
-      - Cataloging: Fix issue of errors attached to source categories not being reset on catalog run
+      - Cataloging: extract duration and last air date from iplayer meta data
+      - Cataloging: extract available and removal dates from iplayer meta data
+      - Cataloging: reduce air date categories with larger time periods for much older content
+      - Cataloging: Fix issue of some catalog errors accumulating across catalog runs
       - Recording: add channel, duration, and last air date to SageTV airing meta data
       - Recording: download the episode fanart to the recording directory.
       - Recording: fix episode title so it has the SageTVs title - SeasonNr - EpisodeNr format
@@ -34,25 +35,25 @@
  \n
 0.3.4 Third beta release.
  \n
-      - Online services menu: some lists not fully populated due to incorrect escaping of podcast titles
+      - Online services menu: fix truncation of categories due to incorrect escaping of titles
       - SageTV Plugin: Configurability of ports and timeouts and recording commands
       - Recording: Better status reporting
       - Recording: Two threads for watching and one for queued recordings
       - Recording: Configurable timeouts
       - Recording: upload to SageTV retries move of recording file
-      - Recording: recording will not wait for a completed file if the recording was stopped or failed
+      - Recording: recording will not wait for completed file if the recording was stopped or failed
       - Recording: get_iplayer command line is now configurable
-      - Recording: no relative path from get_iplayer command in order to work with multiple hard drives
+      - Recording: remove use of relative path to recording dir
       - General: RMI services made to survive suspend/resume of host
  \n
 0.3.3 Second beta release.
  \n
       Online services menu:
  \n
-      - Recording and catalog status moved down a level as SageTV caches downloads at top level
+      - Recording and catalog status moved down a level as SageTV caches at top level
       - Reverse order sorting of categories and episodes by orig air date
       - Added a search podcast to allow programme search from SageTV
-      - Moved show icons to programme level from episode level to facilitate better meta-data visibility
+      - Moved show icons from episode to programme level for better meta-data visibility
       - Improved visibility of meta-data at episode level
       - Added a "New" category for programmes added since the last catalog
       - Added a "Favourite" category for programmes which are also SageTV favourites
@@ -75,8 +76,8 @@
  \n
       - Reduce cataloging time to 10 mins - previously took hours
       - Remove the catchup server host and port from podcast URLs from the catalog
-      - Add a catalog start hour so cataloging always starts at a set hour of day and occurs every X hours
-      - Only start cataloging on startup if the catalog looks sparse otherwise wait to scheduled time
+      - Add a catalog start hour so cataloging starts at a set hour of day and occurs every X hours
+      - Only start cataloging on startup if the catalog is sparse otherwise wait for scheduled time
       - Deal with duplicate programme entries in iplayer
       - Made catalog downloads interruptable so that cataloging can be more quickly terminated
       - Made catalog downloads retry on failure
