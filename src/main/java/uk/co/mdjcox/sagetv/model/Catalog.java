@@ -205,15 +205,7 @@ public class Catalog {
     }
 
   public int getNumberSources() {
-    int size = sources.size();
-    if (sources.containsKey("status")) {
-      size--;
-    }
-    if (sources.containsKey("search")) {
-      size--;
-    }
-
-    return size;
+    return sources.size();
   }
 
   public int getNumberSubCategories() {

@@ -30,4 +30,9 @@ public class Source extends SubCategory {
                   String serviceUrl, String iconUrl) {
         super(id, id, shortName, longName, serviceUrl, iconUrl, parentId);
     }
+
+  @Override
+  public void addSubCategory(Category subCategory) {
+    super.addSubCategory(subCategory);
+  }
 }

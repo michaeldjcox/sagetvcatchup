@@ -153,25 +153,37 @@ public class Cataloger {
         logger.error("Failed to collect favourites", e);
       }
 
-      Source statusSource = new Source(root.getId(), "status", "Status", "Status", "", "");
-      statusSource.setPodcastUrl("/category?id=status;type=xml");
-      newCatalog.addSource(statusSource);
+      final String statusId = root.getId() + "/status";
+      SubCategory statusSource = new SubCategory(root.getId(), statusId, "Status", "Status", "", "", root.getId());
+      statusSource.setPodcastUrl("/category?id="+statusId+";type=xml");
+      newCatalog.addSubCategory(statusSource);
       root.addSubCategory(statusSource);
 
-      Source searchSource = new Source(root.getId(), "search", "Search", "Search", "", "");
-      searchSource.setPodcastUrl("/search?type=xml");
-      newCatalog.addSource(searchSource);
+      final String searchId = root.getId() + "/search";
+      SubCategory searchSource = new SubCategory(root.getId(), searchId, "Search", "Search", "", "", root.getId());
+      searchSource.setPodcastUrl("/category?id="+searchId+";type=xml");
+      newCatalog.addSubCategory(searchSource);
       root.addSubCategory(searchSource);
+
+      final String sourcesId = root.getId() + "/sources";
+      SubCategory sourcesSource = new SubCategory(root.getId(), sourcesId, "Sources", "Sources", "", "", root.getId());
+      sourcesSource.setPodcastUrl("/category?id="+sourcesId+";type=xml");
+      newCatalog.addSubCategory(sourcesSource);
+      root.addSubCategory(sourcesSource);
 
       for (final Plugin plugin : pluginManager.getPlugins()) {
 
-        if (context.skipPlugin(plugin.getSource().getId())) {
+        final Source sourceCat = plugin.getSource();
+
+        if (context.skipPlugin(sourceCat.getId())) {
           continue;
         }
 
         checkForStop();
 
-        final Source sourceCat = plugin.getSource();
+        sourcesSource.addSubCategory(sourceCat);
+        sourceCat.setParentId(sourcesSource.getId());
+
         final String pluginName = sourceCat.getId();
 
         progressString.set("Doing " + pluginName + " listing programmes");
@@ -186,8 +198,7 @@ public class Cataloger {
 
         logger.info("Found source: " + sourceCat);
 
-        root.addSubCategory(sourceCat);
-        sourceCat.setParentId(root.getId());
+//        root.addSubCategory(sourceCat);
 
         sourceCat.setPodcastUrl("/category?id=" + sourceCat.getId() + ";type=xml");
 
@@ -248,9 +259,7 @@ public class Cataloger {
 
         checkForStop();
 
-        sourceCat.clearSubCategories();
-
-        additionalCategorisation(sourceCat, newProgrammes, specialCategories);
+        additionalCategorisation(root, sourceCat, newProgrammes, specialCategories);
 
         logger.info("Found " + newCatalog.getStatsSummary());
       }
@@ -286,7 +295,7 @@ public class Cataloger {
     }
   }
 
-  private void additionalCategorisation(Source sourceCat, ConcurrentHashMap<String, Programme> newProgrammes, Map<String, List<String>> specialCategories) {
+  private void additionalCategorisation(Root root, Source sourceCat, ConcurrentHashMap<String, Programme> newProgrammes, Map<String, List<String>> specialCategories) {
 
     logger.info("Doing " + sourceCat.getId() + " additional categorisation");
 
@@ -296,10 +305,10 @@ public class Cataloger {
 
       checkForStop();
       logger.info("Categorising " + programmeCat);
-      doAtoZcategorisation(sourceCat, programmeCat, newCatalog);
+      doAtoZcategorisation(root, programmeCat, newCatalog);
 
       // Favourite
-      doFavouriteCategorisation(sourceCat, programmeCat, newCatalog);
+      doFavouriteCategorisation(root, programmeCat, newCatalog);
 
       for (String episodeId : programmeCat.getEpisodes()) {
         Episode episode = newCatalog.getEpisode(episodeId);
@@ -309,23 +318,23 @@ public class Cataloger {
 
         // Special
         for (Map.Entry<String, List<String>> entry : specialCategories.entrySet()) {
-          doSpecialCategorisation(sourceCat, programmeCat, episode, entry.getKey(), entry.getValue(), newCatalog);
+          doSpecialCategorisation(root, programmeCat, episode, entry.getKey(), entry.getValue(), newCatalog);
         }
 
         // Genre
-        doGenreCategorisation(sourceCat, programmeCat, episode, newCatalog);
+        doGenreCategorisation(root, programmeCat, episode, newCatalog);
 
         // Channel
-        doChannelCategorisation(sourceCat, programmeCat, episode, newCatalog);
+        doChannelCategorisation(root, programmeCat, episode, newCatalog);
 
         // Air Date
-        doAirDateCategorisation(sourceCat, programmeCat, episode, newCatalog);
+        doAirDateCategorisation(root, programmeCat, episode, newCatalog);
 
         // New
-        doNewProgrammeCategorisation(sourceCat, programmeCat, episode, newCatalog);
+        doNewProgrammeCategorisation(root, programmeCat, episode, newCatalog);
 
         // Air Date
-        doLastChanceCategorisation(sourceCat, programmeCat, episode, newCatalog);
+        doLastChanceCategorisation(root, programmeCat, episode, newCatalog);
 
       }
     }
@@ -375,6 +384,7 @@ public class Cataloger {
               existingProg.addError("WARNING", "Programme has a duplicate - merging episodes");
             } else {
               newCatalog.addProgramme(programme);
+              sourceCat.addSubCategory(programme);
               return programme;
             }
         } else {
@@ -459,18 +469,16 @@ public class Cataloger {
     }
   }
 
-  private void doFavouriteCategorisation(Source sourceCat, Programme programmeCat, Catalog catalog) {
+  private void doFavouriteCategorisation(Root root, Programme programmeCat, Catalog catalog) {
 
-    String sourceId = sourceCat.getId();
-    String favouriteId = sourceId + "/Favourite";
+    String rootId = root.getId();
+    String favouriteId = rootId + "/Favourite";
     SubCategory favouriteCat = catalog.getSubcategory(favouriteId);
     if (favouriteCat == null) {
-      favouriteCat =
-              new SubCategory(sourceId, favouriteId, "Favourites", "Favourites", sourceCat.getServiceUrl(),
-                      null, sourceId);
+      favouriteCat = new SubCategory(rootId, favouriteId, "Favourites", "Favourites", root.getServiceUrl(), null, rootId);
       favouriteCat.setPodcastUrl("/category?id=" + favouriteId + ";type=xml");
       catalog.addSubCategory(favouriteCat);
-      sourceCat.addSubCategory(favouriteCat);
+      catalog.getRoot().addSubCategory(favouriteCat);
     }
 
     String shortName = programmeCat.getShortName();
@@ -480,7 +488,7 @@ public class Cataloger {
     }
   }
 
-  private void doNewProgrammeCategorisation(Source sourceCat, Programme programmeCat, Episode episode, Catalog catalog) {
+  private void doNewProgrammeCategorisation(Root root, Programme programmeCat, Episode episode, Catalog catalog) {
 
     String airDateName = episode.getAdditionDate();
     if (airDateName == null || airDateName.isEmpty()) {
@@ -506,20 +514,18 @@ public class Cataloger {
 
     if (diff < MILLIS_IN_A_DAY*2) {
 
-      String sourceId = sourceCat.getId();
-      String favouriteId = sourceId + "/New";
+      String rootId = root.getId();
+      String favouriteId = rootId + "/New";
       SubCategory favouriteCat = catalog.getSubcategory(favouriteId);
       if (favouriteCat == null) {
-        favouriteCat =
-                new SubCategory(sourceId, favouriteId, "New", "New", sourceCat.getServiceUrl(),
-                        null, sourceId);
+        favouriteCat = new SubCategory(rootId, favouriteId, "New", "New", root.getServiceUrl(), null, rootId);
         favouriteCat.setPodcastUrl("/category?id=" + favouriteId + ";type=xml");
         catalog.addSubCategory(favouriteCat);
-        sourceCat.addSubCategory(favouriteCat);
+        catalog.getRoot().addSubCategory(favouriteCat);
       }
 
       String id = programmeCat.getId();
-        SubCategory newProgrammeCat = addNewProgrammeCat("/New/", programmeCat, catalog, sourceId, favouriteId, favouriteCat, id);
+        SubCategory newProgrammeCat = addNewProgrammeCat("/New/", programmeCat, catalog, rootId, favouriteId, favouriteCat, id);
         newProgrammeCat.addEpisode(episode);
     }
   }
@@ -540,7 +546,7 @@ public class Cataloger {
     return newProgCat;
   }
 
-  private void doAirDateCategorisation(Source sourceCat, Programme programmeCat, Episode episode, Catalog catalog) {
+  private void doAirDateCategorisation(Root root, Programme programmeCat, Episode episode, Catalog catalog) {
     String airDateName = episode.getAirDate();
     if (airDateName == null || airDateName.isEmpty()) {
       return;
@@ -559,37 +565,35 @@ public class Cataloger {
 
     airDateName = getRelativeTime(date);
 
-    String sourceId = sourceCat.getId();
-    String airdateId = sourceId + "/AirDate";
+    String rootId = root.getId();
+    String airdateId = rootId + "/AirDate";
     SubCategory airdateCat = catalog.getSubcategory(airdateId);
     if (airdateCat == null) {
-      airdateCat =
-              new SubCategory(sourceId, airdateId, "Air Date", "Air Date", sourceCat.getServiceUrl(),
-                      null, sourceId);
+      airdateCat = new SubCategory(rootId, airdateId, "Air Date", "Air Date", root.getServiceUrl(), null, rootId);
       airdateCat.setPodcastUrl("/category?id=" + airdateId + ";type=xml");
       catalog.addSubCategory(airdateCat);
-      sourceCat.addSubCategory(airdateCat);
+      catalog.getRoot().addSubCategory(airdateCat);
     }
     String
             airDateInstanceId =
-            sourceId + "/AirDate/" + airDateName.replace(" ", "").replace(",", "");
+            rootId + "/AirDate/" + airDateName.replace(" ", "").replace(",", "");
     SubCategory airDateInstanceCat =  catalog.getSubcategory(airDateInstanceId);
     if (airDateInstanceCat == null) {
       airDateInstanceCat =
-              new SubCategory(sourceId, airDateInstanceId, airDateName, airDateName, sourceCat.getServiceUrl(),
+              new SubCategory(rootId, airDateInstanceId, airDateName, airDateName, root.getServiceUrl(),
                       null, airdateCat.getId());
       airDateInstanceCat.setPodcastUrl("/category?id=" + airDateInstanceId + ";type=xml");
       catalog.addSubCategory(airDateInstanceCat);
       airdateCat.addSubCategory(airDateInstanceCat);
     }
 
-    SubCategory newProgrammeCat = addNewProgrammeCat("/AirDate/" + airDateName.replace(" ", "").replace(",", "") + "/", programmeCat, catalog, sourceId, airDateInstanceId, airDateInstanceCat, programmeCat.getId());
+    SubCategory newProgrammeCat = addNewProgrammeCat("/AirDate/" + airDateName.replace(" ", "").replace(",", "") + "/", programmeCat, catalog, rootId, airDateInstanceId, airDateInstanceCat, programmeCat.getId());
     newProgrammeCat.addEpisode(episode);
 
     airDateInstanceCat.addSubCategory(newProgrammeCat);
   }
 
-  private void doLastChanceCategorisation(Source sourceCat, Programme programmeCat, Episode episode, Catalog catalog) {
+  private void doLastChanceCategorisation(Root root, Programme programmeCat, Episode episode, Catalog catalog) {
     String airDateName = episode.getRemovalDate();
     if (airDateName == null || airDateName.isEmpty()) {
       return;
@@ -611,20 +615,18 @@ public class Cataloger {
 
     if (diff < MILLIS_IN_A_DAY*2) {
 
-      String sourceId = sourceCat.getId();
-      String favouriteId = sourceId + "/LastChance";
+      String rootId = root.getId();
+      String favouriteId = rootId + "/LastChance";
       SubCategory favouriteCat = catalog.getSubcategory(favouriteId);
       if (favouriteCat == null) {
-        favouriteCat =
-                new SubCategory(sourceId, favouriteId, "Last Chance", "Last Chance", sourceCat.getServiceUrl(),
-                        null, sourceId);
+        favouriteCat = new SubCategory(rootId, favouriteId, "Last Chance", "Last Chance", root.getServiceUrl(), null, rootId);
         favouriteCat.setPodcastUrl("/category?id=" + favouriteId + ";type=xml");
         catalog.addSubCategory(favouriteCat);
-        sourceCat.addSubCategory(favouriteCat);
+        catalog.getRoot().addSubCategory(favouriteCat);
       }
 
       String id = programmeCat.getId();
-      SubCategory newProgrammeCat = addNewProgrammeCat("/LastChance/", programmeCat, catalog, sourceId, favouriteId, favouriteCat, id);
+      SubCategory newProgrammeCat = addNewProgrammeCat("/LastChance/", programmeCat, catalog, rootId, favouriteId, favouriteCat, id);
       newProgrammeCat.addEpisode(episode);
     }
   }
@@ -765,27 +767,23 @@ public class Cataloger {
     return year;
   }
 
-  private void doChannelCategorisation(Source sourceCat, Programme programmeCat, Episode prog, Catalog catalog) {
+  private void doChannelCategorisation(Root root, Programme programmeCat, Episode prog, Catalog catalog) {
     String channelName = prog.getChannel();
     if (channelName != null && !channelName.isEmpty()) {
 
-      String sourceId = sourceCat.getId();
-      String channelId = sourceId + "/Channel";
+      String rootId = root.getId();
+      String channelId = rootId + "/Channel";
       SubCategory channelCat = catalog.getSubcategory(channelId);
       if (channelCat == null) {
-        channelCat =
-                new SubCategory(sourceId, channelId, "Channel", "Channel", sourceCat.getServiceUrl(),
-                        null, sourceId);
+        channelCat = new SubCategory(rootId, channelId, "Channel", "Channel", root.getServiceUrl(), null, rootId);
         channelCat.setPodcastUrl("/category?id=" + channelCat.getId() + ";type=xml");
         catalog.addSubCategory(channelCat);
-        sourceCat.addSubCategory(channelCat);
+        catalog.getRoot().addSubCategory(channelCat);
       }
-      String channelInstanceId = sourceId + "/Channel/" + channelName.replace(" ", "");
+      String channelInstanceId = rootId + "/Channel/" + channelName.replace(" ", "");
       SubCategory channelInstanceCat = catalog.getSubcategory(channelInstanceId);
       if (channelInstanceCat == null) {
-        channelInstanceCat =
-                new SubCategory(sourceId, channelInstanceId, channelName, channelName, sourceCat.getServiceUrl(),
-                        null, channelCat.getId());
+        channelInstanceCat = new SubCategory(rootId, channelInstanceId, channelName, channelName, root.getServiceUrl(), null, channelCat.getId());
         channelInstanceCat.setPodcastUrl("/category?id=" + channelInstanceCat.getId() + ";type=xml");
         catalog.addSubCategory(channelInstanceCat);
         channelCat.addSubCategory(channelInstanceCat);
@@ -796,7 +794,7 @@ public class Cataloger {
     }
   }
 
-  private void doSpecialCategorisation(Source sourceCat, Programme programmeCat, Episode episode, String categoryName, List<String> urls, Catalog catalog) {
+  private void doSpecialCategorisation(Root root, Programme programmeCat, Episode episode, String categoryName, List<String> urls, Catalog catalog) {
     if (!urls.contains(episode.getServiceUrl())) {
       boolean found = false;
       for (String meta : episode.getMetaUrls()) {
@@ -807,48 +805,44 @@ public class Cataloger {
       }
     }
 
-    String sourceId = sourceCat.getId();
+    String rootId = root.getId();
     final String insert = htmlUtils.makeIdSafe(categoryName);
-    String categoryId = sourceId + "/" + insert;
+    String categoryId = rootId + "/" + insert;
 
     SubCategory airdateCat = catalog.getSubcategory(categoryId);
     if (airdateCat == null) {
-      airdateCat =
-              new SubCategory(sourceId, categoryId, categoryName, categoryName, sourceCat.getServiceUrl(),
-                      null, sourceId);
+      airdateCat = new SubCategory(rootId, categoryId, categoryName, categoryName, root.getServiceUrl(), null, rootId);
       airdateCat.setPodcastUrl("/category?id=" +categoryId + ";type=xml");
       catalog.addSubCategory(airdateCat);
-      sourceCat.addSubCategory(airdateCat);
+      catalog.getRoot().addSubCategory(airdateCat);
     }
 
-    SubCategory newProgrammeCat = addNewProgrammeCat("/"+insert+"/", programmeCat, catalog, sourceId, categoryId, airdateCat, programmeCat.getId());
+    SubCategory newProgrammeCat = addNewProgrammeCat("/"+insert+"/", programmeCat, catalog, rootId, categoryId, airdateCat, programmeCat.getId());
     newProgrammeCat.addEpisode(episode);
 
     airdateCat.addSubCategory(newProgrammeCat);
 
   }
 
-  private void doGenreCategorisation(Source sourceCat, Programme programmeCat, Episode prog, Catalog catalog) {
+  private void doGenreCategorisation(Root root, Programme programmeCat, Episode prog, Catalog catalog) {
     Set<String> genres = prog.getGenres();
     if (genres != null && !genres.isEmpty()) {
       for (String genreName : genres) {
-        String sourceId = sourceCat.getId();
-        String genreId = sourceId + "/Genre";
+        String rootId = root.getId();
+        String genreId = rootId + "/Genre";
         SubCategory genreCat = catalog.getSubcategory(genreId);
         if (genreCat == null) {
-          genreCat =
-                  new SubCategory(sourceId, genreId, "Genre", "Genre", sourceCat.getServiceUrl(),
-                          null, sourceId);
+          genreCat = new SubCategory(rootId, genreId, "Genre", "Genre", root.getServiceUrl(), null, rootId);
           genreCat.setPodcastUrl("/category?id=" + genreCat.getId() + ";type=xml");
 
           catalog.addSubCategory(genreCat);
-          sourceCat.addSubCategory(genreCat);
+          catalog.getRoot().addSubCategory(genreCat);
         }
-        String genreInstanceId = sourceId + "/Genre/" + genreName.replace(" ", "");
+        String genreInstanceId = rootId + "/Genre/" + htmlUtils.makeIdSafe(genreName);
         SubCategory genreInstanceCat = catalog.getSubcategory(genreInstanceId);
         if (genreInstanceCat == null) {
           genreInstanceCat =
-                  new SubCategory(sourceId, genreInstanceId, genreName, genreName, sourceCat.getServiceUrl(),
+                  new SubCategory(rootId, genreInstanceId, genreName, genreName, root.getServiceUrl(),
                           null, genreCat.getId());
           catalog.addSubCategory(genreInstanceCat);
           genreInstanceCat.setPodcastUrl("/category?id=" + genreInstanceCat.getId() + ";type=xml");
@@ -860,7 +854,7 @@ public class Cataloger {
     }
   }
 
-  private void doAtoZcategorisation(Source sourceCat, Programme programmeCat, Catalog catalog) {
+  private void doAtoZcategorisation(Root root, Programme programmeCat, Catalog catalog) {
     // A to Z
     String azName = programmeCat.getShortName();
     if (azName.startsWith("The ") || azName.startsWith("the ")) {
@@ -874,23 +868,19 @@ public class Cataloger {
 
     azName = azName.substring(0, 1).toUpperCase();
 
-    String sourceId = sourceCat.getId();
-    String atozId = sourceId + "/AtoZ";
+    String rootId = root.getId();
+    String atozId = rootId + "/AtoZ";
     SubCategory atozCat = catalog.getSubcategory(atozId);
     if (atozCat == null) {
-      atozCat =
-              new SubCategory(sourceId, atozId, "A to Z", "A to Z", sourceCat.getServiceUrl(),
-                      null, sourceId);
+      atozCat = new SubCategory(rootId, atozId, "A to Z", "A to Z", root.getServiceUrl(), null, rootId);
       atozCat.setPodcastUrl("/category?id=" + atozCat.getId() + ";type=xml");
       catalog.addSubCategory(atozCat);
-      sourceCat.addSubCategory(atozCat);
+      catalog.getRoot().addSubCategory(atozCat);
     }
-    String azId = sourceId + "/AtoZ/" + azName;
+    String azId = rootId + "/AtoZ/" + azName;
     SubCategory azCat = catalog.getSubcategory(azId);
     if (azCat == null) {
-      azCat =
-              new SubCategory(sourceId, azId, azName, azName, sourceCat.getServiceUrl(), null,
-                      atozCat.getId());
+      azCat = new SubCategory(rootId, azId, azName, azName, root.getServiceUrl(), null, atozCat.getId());
       azCat.setPodcastUrl("/category?id=" + azCat.getId() + ";type=xml");
       catalog.addSubCategory(azCat);
       atozCat.addSubCategory(azCat);

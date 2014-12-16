@@ -150,20 +150,23 @@ public class SageTvPublisher implements CatalogPublisher {
           Root root = catalog.getRoot();
           addSource(root, links, labels);
 
-          for (Source category : catalog.getSources()) {
-            if (context.getShowRoot(category.getId())) {
+          for (String categoryId : root.getSubCategories()) {
+//            if (context.getShowRoot(category.getId())) {
+            SubCategory category = catalog.getSubcategory(categoryId);
+            if (category != null) {
               logger.info("Online adding source " + category.getId());
-              boolean isSearch = category.getId().equals("search");
+              boolean isSearch = category.getId().endsWith("/search");
               addDynamicSource(category, links, labels, isSearch);
-            } else {
-              for (String subCatId : category.getSubCategories()) {
-                Category subCat = catalog.getCategory(subCatId);
-                if (subCat != null) {
-                  logger.info("Online adding source " + subCat.getId());
-                  addDynamicSubcategory(category, subCat, links, labels);
-                }
-              }
             }
+//            } else {
+//              for (String subCatId : category.getSubCategories()) {
+//                Category subCat = catalog.getCategory(subCatId);
+//                if (subCat != null) {
+//                  logger.info("Online adding source " + subCat.getId());
+//                  addDynamicSubcategory(category, subCat, links, labels);
+//                }
+//              }
+//            }
           }
 
             links.commit(linkFile, new LinksPropertyLayout());
@@ -185,7 +188,7 @@ public class SageTvPublisher implements CatalogPublisher {
 
     }
 
-    private void addDynamicSource(Source programme, PropertiesFile links, PropertiesFile labels, boolean isSearch) {
+    private void addDynamicSource(SubCategory programme, PropertiesFile links, PropertiesFile labels, boolean isSearch) {
         String id = programme.getId();
         String parentId = programme.getParentId();
         String name = programme.getShortName();

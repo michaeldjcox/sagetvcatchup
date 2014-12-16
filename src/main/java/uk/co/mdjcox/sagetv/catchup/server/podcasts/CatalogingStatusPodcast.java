@@ -20,7 +20,7 @@ public class CatalogingStatusPodcast extends AbstractPodcast {
         String desc = "Recording status";
 
         String errorsUrl = getPodcastBaseUrl() + "/errors?type=xml";
-        String statusUrl = getPodcastBaseUrl() + "/category?id=status;type=xml";
+        String statusUrl = getPodcastBaseUrl() + "/category?id=Catchup/status;type=xml";
         String catstatusUrl = getPodcastBaseUrl() + "/" + getUri();
         String startCatUrl = getPodcastBaseUrl() + "/startcat?type=xml";
         String stopCatUrl = getPodcastBaseUrl() + "/stopcat?type=xml";

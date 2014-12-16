@@ -21,7 +21,7 @@ public class RecordingStatusPodcast extends AbstractPodcast {
 
         String recordingsUrl = getPodcastBaseUrl() + "/recordings?type=xml";
         String recordingsDoneUrl = getPodcastBaseUrl() + "/recordingsdone?type=xml";
-        String statusUrl = getPodcastBaseUrl() + "/category?id=status;type=xml";
+        String statusUrl = getPodcastBaseUrl() + "/category?id=Catchup/status;type=xml";
         String recerrorsUrl = getPodcastBaseUrl() + "/recerrors?type=xml";
         String recstatusUrl = getPodcastBaseUrl() + "/" + getUri();
         String stopUrl = getPodcastBaseUrl() + "/stopall?type=xml";

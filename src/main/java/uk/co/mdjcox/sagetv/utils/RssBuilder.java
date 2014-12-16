@@ -113,7 +113,7 @@ public class RssBuilder {
         resultStr.append(message);
         resultStr.append("]]></media:description>");
         resultStr.append(CRLF);
-      if (!iconUrl.isEmpty()) {
+      if (iconUrl != null && !iconUrl.isEmpty()) {
         resultStr.append("<media:thumbnail url=\"");
         resultStr.append(iconUrl);
         resultStr.append("\"/>");

@@ -200,16 +200,16 @@ public class SageTvPublisherTest {
     TreeMap<Object,Object> labelProps = new  TreeMap<Object,Object>(new LabelsPropertyLayout().getComparator(labelPropsFile));
     labelProps.putAll(labelPropsFile);
 
-    assertEquals("Link property count", 2, linkProps.size());
-    assertEquals("Label property count", 8, labelProps.size());
+    assertEquals("Link property count", 1, linkProps.size());
+    assertEquals("Label property count", 2, labelProps.size());
 
     Iterator<Map.Entry<Object, Object>> itr = linkProps.entrySet().iterator();
     Map.Entry<Object, Object> next = itr.next();
     assertEquals("Property 1 key","CustomSources",next.getKey());
     assertEquals("Property 1 val","xPodcastRootId",next.getValue());
-    next = itr.next();
-    assertEquals("Property 2 key","xFeedPodcastCustom/sourceId",next.getKey());
-    assertEquals("Property 2 val","xPodcastRootId;podcastUrl",next.getValue());
+//    next = itr.next();
+//    assertEquals("Property 2 key","xFeedPodcastCustom/sourceId",next.getKey());
+//    assertEquals("Property 2 val","xPodcastRootId;podcastUrl",next.getValue());
 //    next = itr.next();
 //    assertEquals("Property 3 key","subcatId/IsCategory",next.getKey());
 //    assertEquals("Property 3 val","true",next.getValue());

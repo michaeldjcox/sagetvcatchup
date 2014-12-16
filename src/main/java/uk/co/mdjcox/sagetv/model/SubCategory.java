@@ -56,7 +56,7 @@ public class SubCategory extends Category {
    *
    * @param subCategory The child subcategory to add
    */
-  public final void addSubCategory(Category subCategory) {
+  public void addSubCategory(Category subCategory) {
     subCategories.add(subCategory.getId());
   }
 

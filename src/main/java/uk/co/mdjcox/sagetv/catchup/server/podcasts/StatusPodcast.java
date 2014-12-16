@@ -20,7 +20,7 @@ public class StatusPodcast extends AbstractPodcast {
 
     @Override
     public String getUri() {
-        return "category?id=status;type=xml";
+        return "category?id=Catchup/status;type=xml";
     }
 
     @Override
@@ -33,7 +33,7 @@ public class StatusPodcast extends AbstractPodcast {
         String recordingsUrl = getPodcastBaseUrl() + "/recstatus?type=xml";
         String catalogingUrl = getPodcastBaseUrl() + "/catstatus?type=xml";
 
-        String statusUrl = getPodcastBaseUrl() + "/category?id=status;type=xml";
+        String statusUrl = getPodcastBaseUrl() + "/category?id=Catchup/status;type=xml";
         String title = "Control";
         String desc = "Catchup TV status and controls";
 

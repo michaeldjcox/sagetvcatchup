@@ -21,7 +21,7 @@
         <serviceUrl></serviceUrl>
         <iconUrl></iconUrl>
         <parentId>Catchup</parentId>
-        <podcastUrl>/category?id=status;type=xml</podcastUrl>
+        <podcastUrl>/category?id=Catchup/status;type=xml</podcastUrl>
         <type>Source</type>
     </source>
     <source>
@@ -50,7 +50,7 @@
         <serviceUrl></serviceUrl>
         <iconUrl></iconUrl>
         <parentId>Catchup</parentId>
-        <podcastUrl>/search?type=xml</podcastUrl>
+        <podcastUrl>/category?id=Catchup/search;type=xml</podcastUrl>
         <type>Source</type>
     </source>
     <subcategory>
