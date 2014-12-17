@@ -7,14 +7,17 @@
       - Online Services menu. Add recording progress to stop button on episode control menu
       - Online Services menu. Add "Last chance" category for soon to be removed episodes
       - Online Services menu. Add "Most popular" category based on BBC web site
-      - Online Services menu. Rework "New" category to be best on availability dates.
-      - Online Services menu. Remove Iplayer root so main categories appear at top level
+      - Online Services menu. Rework "New" category to be based on availability dates.
+      - Online Services menu. Only one "Air date", "New", "Favourite" etc category for all sources
+      - Online Services menu. Move "Air date", "New", "Favourite" etc to the top level
+      - Online Services menu. Add "Sources" categories below which IPlayer and Test go
       - Web Page: Fix issue where podcasts cannot be navigated from remote machine
       - Web Page: Duration, last air date, available and removal dates added to episode views.
       - Cataloging: extract duration and last air date from iplayer meta data
       - Cataloging: extract available and removal dates from iplayer meta data
       - Cataloging: reduce air date categories with larger time periods for much older content
       - Cataloging: Fix issue of some catalog errors accumulating across catalog runs
+      - Cataloging: Only one "Air date", "New", "Favourite" etc category for all sources
       - Recording: add channel, duration, and last air date to SageTV airing meta data
       - Recording: download the episode fanart to the recording directory.
       - Recording: fix episode title so it has the SageTVs title - SeasonNr - EpisodeNr format

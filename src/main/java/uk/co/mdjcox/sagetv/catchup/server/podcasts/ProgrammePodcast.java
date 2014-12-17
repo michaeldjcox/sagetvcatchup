@@ -82,14 +82,9 @@ public class ProgrammePodcast extends OnDemandPodcast {
           descBuilder.append(episode.getDescription());
           descBuilder.append("<br/>");
 
-// TODO forget this for now
-//          if (!episode.getSeriesTitle().isEmpty()) {
-//            descBuilder.append(episode.getSeriesTitle());
-//          }
-
           final String controlUrl=getPodcastBaseUrl() +  "/control?id=" + episode.getId() + ";type=xml";
 
-          // TODO takes too much space
+//          Episode icon - takes too much space
 //          String episodeIconUrl = episode.getIconUrl();
 //          if (episodeIconUrl != null && episodeIconUrl.startsWith("/")) {
 //            episodeIconUrl = getPodcastBaseUrl() + episodeIconUrl;
