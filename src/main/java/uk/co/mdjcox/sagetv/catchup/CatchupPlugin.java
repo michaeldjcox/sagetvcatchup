@@ -858,13 +858,47 @@ public class CatchupPlugin implements SageTVPlugin {
 
   @Override
   public void resetConfig() {
+
+    sageUtils.info("Reset - stopping catchup server");
+
+    stopCatchupServer();
+
+    File backupFile = new File(backupFileName);
+    if (backupFile.exists()) {
+      sageUtils.info("Reset - deleting " + backupFileName);
+      backupFile.delete();
+    }
+    File runFile = new File(propFileName);
+    if (runFile.exists()) {
+      sageUtils.info("Reset - deleting " + propFileName);
+      runFile.delete();
+    }
+
+    File catalog = new File(tmpDir + File.separator + "sagetvcatchup.xml");
+    if (catalog.exists()) {
+      sageUtils.info("Reset - deleting catalog");
+      catalog.delete();
+    }
+
+    sageUtils.info("Reset - deleting other backup files");
+    osUtils.deleteFileOrDir(new File(tmpDir), false);
+
     try {
-      sageUtils.info("Resetting config of catchup plugin");
+      sageUtils.info("Reset - properties");
+      initProperties();
+    } catch (Exception e) {
+      sageUtils.error("Failed to reset properties of catchup plugin", e);
+    }
+
+    try {
+      sageUtils.info("Reset - config ");
       initConfig();
-      sageUtils.info("Done reseting config of catchup plugin");
     } catch (Throwable e) {
       sageUtils.error("Failed to reset config of catchup plugin", e);
     }
+
+    sageUtils.info("Reset - starting catchup server");
+    startCatchupServer();
   }
 
   @Override
