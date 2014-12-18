@@ -30,27 +30,22 @@ public class CatchupPropertiesFileLayout extends OrderedPropertiesFileLayout {
     ORDER.add("Iplayer.skip");
     ORDER.add("Iplayer.programmes");
     ORDER.add("Iplayer.maxprogrammes");
-    ORDER.add("Iplayer.showRoot");
     ORDER.add("Iplayer.command");
     ORDER.add("Channel4OD.skip");
     ORDER.add("Channel4OD.programmes");
     ORDER.add("Channel4OD.maxprogrammes");
-    ORDER.add("Channel4OD.showRoot");
     ORDER.add("Channel4OD.command");
     ORDER.add("Demand5.skip");
     ORDER.add("Demand5.programmes");
     ORDER.add("Demand5.maxprogrammes");
-    ORDER.add("Demand5.showRoot");
     ORDER.add("Demand5.command");
     ORDER.add("ITVPlayer.skip");
     ORDER.add("ITVPlayer.programmes");
     ORDER.add("ITVPlayer.maxprogrammes");
-    ORDER.add("ITVPlayer.showRoot");
     ORDER.add("ITVPlayer.command");
     ORDER.add("Test.skip");
     ORDER.add("Test.programmes");
     ORDER.add("Test.maxprogrammes");
-    ORDER.add("Test.showRoot");
     ORDER.add("Test.command");
 
   }

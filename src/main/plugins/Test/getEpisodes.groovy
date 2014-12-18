@@ -5,7 +5,7 @@ import uk.co.mdjcox.sagetv.model.Episode
 String link = "/episode?id=testEpisode;type=html"
 
     Episode subCat = new Episode(
-            source.getId(),
+            source.getSourceId(),
             "", // id
             category.getShortName(), //programmeTitle
             "", //seriesTitle

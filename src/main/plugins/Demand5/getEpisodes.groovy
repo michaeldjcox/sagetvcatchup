@@ -33,7 +33,7 @@ while (str != null) {
     }
         link = MAKE_LINK_ABSOLUTE("http://www.channel5.com", link);
     Episode subCat = new Episode(
-            source.getId(),
+            source.getSourceId(),
             "", // id
             category.getShortName(), //programmeTitle
             "", //seriesTitle

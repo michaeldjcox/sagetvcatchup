@@ -166,13 +166,6 @@ public void after() throws Exception {
     Source category = new Source("rootId", "id", "shortName", "longName", "serviceUrl", "iconUrl");
     category.setIconUrl("iconUrl2");
     assertEquals("setIconUrl", "iconUrl2", category.getIconUrl());
-    try {
-      category.setIconUrl(null);
-    } catch (NullPointerException e) {
-      return;
-    }
-
-    fail("Should have thrown NullPointerException");
   }
 
   /**

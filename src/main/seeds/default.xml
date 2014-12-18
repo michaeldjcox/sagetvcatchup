@@ -5,199 +5,192 @@
         <shortName>Catchup TV</shortName>
         <longName>Catchup TV</longName>
         <serviceUrl>/</serviceUrl>
-        <iconUrl>/logo.png</iconUrl>
+        <iconUrl>/image?id=Catchup</iconUrl>
         <parentId></parentId>
         <podcastUrl></podcastUrl>
         <type>Root</type>
-        <subCategory>status</subCategory>
-        <subCategory>search</subCategory>
-        <subCategory>Test</subCategory>
+        <subCategory>Catchup/Status</subCategory>
+        <subCategory>Catchup/Search</subCategory>
+        <subCategory>Catchup/Sources</subCategory>
+        <subCategory>Catchup/AtoZ</subCategory>
+        <subCategory>Catchup/Favourite</subCategory>
+        <subCategory>Catchup/Genre</subCategory>
+        <subCategory>Catchup/Channel</subCategory>
+        <subCategory>Catchup/AirDate</subCategory>
     </root>
     <source>
-        <sourceId>status</sourceId>
-        <id>status</id>
+        <sourceId>Test</sourceId>
+        <id>Catchup/Sources/Test</id>
+        <shortName>Test</shortName>
+        <longName>Test</longName>
+        <serviceUrl>/category?id=test;type=html</serviceUrl>
+        <iconUrl>/image?id=Catchup/Sources/Test</iconUrl>
+        <parentId>Catchup/Sources</parentId>
+        <metaUrl>/category?id=test;type=html</metaUrl>
+        <podcastUrl>/category?id=Catchup/Sources/Test;type=xml</podcastUrl>
+        <type>Source</type>
+        <subCategory>testProgramme</subCategory>
+    </source>
+    <subcategory>
+        <sourceId>Catchup</sourceId>
+        <id>Catchup/Sources</id>
+        <shortName>Sources</shortName>
+        <longName>Sources</longName>
+        <serviceUrl></serviceUrl>
+        <iconUrl></iconUrl>
+        <parentId>Catchup</parentId>
+        <podcastUrl>/category?id=Catchup/Sources;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <subCategory>Catchup/Sources/Test</subCategory>
+    </subcategory>
+    <subcategory>
+        <sourceId>Catchup</sourceId>
+        <id>Catchup/AirDate</id>
+        <shortName>Air Date</shortName>
+        <longName>Air Date</longName>
+        <serviceUrl>/</serviceUrl>
+        <parentId>Catchup</parentId>
+        <podcastUrl>/category?id=Catchup/AirDate;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <subCategory>Catchup/AirDate/September</subCategory>
+    </subcategory>
+    <subcategory>
+        <sourceId>Catchup</sourceId>
+        <id>Catchup/Channel</id>
+        <shortName>Channel</shortName>
+        <longName>Channel</longName>
+        <serviceUrl>/</serviceUrl>
+        <parentId>Catchup</parentId>
+        <podcastUrl>/category?id=Catchup/Channel;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <subCategory>Catchup/Channel/Test</subCategory>
+    </subcategory>
+    <subcategory>
+        <sourceId>Catchup</sourceId>
+        <id>Catchup/AirDate/September</id>
+        <shortName>September</shortName>
+        <longName>September</longName>
+        <serviceUrl>/</serviceUrl>
+        <parentId>Catchup/AirDate</parentId>
+        <podcastUrl>/category?id=Catchup/AirDate/September;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <subCategory>Catchup/AirDate/September/testProgramme</subCategory>
+    </subcategory>
+    <subcategory>
+        <sourceId>Catchup</sourceId>
+        <id>Catchup/Genre/News</id>
+        <shortName>News</shortName>
+        <longName>News</longName>
+        <serviceUrl>/</serviceUrl>
+        <parentId>Catchup/Genre</parentId>
+        <podcastUrl>/category?id=Catchup/Genre/News;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <subCategory>testProgramme</subCategory>
+    </subcategory>
+    <subcategory>
+        <sourceId>Catchup</sourceId>
+        <id>Catchup/Favourite</id>
+        <shortName>Favourites</shortName>
+        <longName>Favourites</longName>
+        <serviceUrl>/</serviceUrl>
+        <parentId>Catchup</parentId>
+        <podcastUrl>/category?id=Catchup/Favourite;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <subCategory>testProgramme</subCategory>
+    </subcategory>
+    <subcategory>
+        <sourceId>Catchup</sourceId>
+        <id>Catchup/Channel/Test</id>
+        <shortName>Test</shortName>
+        <longName>Test</longName>
+        <serviceUrl>/</serviceUrl>
+        <iconUrl>/image?id=Catchup/Channel/Test</iconUrl>
+        <parentId>Catchup/Channel</parentId>
+        <podcastUrl>/category?id=Catchup/Channel/Test;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <subCategory>testProgramme</subCategory>
+    </subcategory>
+    <subcategory>
+        <sourceId>Catchup</sourceId>
+        <id>Catchup/Status</id>
         <shortName>Status</shortName>
         <longName>Status</longName>
         <serviceUrl></serviceUrl>
         <iconUrl></iconUrl>
         <parentId>Catchup</parentId>
-        <podcastUrl>/category?id=Catchup/status;type=xml</podcastUrl>
-        <type>Source</type>
-    </source>
-    <source>
-        <sourceId>Test</sourceId>
-        <id>Test</id>
-        <shortName>Test</shortName>
-        <longName>Test</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Catchup</parentId>
-        <metaUrl>/category?id=test;type=html</metaUrl>
-        <podcastUrl>/category?id=Test;type=xml</podcastUrl>
-        <type>Source</type>
-        <subCategory>Test/AtoZ</subCategory>
-        <subCategory>Test/Favourite</subCategory>
-        <subCategory>Test/Genre</subCategory>
-        <subCategory>Test/Channel</subCategory>
-        <subCategory>Test/AirDate</subCategory>
-        <subCategory>Test/New</subCategory>
-    </source>
-    <source>
-        <sourceId>search</sourceId>
-        <id>search</id>
+        <podcastUrl>/category?id=Catchup/Status;type=xml</podcastUrl>
+        <type>SubCategory</type>
+    </subcategory>
+    <subcategory>
+        <sourceId>Catchup</sourceId>
+        <id>Catchup/AtoZ/T</id>
+        <shortName>T</shortName>
+        <longName>T</longName>
+        <serviceUrl>/</serviceUrl>
+        <parentId>Catchup/AtoZ</parentId>
+        <podcastUrl>/category?id=Catchup/AtoZ/T;type=xml</podcastUrl>
+        <type>SubCategory</type>
+        <subCategory>testProgramme</subCategory>
+    </subcategory>
+    <subcategory>
+        <sourceId>Catchup</sourceId>
+        <id>Catchup/Search</id>
         <shortName>Search</shortName>
         <longName>Search</longName>
         <serviceUrl></serviceUrl>
         <iconUrl></iconUrl>
         <parentId>Catchup</parentId>
-        <podcastUrl>/category?id=Catchup/search;type=xml</podcastUrl>
-        <type>Source</type>
-    </source>
-    <subcategory>
-        <sourceId>Test</sourceId>
-        <id>Test/AirDate</id>
-        <shortName>Air Date</shortName>
-        <longName>Air Date</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Test</parentId>
-        <podcastUrl>/category?id=Test/AirDate;type=xml</podcastUrl>
-        <type>SubCategory</type>
-        <subCategory>Test/AirDate/01-09-2014</subCategory>
-    </subcategory>
-    <subcategory>
-        <sourceId>Test</sourceId>
-        <id>Test/New</id>
-        <shortName>New</shortName>
-        <longName>New</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Test</parentId>
-        <podcastUrl>/category?id=Test/New;type=xml</podcastUrl>
+        <podcastUrl>/category?id=Catchup/Search;type=xml</podcastUrl>
         <type>SubCategory</type>
     </subcategory>
     <subcategory>
-        <sourceId>Test</sourceId>
-        <id>Test/AirDate/01-09-2014</id>
-        <shortName>01-09-2014</shortName>
-        <longName>01-09-2014</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Test/AirDate</parentId>
-        <podcastUrl>/category?id=Test/AirDate/01-09-2014;type=xml</podcastUrl>
+        <sourceId>Catchup</sourceId>
+        <id>Catchup/Genre/Factual</id>
+        <shortName>Factual</shortName>
+        <longName>Factual</longName>
+        <serviceUrl>/</serviceUrl>
+        <parentId>Catchup/Genre</parentId>
+        <podcastUrl>/category?id=Catchup/Genre/Factual;type=xml</podcastUrl>
         <type>SubCategory</type>
-        <subCategory>Test/AirDate/01-09-2014/testProgramme</subCategory>
+        <subCategory>testProgramme</subCategory>
     </subcategory>
     <subcategory>
-        <sourceId>Test</sourceId>
-        <id>Test/AirDate/01-09-2014/testProgramme</id>
+        <sourceId>Catchup</sourceId>
+        <id>Catchup/AirDate/September/testProgramme</id>
         <shortName>Test Programme</shortName>
         <longName>Test Programme</longName>
-        <serviceUrl>/programme?id=Test/AirDate/01-09-2014/testProgramme;type=html</serviceUrl>
+        <serviceUrl>/programme?id=Catchup/AirDate/September/testProgramme;type=html</serviceUrl>
         <iconUrl>http://upload.wikimedia.org/wikipedia/en/0/02/The_Amazing_Spider-Man_theatrical_poster.jpeg</iconUrl>
-        <parentId>Test/AirDate/01-09-2014</parentId>
+        <parentId>Catchup/AirDate/September</parentId>
         <podcastUrl></podcastUrl>
         <type>SubCategory</type>
         <episode>TestEpisode</episode>
     </subcategory>
     <subcategory>
-        <sourceId>Test</sourceId>
-        <id>Test/Genre/News</id>
-        <shortName>News</shortName>
-        <longName>News</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Test/Genre</parentId>
-        <podcastUrl>/category?id=Test/Genre/News;type=xml</podcastUrl>
-        <type>SubCategory</type>
-        <subCategory>testProgramme</subCategory>
-    </subcategory>
-    <subcategory>
-        <sourceId>Test</sourceId>
-        <id>Test/Favourite</id>
-        <shortName>Favourites</shortName>
-        <longName>Favourites</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Test</parentId>
-        <podcastUrl>/category?id=Test/Favourite;type=xml</podcastUrl>
-        <type>SubCategory</type>
-    </subcategory>
-    <subcategory>
-        <sourceId>Test</sourceId>
-        <id>Test/Channel</id>
-        <shortName>Channel</shortName>
-        <longName>Channel</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Test</parentId>
-        <podcastUrl>/category?id=Test/Channel;type=xml</podcastUrl>
-        <type>SubCategory</type>
-        <subCategory>Test/Channel/Test</subCategory>
-    </subcategory>
-    <subcategory>
-        <sourceId>Test</sourceId>
-        <id>Test/Channel/Test</id>
-        <shortName>Test</shortName>
-        <longName>Test</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Test/Channel</parentId>
-        <podcastUrl>/category?id=Test/Channel/Test;type=xml</podcastUrl>
-        <type>SubCategory</type>
-        <subCategory>testProgramme</subCategory>
-    </subcategory>
-    <subcategory>
-        <sourceId>Test</sourceId>
-        <id>Test/Genre</id>
-        <shortName>Genre</shortName>
-        <longName>Genre</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Test</parentId>
-        <podcastUrl>/category?id=Test/Genre;type=xml</podcastUrl>
-        <type>SubCategory</type>
-        <subCategory>Test/Genre/Factual</subCategory>
-        <subCategory>Test/Genre/News</subCategory>
-    </subcategory>
-    <subcategory>
-        <sourceId>Test</sourceId>
-        <id>Test/AtoZ</id>
+        <sourceId>Catchup</sourceId>
+        <id>Catchup/AtoZ</id>
         <shortName>A to Z</shortName>
         <longName>A to Z</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Test</parentId>
-        <podcastUrl>/category?id=Test/AtoZ;type=xml</podcastUrl>
+        <serviceUrl>/</serviceUrl>
+        <parentId>Catchup</parentId>
+        <podcastUrl>/category?id=Catchup/AtoZ;type=xml</podcastUrl>
         <type>SubCategory</type>
-        <subCategory>Test/AtoZ/T</subCategory>
+        <subCategory>Catchup/AtoZ/T</subCategory>
     </subcategory>
     <subcategory>
-        <sourceId>Test</sourceId>
-        <id>Test/AtoZ/T</id>
-        <shortName>T</shortName>
-        <longName>T</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Test/AtoZ</parentId>
-        <podcastUrl>/category?id=Test/AtoZ/T;type=xml</podcastUrl>
+        <sourceId>Catchup</sourceId>
+        <id>Catchup/Genre</id>
+        <shortName>Genre</shortName>
+        <longName>Genre</longName>
+        <serviceUrl>/</serviceUrl>
+        <parentId>Catchup</parentId>
+        <podcastUrl>/category?id=Catchup/Genre;type=xml</podcastUrl>
         <type>SubCategory</type>
-        <subCategory>testProgramme</subCategory>
-    </subcategory>
-    <subcategory>
-        <sourceId>Test</sourceId>
-        <id>Test/Genre/Factual</id>
-        <shortName>Factual</shortName>
-        <longName>Factual</longName>
-        <serviceUrl>/category?id=test;type=html</serviceUrl>
-        <iconUrl></iconUrl>
-        <parentId>Test/Genre</parentId>
-        <podcastUrl>/category?id=Test/Genre/Factual;type=xml</podcastUrl>
-        <type>SubCategory</type>
-        <subCategory>testProgramme</subCategory>
+        <subCategory>Catchup/Genre/Factual</subCategory>
+        <subCategory>Catchup/Genre/News</subCategory>
     </subcategory>
     <programme>
-        <sourceId>Test</sourceId>
+        <sourceId>Catchup/Sources/Test</sourceId>
         <id>testProgramme</id>
         <shortName>Test Programme</shortName>
         <longName>Test Programme</longName>
@@ -207,14 +200,14 @@
         <metaUrl>/programme?id=testProgramme;type=html</metaUrl>
         <podcastUrl>/programme?id=testProgramme;type=xml</podcastUrl>
         <type>Programme</type>
-        <otherParentId>Test/AtoZ/T</otherParentId>
-        <otherParentId>Test/Genre/Factual</otherParentId>
-        <otherParentId>Test/Genre/News</otherParentId>
-        <otherParentId>Test/Channel/Test</otherParentId>
+        <otherParentId>Catchup/AtoZ/T</otherParentId>
+        <otherParentId>Catchup/Genre/Factual</otherParentId>
+        <otherParentId>Catchup/Genre/News</otherParentId>
+        <otherParentId>Catchup/Channel/Test</otherParentId>
         <episode>TestEpisode</episode>
     </programme>
     <episode>
-        <sourceId>Test</sourceId>
+        <sourceId>Catchup/Sources/Test</sourceId>
         <id>TestEpisode</id>
         <programmeTitle>Test Programme</programmeTitle>
         <seriesTitle>Test Series</seriesTitle>
@@ -223,16 +216,21 @@
         <series>1</series>
         <episode>1</episode>
         <description>Test Episode Description</description>
-        <iconUrl>http://upload.wikimedia.org/wikipedia/en/0/02/The_Amazing_Spider-Man_theatrical_poster.jpeg</iconUrl>
+        <iconUrl>http://ichef.bbci.co.uk/images/ic/272x153/p01l9hsm.jpg</iconUrl>
         <serviceUrl>/watch?id=TestEpisode;type=mpeg4</serviceUrl>
         <airDate>01-09-2014</airDate>
         <airTime>10:00:00</airTime>
         <origAirDate>01-10-2014</origAirDate>
         <origAirTime>12:00:00</origAirTime>
+        <additionDate></additionDate>
+        <additionTime></additionTime>
+        <removalDate></removalDate>
+        <removalTime></removalTime>
         <channel>Test</channel>
         <genre>Factual</genre>
         <genre>News</genre>
         <metaUrl>/episode?id=TestEpisode;type=html</metaUrl>
         <podcastUrl>/control?id=TestEpisode;type=xml</podcastUrl>
+        <duration>60</duration>
     </episode>
 </catalog>

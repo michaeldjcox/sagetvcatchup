@@ -274,14 +274,6 @@ public class CategoryTest {
         new MyCategory("sourceId", "id", "shortName", "longName", "serviceUrl", "iconUrl", "parentId");
     category.setIconUrl("iconUrl2");
     assertEquals("setIconUrl", "iconUrl2", category.getIconUrl());
-
-    try {
-      category.setIconUrl(null);
-    } catch (NullPointerException e) {
-      return;
-    }
-
-    fail("Should have thrown NullPointerException");
   }
 
   /**

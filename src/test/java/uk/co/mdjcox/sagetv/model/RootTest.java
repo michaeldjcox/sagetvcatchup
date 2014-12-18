@@ -165,13 +165,6 @@ public void after() throws Exception {
     Root category = new Root("rootId", "shortName", "longName", "serviceUrl", "iconUrl");
     category.setIconUrl("iconUrl2");
     assertEquals("setIconUrl", "iconUrl2", category.getIconUrl());
-    try {
-      category.setIconUrl(null);
-    } catch (NullPointerException e) {
-      return;
-    }
-
-    fail("Should have thrown NullPointerException");
   }
 
   /**

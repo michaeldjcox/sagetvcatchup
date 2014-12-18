@@ -6,17 +6,43 @@ import uk.co.mdjcox.sagetv.catchup.server.Server;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.util.StringTokenizer;
 
 /**
  * Created by michael on 07/10/14.
  */
 public class LogoImage implements ContentProvider {
-    @Override
+
+  private final String imagesDir;
+  private String id;
+  private String image;
+  private String type;
+
+  public LogoImage(String imagesDir, String imageFileName) {
+    this.imagesDir = imagesDir;
+    imageFileName = imageFileName.replace(File.separator, "/");
+    imageFileName = imageFileName.replace(imagesDir, "");
+    while (imageFileName.startsWith("/")) {
+      imageFileName = imageFileName.substring(1);
+    }
+    int lastSlash = imageFileName.lastIndexOf("/");
+    if (lastSlash >= 0) {
+      id = imageFileName.substring(0, lastSlash);
+    }
+    final int lastDot = imageFileName.lastIndexOf(".");
+    image = imageFileName.substring(lastSlash+1, lastDot);
+    type = imageFileName.substring(lastDot+1);
+    if (id == null) {
+      id = image;
+    } else {
+      id = id + "/" + image;
+    }
+  }
+
+  @Override
     public String getUri() {
-        return "logo.png";
+        return  "image?id=" + id;
     }
 
     @Override
@@ -31,7 +57,11 @@ public class LogoImage implements ContentProvider {
 
     @Override
     public String getType() {
-        return "image/png";
+      if (type.equals("jpg")) {
+        return "image/jpeg";
+      } else {
+        return "image/" + type;
+      }
     }
 
     @Override
@@ -57,15 +87,16 @@ public class LogoImage implements ContentProvider {
 
     @Override
     public void serve(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        final ClassLoader cl = Server.class.getClassLoader();
-        InputStream in = cl.getResourceAsStream("logo.png");
-        int fileSize = findResourceLength(in);
+        File imageFile = new File(imagesDir+ File.separator + id.replace("/", File.separator) + "." + type);
 
-        response.setContentType("image/png");
-        response.setCharacterEncoding("ISO-8859-1");
-        response.setContentLength((int) fileSize);
+        FileInputStream in = new FileInputStream(imageFile);
 
-        in = cl.getResourceAsStream("logo.png");
+      long fileSize = imageFile.length();
+
+      response.setContentType(getType());
+      response.setCharacterEncoding("ISO-8859-1");
+      response.setContentLength((int) fileSize);
+
 
         // Open the file and output streams
         OutputStream out = response.getOutputStream();

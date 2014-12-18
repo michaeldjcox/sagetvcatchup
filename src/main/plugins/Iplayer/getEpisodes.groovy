@@ -33,7 +33,7 @@ while (str != null) {
     }
     link = MAKE_LINK_ABSOLUTE("http://www.bbc.co.uk", link);
     Episode subCat = new Episode(
-            source.getId(),
+            source.getSourceId(),
             "", // id
             category.getShortName(), //programmeTitle
             "", //seriesTitle

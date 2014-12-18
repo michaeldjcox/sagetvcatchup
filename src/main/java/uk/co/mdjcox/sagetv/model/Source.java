@@ -32,7 +32,7 @@ public class Source extends SubCategory {
     }
 
   @Override
-  public void addSubCategory(Category subCategory) {
-    super.addSubCategory(subCategory);
+  public void setIconUrl(String iconUrl) {
+    super.setIconUrl(iconUrl);
   }
 }

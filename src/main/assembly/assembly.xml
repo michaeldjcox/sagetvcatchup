@@ -36,6 +36,10 @@
             <outputDirectory>sagetvcatchup/css</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>${basedir}/src/main/images</directory>
+            <outputDirectory>sagetvcatchup/images</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>${basedir}/src/main/recordings</directory>
             <outputDirectory>sagetvcatchup/recordings</outputDirectory>
         </fileSet>

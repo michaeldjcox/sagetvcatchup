@@ -11,6 +11,7 @@
       - Online Services menu. Only one "Air date", "New", "Favourite" etc category for all sources
       - Online Services menu. Move "Air date", "New", "Favourite" etc to the top level
       - Online Services menu. Add "Sources" categories below which IPlayer and Test go
+      - Online Services menu. Add icons for some sub categories
       - Web Page: Fix issue where podcasts cannot be navigated from remote machine
       - Web Page: Duration, last air date, available and removal dates added to episode views.
       - Cataloging: extract duration and last air date from iplayer meta data

@@ -147,6 +147,7 @@ public class CatchupDevModule extends AbstractModule {
     private String logDir;
     private String recordingDir;
     private String onlineVideoPropertiesDir;
+    private String imageDir;
     private int port;
     private int refreshRate;
     private String catalogFileName;
@@ -168,6 +169,7 @@ public class CatchupDevModule extends AbstractModule {
       pluginDir = homeDir + "src/main/plugins";
       cssDir = homeDir + "src/main/css";
       xsltDir = homeDir + "src/main/xslt";
+      imageDir = homeDir + "src/main/images";
       logDir = workingDir + "logs";
       recordingDir = workingDir + "recordings";
       onlineVideoPropsSuffix = "sagetvcatchup";
@@ -256,6 +258,11 @@ public class CatchupDevModule extends AbstractModule {
     }
 
     @Override
+    public String getImageDir() {
+      return imageDir;
+    }
+
+    @Override
     public String getOnlineVideoPropertiesSuffix() {
       return onlineVideoPropsSuffix;
     }
@@ -273,11 +280,6 @@ public class CatchupDevModule extends AbstractModule {
     @Override
     public int getMaxProgrammes(String pluginName) {
       return properties.getInt(pluginName + ".maxprogrammes", 0);
-    }
-
-    @Override
-    public boolean getShowRoot(String pluginName) {
-      return properties.getBoolean(pluginName + ".showRoot", true);
     }
 
     @Override

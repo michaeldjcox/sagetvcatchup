@@ -22,10 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The web server.
@@ -39,7 +36,8 @@ public class Server implements CatalogPublisher {
     private final String cssDir;
     private final String xsltDir;
     private final String logDir;
-    private final String tmpDir;
+  private final String imagesDir;
+  private final String tmpDir;
 //    private final String htDocsDir;
 //  private final String stagingDir;
   private final SocketConnector connector;
@@ -86,6 +84,8 @@ public class Server implements CatalogPublisher {
         logDir = context.getLogDir();
         cssDir = context.getCssDir();
         xsltDir = context.getXsltDir();
+        imagesDir = context.getImageDir();
+
 //        htDocsDir = context.getTmpDir() + File.separator + "htdocs";
 //        stagingDir = context.getTmpDir() + File.separator + "staging";
         tmpDir = context.getTmpDir();
@@ -117,8 +117,15 @@ public class Server implements CatalogPublisher {
         LogsPage logsProvider = new LogsPage(logDir + File.separator + "sagetvcatchup.log");
         addStaticContent(logsProvider);
 
-        LogoImage logoProvider = new LogoImage();
-        addStaticContent(logoProvider);
+        File dir = new File(imagesDir);
+        List<File> imageFiles = new ArrayList<File>();
+
+        findFiles(dir, imageFiles);
+
+        for (File imageFile : imageFiles) {
+         LogoImage logoProvider = new LogoImage(imagesDir, imageFile.getAbsolutePath());
+          addStaticContent(logoProvider);
+        }
 
         StatusPodcast statusProvider = new StatusPodcast(baseUrl, recorder, cataloger);
         addStaticContent(statusProvider);
@@ -145,7 +152,19 @@ public class Server implements CatalogPublisher {
         addStaticContent(stopAllRecordingPodcastProvider);
     }
 
-    public void addStaticContent(ContentProvider provider) {
+  private void findFiles(File dir, List<File> imageFiles) {
+    File[] files = dir.listFiles();
+    for (File file : files) {
+      if (file.isDirectory()) {
+        findFiles(file, imageFiles);
+
+      } else {
+        imageFiles.add(file);
+      }
+    }
+  }
+
+  public void addStaticContent(ContentProvider provider) {
         staticContent.put(provider.getUri(), provider);
     }
 

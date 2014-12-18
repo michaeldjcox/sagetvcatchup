@@ -187,8 +187,8 @@ public abstract class Category implements ErrorRecorder {
      *
      * @throws NullPointerException if a <code>null</code> value is provided
      */
-    public final void setIconUrl(String iconUrl) {
-        this.iconUrl = checkNotNull(iconUrl);
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
     }
 
     /**

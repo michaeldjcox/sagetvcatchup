@@ -76,6 +76,7 @@ public class CatchupTestModule extends AbstractModule {
     private String xsltDir;
     private String logDir;
     private String recordingDir;
+    private String imageDir;
     private int port;
     private int refreshRate;
     private String catalogFileName;
@@ -99,6 +100,7 @@ public class CatchupTestModule extends AbstractModule {
       cssDir = homeDir + "src/main/css";
       configDir = homeDir + "src/main/config";
       xsltDir = homeDir + "src/main/xslt";
+      imageDir = homeDir + "src/main/images";
       logDir = workingDir + "logs";
       recordingDir = workingDir + "recordings";
       onlineVideoPropsSuffix = "testsagetvcatchup";
@@ -184,6 +186,11 @@ public class CatchupTestModule extends AbstractModule {
     }
 
     @Override
+    public String getImageDir() {
+      return imageDir;
+    }
+
+    @Override
     public String getOnlineVideoPropertiesSuffix() {
       return onlineVideoPropsSuffix;
     }
@@ -209,11 +216,6 @@ public class CatchupTestModule extends AbstractModule {
     @Override
     public int getMaxProgrammes(String pluginName) {
       return properties.getInt(pluginName + ".maxprogrammes", 0);
-    }
-
-    @Override
-    public boolean getShowRoot(String pluginName) {
-      return properties.getBoolean(pluginName + ".showRoot", true);
     }
 
     @Override

@@ -37,6 +37,7 @@ public class CatchupContext implements CatchupContextInterface {
   private long partialFileNameConfirmationTimeout;
   private long streamingTimeout;
   private long recordingTimeout;
+  private String imageDir;
 
   public CatchupContext(final PropertiesInterface properties) {
       this.properties = properties;
@@ -49,6 +50,7 @@ public class CatchupContext implements CatchupContextInterface {
         logDir = workingDir + File.separator + "logs";
         pluginDir = workingDir + File.separator + "plugins";
         configDir = workingDir + File.separator + "config";
+        imageDir = workingDir + File.separator + "images";
 
         recordingDir = properties.getString("recordingDir");
         refreshRate = properties.getInt("refreshRateHours");
@@ -144,6 +146,11 @@ public class CatchupContext implements CatchupContextInterface {
   }
 
   @Override
+  public String getImageDir() {
+    return imageDir;
+  }
+
+  @Override
   public String getLogDir() {
     return logDir;
   }
@@ -171,11 +178,6 @@ public class CatchupContext implements CatchupContextInterface {
   @Override
   public int getMaxProgrammes(String pluginName) {
     return properties.getInt(pluginName + ".maxprogrammes", 0);
-  }
-
-  @Override
-  public boolean getShowRoot(String pluginName) {
-    return properties.getBoolean(pluginName + ".showRoot", true);
   }
 
   @Override

@@ -42,8 +42,6 @@ public interface CatchupContextInterface {
 
     int getMaxProgrammes(String pluginName);
 
-  boolean getShowRoot(String pluginName);
-
   PropertiesInterface getProperties();
 
     boolean skipPlugin(String sourceId);
@@ -71,4 +69,6 @@ public interface CatchupContextInterface {
   long getStreamingTimeout();
 
   long getRecordingTimeout();
+
+  String getImageDir();
 }
