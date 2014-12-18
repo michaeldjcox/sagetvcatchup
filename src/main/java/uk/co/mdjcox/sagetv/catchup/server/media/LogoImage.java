@@ -69,21 +69,6 @@ public class LogoImage implements ContentProvider {
         return "ISO-8859-1";
     }
 
-    private int findResourceLength(InputStream in) {
-            int length = 0;
-            try {
-                byte[] buf = new byte[1024];
-                int count = 0;
-                length = 0;
-                while ((count = in.read(buf)) >= 0) {
-                    length += count;
-                }
-            } catch (IOException e) {
-                // Ignore
-            }
-            return length;
-
-    }
 
     @Override
     public void serve(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
