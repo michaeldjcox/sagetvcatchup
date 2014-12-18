@@ -21,8 +21,8 @@ public class LogoImage implements ContentProvider {
 
   public LogoImage(String imagesDir, String imageFileName) {
     this.imagesDir = imagesDir;
+      imageFileName = imageFileName.replace(imagesDir, "");
     imageFileName = imageFileName.replace(File.separator, "/");
-    imageFileName = imageFileName.replace(imagesDir, "");
     while (imageFileName.startsWith("/")) {
       imageFileName = imageFileName.substring(1);
     }
