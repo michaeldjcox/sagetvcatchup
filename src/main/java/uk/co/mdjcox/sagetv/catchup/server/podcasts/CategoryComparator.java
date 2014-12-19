@@ -45,8 +45,8 @@ public class CategoryComparator implements Comparator<Category> {
         Date date1 = parseDateStr(dateTime1, false);
         Date date2 = parseDateStr(dateTime2, false);
 
-        System.err.println("Comparing " + dateTime1 + " with " + dateTime2 + "=" + date2.compareTo(date1));
-        System.err.println("Comparing " + date1 + " with " + date2 + "=" + date2.compareTo(date1));
+//        System.err.println("SORT " + o1.getShortName() + " vs " + o2.getShortName() + " Comparing " + dateTime1 + " with " + dateTime2 + "=" + date2.compareTo(date1));
+//        System.err.println("SORT " + o1.getShortName() + " vs " + o2.getShortName() + " Comparing " + date1 + " with " + date2 + "=" + date2.compareTo(date1));
 
         int compare = date2.compareTo(date1);
 
@@ -54,28 +54,11 @@ public class CategoryComparator implements Comparator<Category> {
           return compare;
         }
       }
-
-      if (o1Parent.contains("/RemovalDate/") && o2Parent.contains("/RemovalDate/")) {
-        String dateTime1 = o1Parent.replaceFirst(".*/RemovalDate/", "");
-        String dateTime2 = o2Parent.replaceFirst(".*/RemovalDate/", "");
-
-        Date date1 = parseDateStr(dateTime1, true);
-        Date date2 = parseDateStr(dateTime2, true);
-
-        System.err.println("Comparing " + dateTime1 + " with " + dateTime2 + "=" + date1.compareTo(date2));
-        System.err.println("Comparing " + date1 + " with " + date2 + "=" + date1.compareTo(date2));
-
-        int compare = date1.compareTo(date2);
-
-        if (compare != 0) {
-          return compare;
-        }
-      }
-
-
     } catch (ParseException e) {
-
+       // Ignore
     }
+
+//    System.err.println("Defaulting to alpha sort on " + o1.getShortName() + " vs " + o2.getShortName());
 
     return o1.getShortName().compareTo(o2.getShortName());
   }
