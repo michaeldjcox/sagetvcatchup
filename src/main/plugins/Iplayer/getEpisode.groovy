@@ -372,11 +372,11 @@ if (versionId != null) {
 
         if (PAST_DATE(newDate, newTime) &&
             DATE_AFTER(episode.getAirDate(), episode.getAirTime(), newDate, newTime)) {
-            LOG_INFO(episode.getPodcastTitle() + " repeat date " + newDate + " " + newTime + " is after " + episode.getAirDate() + " " + episode.getAirTime());
+//            LOG_INFO(episode.getPodcastTitle() + " repeat date " + newDate + " " + newTime + " is after " + episode.getAirDate() + " " + episode.getAirTime());
             episode.setAirDate(newDate);
             episode.setAirTime(newTime);
         } else {
-            LOG_INFO(episode.getPodcastTitle() + " repeat " + episode.getAirTime() + " " + episode.getAirTime() + " prevails over " + newDate + " " + newTime);
+//            LOG_INFO(episode.getPodcastTitle() + " repeat " + episode.getAirDate() + " " + episode.getAirTime() + " prevails over " + newDate + " " + newTime);
         }
 
         versionDetails = MOVE_TO("<broadcast", versionDetails);
@@ -432,11 +432,11 @@ if (versionId != null) {
 
             if (PAST_DATE(newDate, newTime) &&
                 DATE_BEFORE(episode.getAdditionDate(), episode.getAdditionTime(), newDate, newTime)) {
-                LOG_INFO(episode.getPodcastTitle() + " addition date " + newDate + " " + newTime + " is before " + episode.getAdditionDate() + " " + episode.getAdditionTime());
+//                LOG_INFO(episode.getPodcastTitle() + " addition date " + newDate + " " + newTime + " is before " + episode.getAdditionDate() + " " + episode.getAdditionTime());
                 episode.setAdditionDate(newDate);
                 episode.setAdditionTime(newTime);
             } else {
-                LOG_INFO(episode.getPodcastTitle() + " addition date " + episode.getAdditionDate() + " " + episode.getAdditionTime() + " prevails over " + newDate + " " + newTime);
+//                LOG_INFO(episode.getPodcastTitle() + " addition date " + episode.getAdditionDate() + " " + episode.getAdditionTime() + " prevails over " + newDate + " " + newTime);
             }
         }
 
@@ -484,11 +484,11 @@ if (versionId != null) {
 
             if (FUTURE_DATE(newDate, newTime) &&
                 DATE_BEFORE(episode.getRemovalDate(), episode.getRemovalTime(), newDate, newTime)) {
-                LOG_INFO(episode.getPodcastTitle() + " removal date " + newDate + " " + newTime + " is before " + episode.getRemovalDate() + " " + episode.getRemovalTime());
+//                LOG_INFO(episode.getPodcastTitle() + " removal date " + newDate + " " + newTime + " is before " + episode.getRemovalDate() + " " + episode.getRemovalTime());
                 episode.setRemovalDate(newDate);
                 episode.setRemovalTime(newTime);
             } else {
-                LOG_INFO(episode.getPodcastTitle() + " removal date " + episode.getRemovalDate() + " " + episode.getRemovalTime() + " prevails over " + newDate + " " + newTime);
+//                LOG_INFO(episode.getPodcastTitle() + " removal date " + episode.getRemovalDate() + " " + episode.getRemovalTime() + " prevails over " + newDate + " " + newTime);
             }
         }
 

@@ -1,19 +1,31 @@
 package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
 import uk.co.mdjcox.sagetv.model.Category;
-import uk.co.mdjcox.sagetv.model.Episode;
-import uk.co.mdjcox.sagetv.model.SubCategory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * Created by michael on 23/10/14.
  */
 public class CategoryComparator implements Comparator<Category> {
+
+  private static ArrayList<String> CHANNELS = new ArrayList<String>();
+
+  static {
+    CHANNELS.add("BBCOne");
+    CHANNELS.add("BBCTwo");
+    CHANNELS.add("BBCThree");
+    CHANNELS.add("BBCFour");
+    CHANNELS.add("BBC");
+    CHANNELS.add("CBBC");
+    CHANNELS.add("CBeebies");
+    CHANNELS.add("BBCNews");
+    CHANNELS.add("BBCNewsChannel");
+    CHANNELS.add("BBCAlba");
+    CHANNELS.add("S4C");
+  }
 
   private final SimpleDateFormat format=new SimpleDateFormat("dd-MM-yyyy");
   private final SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEEddMMM");
@@ -34,11 +46,11 @@ public class CategoryComparator implements Comparator<Category> {
   @Override
   public int compare(Category o1, Category o2) {
 
-    try {
       String o1Parent = o1.getId() == null ? "" : o1.getId();
       String o2Parent = o2.getId() == null ? "" : o2.getId();
 
-      if (o1Parent.contains("/AirDate/") && o2Parent.contains("/AirDate/")) {
+    if (o1Parent.contains("/AirDate/") && o2Parent.contains("/AirDate/")) {
+      try {
         String dateTime1 = o1Parent.replaceFirst(".*/AirDate/", "");
         String dateTime2 = o2Parent.replaceFirst(".*/AirDate/", "");
 
@@ -53,14 +65,37 @@ public class CategoryComparator implements Comparator<Category> {
         if (compare != 0) {
           return compare;
         }
+      } catch (ParseException e) {
+        // Ignore
       }
-    } catch (ParseException e) {
-       // Ignore
+    }
+
+    if (o1Parent.contains("/Channel/") && o2Parent.contains("/Channel/")) {
+      String chan1 = o1Parent.replaceFirst(".*/Channel/", "");
+      String chan2 = o2Parent.replaceFirst(".*/Channel/", "");
+
+      Integer index1 = getChannelIndex(chan1);
+      Integer index2 = getChannelIndex(chan2);
+
+      int compare = index1.compareTo(index2);
+
+      if (compare != 0) {
+        return compare;
+      }
+
     }
 
 //    System.err.println("Defaulting to alpha sort on " + o1.getShortName() + " vs " + o2.getShortName());
 
     return o1.getShortName().compareTo(o2.getShortName());
+  }
+
+  private Integer getChannelIndex(String channel) {
+    int index = CHANNELS.indexOf(channel);
+    if (index != -1) {
+      return index;
+    }
+    return CHANNELS.size();
   }
 
   private Date parseDateStr(String dateTime1, boolean future) throws ParseException {
