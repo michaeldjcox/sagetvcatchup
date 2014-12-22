@@ -808,11 +808,14 @@ public class Cataloger {
     imagePath = imagePath.replace("/", File.separator);
     File png = new File(imagePath+ ".png");
     File jpg = new File(imagePath + ".jpg");
-    if (png.exists() || jpg.exists()) {
-      return "/image?id=" + channelInstanceId;
-    } else {
-      return null;
-    }
+      if (jpg.exists()) {
+          return "/image?id=" + channelInstanceId + ".jpg";
+      }
+      else if (png.exists()) {
+          return "/image?id=" + channelInstanceId + ".png";
+      } else {
+          return null;
+      }
   }
 
   private void doSpecialCategorisation(Root root, Programme programmeCat, Episode episode, String categoryName, List<String> urls, Catalog catalog) {

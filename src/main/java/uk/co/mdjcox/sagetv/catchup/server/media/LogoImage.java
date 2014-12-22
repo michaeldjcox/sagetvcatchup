@@ -42,7 +42,7 @@ public class LogoImage implements ContentProvider {
 
   @Override
     public String getUri() {
-        return  "image?id=" + id;
+        return  "image?id=" + id + "." + type;
     }
 
     @Override
