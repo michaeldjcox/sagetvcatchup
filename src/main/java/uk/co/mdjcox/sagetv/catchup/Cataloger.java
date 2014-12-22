@@ -805,6 +805,7 @@ public class Cataloger {
 
   private String getIconUrl(String channelInstanceId) {
     String imagePath = context.getImageDir() + File.separator + channelInstanceId;
+    imagePath = imagePath.replace("/", File.separator);
     File png = new File(imagePath+ ".png");
     File jpg = new File(imagePath + ".jpg");
     if (png.exists() || jpg.exists()) {

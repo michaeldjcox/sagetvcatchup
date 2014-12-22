@@ -79,7 +79,7 @@ public class LogoImage implements ContentProvider {
       long fileSize = imageFile.length();
 
       response.setContentType(getType());
-      response.setCharacterEncoding("ISO-8859-1");
+//      response.setCharacterEncoding(getEncoding());
       response.setContentLength((int) fileSize);
 
 
