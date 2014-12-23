@@ -17,6 +17,26 @@ _DESCRIPTION_
 </Dependency>
 <ServerOnly>true</ServerOnly>
 <ResourcePath>_PATH_</ResourcePath>
+<Screenshot title="TopMenu">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/TopMenu.png</Screenshot>
+<Screenshot title="AirDate">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/AirDate.png</Screenshot>
+<Screenshot title="AtoZ">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/AtoZ.png</Screenshot>
+<Screenshot title="Channel">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/Channel.png</Screenshot>
+<Screenshot title="Favourites">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/Favourites.png</Screenshot>
+<Screenshot title="Genre">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/Genre.png</Screenshot>
+<Screenshot title="LastChance">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/LastChance.png</Screenshot>
+<Screenshot title="MostPopular">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/MostPopular.png</Screenshot>
+<Screenshot title="New">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/New.png</Screenshot>
+<Screenshot title="Sources">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/Sources.png</Screenshot>
+<Screenshot title="Search">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/Search.png</Screenshot>
+<Screenshot title="Status">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/Status.png</Screenshot>
+<Screenshot title="Episodes">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/Episodes.png</Screenshot>
+<Screenshot title="Control">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/Control.png</Screenshot>
+<Screenshot title="RecordingProgress">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/RecordingProgress.png</Screenshot>
+<Screenshot title="MetaData">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/MetaData.png</Screenshot>
+<Screenshot title="RecordingStatus">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/RecordingStatus.png</Screenshot>
+<Screenshot title="CatalogingStatus">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/CatalogingStatus.png</Screenshot>
+<Screenshot title="WebPage">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/WebPage.png</Screenshot>
+<Screenshot title="Configure">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/screenshots/Configure.png</Screenshot>
 <PluginType>Standard</PluginType>
 <Package>
 <PackageType>System</PackageType>
