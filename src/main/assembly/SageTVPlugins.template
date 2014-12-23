@@ -17,26 +17,26 @@ _DESCRIPTION_
 </Dependency>
 <ServerOnly>true</ServerOnly>
 <ResourcePath>_PATH_</ResourcePath>
-<Screenshot title="TopMenu">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/TopMenu.png</Screenshot>
-<Screenshot title="AirDate">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/AirDate.png</Screenshot>
-<Screenshot title="AtoZ">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/AtoZ.png</Screenshot>
-<Screenshot title="Channel">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Channel.png</Screenshot>
-<Screenshot title="Favourites">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Favourites.png</Screenshot>
-<Screenshot title="Genre">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Genre.png</Screenshot>
-<Screenshot title="LastChance">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/LastChance.png</Screenshot>
-<Screenshot title="MostPopular">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/MostPopular.png</Screenshot>
-<Screenshot title="New">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/New.png</Screenshot>
-<Screenshot title="Sources">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Sources.png</Screenshot>
-<Screenshot title="Search">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Search.png</Screenshot>
-<Screenshot title="Status">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Status.png</Screenshot>
-<Screenshot title="Episodes">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Episodes.png</Screenshot>
-<Screenshot title="Control">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Control.png</Screenshot>
-<Screenshot title="RecordingProgress">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/RecordingProgress.png</Screenshot>
-<Screenshot title="MetaData">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/MetaData.png</Screenshot>
-<Screenshot title="RecordingStatus">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/RecordingStatus.png</Screenshot>
-<Screenshot title="CatalogingStatus">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/CatalogingStatus.png</Screenshot>
-<Screenshot title="WebPage">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/WebPage.png</Screenshot>
-<Screenshot title="Configure">https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Configure.png</Screenshot>
+<Screenshot title="TopMenu"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/TopMenu.png]]></Screenshot>
+<Screenshot title="AirDate"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/AirDate.png]]></Screenshot>
+<Screenshot title="AtoZ"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/AtoZ.png]]></Screenshot>
+<Screenshot title="Channel"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Channel.png]]></Screenshot>
+<Screenshot title="Favourites"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Favourites.png]]></Screenshot>
+<Screenshot title="Genre"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Genre.png]]></Screenshot>
+<Screenshot title="LastChance"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/LastChance.png]]></Screenshot>
+<Screenshot title="MostPopular"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/MostPopular.png]]></Screenshot>
+<Screenshot title="New"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/New.png]]></Screenshot>
+<Screenshot title="Sources"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Sources.png]]></Screenshot>
+<Screenshot title="Search"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Search.png]]></Screenshot>
+<Screenshot title="Status"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Status.png]]></Screenshot>
+<Screenshot title="Episodes"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Episodes.png]]></Screenshot>
+<Screenshot title="Control"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Control.png]]></Screenshot>
+<Screenshot title="RecordingProgress"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/RecordingProgress.png]]></Screenshot>
+<Screenshot title="MetaData"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/MetaData.png]]></Screenshot>
+<Screenshot title="RecordingStatus"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/RecordingStatus.png]]></Screenshot>
+<Screenshot title="CatalogingStatus"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/CatalogingStatus.png]]></Screenshot>
+<Screenshot title="WebPage"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/WebPage.png]]></Screenshot>
+<Screenshot title="Configure"><![CDATA[https://raw.githubusercontent.com/michaeldjcox/sagetvcatchup/master/screenshots/Configure.png]]></Screenshot>
 <PluginType>Standard</PluginType>
 <Package>
 <PackageType>System</PackageType>
