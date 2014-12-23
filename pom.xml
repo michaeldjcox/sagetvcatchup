@@ -3,7 +3,7 @@
 
     <groupId>uk.co.mdjcox.sagetvcatchup</groupId>
     <artifactId>sagetvcatchup</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>SageTV Catchup TV</name>
@@ -194,7 +194,7 @@
                                 </replacement>
                                 <replacement>
                                     <token>_WEBPAGE_</token>
-                                    <value/>
+                                    <value />
                                 </replacement>
                                 <replacement>
                                     <token>_MAINCLASS_</token>
@@ -202,11 +202,11 @@
                                 </replacement>
                                 <replacement>
                                     <token>_SCREENSHOTNAME_</token>
-                                    <value/>
+                                    <value />
                                 </replacement>
                                 <replacement>
                                     <token>_SCREENSHOTLINK_</token>
-                                    <value/>
+                                    <value />
                                 </replacement>
                                 <replacement>
                                     <token>_RELEASENOTES_</token>
@@ -276,7 +276,7 @@
                                 </replacement>
                                 <replacement>
                                     <token>_WEBPAGE_</token>
-                                    <value/>
+                                    <value />
                                 </replacement>
                                 <replacement>
                                     <token>_MAINCLASS_</token>
@@ -284,11 +284,11 @@
                                 </replacement>
                                 <replacement>
                                     <token>_SCREENSHOTNAME_</token>
-                                    <value/>
+                                    <value />
                                 </replacement>
                                 <replacement>
                                     <token>_SCREENSHOTLINK_</token>
-                                    <value/>
+                                    <value />
                                 </replacement>
                                 <replacement>
                                     <token>_RELEASENOTES_</token>
@@ -358,7 +358,7 @@
                                 </replacement>
                                 <replacement>
                                     <token>_WEBPAGE_</token>
-                                    <value/>
+                                    <value />
                                 </replacement>
                                 <replacement>
                                     <token>_MAINCLASS_</token>
@@ -366,11 +366,11 @@
                                 </replacement>
                                 <replacement>
                                     <token>_SCREENSHOTNAME_</token>
-                                    <value/>
+                                    <value />
                                 </replacement>
                                 <replacement>
                                     <token>_SCREENSHOTLINK_</token>
-                                    <value/>
+                                    <value />
                                 </replacement>
                                 <replacement>
                                     <token>_RELEASENOTES_</token>
