@@ -174,14 +174,15 @@ public class CatchupServer {
     }
     finally
     {
-      logger.info("#######################");
-      logger.info("Stopped catchup server");
-      logger.info("#######################");
+      if (logger != null) {
+        logger.info("#######################");
+        logger.info("Stopped catchup server");
+        logger.info("#######################");
 
-      logger.flush();
+        logger.flush();
 
-      PersistentRollingFileAppender.stopped = true;
-
+        PersistentRollingFileAppender.stopped = true;
+      }
     }
   }
 

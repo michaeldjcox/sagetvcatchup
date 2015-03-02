@@ -82,18 +82,25 @@ public class ProgrammePodcast extends OnDemandPodcast {
           descBuilder.append(episode.getDescription());
           descBuilder.append("<br/>");
 
-          final String controlUrl=getPodcastBaseUrl() +  "/control?id=" + episode.getId() + ";type=xml";
-
-//          Episode icon - takes too much space
-//          String episodeIconUrl = episode.getIconUrl();
-//          if (episodeIconUrl != null && episodeIconUrl.startsWith("/")) {
-//            episodeIconUrl = getPodcastBaseUrl() + episodeIconUrl;
-//          }
 
           String desc = htmlUtils.makeContentSafe(descBuilder.toString());
           String title = htmlUtils.makeContentSafe(titleBuilder.toString());
+    //      Episode icon - takes too much space
+          String episodeIconUrl = episode.getIconUrl();
+          if (episodeIconUrl != null && episodeIconUrl.startsWith("/")) {
+            episodeIconUrl = getPodcastBaseUrl() + episodeIconUrl;
+          }
 
-          builder.addCategoryItem(title, desc, controlUrl, "");
+          if (!episode.getPodcastUrl().startsWith("/control")) {
+            String controlUrl = episode.getPodcastUrl();
+            builder.addVideoItem(title, desc, controlUrl, episodeIconUrl);
+          } else {
+            String controlUrl=getPodcastBaseUrl() +  "/control?id=" + episode.getId() + ";type=xml";
+            builder.addCategoryItem(title, desc, controlUrl, "");
+          }
+
+
+
         }
         builder.stopDocument();
         return builder.toString();

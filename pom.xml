@@ -63,6 +63,14 @@
             <name>mvnrepository</name>
             <url>http://mvnrepository.com/</url>
         </repository>
+
+        <repository>
+            <id>4thline-repo</id>
+            <url>http://4thline.org/m2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 
     <profiles>
@@ -653,9 +661,19 @@
         <dependency>
             <groupId>sagex.api</groupId>
             <artifactId>api</artifactId>
-            <version>7.0.15.0</version>
+            <version>7.1.9.26</version>
             <scope>system</scope>
             <systemPath>${sagedir}/JARs/sagex-api.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.fourthline.cling</groupId>
+            <artifactId>cling-core</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fourthline.cling</groupId>
+            <artifactId>cling-support</artifactId>
+            <version>2.0.1</version>
         </dependency>
     </dependencies>
 

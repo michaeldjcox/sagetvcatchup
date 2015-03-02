@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Time: 18:42
  * To change this template use File | Settings | File Templates.
  */
-public class Plugin {
+public class Plugin implements PluginInterface {
 
     private String sourceId;
     private String base;
@@ -40,6 +40,12 @@ public class Plugin {
         this.base = base;
     }
 
+  @Override
+  public boolean beginCatalog() {
+    return true;
+  }
+
+  @Override
     public void init() {
         sourceScript = scriptFactory.createSourceScript(sourceId, base);
         programmesScript = scriptFactory.createProgrammesScript(base);
@@ -50,30 +56,37 @@ public class Plugin {
         stopScript = scriptFactory.createStopScript(base);
     }
 
+    @Override
     public Source getSource() {
         return sourceScript.getSource();
     }
 
+    @Override
     public Collection<Programme> getProgrammes(Source source, AtomicBoolean stopFlag) {
         return programmesScript.getProgrammes(source, stopFlag);
     }
 
+    @Override
     public Collection<Episode> getEpisodes(Source source, Programme programme, AtomicBoolean stopFlag) {
         return episodesScript.getEpisodes(source, programme, stopFlag);
     }
 
+    @Override
     public void getEpisode(Source source, Programme programme, Episode episode, AtomicBoolean stopFlag) {
         episodeScript.getEpisode(source, programme, episode, stopFlag);
     }
 
+    @Override
     public void getCategories(Source source, Map<String, List<String>> categories, AtomicBoolean stopFlag) {
       categoriesScript.getCategories(source, categories, stopFlag);
     }
 
+    @Override
     public void playEpisode(Recording recording) {
         playScript.play(recording);
     }
 
+    @Override
     public void stopEpisode(Recording recording) {
         stopScript.stop(recording);
     }

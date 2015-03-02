@@ -332,23 +332,25 @@ public class Server implements CatalogPublisher {
                 StyledPage provider = new StyledPage(xsltDir, logger, "Episode", "episode.html", episode.getId(), episode, persister);
                 addCachedPublishedContent(publishedContent, provider);
 
-                ControlPodcast controlPodcastProvider = new ControlPodcast(baseUrl, recorder, episode, htmlUtils);
-                addPublishedContent(publishedContent, controlPodcastProvider);
+                if (episode.getPodcastUrl().startsWith("/control")) {
+                  ControlPodcast controlPodcastProvider = new ControlPodcast(baseUrl, recorder, episode, htmlUtils);
+                  addPublishedContent(publishedContent, controlPodcastProvider);
 
-                StopEpisodePage stopEpisodeRecordingHtmlProvider = new StopEpisodePage(episode.getId(), recorder);
-                addPublishedContent(publishedContent, stopEpisodeRecordingHtmlProvider);
-                StopEpisodePodcast stopEpisodeRecordingPodcastProvider = new StopEpisodePodcast(baseUrl, episode.getId(), recorder);
-                addPublishedContent(publishedContent, stopEpisodeRecordingPodcastProvider);
+                  StopEpisodePage stopEpisodeRecordingHtmlProvider = new StopEpisodePage(episode.getId(), recorder);
+                  addPublishedContent(publishedContent, stopEpisodeRecordingHtmlProvider);
+                  StopEpisodePodcast stopEpisodeRecordingPodcastProvider = new StopEpisodePodcast(baseUrl, episode.getId(), recorder);
+                  addPublishedContent(publishedContent, stopEpisodeRecordingPodcastProvider);
 
-                RecordEpisodePage recordEpisodeRecordingHtmlProvider = new RecordEpisodePage(episode, recorder);
-                addPublishedContent(publishedContent, recordEpisodeRecordingHtmlProvider);
-                RecordEpisodePodcast recordEpisodeRecordingPodcastProvider = new RecordEpisodePodcast(baseUrl, episode, recorder);
-                addPublishedContent(publishedContent, recordEpisodeRecordingPodcastProvider);
+                  RecordEpisodePage recordEpisodeRecordingHtmlProvider = new RecordEpisodePage(episode, recorder);
+                  addPublishedContent(publishedContent, recordEpisodeRecordingHtmlProvider);
+                  RecordEpisodePodcast recordEpisodeRecordingPodcastProvider = new RecordEpisodePodcast(baseUrl, episode, recorder);
+                  addPublishedContent(publishedContent, recordEpisodeRecordingPodcastProvider);
 
-                WatchEpisode watchEpisodeVideoProvider = new WatchEpisode(logger, episode, recorder);
-                addPublishedContent(publishedContent, watchEpisodeVideoProvider);
-              WatchAndKeepEpisode watchAndKeepEpisodeVideoProvider = new WatchAndKeepEpisode(logger, episode, recorder);
-              addPublishedContent(publishedContent, watchAndKeepEpisodeVideoProvider);
+                  WatchEpisode watchEpisodeVideoProvider = new WatchEpisode(logger, episode, recorder);
+                  addPublishedContent(publishedContent, watchEpisodeVideoProvider);
+                  WatchAndKeepEpisode watchAndKeepEpisodeVideoProvider = new WatchAndKeepEpisode(logger, episode, recorder);
+                  addPublishedContent(publishedContent, watchAndKeepEpisodeVideoProvider);
+                }
             }
 
           SearchPodcast searchPodcast = new SearchPodcast(baseUrl, catalog);

@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Named;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginFactory;
+import uk.co.mdjcox.sagetv.catchup.plugins.PluginUpnpFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.ScriptFactory;
 import uk.co.mdjcox.sagetv.utils.*;
 
@@ -28,11 +29,13 @@ public class CatchupDevModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        workingDir = System.getProperty("user.dir") + File.separator;
-        install(new FactoryModuleBuilder()
-                .build(ScriptFactory.class));
-        install(new FactoryModuleBuilder()
-                .build(PluginFactory.class));
+      workingDir = System.getProperty("user.dir") + File.separator;
+      install(new FactoryModuleBuilder()
+              .build(ScriptFactory.class));
+      install(new FactoryModuleBuilder()
+              .build(PluginFactory.class));
+      install(new FactoryModuleBuilder()
+              .build(PluginUpnpFactory.class));
     }
 
     @Provides

@@ -3,6 +3,7 @@ package uk.co.mdjcox.sagetv.catchup;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import uk.co.mdjcox.sagetv.catchup.plugins.Plugin;
+import uk.co.mdjcox.sagetv.catchup.plugins.PluginInterface;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginManager;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Recording;
@@ -410,7 +411,7 @@ public class Recorder {
   }
 
   private File callPlayScript(Recording recording) throws Exception {
-    Plugin plugin = pluginManager.getPlugin(recording.getSourceId());
+    PluginInterface plugin = pluginManager.getPlugin(recording.getSourceId());
     plugin.playEpisode(recording);
 
     synchronized (recording) {
@@ -458,7 +459,7 @@ public class Recorder {
     try {
       logger.info("Going to stop recording of " + recording);
       recording.setStopped();
-      Plugin plugin = pluginManager.getPlugin(recording.getSourceId());
+      PluginInterface plugin = pluginManager.getPlugin(recording.getSourceId());
       plugin.stopEpisode(recording);
       return "Recording " + recording + " stopping";
     } catch (Exception e1) {

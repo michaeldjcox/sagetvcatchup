@@ -23,10 +23,12 @@ import java.util.TreeSet;
 public class PluginManager {
 
     private LoggerInterface logger;
-    private LinkedHashMap<String, Plugin> plugins = new  LinkedHashMap<String, Plugin>();
+    private LinkedHashMap<String, PluginInterface> plugins = new  LinkedHashMap<String, PluginInterface>();
     private Set<String> pluginNames = new TreeSet<String>();
     @Inject
     private PluginFactory pluginFactory;
+    @Inject
+    private PluginUpnpFactory pluginUpnpFactory;
     private CatchupContextInterface context;
 
     @Inject
@@ -35,11 +37,11 @@ public class PluginManager {
         this.context = context;
     }
 
-    public Collection<Plugin> getPlugins() {
+    public Collection<PluginInterface> getPlugins() {
         return plugins.values();
     }
 
-    public Plugin getPlugin(String sourceId) {
+    public PluginInterface getPlugin(String sourceId) {
         return plugins.get(sourceId);
     }
 
@@ -69,9 +71,25 @@ public class PluginManager {
         for (File pluginDir : pluginDirs) {
             String sourceId = pluginDir.getName();
           pluginNames.add(sourceId);
-            Plugin plugin = pluginFactory.createPlugin(sourceId, pluginDir.getAbsolutePath());
-            plugin.init();
-            plugins.put(sourceId, plugin);
+            PluginInterface plugin = null;
+          final File[] files = pluginDir.listFiles();
+          if (files != null) {
+            try {
+              if (files.length == 1) {
+                plugin = pluginUpnpFactory.createPlugin(sourceId, pluginDir.getAbsolutePath());
+              } else
+              if (files.length > 1)
+              {
+                plugin = pluginFactory.createPlugin(sourceId, pluginDir.getAbsolutePath());
+              } else {
+                continue;
+              }
+              plugin.init();
+              plugins.put(sourceId, plugin);
+            } catch (Exception e) {
+              logger.error("Failed to initialise plugin", e);
+            }
+          }
         }
 
         logger.info("Started the plugin manager");
