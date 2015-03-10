@@ -94,6 +94,25 @@ public abstract class GroovyScript extends groovy.lang.Script {
         downloadUtils.downloadFile(url, file);
     }
 
+  public void DOWNLOAD_WEB_PAGE(URL url, String file, AtomicBoolean stopFlag) throws IOException {
+    downloadUtils.downloadFile(url, file, stopFlag);
+  }
+
+  public void DOWNLOAD_WEB_PAGE_BACKGROUND(final URL url, final String file, final AtomicBoolean stopFlag) throws IOException {
+    Runnable runnable = new Runnable() {
+      public void run() {
+        try {
+          downloadUtils.downloadFile(url, file, stopFlag);
+        } catch (Exception e) {
+          logger.error("Failed to download file", e);
+        }
+      }
+    };
+    Thread thread = new Thread(runnable);
+    thread.start();
+  }
+
+
     public String MOVE_TO(String token, String fileStr) {
         return htmlUtils.moveTo(token, fileStr);
     }

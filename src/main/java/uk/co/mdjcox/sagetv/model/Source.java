@@ -12,10 +12,17 @@ package uk.co.mdjcox.sagetv.model;
  */
 public class Source extends SubCategory {
 
+  private String pluginId;
+
   public Source() {
   }
 
-  /**
+    public final String getSourceId() {
+        return sourceId;
+    }
+
+
+    /**
    * Constructs a new source category.
    *
    * This category always as the root as parent category.
@@ -31,7 +38,7 @@ public class Source extends SubCategory {
         super(id, id, shortName, longName, serviceUrl, iconUrl, parentId);
     }
 
-  @Override
+    @Override
   public void setIconUrl(String iconUrl) {
     super.setIconUrl(iconUrl);
   }

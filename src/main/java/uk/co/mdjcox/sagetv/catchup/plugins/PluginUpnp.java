@@ -18,6 +18,7 @@ import uk.co.mdjcox.sagetv.utils.HtmlUtils;
 import uk.co.mdjcox.sagetv.utils.PropertiesFile;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
@@ -28,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class PluginUpnp implements PluginInterface {
 
-  private String sourceId;
+  private String pluginId;
   private String base;
   private UpnpUtils upnpUtils;
 
@@ -37,54 +38,60 @@ public class PluginUpnp implements PluginInterface {
   private Map<String, UpnpItem> items;
 
   private Set<String> excludes = new HashSet<String>();
-  private int channelPosition = 3;
-  private int categoryPosition = 4;
-  private Map<String, String> categoryMaps = new HashMap<String, String>();
+  private Map<String, String> categoryMaps = new LinkedHashMap<String, String>();
 
+  private Map<String, ArrayList<UpnpItem>> sourceItems = new HashMap<String,ArrayList<UpnpItem>>();
   private Map<String, ArrayList<UpnpItem>> programmeItems = new HashMap<String,ArrayList<UpnpItem>>();
   private Map<String,ArrayList<ArrayList<Container>>> programmePaths = new HashMap<String,ArrayList<ArrayList<Container>>>();
-  private Map<String, List<String>> specialSubcategories = new HashMap<String, List<String>>();
+  private Map<String, Map<String, List<String>>> specialSubcategories = new HashMap<String, Map<String, List<String>>>();
   private Map<String, String> channelImages = new HashMap<String, String>();
+
+  private PlayScript playScript;
+  private StopScript stopScript;
 
   @Inject
   CatchupContextInterface context;
 
   @Inject
+  private ScriptFactory scriptFactory;
+
+  @Inject
   public PluginUpnp(@Assisted("id") String id, @Assisted("base") String base) {
-    this.sourceId = id;
+    this.pluginId = id;
     this.base = base;
   }
 
   @Override
+  public String getPluginId() {
+    return pluginId;
+  }
+
+  @Override
   public void init() {
-    upnpUtils = UpnpUtils.instance();
 
     try {
-      PropertiesFile propertiesFile = new PropertiesFile(base + File.separator + sourceId + ".properties", true);
-      String template = propertiesFile.getString("template", "");
-      String[] templateParts = template.split("/");
-      ArrayList<String> templatePartList = new ArrayList<String>();
-      for (String bit : templateParts) {
-        templatePartList.add(bit);
-      }
-      if (template.isEmpty()) {
-        throw new Exception("No template specified for plugin " + sourceId);
-      }
-      channelPosition = templatePartList.indexOf("CHANNEL");
-      categoryPosition = templatePartList.indexOf("CATEGORY");
+      playScript = scriptFactory.createPlayScript(base);
+      stopScript = scriptFactory.createStopScript(base);
+
+      PropertiesFile propertiesFile = new PropertiesFile(base + File.separator + pluginId + ".properties", true);
       Collection<String> excludeList = propertiesFile.getPropertySequence("excludes");
       if (excludeList != null) {
         excludes = new HashSet<String>(excludeList);
       }
       Collection<String> categoryMappings = propertiesFile.getPropertySequence("mapping");
-      for (String map : categoryMappings) {
-        String[] split = map.split("=");
-        if (split.length > 1) {
-          categoryMaps.put(split[0], split[1]);
+      if (categoryMappings != null) {
+        for (String map : categoryMappings) {
+          String[] split = map.split("=");
+          if (split.length > 1) {
+            categoryMaps.put(split[0], split[1]);
+          } else
+          if (split.length == 1) {
+            categoryMaps.put(split[0], "");
+          }
         }
       }
     } catch (Exception e) {
-      throw new RuntimeException("Failed to initialise plugin " + sourceId, e);
+      throw new RuntimeException("Failed to initialise plugin " + pluginId, e);
     }
 
   }
@@ -99,7 +106,8 @@ public class PluginUpnp implements PluginInterface {
 
     RemoteDevice[] devices = new RemoteDevice[0];
     try {
-      devices = upnpUtils.findDevices("MediaServer", sourceId);
+      upnpUtils = UpnpUtils.instance();
+      devices = upnpUtils.findDevices("MediaServer", pluginId);
     } catch (Exception e) {
       e.printStackTrace();
       return false;
@@ -120,26 +128,78 @@ public class PluginUpnp implements PluginInterface {
   }
 
   @Override
-  public Source getSource() {
-    Source source = new Source();
-    String id = HtmlUtils.instance().makeIdSafe(sourceId);
-    source.setSourceId(id);
-    source.setId("Catchup/Sources/" + id);
-    source.setShortName(device.getDetails().getModelDetails().getModelName());
-    source.setLongName(device.getDetails().getModelDetails().getModelDescription());
-    source.setServiceUrl("/category?id=" + id + ";type=html");
-    URI iconUri = device.getIcons()[0].getUri();
-    URL iconUrl = device.normalizeURI(iconUri);
-    source.setIconUrl(iconUrl.toString());
-    return source;
+  public Collection<Source> getSources() {
+    Map<String, Source> sources = new HashMap<String, Source>();
+    items = upnpUtils.findItems(UpnpUtils.ContentType.VIDEO, excludes, services);
+    for (UpnpItem item : items.values()) {
+      for (ArrayList<Container> path : item.getPaths()) {
+        String sourcePath = toStringPath(path);
+        sourcePath = applyCategoryMaps(sourcePath);
+        String sourceName = sourcePath;
+        if (sourceName.contains("/")) {
+          sourceName = sourceName.substring(0, sourceName.indexOf("/"));
+        }
+
+        final String sourceIdShort = HtmlUtils.instance().makeIdSafe(sourceName);
+        final String sourceId = "Catchup/Sources/" + sourceIdShort;
+
+        Source source = sources.get(sourceId);
+        if (source == null) {
+          source = new Source();
+          source.setSourceId(sourceIdShort);
+          source.setId(sourceId);
+          source.setShortName(sourceName);
+          source.setLongName(sourceName);
+          source.setServiceUrl("/category?sourceId=" + sourceId + ";type=html");
+          URI iconUri = path.get(0).getFirstPropertyValue(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
+          URL iconUrl = normaliseURI(iconUri);
+          final String iconUrlString = iconUrl == null ? null : iconUrl.toString();
+          source.setIconUrl(iconUrlString);
+          sources.put(source.getId(), source);
+        }
+
+        ArrayList<UpnpItem> sourceItemList = sourceItems.get(source.getId());
+        if (sourceItemList == null) {
+          sourceItemList = new ArrayList<UpnpItem>();
+          sourceItems.put(source.getId(), sourceItemList);
+        }
+        sourceItemList.add(item);
+
+      }
+    }
+
+
+    return sources.values();
+  }
+
+  private URL normaliseURI(URI iconUri) {
+    if (iconUri == null) {
+      return null;
+    }
+    return device.normalizeURI(iconUri);
+  }
+
+  private String toStringPath(ArrayList<Container> path) {
+    String stringPath = "";
+    for (Container container : path) {
+      if (!stringPath.isEmpty()) {
+        stringPath += "/";
+      }
+      stringPath += container.getTitle().trim();
+    }
+    if (stringPath.endsWith("/")) {
+      stringPath = stringPath.substring(0, stringPath.length()-1);
+    }
+    return stringPath.trim();
   }
 
   @Override
   public Collection<Programme> getProgrammes(Source source, AtomicBoolean stopFlag) {
-    items = upnpUtils.findItems(UpnpUtils.ContentType.VIDEO, excludes, services);
 
+    //TODO outside the world of TV there are no "programmes" -  how do I detect and address this?
     Map<String, Programme> programmes = new TreeMap<String, Programme>();
-    for (UpnpItem item : items.values()) {
+    ArrayList<UpnpItem> items = sourceItems.get(source.getId());
+    for (UpnpItem item : items) {
       ArrayList<ArrayList<Container>> paths = item.getPaths();
       ArrayList<Container> firstPath = paths.get(0);
       Container parentContainer = firstPath.get(firstPath.size()-1);
@@ -150,11 +210,12 @@ public class PluginUpnp implements PluginInterface {
       String longName = title;
       String serviceUrl = "/programme?id="+ id +";type=html";
       URI iconUri = parentContainer.getFirstPropertyValue(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
-      URL iconUrl = device.normalizeURI(iconUri);
+      URL iconUrl = normaliseURI(iconUri);
+      final String iconUrlString = iconUrl == null ? null : iconUrl.toString();
 
       String parentId = "";
 
-      Programme prog = new Programme(sourceId, id, shortName, longName, serviceUrl, iconUrl.toString(), parentId);
+      Programme prog = new Programme(sourceId, id, shortName, longName, serviceUrl, iconUrlString, parentId);
 
       ArrayList<UpnpItem> progItems = programmeItems.get(id);
       if (progItems == null) {
@@ -171,7 +232,7 @@ public class PluginUpnp implements PluginInterface {
       progPaths.addAll(item.getPaths());
 
       if (!programmes.containsKey(id)) {
-        programmes.put(prog.getId(), prog);
+        programmes.put(id, prog);
       }
 
       if (programmes.size() == context.getMaxProgrammes(source.getSourceId())) {
@@ -183,7 +244,15 @@ public class PluginUpnp implements PluginInterface {
 
   @Override
   public Collection<Episode> getEpisodes(Source source, Programme programme, AtomicBoolean stopFlag) {
-    List<Episode> episodes = new ArrayList<Episode>();
+
+    Map<String, List<String>> specialCats = specialSubcategories.get(source.getId());
+    if (specialCats == null) {
+      specialCats = new HashMap<String, List<String>>();
+      specialSubcategories.put(source.getId(), specialCats);
+    }
+
+    Map<String, Episode> episodes = new HashMap<String, Episode>();
+
     for (UpnpItem item : programmeItems.get(programme.getId())) {
       String episodeTitle = item.getItem().getTitle();
       String id = HtmlUtils.instance().makeIdSafe(episodeTitle);
@@ -192,58 +261,72 @@ public class PluginUpnp implements PluginInterface {
       String seriesNo="";
       String episodeNo="";
       String description = item.getItem().getFirstPropertyValue(DIDLObject.Property.UPNP.LONG_DESCRIPTION.class);
+      if (description == null){
+        description = episodeTitle;
+      }
       URI iconUri = item.getItem().getFirstPropertyValue(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
-      URL iconUrl = device.normalizeURI(iconUri);
+      URL iconUrl = normaliseURI(iconUri);
       final Res resource = item.getItem().getFirstResource();
       String serviceUrl = resource.getValue();
+        // This does not work because on windows playon is on a virtual host
+//      try {
+//        URL url = new URL(serviceUrl);
+//        serviceUrl = "http://localhost:" + url.getPort() + url.getFile();
+//      } catch (Exception e) {
+//        e.printStackTrace();
+//      }
+
       String airDate = "";
       String airTime = "";
       String origAirDate = "";
       String origAirTime = "";
-      ArrayList<Container> path = new ArrayList<Container>(programmePaths.get(programme.getId()).get(0));
-      for (int i=0 ; i< channelPosition; i++) {
-        path.remove(0);
-      }
-      String channel = path.get(0).getTitle();
-      URI channelUri = path.get(0).getFirstPropertyValue(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
-      if (channelUri != null) {
-        String channelId = "Catchup/Channel/" + HtmlUtils.instance().makeIdSafe(channel);
-        URL channelUrl = device.normalizeURI(channelUri);
-        channelImages.put(channelId, channelUrl.toString());
-      }
+      String channel = "";
       Set<String> subcats = new HashSet<String>();
       for (ArrayList<Container> pathItems : programmePaths.get(programme.getId())) {
-        ArrayList<Container> categoryPathitems = new ArrayList<Container>(pathItems);
-        for (int i=0 ; i< categoryPosition; i++) {
-          categoryPathitems.remove(0);
-        }
-        StringBuilder builder = new StringBuilder();
-        for (Container pathItem : categoryPathitems) {
-          if (builder.length()>0) {
-            builder.append("/");
-          }
-          if (pathItem.getTitle().equals(programmeTitle)) {
+        String pathString = toStringPath(pathItems);
+        pathString = applyCategoryMaps(pathString);
+        String[] pathBits = pathString.split("/");
+        String subCatPath = "";
+        for (int i=1; i<pathBits.length; i++) {
+          if (!subCatPath.isEmpty()) {
+            subCatPath +="/"
+;          }
+          if (pathBits[i].equals(programmeTitle)) {
             break;
           }
-          builder.append(pathItem.getTitle());
+          subCatPath += pathBits[i];
         }
-        subcats.add(builder.toString());
+
+        if (subCatPath.endsWith("/")) {
+          subCatPath = subCatPath.substring(0, subCatPath.length()-1);
+        }
+        subcats.add(subCatPath);
       };
       Set<String> genres = new HashSet<String>();
       Iterator<String> itr = subcats.iterator();
       while (itr.hasNext()) {
         String subcat = itr.next();
 
-        for (Map.Entry<String,String> map : categoryMaps.entrySet()) {
-          String from = map.getKey();
-          String to = map.getValue();
-          subcat = subcat.replaceFirst(from+"/", to + "/");
+        subcat = applyCategoryMaps(subcat);
+
+        if (subcat.isEmpty()) {
+          continue;
         }
 
-        if (subcat.endsWith("/")) {
-          subcat = subcat.substring(0, subcat.length()-1);
-        }
-
+        if (subcat.contains("Channel/")) {
+          subcat = subcat.replaceAll(".*" + "Channel/", "");
+          if (subcat.contains("/")) {
+            channel = subcat.substring(0, subcat.indexOf("/"));
+          } else {
+            channel = subcat;
+          }
+          // TODO get the image for the channel from the Container
+//          String channelId = "Catchup/Channel/" + HtmlUtils.instance().makeIdSafe(channel);
+          //      URI channelUri = path.get(0).getFirstPropertyValue(DIDLObject.Property.UPNP.ALBUM_ART_URI.class);
+//      if (channelUri != null) {
+//        URL channelUrl = device.normalizeURI(channelUri);
+//        channelImages.put(channelId, channelUrl.toString());
+        } else
         if (subcat.contains("Genre/")) {
           subcat = subcat.replaceAll(".*" + "Genre/", "");
           String[] genreNames = subcat.split("/");
@@ -251,23 +334,42 @@ public class PluginUpnp implements PluginInterface {
             genres.add(genreName);
           }
         } else {
-          List<String> links = specialSubcategories.get(subcat);
+          List<String> links = specialCats.get(subcat);
           if (links == null) {
             links = new ArrayList<String>();
-            specialSubcategories.put(subcat, links);
+            specialCats.put(subcat, links);
           }
-          links.add(serviceUrl);
+          if (!links.contains(serviceUrl)) {
+            links.add(serviceUrl);
+          }
         }
       }
 
 
-      Episode episode = new Episode(source.getSourceId(), id, programmeTitle, seriesTitle, episodeTitle, seriesNo, episodeNo, description,
-              iconUrl.toString(), serviceUrl, airDate, airTime, origAirDate, origAirTime, channel, genres);
+      final String iconUrlString = iconUrl == null ? null : iconUrl.toString();
+      Episode episode = new Episode(pluginId, id, programmeTitle, seriesTitle, episodeTitle, seriesNo, episodeNo, description,
+              iconUrlString, serviceUrl, airDate, airTime, origAirDate, origAirTime, channel, genres);
 
-      episodes.add(episode);
+      episodes.put(episode.getId(), episode);
 
     }
-    return episodes;
+    return episodes.values();
+  }
+
+  private String applyCategoryMaps(String subcat) {
+    for (Map.Entry<String,String> map : categoryMaps.entrySet()) {
+      String from = map.getKey();
+      String to = map.getValue();
+      subcat = subcat.replaceFirst(from, to);
+      if (subcat.startsWith("/")) {
+        subcat = subcat.substring(1);
+      }
+    }
+
+    if (subcat.endsWith("/")) {
+      subcat = subcat.substring(0, subcat.length()-1);
+    }
+    return subcat.trim();
   }
 
   @Override
@@ -277,25 +379,26 @@ public class PluginUpnp implements PluginInterface {
 
   @Override
   public void getCategories(Source source, Map<String, List<String>> categories, AtomicBoolean stopFlag) {
-    categories.putAll(specialSubcategories);
+    Map<String, List<String>> specialCats = specialSubcategories.get(source.getId());
+    categories.putAll(specialCats);
   }
 
   @Override
   public void playEpisode(Recording recording) {
-    // Do nothing
+    playScript.play(recording);
   }
 
   @Override
   public void stopEpisode(Recording recording) {
-    // Do nothing
+    stopScript.stop(recording);
   }
 
-  public String getChannelImage(String channel) {
+  public String getIconUrl(String channel) {
     return channelImages.get(channel);
   }
 
   @Override
   public String toString() {
-    return sourceId;
+    return pluginId;
   }
 }

@@ -180,6 +180,15 @@ public class CatchupContext implements CatchupContextInterface {
     return properties.getInt(pluginName + ".maxprogrammes", 0);
   }
 
+  public boolean isStreamOnly(String sourceId) {
+    return properties.getBoolean(sourceId+".streamonly", false);
+  }
+
+  @Override
+  public boolean isStreamable(String sourceId) {
+    return properties.getBoolean(sourceId+".streamble", false);
+  }
+
   @Override
   public PropertiesInterface getProperties() {
     return properties;

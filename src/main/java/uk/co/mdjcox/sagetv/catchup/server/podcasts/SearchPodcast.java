@@ -11,6 +11,7 @@ public class SearchPodcast extends AbstractPodcast {
 
   private Catalog catalog;
   private String searchString="+$df!";
+  private String sourceId;
 
   public SearchPodcast(String podcastUrl, Catalog catalog) {
     super(podcastUrl);
@@ -38,6 +39,9 @@ public class SearchPodcast extends AbstractPodcast {
     builder.startDocument(title, desc, errorsUrl);
 
     for (Programme prog : catalog.getProgrammes()) {
+      if (sourceId != null && !sourceId.equals(prog.getSourceId())) {
+        continue;
+      }
         if (!prog.getLongName().toUpperCase().contains(searchString.toUpperCase()) &&
                 !prog.getShortName().toUpperCase().contains(searchString.toUpperCase())) {
           continue;
@@ -56,7 +60,8 @@ public class SearchPodcast extends AbstractPodcast {
     return builder.toString();
   }
 
-  public void setSearchString(String searchString) {
+  public void setSearchString(String sourceId, String searchString) {
     this.searchString = searchString;
+    this.sourceId = sourceId;
   }
 }

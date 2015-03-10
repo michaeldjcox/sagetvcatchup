@@ -3,6 +3,7 @@ package uk.co.mdjcox.sagetv.catchup.plugins;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
+import uk.co.mdjcox.sagetv.model.Source;
 import uk.co.mdjcox.sagetv.utils.LoggerInterface;
 
 import java.io.File;
@@ -24,6 +25,8 @@ public class PluginManager {
 
     private LoggerInterface logger;
     private LinkedHashMap<String, PluginInterface> plugins = new  LinkedHashMap<String, PluginInterface>();
+    private LinkedHashMap<String, PluginInterface> pluginForSource = new  LinkedHashMap<String, PluginInterface>();
+
     private Set<String> pluginNames = new TreeSet<String>();
     @Inject
     private PluginFactory pluginFactory;
@@ -43,6 +46,10 @@ public class PluginManager {
 
     public PluginInterface getPlugin(String sourceId) {
         return plugins.get(sourceId);
+    }
+
+    public PluginInterface getPluginForSource(String sourceId) {
+        return pluginForSource.get(sourceId);
     }
 
     public void start() {
@@ -75,17 +82,17 @@ public class PluginManager {
           final File[] files = pluginDir.listFiles();
           if (files != null) {
             try {
-              if (files.length == 1) {
-                plugin = pluginUpnpFactory.createPlugin(sourceId, pluginDir.getAbsolutePath());
-              } else
-              if (files.length > 1)
-              {
+              if (files.length > 3) {
                 plugin = pluginFactory.createPlugin(sourceId, pluginDir.getAbsolutePath());
+              } else
+              if (files.length > 0) {
+                plugin = pluginUpnpFactory.createPlugin(sourceId, pluginDir.getAbsolutePath());
               } else {
                 continue;
               }
               plugin.init();
               plugins.put(sourceId, plugin);
+
             } catch (Exception e) {
               logger.error("Failed to initialise plugin", e);
             }
@@ -98,7 +105,11 @@ public class PluginManager {
       }
     }
 
-  public Set<String> getPluginNames() {
+    public void addPluginForSource(PluginInterface plugin, Source source) {
+        pluginForSource.put(source.getId(), plugin);
+    }
+
+    public Set<String> getPluginNames() {
     return pluginNames;
   }
 }

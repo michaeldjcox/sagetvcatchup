@@ -42,7 +42,11 @@ public interface CatchupContextInterface {
 
     int getMaxProgrammes(String pluginName);
 
-  PropertiesInterface getProperties();
+    boolean isStreamOnly(String sourceId);
+
+    boolean isStreamable(String sourceId);
+
+    PropertiesInterface getProperties();
 
     boolean skipPlugin(String sourceId);
 

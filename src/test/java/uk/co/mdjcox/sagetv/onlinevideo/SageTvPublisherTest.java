@@ -206,7 +206,7 @@ public class SageTvPublisherTest {
     Iterator<Map.Entry<Object, Object>> itr = linkProps.entrySet().iterator();
     Map.Entry<Object, Object> next = itr.next();
     assertEquals("Property 1 key","CustomSources",next.getKey());
-    assertEquals("Property 1 val","xPodcastRootId",next.getValue());
+    assertEquals("Property 1 val","xPodcastsourceId",next.getValue());
 //    next = itr.next();
 //    assertEquals("Property 2 key","xFeedPodcastCustom/sourceId",next.getKey());
 //    assertEquals("Property 2 val","xPodcastRootId;podcastUrl",next.getValue());
@@ -390,7 +390,7 @@ public class SageTvPublisherTest {
 
     Method
         method =
-        SageTvPublisher.class.getDeclaredMethod("addSource", Root.class,
+        SageTvPublisher.class.getDeclaredMethod("addSource", SubCategory.class,
                                           PropertiesFile.class, PropertiesFile.class);
     method.setAccessible(true);
     PropertiesFile links = new PropertiesFile();

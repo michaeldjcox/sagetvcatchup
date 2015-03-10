@@ -49,6 +49,9 @@ public class CategoryPodcast extends OnDemandPodcast {
       CategoryComparator comparator = new CategoryComparator();
         Set<Category> subCatSet = new TreeSet<Category>(comparator);
       for (String subCatId : subCats) {
+          if (subCatId.endsWith("/Search")) {
+              continue;
+          }
         Category subCat =  catalog.getCategory(subCatId);
         subCatSet.add(subCat);
       }

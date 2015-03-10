@@ -23,4 +23,7 @@ public interface DownloadUtilsInterface {
     String downloadFileString(String source, int timeout, int attempts, AtomicBoolean stopFlag) throws Exception;
 
     void downloadFile(URL url, String file) throws IOException;
+
+    void downloadFile(URL url, String file, AtomicBoolean stopFlag) throws IOException;
+
 }

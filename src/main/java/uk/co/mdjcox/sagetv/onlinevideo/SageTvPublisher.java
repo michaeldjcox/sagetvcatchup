@@ -148,25 +148,41 @@ public class SageTvPublisher implements CatalogPublisher {
             labels.clear();
 
           Root root = catalog.getRoot();
-          addSource(root, links, labels);
+
+            logger.info("Online adding root " + root.getId());
+
+            addSource(root, links, labels);
 
           for (String categoryId : root.getSubCategories()) {
-//            if (context.getShowRoot(category.getId())) {
             SubCategory category = catalog.getSubcategory(categoryId);
+            if (category == null) {
+                category = catalog.getSource(categoryId);
+            }
+
             if (category != null) {
-              logger.info("Online adding source " + category.getId());
+              logger.info("Online adding root cat " + category.getId());
               boolean isSearch = category.getId().endsWith("/Search");
               addDynamicSource(category, links, labels, isSearch);
             }
-//            } else {
-//              for (String subCatId : category.getSubCategories()) {
-//                Category subCat = catalog.getCategory(subCatId);
-//                if (subCat != null) {
-//                  logger.info("Online adding source " + subCat.getId());
-//                  addDynamicSubcategory(category, subCat, links, labels);
-//                }
-//              }
-//            }
+          }
+
+          for (Source source : catalog.getSources()) {
+              logger.info("Online adding source " + source.getId());
+
+              if (source.getSourceId().equals("Test")) {
+                  continue;
+              }
+
+            addSource(source, links, labels);
+
+            for (String categoryId : source.getSubCategories()) {
+              SubCategory category = catalog.getSubcategory(categoryId);
+              if (category != null) {
+                logger.info("Online adding source cat " + category.getId());
+                boolean isSearch = category.getId().endsWith("/Search");
+                addDynamicSource(category, links, labels, isSearch);
+              }
+            }
           }
 
             links.commit(linkFile, new LinksPropertyLayout());
@@ -190,6 +206,7 @@ public class SageTvPublisher implements CatalogPublisher {
 
     private void addDynamicSource(SubCategory programme, PropertiesFile links, PropertiesFile labels, boolean isSearch) {
         String id = programme.getId();
+        String sourceId = programme.getId();
         String parentId = programme.getParentId();
         String name = programme.getShortName();
         String description = programme.getLongName();
@@ -233,7 +250,7 @@ public class SageTvPublisher implements CatalogPublisher {
 
         if (isSearch) {
           links.setProperty(id + "/IsSearch", "true");
-          links.setProperty(id + "/URLSearchPrefix", podcastBaseUrl + "/search?text=");
+          links.setProperty(id + "/URLSearchPrefix", podcastBaseUrl + "/search?sourceId="+ programme.getParentId() + ";text=");
           links.setProperty(id + "/URLSearchPostfix", ";type=xml");
         }
     }
@@ -420,7 +437,7 @@ public class SageTvPublisher implements CatalogPublisher {
      * @param links the custom online video property file containing the podcast URL
      * @param labels the custom online video property file containing associated UI text
      */
-    private void addSource(Root source, PropertiesFile links, PropertiesFile labels) {
+    private void addSource(SubCategory source, PropertiesFile links, PropertiesFile labels) {
 
         String id = source.getId();
         String name = source.getShortName();

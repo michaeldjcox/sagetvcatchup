@@ -10,6 +10,8 @@ import uk.co.mdjcox.sagetv.utils.LoggerInterface;
 import uk.co.mdjcox.sagetv.utils.OsUtilsInterface;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,16 +32,16 @@ public class SourceScript extends Script {
         sourceId = id;
     }
 
-    public Source getSource() {
-        Source source = new Source("", "", "", "", "", "");
+    public Collection<Source> getSources() {
+        Collection<Source> sources = new ArrayList<Source>();
         try {
             getLogger().info("Getting details of source " + sourceId);
-            call("source", source);
-            getLogger().info("Found source " + source);
+            call("sources", sources);
+            getLogger().info("Found sources " + sources);
         } catch (Throwable e) {
             getLogger().error("Unable to get details of source: " + sourceId, e);
         }
-        return source;
+        return sources;
     }
 
 }

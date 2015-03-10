@@ -23,7 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class Category implements ErrorRecorder {
 
     /** The unique id of this category */
-    private String sourceId="";
+    protected String sourceId="";
     /** The unique id of this category */
     private String id="";
     /** The short name for this category */
@@ -78,7 +78,7 @@ public abstract class Category implements ErrorRecorder {
      *
      * @return The id of the media file source providing this file
      */
-    public final String getSourceId() {
+    public String getSourceId() {
         return sourceId;
     }
 

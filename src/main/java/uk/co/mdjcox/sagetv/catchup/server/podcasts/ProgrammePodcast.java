@@ -40,7 +40,9 @@ public class ProgrammePodcast extends OnDemandPodcast {
 
         RssBuilder builder = new RssBuilder();
         builder.startDocument(shortName, longName, url);
-        builder.addImage(iconUrl, shortName, url);
+        if (iconUrl != null) {
+          builder.addImage(iconUrl, shortName, url);
+        }
         Set<String> episodes = programme.getEpisodes();
         EpisodeComparator comparator = new EpisodeComparator();
         TreeSet<Episode> sortedEpisodes = new TreeSet<Episode>(comparator);

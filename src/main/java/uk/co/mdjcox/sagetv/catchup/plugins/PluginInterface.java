@@ -18,7 +18,7 @@ public interface PluginInterface {
 
   boolean beginCatalog();
 
-  Source getSource();
+  Collection<Source> getSources();
 
   Collection<Programme> getProgrammes(Source source, AtomicBoolean stopFlag);
 
@@ -31,4 +31,8 @@ public interface PluginInterface {
   void playEpisode(Recording recording);
 
   void stopEpisode(Recording recording);
+
+  String getIconUrl(String channel);
+
+  String getPluginId();
 }

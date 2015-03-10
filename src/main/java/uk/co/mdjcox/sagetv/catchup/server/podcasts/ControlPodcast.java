@@ -1,5 +1,6 @@
 package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
+import uk.co.mdjcox.sagetv.catchup.CatchupContextInterface;
 import uk.co.mdjcox.sagetv.catchup.Recorder;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.utils.HtmlUtilsInterface;
@@ -13,12 +14,14 @@ public class ControlPodcast extends AbstractPodcast {
     private final HtmlUtilsInterface htmlUtils;
     private final Recorder recorder;
     private Episode episode;
+    private CatchupContextInterface context;
 
-    public ControlPodcast(String baseUrl, Recorder recorder, Episode episode, HtmlUtilsInterface htmlUtils) {
+    public ControlPodcast(String baseUrl, Recorder recorder, Episode episode, HtmlUtilsInterface htmlUtils, CatchupContextInterface context) {
         super(baseUrl);
         this.episode = episode;
         this.htmlUtils = htmlUtils;
         this.recorder = recorder;
+      this.context = context;
     }
 
     @Override
@@ -42,7 +45,12 @@ public class ControlPodcast extends AbstractPodcast {
         }
 
         final String stopUrl = getPodcastBaseUrl() + "/stop?id=" + episode.getId() + ";type=xml";
-        final String watchUrl = getPodcastBaseUrl() + "/watch?id=" + episode.getId() + ";type=mpeg4";
+        final String watchUrl;
+        if (context.isStreamable(episode.getSourceId())) {
+          watchUrl = episode.getServiceUrl();
+        } else {
+          watchUrl = getPodcastBaseUrl() + "/watch?id=" + episode.getId() + ";type=mpeg4";
+        }
         final String watchAndKeepUrl = getPodcastBaseUrl() + "/watchandkeep?id=" + episode.getId() + ";type=mpeg4";
         final String recordUrl = getPodcastBaseUrl() + "/record?id=" + episode.getId() + ";type=xml";
 

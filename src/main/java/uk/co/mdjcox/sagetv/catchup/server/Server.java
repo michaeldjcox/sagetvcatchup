@@ -42,7 +42,7 @@ public class Server implements CatalogPublisher {
 //  private final String stagingDir;
   private final SocketConnector connector;
   private final CatalogPersister persister;
-  private final OsUtilsInterface osUtils;
+  private final CatchupContextInterface context;
   private LoggerInterface logger;
     private org.mortbay.jetty.Server server;
     private int port;
@@ -56,11 +56,11 @@ public class Server implements CatalogPublisher {
 
     @Inject
     private Server(LoggerInterface logger, CatchupContextInterface context,
-                   HtmlUtilsInterface htmlUtils, OsUtilsInterface osUtils,
+                   HtmlUtilsInterface htmlUtils,
                    Cataloger cataloger, Recorder recorder, CatalogPersister persister) throws Exception {
         this.logger = logger;
         this.htmlUtils = htmlUtils;
-      this.osUtils = osUtils;
+      this.context = context;
       this.persister = persister;
 
         Handler handler = new AbstractHandler() {
@@ -276,16 +276,29 @@ public class Server implements CatalogPublisher {
 
       if (target.endsWith(".css")) {
         new CssPage(logger, cssDir, target).serve(request, response);
-      } else if (staticContent.containsKey(page)) {
-        staticContent.get(page).serve(request, response);
       } else
-      if (page.contains("search?text=")) {
-        SearchPodcast searchPodcast = (SearchPodcast)publishedContent.get(page.replaceAll("text=.*;type=xml", "type=xml"));
-        searchPodcast.setSearchString(page.replaceAll("search\\?text=", "").replaceAll(";type=xml", ""));
-        searchPodcast.serve(request, response);
+      if (staticContent.containsKey(page)) {
+        staticContent.get(page).serve(request, response);
+      } else if (page.contains("/Status;type=xml")) {
+        final String newPage = page.replaceAll("Sources/\\w/Status", "Sources/Status");
+        final ContentProvider contentProvider = staticContent.get("category?id=Catchup/Status;type=xml");
+        contentProvider.serve(request, response);
+        System.err.println(page);
+      } else
+      if (page.contains("search?")) {
+        SearchPodcast searchPodcast = (SearchPodcast)publishedContent.get(page.replaceAll("\\?.*;type=xml", "?type=xml"));
+        final String searchString = page.replaceAll(".*text=", "").replaceAll(";type=xml", "");
+        final String sourceId = page.replaceAll(".*sourceId=", "").replaceAll(";text=.*", "");
+        if (sourceId.equals("Catchup")) {
+          searchPodcast.setSearchString(null, searchString);
+        } else {
+          searchPodcast.setSearchString(sourceId, searchString);
+        }
+          searchPodcast.serve(request, response);
       } else
         if (publishedContent.containsKey(page)) {
-            publishedContent.get(page).serve(request, response);
+          final ContentProvider contentProvider = publishedContent.get(page);
+          contentProvider.serve(request, response);
         } else {
             if (page.contains(";type=xml")) {
                 new MessagePodcast(baseUrl, "Podcast not found " + page).serve(request, response);
@@ -333,7 +346,7 @@ public class Server implements CatalogPublisher {
                 addCachedPublishedContent(publishedContent, provider);
 
                 if (episode.getPodcastUrl().startsWith("/control")) {
-                  ControlPodcast controlPodcastProvider = new ControlPodcast(baseUrl, recorder, episode, htmlUtils);
+                  ControlPodcast controlPodcastProvider = new ControlPodcast(baseUrl, recorder, episode, htmlUtils, context);
                   addPublishedContent(publishedContent, controlPodcastProvider);
 
                   StopEpisodePage stopEpisodeRecordingHtmlProvider = new StopEpisodePage(episode.getId(), recorder);

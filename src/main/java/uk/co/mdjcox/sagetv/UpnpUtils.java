@@ -204,6 +204,7 @@ public class UpnpUtils {
     if (container.getTitle().equals("Preferences")) {
       continue;
     }
+
     ArrayList<Container> newPath = new ArrayList<Container>(path);
     newPath.add(container);
     containerContainers.addAll(findContainers(newPath, upnpService, items, itemType, container.getId(), contentService, excludes));

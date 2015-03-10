@@ -411,7 +411,7 @@ public class Recorder {
   }
 
   private File callPlayScript(Recording recording) throws Exception {
-    PluginInterface plugin = pluginManager.getPlugin(recording.getSourceId());
+    PluginInterface plugin = pluginManager.getPluginForSource(recording.getSourceId());
     plugin.playEpisode(recording);
 
     synchronized (recording) {
@@ -459,7 +459,7 @@ public class Recorder {
     try {
       logger.info("Going to stop recording of " + recording);
       recording.setStopped();
-      PluginInterface plugin = pluginManager.getPlugin(recording.getSourceId());
+      PluginInterface plugin = pluginManager.getPluginForSource(recording.getSourceId());
       plugin.stopEpisode(recording);
       return "Recording " + recording + " stopping";
     } catch (Exception e1) {

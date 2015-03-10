@@ -24,14 +24,14 @@ public class DownloadUtils implements DownloadUtilsInterface {
   private static final int DOWNLOAD_TIMEOUT = 30000;
   private static DownloadInterruptThread interruptThread;
   private static DownloadUtilsInterface instance;
-    private final String DEFAULT_ENCODING = "UTF-8";
+  private final String DEFAULT_ENCODING = "UTF-8";
 
-    public static synchronized DownloadUtilsInterface instance() {
-        if (instance == null) {
-            instance = new DownloadUtils();
-        }
-        return instance;
+  public static synchronized DownloadUtilsInterface instance() {
+    if (instance == null) {
+      instance = new DownloadUtils();
     }
+    return instance;
+  }
 
   private DownloadUtils() {
     interruptThread = new DownloadInterruptThread();
@@ -39,127 +39,154 @@ public class DownloadUtils implements DownloadUtilsInterface {
   }
 
   @Override
-    public String sampleFileString(String source) throws Exception {
-        return downloadFileString(source, DEFAULT_ENCODING, true, DOWNLOAD_TIMEOUT, 1, null);
+  public String sampleFileString(String source) throws Exception {
+    return downloadFileString(source, DEFAULT_ENCODING, true, DOWNLOAD_TIMEOUT, 1, null);
 
-    }
+  }
 
-    @Override
-    public String sampleFileString(String source, String encoding) throws Exception {
-        return downloadFileString(source, encoding, true, DOWNLOAD_TIMEOUT, 1, null);
-    }
+  @Override
+  public String sampleFileString(String source, String encoding) throws Exception {
+    return downloadFileString(source, encoding, true, DOWNLOAD_TIMEOUT, 1, null);
+  }
 
 
-    @Override
-    public String downloadFileString(String source, AtomicBoolean stopFlag) throws Exception {
-        return downloadFileString(source, DEFAULT_ENCODING, stopFlag);
-    }
+  @Override
+  public String downloadFileString(String source, AtomicBoolean stopFlag) throws Exception {
+    return downloadFileString(source, DEFAULT_ENCODING, stopFlag);
+  }
 
-    @Override
-    public String downloadFileString(String source, String encoding, AtomicBoolean stopFlag) throws Exception {
-        return downloadFileString(source, encoding, false, DOWNLOAD_TIMEOUT, 1, stopFlag);
-    }
+  @Override
+  public String downloadFileString(String source, String encoding, AtomicBoolean stopFlag) throws Exception {
+    return downloadFileString(source, encoding, false, DOWNLOAD_TIMEOUT, 1, stopFlag);
+  }
 
   public String downloadFileString(String source, int timeout, int attempts, AtomicBoolean stopFlag) throws Exception {
     return downloadFileString(source, DEFAULT_ENCODING, false, timeout, attempts, stopFlag);
   }
 
-    private String downloadFileString(String source, String encoding, boolean sample, int timeout, int attempts, AtomicBoolean stopFlag) throws Exception {
-      for (int i =0 ; i < attempts; i++) {
-        String webpage = "";
-        InputStream stream = null;
-        BufferedInputStream bis = null;
-        URLConnection conn = null;
-        try {
-          URL url = new URL(source);
+  private String downloadFileString(String source, String encoding, boolean sample, int timeout, int attempts, AtomicBoolean stopFlag) throws Exception {
+    for (int i =0 ; i < attempts; i++) {
+      String webpage = "";
+      InputStream stream = null;
+      BufferedInputStream bis = null;
+      URLConnection conn = null;
+      try {
+        URL url = new URL(source);
 
-          conn = url.openConnection();
-          conn.setReadTimeout(timeout);
-          conn.setConnectTimeout(timeout);
-          interruptThread.addDownload(conn, stopFlag, timeout);
-          conn.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17");
+        conn = url.openConnection();
+        conn.setReadTimeout(timeout);
+        conn.setConnectTimeout(timeout);
+        interruptThread.addDownload(conn, stopFlag, timeout);
+        conn.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17");
 //            conn.setRequestProperty("Accept-Encoding", "tgzip,deflate,sdch");
-          stream = conn.getInputStream();
-          bis = new BufferedInputStream(stream);
-          byte[] buf = new byte[1024];
-          int len;
-          while ((len = bis.read(buf)) > 0) {
-            webpage += new String(buf, 0, len, Charset.forName(encoding));
-            if (sample) break;
-            if (stopFlag.get()) {
-              throw new RuntimeException(STOPPED_ON_REQUEST);
-            }
+        stream = conn.getInputStream();
+        bis = new BufferedInputStream(stream);
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = bis.read(buf)) > 0) {
+          webpage += new String(buf, 0, len, Charset.forName(encoding));
+          if (sample) break;
+          if (stopFlag.get()) {
+            throw new RuntimeException(STOPPED_ON_REQUEST);
           }
-          return webpage;
-        } catch (Exception ex) {
-          String message = ex.getMessage();
-          if (message == null) {
-            message = ex.getClass().getSimpleName();
+        }
+        return webpage;
+      } catch (Exception ex) {
+        String message = ex.getMessage();
+        if (message == null) {
+          message = ex.getClass().getSimpleName();
+        }
+        if (!message.contains("Bogus chunk") && !message.contains("missing CR")) {
+          if (message.equals(STOPPED_ON_REQUEST) || (i == (attempts-1))) {
+            throw ex;
+          } else {
+            continue;
           }
-          if (!message.contains("Bogus chunk") && !message.contains("missing CR")) {
-            if (message.equals(STOPPED_ON_REQUEST) || (i == (attempts-1))) {
-              throw ex;
-            } else {
-              continue;
-            }
+        }
+        return webpage;
+      } finally {
+        if (bis != null) {
+          try {
+            bis.close();
+          } catch (IOException e) {
+            //Ignore
           }
-          return webpage;
-        } finally {
-          if (bis != null) {
-            try {
-              bis.close();
-            } catch (IOException e) {
-              //Ignore
-            }
+        }
+        if (stream != null) {
+          try {
+            stream.close();
+          } catch (IOException e) {
+            // Ignore
           }
-          if (stream != null) {
-            try {
-              stream.close();
-            } catch (IOException e) {
-              // Ignore
-            }
-          }
-          if (conn != null && conn instanceof HttpURLConnection) {
-            try {
-              ((HttpURLConnection) conn).disconnect();
-            } catch (Exception e) {
-              // Ignore
-            }
+        }
+        if (conn != null && conn instanceof HttpURLConnection) {
+          try {
+            ((HttpURLConnection) conn).disconnect();
+          } catch (Exception e) {
+            // Ignore
           }
         }
       }
-
-      throw new Exception("Failed to download web page " + source );
     }
+
+    throw new Exception("Failed to download web page " + source );
+  }
 
 
   /**
-     * Downloads the file at the specfied URL and stores in in the specified
-     * path.
-     *
-     * @param url  the URL of the resource to download
-     * @param file the path to save the content at
-     * @throws IOException any exception thrown
-     */
-    @Override
-    public void downloadFile(URL url, String file) throws IOException {
-        URLConnection uc = url.openConnection();
-        String contentType = uc.getContentType();
-        int contentLength = uc.getContentLength();
-        InputStream raw = uc.getInputStream();
-        InputStream in = new BufferedInputStream(raw);
-        FileOutputStream out = new FileOutputStream(file);
+   * Downloads the file at the specfied URL and stores in in the specified
+   * path.
+   *
+   * @param url  the URL of the resource to download
+   * @param file the path to save the content at
+   * @throws IOException any exception thrown
+   */
+  @Override
+  public void downloadFile(URL url, String file) throws IOException {
+    downloadFile(url, file, null);
+  }
 
-        byte[] buf = new byte[1024];
-        int len;
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
+  /**
+   * Downloads the file at the specfied URL and stores in in the specified
+   * path.
+   *
+   * @param url      the URL of the resource to download
+   * @param file     the path to save the content at
+   * @param stopFlag set when we are abandoning the operation
+   * @throws IOException any exception thrown
+   */
+  @Override
+  public void downloadFile(URL url, String file, AtomicBoolean stopFlag) throws IOException {
+    InputStream in = null;
+    FileOutputStream out = null;
+    try {
+      URLConnection uc = url.openConnection();
+      String contentType = uc.getContentType();
+      int contentLength = uc.getContentLength();
+      InputStream raw = uc.getInputStream();
+      in = new BufferedInputStream(raw);
+      out = new FileOutputStream(file);
+
+      byte[] buf = new byte[1024];
+      int len;
+      while ((len = in.read(buf)) > 0) {
+        out.write(buf, 0, len);
+        if (stopFlag != null && stopFlag.get()) {
+          throw new RuntimeException(STOPPED_ON_REQUEST);
         }
-
+      }
+    } finally {
+      if (out != null) {
         out.flush();
+      }
+      if (in != null) {
         in.close();
+      }
+      if (out != null) {
         out.close();
-        TmpFileManager.addTmpFile(file);
+      }
+      TmpFileManager.addTmpFile(file);
     }
+  }
 
 }
