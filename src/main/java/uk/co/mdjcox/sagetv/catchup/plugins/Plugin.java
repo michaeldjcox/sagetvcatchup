@@ -2,6 +2,7 @@ package uk.co.mdjcox.sagetv.catchup.plugins;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import uk.co.mdjcox.sagetv.catchup.ProgressTracker;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Programme;
 import uk.co.mdjcox.sagetv.model.Recording;
@@ -30,8 +31,10 @@ public class Plugin implements PluginInterface {
   private CategoriesScript categoriesScript;
   private PlayScript playScript;
   private StopScript stopScript;
+    private ProgressTracker progressTracker;
 
-  @Inject
+
+    @Inject
   private ScriptFactory scriptFactory;
 
   @Inject
@@ -50,7 +53,12 @@ public class Plugin implements PluginInterface {
     return true;
   }
 
-  @Override
+    @Override
+    public void setProgressTracker(ProgressTracker progressTracker) {
+       this.progressTracker = progressTracker;
+    }
+
+    @Override
   public void init() {
     sourceScript = scriptFactory.createSourceScript(pluginId, base);
     programmesScript = scriptFactory.createProgrammesScript(base);

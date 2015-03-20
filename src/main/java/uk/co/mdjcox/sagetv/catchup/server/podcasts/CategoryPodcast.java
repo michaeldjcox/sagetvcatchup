@@ -1,8 +1,6 @@
 package uk.co.mdjcox.sagetv.catchup.server.podcasts;
 
-import uk.co.mdjcox.sagetv.model.Catalog;
-import uk.co.mdjcox.sagetv.model.Category;
-import uk.co.mdjcox.sagetv.model.SubCategory;
+import uk.co.mdjcox.sagetv.model.*;
 import uk.co.mdjcox.sagetv.utils.HtmlUtilsInterface;
 import uk.co.mdjcox.sagetv.utils.RssBuilder;
 
@@ -56,6 +54,34 @@ public class CategoryPodcast extends OnDemandPodcast {
         subCatSet.add(subCat);
       }
       for (Category subCat: subCatSet) {
+          // Massive hack to get rid of UPnP artificial programme categories with only one
+          // Episode and the same details as the Programme
+        if (subCat.isSubCategory()) {
+            SubCategory prog = (SubCategory)subCat;
+            Set<String> episodes = prog.getEpisodes();
+            if (episodes.size() == 1) {
+                String episodeId = episodes.iterator().next();
+                Episode episode = catalog.getEpisode(episodeId);
+                if (episode.getEpisodeTitle().equals(subCat.getShortName()) &&
+                    episode.getEpisodeTitle().equals(subCat.getLongName())) {
+                    //      Episode icon - takes too much space
+                    String episodeIconUrl = episode.getIconUrl();
+                    if (episodeIconUrl != null && episodeIconUrl.startsWith("/")) {
+                        episodeIconUrl = getPodcastBaseUrl() + episodeIconUrl;
+                    }
+
+                    if (!episode.getPodcastUrl().startsWith("/control")) {
+                        String controlUrl = episode.getPodcastUrl();
+                        builder.addVideoItem(episode.getEpisodeTitle(), episode.getDescription(), controlUrl, episodeIconUrl);
+                    } else {
+                        String controlUrl=getPodcastBaseUrl() +  "/control?id=" + episode.getId() + ";type=xml";
+                        builder.addCategoryItem(episode.getEpisodeTitle(), episode.getDescription(), controlUrl, episodeIconUrl);
+                    }
+                    continue;
+                }
+            }
+        }
+
         if (subCat.hasEpisodes()) {
           String programmeIconUrl = subCat.getIconUrl();
           if (programmeIconUrl != null && programmeIconUrl.startsWith("/")) {

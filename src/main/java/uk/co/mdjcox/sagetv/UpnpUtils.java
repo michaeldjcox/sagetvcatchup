@@ -19,6 +19,7 @@ import org.fourthline.cling.support.model.item.AudioItem;
 import org.fourthline.cling.support.model.item.ImageItem;
 import org.fourthline.cling.support.model.item.Item;
 import org.fourthline.cling.support.model.item.VideoItem;
+import uk.co.mdjcox.sagetv.catchup.ProgressTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +87,7 @@ public class UpnpUtils {
 
 
 
-  public RemoteDevice[] findDevices(final String reqType, final String reqName) {
+  public RemoteDevice[] findDevices(final ProgressTracker tracker, final String reqType, final String reqName) {
     final ArrayList<RemoteDevice> devices = new ArrayList<RemoteDevice>();
     UpnpService upnpService = null;
     try {
@@ -97,6 +98,9 @@ public class UpnpUtils {
           if (reqType == null || reqType.equals(deviceType)) {
             if (device.getDetails().getFriendlyName().contains(reqName)) {
               devices.add(device);
+                if (tracker != null) {
+                    tracker.setProgress("Doing " + device.getDetails().getModelDetails().getModelName());
+                }
             }
           }
         }
@@ -115,7 +119,7 @@ public class UpnpUtils {
     return devices.toArray(new RemoteDevice[devices.size()]);
   }
 
-  public RemoteService[] findServices(String reqType, RemoteDevice... devices) {
+  public RemoteService[] findServices(ProgressTracker tracker, String reqType, RemoteDevice... devices) {
     final ArrayList<RemoteService> services = new ArrayList<RemoteService>();
     for (RemoteDevice device : devices) {
       for (RemoteService service : device.getServices()) {
@@ -129,7 +133,7 @@ public class UpnpUtils {
   }
 
 
-  public Map<String, UpnpItem> findItems(ContentType itemType, Set<String> excludes, RemoteService... services) {
+  public Map<String, UpnpItem> findItems(ProgressTracker tracker, ContentType itemType, Set<String> excludes, RemoteService... services) {
     ConcurrentHashMap<String, UpnpItem> items = new ConcurrentHashMap<String, UpnpItem>();
 
     UpnpService upnpService = new UpnpServiceImpl(new BaseRegistryListener());
@@ -141,7 +145,7 @@ public class UpnpUtils {
         continue;
       }
 
-      List<Container> serviceContainers = findContainers(new ArrayList<Container>(), upnpService, items, itemType, "0", service, excludes);
+      List<Container> serviceContainers = findContainers(tracker, new ArrayList<Container>(), upnpService, items, itemType, "0", service, excludes);
 
       containers.addAll(serviceContainers);
     }
@@ -150,7 +154,7 @@ public class UpnpUtils {
     return items;
   }
 
-  private List<Container> findContainers(final ArrayList<Container> path, UpnpService upnpService, final ConcurrentHashMap<String, UpnpItem> items, final ContentType itemType, final String parentId, final RemoteService contentService, final Set<String> excludes) {
+  private List<Container> findContainers(final ProgressTracker tracker, final ArrayList<Container> path, UpnpService upnpService, final ConcurrentHashMap<String, UpnpItem> items, final ContentType itemType, final String parentId, final RemoteService contentService, final Set<String> excludes) {
 
     final List<Container> containers = new ArrayList<Container>();
 
@@ -170,7 +174,9 @@ public class UpnpUtils {
             if (uitem != null) {
               uitem.addPath(path);
             } else {
-              System.err.println("Items=" + items.size());
+                if (tracker != null) {
+                    tracker.setProgress("Doing " + contentService.getDevice().getDetails().getModelDetails().getModelName() + " item " + items.size());
+                }
             }
           }
         }
@@ -207,7 +213,7 @@ public class UpnpUtils {
 
     ArrayList<Container> newPath = new ArrayList<Container>(path);
     newPath.add(container);
-    containerContainers.addAll(findContainers(newPath, upnpService, items, itemType, container.getId(), contentService, excludes));
+    containerContainers.addAll(findContainers(tracker, newPath, upnpService, items, itemType, container.getId(), contentService, excludes));
   }
 
   containers.addAll(containerContainers);

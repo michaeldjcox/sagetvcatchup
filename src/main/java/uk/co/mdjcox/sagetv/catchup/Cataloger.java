@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * File | Settings | File Templates.
  */
 @Singleton
-public class Cataloger {
+public class Cataloger implements ProgressTracker {
 
   private static final String STOPPED_ON_REQUEST = "Stopped on request";
   private static final int PROGRAMME_THREADS = 20;
@@ -186,6 +186,8 @@ public class Cataloger {
           logger.info("Skipping plugin " + plugin + " as is disabled");
           continue;
         }
+
+        plugin.setProgressTracker(this);
 
         progressString.set("Doing plugin " + plugin);
 
@@ -975,6 +977,7 @@ public class Cataloger {
     azCat.addSubCategory(programmeCat);
   }
 
+  @Override
   public String getProgress() {
     if (progressString.get().startsWith("Finished") || progressString.get().startsWith("Failed") ||
             progressString.get().startsWith("Waiting") || progressString.get().startsWith("Stopped")) {
@@ -1024,6 +1027,7 @@ public class Cataloger {
     }
   }
 
+  @Override
   public void setProgress(String progress) {
     progressString.set(progress);
   }

@@ -201,12 +201,12 @@ public class SageTvPublisherTest {
     labelProps.putAll(labelPropsFile);
 
     assertEquals("Link property count", 1, linkProps.size());
-    assertEquals("Label property count", 2, labelProps.size());
+    assertEquals("Label property count", 4, labelProps.size());
 
     Iterator<Map.Entry<Object, Object>> itr = linkProps.entrySet().iterator();
     Map.Entry<Object, Object> next = itr.next();
     assertEquals("Property 1 key","CustomSources",next.getKey());
-    assertEquals("Property 1 val","xPodcastsourceId",next.getValue());
+    assertEquals("Property 1 val","xPodcastRootId,xPodcastsourceId",next.getValue());
 //    next = itr.next();
 //    assertEquals("Property 2 key","xFeedPodcastCustom/sourceId",next.getKey());
 //    assertEquals("Property 2 val","xPodcastRootId;podcastUrl",next.getValue());

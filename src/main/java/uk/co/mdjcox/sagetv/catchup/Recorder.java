@@ -258,7 +258,7 @@ public class Recorder {
       file = recording.hasCompletedFile() ? recording.getCompletedFile() : recording.getPartialFile();
 
       if (file == null || !file.exists()) {
-        throw new Exception("Failed to stream episode " + episode);
+        throw new Exception("Failed to stream episode " + episode + " - no file " + file + " found");
       }
 
         logger.info("Streaming " + file + " exists=" + file.exists());
@@ -348,23 +348,23 @@ public class Recorder {
       }
 
       // Only on mintpad dev machine will we use a substitute recording
-      if (hostname.equals("mintpad")) {
-        if (!recording.hasCompletedFile()) {
-          File completedFile = recording.getCompletedFile();
-          if (completedFile == null) {
-            completedFile = new File(context.getRecordingDir() + File.separator + recording.getEpisode().getId() + ".mp4" );
-            recording.setCompletedFile(completedFile);
-          }
-          File testFile = new File(context.getPluginDir() + File.separator + "Test" + File.separator + "TestEpisode.mp4");
-          try {
-            logger.info("Copy test programme in from " + testFile + " to " + completedFile);
-            Files.copy(testFile.toPath(), completedFile.toPath());
-          } catch (Exception e) {
-            logger.error("Failed to copy in substitute completed file", e);
-            e.printStackTrace();
-          }
-        }
-      }
+//      if (hostname.equals("mintpad")) {
+//        if (!recording.hasCompletedFile()) {
+//          File completedFile = recording.getCompletedFile();
+//          if (completedFile == null) {
+//            completedFile = new File(context.getRecordingDir() + File.separator + recording.getEpisode().getId() + ".mp4" );
+//            recording.setCompletedFile(completedFile);
+//          }
+//          File testFile = new File(context.getPluginDir() + File.separator + "Test" + File.separator + "TestEpisode.mp4");
+//          try {
+//            logger.info("Copy test programme in from " + testFile + " to " + completedFile);
+//            Files.copy(testFile.toPath(), completedFile.toPath());
+//          } catch (Exception e) {
+//            logger.error("Failed to copy in substitute completed file", e);
+//            e.printStackTrace();
+//          }
+//        }
+//      }
         if (recording.isToKeep() && recording.hasCompletedFile()) {
                 uploadToSageTv(recording);
         }
@@ -412,6 +412,9 @@ public class Recorder {
 
   private File callPlayScript(Recording recording) throws Exception {
     PluginInterface plugin = pluginManager.getPluginForSource(recording.getSourceId());
+      if (plugin == null) {
+          plugin = pluginManager.getPlugin(recording.getSourceId());
+      }
     plugin.playEpisode(recording);
 
     synchronized (recording) {
@@ -460,6 +463,9 @@ public class Recorder {
       logger.info("Going to stop recording of " + recording);
       recording.setStopped();
       PluginInterface plugin = pluginManager.getPluginForSource(recording.getSourceId());
+        if (plugin == null) {
+            plugin = pluginManager.getPlugin(recording.getSourceId());
+        }
       plugin.stopEpisode(recording);
       return "Recording " + recording + " stopping";
     } catch (Exception e1) {

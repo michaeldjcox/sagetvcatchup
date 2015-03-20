@@ -1,5 +1,6 @@
 package uk.co.mdjcox.sagetv.catchup.plugins;
 
+import uk.co.mdjcox.sagetv.catchup.ProgressTracker;
 import uk.co.mdjcox.sagetv.model.Episode;
 import uk.co.mdjcox.sagetv.model.Programme;
 import uk.co.mdjcox.sagetv.model.Recording;
@@ -18,7 +19,9 @@ public interface PluginInterface {
 
   boolean beginCatalog();
 
-  Collection<Source> getSources();
+    void setProgressTracker(ProgressTracker progressTracker);
+
+    Collection<Source> getSources();
 
   Collection<Programme> getProgrammes(Source source, AtomicBoolean stopFlag);
 

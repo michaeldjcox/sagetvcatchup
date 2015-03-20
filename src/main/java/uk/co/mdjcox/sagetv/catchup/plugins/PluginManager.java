@@ -80,15 +80,20 @@ public class PluginManager {
           pluginNames.add(sourceId);
             PluginInterface plugin = null;
           final File[] files = pluginDir.listFiles();
-          if (files != null) {
+          if ((files != null) && files.length > 0) {
+              boolean isUpnp = false;
+              for (File file : files) {
+                  if (file.getName().endsWith(".properties")) {
+                     isUpnp = true;
+                      break;
+                  }
+              }
+
             try {
-              if (files.length > 3) {
-                plugin = pluginFactory.createPlugin(sourceId, pluginDir.getAbsolutePath());
-              } else
-              if (files.length > 0) {
-                plugin = pluginUpnpFactory.createPlugin(sourceId, pluginDir.getAbsolutePath());
+              if (isUpnp) {
+                  plugin = pluginUpnpFactory.createPlugin(sourceId, pluginDir.getAbsolutePath());
               } else {
-                continue;
+                  plugin = pluginFactory.createPlugin(sourceId, pluginDir.getAbsolutePath());
               }
               plugin.init();
               plugins.put(sourceId, plugin);
@@ -106,7 +111,7 @@ public class PluginManager {
     }
 
     public void addPluginForSource(PluginInterface plugin, Source source) {
-        pluginForSource.put(source.getId(), plugin);
+        pluginForSource.put(source.getSourceId(), plugin);
     }
 
     public Set<String> getPluginNames() {

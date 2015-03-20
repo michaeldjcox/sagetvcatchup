@@ -209,7 +209,7 @@ public class CatchupPlugin implements SageTVPlugin {
             }
             javaCmd += "bin";
             javaCmd += File.separator;
-            javaCmd += "java\" \"-Xmx500m\" \"-jar\" \"" + catchupDir + "libs" + File.separator + "sagetvcatchup.jar\"";
+            javaCmd += "java\" \"-Xmx750m\" \"-jar\" \"" + catchupDir + "libs" + File.separator + "sagetvcatchup.jar\"";
         } else {
             javaCmd = System.getProperty("java.home");
             if (!javaCmd.endsWith(File.separator)) {
@@ -217,7 +217,7 @@ public class CatchupPlugin implements SageTVPlugin {
             }
             javaCmd += "bin";
             javaCmd += File.separator;
-            javaCmd += "java -Xmx500m -jar " + catchupDir + "libs" + File.separator + "sagetvcatchup.jar";
+            javaCmd += "java -Xmx750m -jar " + catchupDir + "libs" + File.separator + "sagetvcatchup.jar";
         }
 
       osUtils.spawnProcess(javaCmd, "catchupserver", false, new File(catchupDir));

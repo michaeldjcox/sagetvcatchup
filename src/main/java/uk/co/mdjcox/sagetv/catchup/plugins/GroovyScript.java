@@ -12,6 +12,8 @@ import uk.co.mdjcox.sagetv.utils.OsUtilsInterface;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -98,11 +100,14 @@ public abstract class GroovyScript extends groovy.lang.Script {
     downloadUtils.downloadFile(url, file, stopFlag);
   }
 
-  public void DOWNLOAD_WEB_PAGE_BACKGROUND(final URL url, final String file, final AtomicBoolean stopFlag) throws IOException {
+  public void DOWNLOAD_WEB_PAGE_BACKGROUND(final URL url, final String partial, final String completed, final AtomicBoolean stopFlag) throws IOException {
     Runnable runnable = new Runnable() {
       public void run() {
         try {
-          downloadUtils.downloadFile(url, file, stopFlag);
+          downloadUtils.downloadFile(url, partial, stopFlag);
+          File partialFile = new File(partial);
+            File completedFile = new File(completed);
+            Files.copy(partialFile.toPath(), completedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
           logger.error("Failed to download file", e);
         }
