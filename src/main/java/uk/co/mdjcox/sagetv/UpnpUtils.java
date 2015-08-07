@@ -154,71 +154,170 @@ public class UpnpUtils {
     return items;
   }
 
-  private List<Container> findContainers(final ProgressTracker tracker, final ArrayList<Container> path, UpnpService upnpService, final ConcurrentHashMap<String, UpnpItem> items, final ContentType itemType, final String parentId, final RemoteService contentService, final Set<String> excludes) {
+    public Map<String, Container> findContainers(ProgressTracker tracker, ContentType itemType, Map<String, String> categoryMaps, Set<String> excludes, RemoteService... services) {
+        ConcurrentHashMap<String, Container> containers = new ConcurrentHashMap<String, Container>();
 
-    final List<Container> containers = new ArrayList<Container>();
+        UpnpService upnpService = new UpnpServiceImpl(new BaseRegistryListener());
 
-    final Browse browse = new Browse(contentService, parentId, BrowseFlag.DIRECT_CHILDREN) {
-      @Override
-      public void received(ActionInvocation actionInvocation, DIDLContent didl) {
-        for (Item item : didl.getItems()) {
-          if ((itemType == ContentType.VIDEO && item instanceof VideoItem) ||
-                  (itemType == ContentType.AUDIO && item instanceof AudioItem) ||
-                  (itemType == ContentType.IMAGE && item instanceof ImageItem))
-          {
+        for (RemoteService service : services) {
+            Action browseAction = service.getAction("Browse");
+            if (browseAction == null) {
+                continue;
+            }
 
-            UpnpItem uitem = new UpnpItem(item);
-            uitem.addPath(path);
+            Map<String, Container> serviceContainers = findContainers(tracker, new ArrayList<Container>(), upnpService, itemType, "0", service, categoryMaps, excludes);
 
-            uitem = items.putIfAbsent(item.getTitle(), uitem);
-            if (uitem != null) {
-              uitem.addPath(path);
-            } else {
-                if (tracker != null) {
-                    tracker.setProgress("Doing " + contentService.getDevice().getDetails().getModelDetails().getModelName() + " item " + items.size());
+            containers.putAll(serviceContainers);
+        }
+
+        upnpService.shutdown();
+
+        return containers;
+    }
+
+
+    private List<Container> findContainers(final ProgressTracker tracker, final ArrayList<Container> path, UpnpService upnpService, final ConcurrentHashMap<String, UpnpItem> items, final ContentType itemType, final String parentId, final RemoteService contentService, final Set<String> excludes) {
+
+        final List<Container> containers = new ArrayList<Container>();
+
+        final Browse browse = new Browse(contentService, parentId, BrowseFlag.DIRECT_CHILDREN) {
+            @Override
+            public void received(ActionInvocation actionInvocation, DIDLContent didl) {
+                for (Item item : didl.getItems()) {
+                    if ((itemType == ContentType.VIDEO && item instanceof VideoItem) ||
+                            (itemType == ContentType.AUDIO && item instanceof AudioItem) ||
+                            (itemType == ContentType.IMAGE && item instanceof ImageItem))
+                    {
+
+                        UpnpItem uitem = new UpnpItem(item);
+                        uitem.addPath(path);
+
+                        uitem = items.putIfAbsent(item.getTitle(), uitem);
+                        if (uitem != null) {
+                            uitem.addPath(path);
+                        } else {
+                            if (tracker != null) {
+                                tracker.setProgress("Doing " + contentService.getDevice().getDetails().getModelDetails().getModelName() + " item " + items.size());
+                            }
+                        }
+                    }
+                }
+                List<Container> theseContainers = didl.getContainers();
+                containers: for (Container container : theseContainers) {
+                    if (excludes.contains(container.getTitle())) {
+                        continue;
+                    }
+                    containers.add(container);
                 }
             }
-          }
-        }
-          List<Container> theseContainers = didl.getContainers();
-          containers: for (Container container : theseContainers) {
-            if (excludes.contains(container.getTitle())) {
-              continue;
+
+            @Override
+            public void updateStatus(Status status) { }
+
+            @Override
+            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+                System.err.println(defaultMsg);
             }
-            containers.add(container);
+        };
+
+        Future future = upnpService.getControlPoint().execute(browse);
+        try {
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-      }
 
-      @Override
-      public void updateStatus(Status status) { }
+        List<Container> containerContainers = new ArrayList<Container>();
+        for (Container container : containers) {
+            if (excludes.contains(container.getTitle())) {
+                continue;
+            }
 
-      @Override
-      public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-        System.err.println(defaultMsg);
-      }
-    };
+            ArrayList<Container> newPath = new ArrayList<Container>(path);
+            newPath.add(container);
+            containerContainers.addAll(findContainers(tracker, newPath, upnpService, items, itemType, container.getId(), contentService, excludes));
+        }
 
-    Future future = upnpService.getControlPoint().execute(browse);
-    try {
-      future.get();
-    } catch (Exception e) {
-      e.printStackTrace();
+        containers.addAll(containerContainers);
+
+        return containers;
     }
 
-  List<Container> containerContainers = new ArrayList<Container>();
-  for (Container container : containers) {
-    if (container.getTitle().equals("Preferences")) {
-      continue;
+
+  private Map<String, Container> findContainers(final ProgressTracker tracker, final ArrayList<Container> path, UpnpService upnpService, final ContentType itemType, final String parentId, final RemoteService contentService, final Map<String, String> categoryMaps, final Set<String> excludes) {
+
+        final Map<String, Container> containers = new ConcurrentHashMap<String, Container>();
+
+        final Browse browse = new Browse(contentService, parentId, BrowseFlag.DIRECT_CHILDREN) {
+            @Override
+            public void received(ActionInvocation actionInvocation, DIDLContent didl) {
+                List<Container> theseContainers = didl.getContainers();
+                containers: for (Container container : theseContainers) {
+                    if (excludes.contains(container.getTitle())) {
+                        continue;
+                    }
+
+                    String id = "";
+                    for (Container pathContainer : path) {
+                        id += "/";
+                        id += pathContainer.getTitle();
+                    }
+                    id+="/";
+                    id += container.getTitle();
+                    System.err.println("Found " + id);
+
+                    id = applyCategoryMaps(categoryMaps, id);
+                    containers.put(id, container);
+                }
+            }
+
+            @Override
+            public void updateStatus(Status status) { }
+
+            @Override
+            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+                System.err.println(defaultMsg);
+            }
+        };
+
+        Future future = upnpService.getControlPoint().execute(browse);
+        try {
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Map<String, Container> containerContainers = new ConcurrentHashMap<String, Container>();
+        for (Container container : containers.values()) {
+            if (excludes.contains(container.getTitle())) {
+                continue;
+            }
+
+            ArrayList<Container> newPath = new ArrayList<Container>(path);
+            newPath.add(container);
+            containerContainers.putAll(findContainers(tracker, newPath, upnpService, itemType, container.getId(), contentService, categoryMaps, excludes));
+        }
+
+        containers.putAll(containerContainers);
+
+        return containers;
     }
 
-    ArrayList<Container> newPath = new ArrayList<Container>(path);
-    newPath.add(container);
-    containerContainers.addAll(findContainers(tracker, newPath, upnpService, items, itemType, container.getId(), contentService, excludes));
-  }
+    private String applyCategoryMaps(Map<String, String> categoryMaps, String subcat) {
+        for (Map.Entry<String,String> map : categoryMaps.entrySet()) {
+            String from = map.getKey();
+            String to = map.getValue();
+            subcat = subcat.replaceFirst(from, to);
+            if (subcat.startsWith("/")) {
+                subcat = subcat.substring(1);
+            }
+        }
 
-  containers.addAll(containerContainers);
+        if (subcat.endsWith("/")) {
+            subcat = subcat.substring(0, subcat.length()-1);
+        }
+        return subcat.trim();
+    }
 
-    return containers;
-  }
 }
 

@@ -7,6 +7,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Named;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.PluginUpnpFactory;
+import uk.co.mdjcox.sagetv.catchup.plugins.PluginUpnpLiteFactory;
 import uk.co.mdjcox.sagetv.catchup.plugins.ScriptFactory;
 import uk.co.mdjcox.sagetv.utils.*;
 
@@ -35,7 +36,7 @@ public class CatchupDevModule extends AbstractModule {
       install(new FactoryModuleBuilder()
               .build(PluginFactory.class));
       install(new FactoryModuleBuilder()
-              .build(PluginUpnpFactory.class));
+              .build(PluginUpnpLiteFactory.class));
     }
 
     @Provides

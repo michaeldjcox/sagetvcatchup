@@ -31,7 +31,7 @@ public class PluginManager {
     @Inject
     private PluginFactory pluginFactory;
     @Inject
-    private PluginUpnpFactory pluginUpnpFactory;
+    private PluginUpnpLiteFactory pluginUpnpFactory;
     private CatchupContextInterface context;
 
     @Inject
