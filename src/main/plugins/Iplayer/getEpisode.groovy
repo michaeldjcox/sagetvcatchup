@@ -4,14 +4,14 @@ package Iplayer
 String pid = REPLACE_LINK_PREFIX(url, "http://www.bbc.co.uk/iplayer/episode/", "");
 pid = REPLACE_LINK_TARGET(pid, "");
 String metaurl = "http://www.bbc.co.uk/programmes/" + pid + ".xml";
-String programmeUrl = REPLACE_LINK_PREFIX(url, "http://www.bbc.co.uk/iplayer/episode/", "http://www.bbc.co.uk/iplayer/playlist/");
+//String programmeUrl = REPLACE_LINK_PREFIX(url, "http://www.bbc.co.uk/iplayer/episode/", "http://www.bbc.co.uk/iplayer/playlist/");
 
 episode.addMetaUrl(url);
 episode.addMetaUrl(metaurl);
-episode.addMetaUrl(programmeUrl);
+//episode.addMetaUrl(programmeUrl);
 
 String metadetails = GET_WEB_PAGE(metaurl, stopFlag);
-String programmeDetails = GET_WEB_PAGE(programmeUrl, stopFlag);
+String programmeDetails = ""; //GET_WEB_PAGE(programmeUrl, stopFlag);
 
 // EPISODE TITLE
 String details = MOVE_TO("<title>", metadetails)
@@ -104,7 +104,8 @@ tuneurl = MAKE_LINK_ABSOLUTE("http://www.bbc.co.uk", tuneurl);
 if (tuneurl != null) {
     episode.setServiceUrl(tuneurl);
 } else {
-    LOG_ERROR(episode, "Tuning URL not found" );
+    episode.setServiceUrl(url);
+//    LOG_ERROR(episode, "Tuning URL not found" );
 }
 
 // CHANNEL
