@@ -1,6 +1,10 @@
 <![CDATA[
  \n
-1.0.0 First official release.
+1.0.1 - Breakfix following BBC Iplayer website changes.
+ \n
+      - Require get_iplayer 2.94 and remove dependence on playlist URLS which BBC blocks access to
+ \n
+1.0.0 - First official release.
  \n
       - Online Services menu. Show the last air date rather than original air date in episode detail
       - Online Services menu. Cataloging status - add a count of subcategories
