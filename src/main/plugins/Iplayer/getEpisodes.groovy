@@ -25,7 +25,7 @@ while (str != null) {
         break;
     }
     String programmeBlock = EXTRACT_TO(end, str)
-    programmeBlock = MOVE_TO("<a href=\"", programmeBlock);
+    programmeBlock = MOVE_TO("href=\"", programmeBlock);
     link = EXTRACT_TO("\"", programmeBlock)
     if (link == null) {
         LOG_ERROR(category, "Cannot add episode - episode link not found" );
