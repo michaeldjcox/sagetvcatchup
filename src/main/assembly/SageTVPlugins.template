@@ -9,7 +9,7 @@ _DESCRIPTION_
 <Author>_AUTHOR_</Author>
 <CreationDate>_CREATEDATE_</CreationDate>
 <ModificationDate>_MODDATE_</ModificationDate>
-<Version beta="true">_VERSION_</Version>
+<Version beta="false">_VERSION_</Version>
 <Desktop>false</Desktop>
 <Dependency>
 <Plugin>sagex-api</Plugin>
