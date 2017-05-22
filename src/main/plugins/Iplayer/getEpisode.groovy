@@ -3,7 +3,7 @@ package Iplayer
 
 String pid = REPLACE_LINK_PREFIX(url, "http://www.bbc.co.uk/iplayer/episode/", "");
 pid = REPLACE_LINK_TARGET(pid, "");
-String metaurl = "http://www.bbc.co.uk/programmes/" + pid + ".xml";
+String metaurl = "http://www.bbc.co.uk/programmes/" + pid + ".json";
 //String programmeUrl = REPLACE_LINK_PREFIX(url, "http://www.bbc.co.uk/iplayer/episode/", "http://www.bbc.co.uk/iplayer/playlist/");
 
 episode.addMetaUrl(url);
@@ -14,24 +14,14 @@ String metadetails = GET_WEB_PAGE(metaurl, stopFlag);
 String programmeDetails = ""; //GET_WEB_PAGE(programmeUrl, stopFlag);
 
 // EPISODE TITLE
-String details = MOVE_TO("<title>", metadetails)
-String title = EXTRACT_TO("<", details)
+String details = MOVE_TO("\"title\":\"", metadetails)
+String title = EXTRACT_TO("\"", details)
 title = REMOVE_HTML_TAGS(title);
 
 if (title == null) {
-    details = MOVE_TO("<display_title>", metadetails)
-    details = MOVE_TO("<title>", details)
-    title = EXTRACT_TO("<", details)
+    details = MOVE_TO("\"display_title\":{\"title\":\"Abadas\",\"subtitle\":\"", metadetails)
+    title = EXTRACT_TO("\"", details)
     title = REMOVE_HTML_TAGS(title);
-
-    details = MOVE_TO("<display_title>", metadetails)
-    details = MOVE_TO("<subtitle>", details)
-    String subtitle = EXTRACT_TO("<", details)
-    subtitle = REMOVE_HTML_TAGS(subtitle);
-
-    if (subtitle != null) {
-        title=subtitle;
-    }   
 }
 
 if (title != null) {
@@ -42,14 +32,9 @@ if (title != null) {
 
 // SERIES TITLE
 
-details = MOVE_TO("<programme type=\"series\">", metadetails);
+details = MOVE_TO("\"display_title\":{\"title\":\"", metadetails);
 
-if (details == null) {
-    details = MOVE_TO("<programme type=\"brand\">", metadetails);
-}
-
-details = MOVE_TO("<title>", details);
-String seriesTitle = EXTRACT_TO("<", details)
+String seriesTitle = EXTRACT_TO("\"", details)
 seriesTitle = REMOVE_HTML_TAGS(seriesTitle);
 
 if (seriesTitle != null) {
@@ -59,19 +44,19 @@ if (seriesTitle != null) {
 }
 
 // SYNOPSIS
-details = MOVE_TO("<long_synopsis>", metadetails)
-String desc = EXTRACT_TO("<", details)
+details = MOVE_TO("\"long_synopsis\":\"", metadetails)
+String desc = EXTRACT_TO("\"", details)
 desc = REMOVE_HTML_TAGS(desc);
 
 if (desc == null) {
-    details = MOVE_TO("<medium_synopsis>", metadetails)
-    desc = EXTRACT_TO("<", details)
+    details = MOVE_TO("\"medium_synopsis\":\"", metadetails)
+    desc = EXTRACT_TO("\"", details)
     desc = REMOVE_HTML_TAGS(desc);
 }
 
 if (desc == null) {
-    details = MOVE_TO("<short_synopsis>", metadetails)
-    desc = EXTRACT_TO("<", details)
+    details = MOVE_TO("\"short_synopsis\":\"", metadetails)
+    desc = EXTRACT_TO("\"", details)
     desc = REMOVE_HTML_TAGS(desc);
 }
 
@@ -82,9 +67,8 @@ if (desc != null) {
 }
 
 // IMAGE URL
-details = MOVE_TO("<image>", metadetails);
-details = MOVE_TO("<pid>", details);
-String image = EXTRACT_TO("<", details);
+details = MOVE_TO("\"image\":{\"pid\":\"", metadetails);
+String image = EXTRACT_TO("\"", details);
 image = REMOVE_HTML_TAGS(image);
 image = "http://ichef.bbci.co.uk/images/ic/272x153/" + image + ".jpg";
 
@@ -113,9 +97,9 @@ details=MOVE_TO("<service id=", programmeDetails);
 details=MOVE_TO(">", details);
 String channel1 = EXTRACT_TO("<", details)
 
-details = MOVE_TO("<service type=", metadetails)
-details = MOVE_TO("<title>", details)
-String channel2 = EXTRACT_TO("<", details)
+details = MOVE_TO("\"ownership\":{\"service\"", metadetails)
+details = MOVE_TO("\"title\":\"", details)
+String channel2 = EXTRACT_TO("\"", details)
 channel2 = REMOVE_HTML_TAGS(channel2);
 
 String channel;
@@ -139,13 +123,13 @@ if (channel == null) {
 episode.setChannel(channel);
 
 // CATEGORY
-details = MOVE_TO("<categories>", metadetails);
-String genres = EXTRACT_TO("</categories>", details);
+details = MOVE_TO("\"categories\":[{", metadetails);
+String genres = EXTRACT_TO("}]", details);
 
 while (genres != null) {
-    genres = MOVE_TO("<category type=\"genre", genres);
-    genres = MOVE_TO("<title>", genres);
-    genre = EXTRACT_TO("</title>", genres);
+    genres = MOVE_TO("\"type\":\"genre\"", genres);
+    genres = MOVE_TO("\"title\":\"", genres);
+    genre = EXTRACT_TO("\"", genres);
     genre = REMOVE_HTML_TAGS(genre);
     if (genre != null && !genre.isEmpty()) {
         genre = genre.replace(" & ", " and ");
@@ -161,44 +145,42 @@ if (episode.getGenres().size() == 0) {
 }
 
 // SERIES
-details = MOVE_TO("<programme type=\"series\">", metadetails);
+details = MOVE_TO("\"parent\":{\"programme\":{\"type\":\"series\"", metadetails);
 
 if (details == null) {
-    details = MOVE_TO("<programme type=\"brand\">", metadetails);
+    details = MOVE_TO("\"parent\":{\"programme\":{\"type\":\"brand\"", metadetails);
 }
 
-details = MOVE_TO("<position", details);
+details = MOVE_TO("\"position\":", details);
 
 String seriesNumber = null;
 
 if (details != null && !details.startsWith("/>")) {
-    details = MOVE_TO(">", details);
-    seriesNumber = EXTRACT_TO("<", details)
+    seriesNumber = EXTRACT_TO(",", details)
     seriesNumber = REMOVE_HTML_TAGS(seriesNumber);
 }
 
 // EPISODE
 String episodeNo = null;
-details = MOVE_TO("<position", metadetails);
+details = MOVE_TO("\"position\":", metadetails);
 if (details != null && !details.startsWith("/>")) {
-    details = MOVE_TO(">", details);
-    episodeNo = EXTRACT_TO("</position", details)
+    episodeNo = EXTRACT_TO(",", details)
     episodeNo = REMOVE_HTML_TAGS(episodeNo);
 }
 
-if (episodeNo != null) {
+if (episodeNo != null && !episodeNo.equals("null")) {
     if (!episodeNo.matches("[0-9]*")) {
         LOG_WARNING(episode, "Episode number is not a number: " + episodeNo);
     }
     episode.setEpisode(episodeNo);
-    if (seriesNumber == null) {
+    if (seriesNumber == null || seriesNumber.equals("null")) {
         seriesNumber = "1"
     }
 } else {
     LOG_WARNING(episode, "Episode number not found");
 }
 
-if (seriesNumber != null) {
+if (seriesNumber != null && !seriesNumber.equals("null")) {
     if (!seriesNumber.matches("[0-9]*")) {
         LOG_WARNING(episode, "Series number is not a number: " + seriesNumber);
     }
@@ -208,12 +190,11 @@ if (seriesNumber != null) {
 }
 
 //AIRING DATE AND TIME
-details = MOVE_TO("<first_broadcast_date", metadetails)
+details = MOVE_TO("\"first_broadcast_date\":\"", metadetails)
 
 // If empty tag is present then there is no data to parse otherwise...
 if (details != null && !details.startsWith("/>")) {
-    details = MOVE_TO(">", details);
-    details = EXTRACT_TO("</first_broadcast_date>", details)
+    details = EXTRACT_TO("\"", details)
 
     String time=null;
     String date = null;
@@ -263,76 +244,56 @@ if (details != null && !details.startsWith("/>")) {
 // It could be irrelvant - just take the last broadcasted anywhere
 
 
-details = MOVE_TO("<versions", metadetails);
-details = MOVE_TO("<version canonical=\"1\"", details)
-String version = EXTRACT_TO("</version", details)
+details = MOVE_TO("\"versions\":[{", metadetails);
+String version = EXTRACT_TO("}]", details)
 String versionId = null
 String duration = null
-boolean originalVersion = false
-while (version != null && versionId == null && !originalVersion) {
-    originalVersion = version.contains("<type>Original version</type>");
+while (version != null) {
 
-        version = MOVE_TO("<pid>", version);
-        versionId = EXTRACT_TO("</pid>", version)
-        durationDetails = MOVE_TO("<duration>", version)
-        duration = EXTRACT_TO("</duration>", durationDetails)
+    version = MOVE_TO("\"pid\":\"", version);
+    if (version != null) {
+        versionId = EXTRACT_TO("\"", version)
+        durationDetails = MOVE_TO("\"duration\":", version)
+        duration = EXTRACT_TO(",", durationDetails)
         if (duration != null) {
             episode.setDuration(duration)
         }
 
-    details = MOVE_TO("<version canonical=\"1\"", details)
-    version = EXTRACT_TO("</version ", details)
-}
-
-if (versionId == null) {
-    details = MOVE_TO("<versions", metadetails);
-    details = MOVE_TO("<version canonical=\"0\"", details)
-    version = EXTRACT_TO("</version", details)
-    versionId = null
-    duration = null
-    while (version != null && versionId == null && !originalVersion) {
-        originalVersion = version.contains("<type>Original version</type>");
-
-        version = MOVE_TO("<pid>", version);
-        versionId = EXTRACT_TO("</pid>", version)
-        durationDetails = MOVE_TO("<duration>", version)
-        duration = EXTRACT_TO("</duration>", durationDetails)
-        if (duration != null) {
-            episode.setDuration(duration)
-        }
-        details = MOVE_TO("<version canonical=\"1\"", details)
-        version = EXTRACT_TO("</version ", details)
+        details = MOVE_TO("\"canonical\"", details)
+        version = EXTRACT_TO("}]", details)
     }
-
 }
+
+
+String versionDetails = null
+String origVersionDetails = null
 
 if (versionId != null) {
-    String versionUrl = "http://www.bbc.co.uk/programmes/" + versionId + ".xml";
+    String versionUrl = "http://www.bbc.co.uk/programmes/" + versionId + ".json";
     episode.addMetaUrl(versionUrl)
-    String versionDetails = GET_WEB_PAGE(versionUrl, stopFlag);
-    String origVersionDetails = versionDetails;
+    versionDetails = GET_WEB_PAGE(versionUrl, stopFlag);
+    origVersionDetails = versionDetails;
 
-    durationDetails = MOVE_TO("<duration>", versionDetails)
-    duration = EXTRACT_TO("</duration>", durationDetails)
+    durationDetails = MOVE_TO("\"duration\":", versionDetails)
+    duration = EXTRACT_TO(",", durationDetails)
     if (duration != null) {
         episode.setDuration(duration)
     } else {
 
     }
 
-    versionDetails = MOVE_TO("<broadcast", versionDetails);
-    versionDetails = MOVE_TO("<start", versionDetails);
+    versionDetails = MOVE_TO("\"is_repeat\":", versionDetails);
 
     while (versionDetails != null && !versionDetails.startsWith("/>")) {
 
-        durationDetails = MOVE_TO("<duration>", versionDetails)
-        duration = EXTRACT_TO("</duration>", durationDetails)
+        durationDetails = MOVE_TO("\"duration\":", versionDetails)
+        duration = EXTRACT_TO(",", durationDetails)
         if (duration != null) {
             episode.setDuration(duration)
         }
 
-        String airDateDetails = MOVE_TO(">", versionDetails);
-        airDateDetails = EXTRACT_TO("</start>", airDateDetails)
+        String airDateDetails = MOVE_TO("\"start\":\"", versionDetails);
+        airDateDetails = EXTRACT_TO("\"", airDateDetails)
 
         String time=null;
         String date = null;
@@ -380,124 +341,110 @@ if (versionId != null) {
 //            LOG_INFO(episode.getPodcastTitle() + " repeat " + episode.getAirDate() + " " + episode.getAirTime() + " prevails over " + newDate + " " + newTime);
         }
 
-        versionDetails = MOVE_TO("<broadcast", versionDetails);
-        versionDetails = MOVE_TO("<start", versionDetails);
+        versionDetails = MOVE_TO("\"is_repeat\":", versionDetails);
     }
 
+    String availabiityDetails = GET_WEB_PAGE(url, stopFlag);
 
-    versionDetails = MOVE_TO("<availability>", origVersionDetails);
+    availabiityDetails = MOVE_TO("\"availability\":{", availabiityDetails);
 
-    while (versionDetails != null) {
+    availabiityDetails = EXTRACT_TO("}", availabiityDetails);
 
-        String availDetails = MOVE_TO("<start", versionDetails);
-        if (availDetails != null && !availDetails.startsWith("/>")) {
-            availDetails = MOVE_TO(">", availDetails);
-            availDetails = EXTRACT_TO("</start>", availDetails)
+    String begin = MOVE_TO("\"start\":\"", availabiityDetails);
+    begin = EXTRACT_TO("\"", begin);
 
-            String time = null;
-            String date = null;
+    String time = null;
+    String date = null;
 
-            if (availDetails != null) {
-                date = EXTRACT_TO("T", availDetails);
-                date = REMOVE_HTML_TAGS(date);
-                time = MOVE_TO("T", availDetails);
-                String time2 = EXTRACT_TO("+", time);
-                if (time2 == null) {
-                    time2 = EXTRACT_TO("Z", time);
-                }
-                time = REMOVE_HTML_TAGS(time2);
-            }
+    if (begin != null) {
+        date = EXTRACT_TO("T", begin);
+        date = REMOVE_HTML_TAGS(date);
+        time = MOVE_TO("T", begin);
+        String time2 = EXTRACT_TO("+", time);
+        if (time2 == null) {
+            time2 = EXTRACT_TO("Z", time);
+        }
+        time = REMOVE_HTML_TAGS(time2);
+    }
 
-            String newDate = null;
-            if (date != null) {
-                newDate = FIX_DATE("yyyy-MM-dd", date);
-                if (newDate == null) {
-                    LOG_ERROR(episode, "Failed to parse addition date: " + date);
-                    newDate = date;
-                }
-            } else {
-                LOG_WARNING(episode, "Addition date not found");
-            }
+    String newDate = null;
+    if (date != null) {
+        newDate = FIX_DATE("yyyy-MM-dd", date);
+        if (newDate == null) {
+            LOG_ERROR(episode, "Failed to parse addition date: " + date);
+            newDate = date;
+        }
+    } else {
+        LOG_WARNING(episode, "Addition date not found");
+    }
 
-            String newTime = null
-            if (time != null) {
-                newTime = FIX_TIME("HH:mm:ss", time);
-                if (newTime == null) {
-                    LOG_ERROR(episode, "Failed to parse addition time: " + time);
-                    newTime = time;
-                }
+    String newTime = null
+    if (time != null) {
+        newTime = FIX_TIME("HH:mm:ss", time);
+        if (newTime == null) {
+            LOG_ERROR(episode, "Failed to parse addition time: " + time);
+            newTime = time;
+        }
 
-            } else {
-                LOG_WARNING(episode, "Addition time not found");
-            }
+    } else {
+        LOG_WARNING(episode, "Addition time not found");
+    }
 
-            if (PAST_DATE(newDate, newTime) &&
-                DATE_BEFORE(episode.getAdditionDate(), episode.getAdditionTime(), newDate, newTime)) {
+    if (PAST_DATE(newDate, newTime) &&
+            DATE_BEFORE(episode.getAdditionDate(), episode.getAdditionTime(), newDate, newTime)) {
 //                LOG_INFO(episode.getPodcastTitle() + " addition date " + newDate + " " + newTime + " is before " + episode.getAdditionDate() + " " + episode.getAdditionTime());
-                episode.setAdditionDate(newDate);
-                episode.setAdditionTime(newTime);
-            } else {
+        episode.setAdditionDate(newDate);
+        episode.setAdditionTime(newTime);
+    } else {
 //                LOG_INFO(episode.getPodcastTitle() + " addition date " + episode.getAdditionDate() + " " + episode.getAdditionTime() + " prevails over " + newDate + " " + newTime);
-            }
-        }
-
-        availDetails = MOVE_TO("<end", versionDetails);
-        if (availDetails != null && !availDetails.startsWith("/>")) {
-            availDetails = MOVE_TO(">", availDetails);
-            availDetails = EXTRACT_TO("</end>", availDetails)
-
-            String time = null;
-            String date = null;
-
-            if (availDetails != null) {
-                date = EXTRACT_TO("T", availDetails);
-                date = REMOVE_HTML_TAGS(date);
-                time = MOVE_TO("T", availDetails);
-                String time2 = EXTRACT_TO("+", time);
-                if (time2 == null) {
-                    time2 = EXTRACT_TO("Z", time);
-                }
-                time = REMOVE_HTML_TAGS(time2);
-            }
-
-            String newDate = null;
-            if (date != null) {
-                newDate = FIX_DATE("yyyy-MM-dd", date);
-                if (newDate == null) {
-                    LOG_ERROR(episode, "Failed to parse removal date: " + date);
-                    newDate = date;
-                }
-            } else {
-                LOG_WARNING(episode, "Removal date not found");
-            }
-
-            String newTime = null
-            if (time != null) {
-                newTime = FIX_TIME("HH:mm:ss", time);
-                if (newTime == null) {
-                    LOG_ERROR(episode, "Failed to parse removal time: " + time);
-                    newTime = time;
-                }
-
-            } else {
-                LOG_WARNING(episode, "Removal time not found");
-            }
-
-            if (FUTURE_DATE(newDate, newTime) &&
-                DATE_BEFORE(episode.getRemovalDate(), episode.getRemovalTime(), newDate, newTime)) {
-//                LOG_INFO(episode.getPodcastTitle() + " removal date " + newDate + " " + newTime + " is before " + episode.getRemovalDate() + " " + episode.getRemovalTime());
-                episode.setRemovalDate(newDate);
-                episode.setRemovalTime(newTime);
-            } else {
-//                LOG_INFO(episode.getPodcastTitle() + " removal date " + episode.getRemovalDate() + " " + episode.getRemovalTime() + " prevails over " + newDate + " " + newTime);
-            }
-        }
-
-        versionDetails = MOVE_TO("<availability>", versionDetails);
     }
-} else {
-    LOG_WARNING(episode, "No default versionId found for programme");
+
+    String end = MOVE_TO("\"end\":\"", availabiityDetails);
+    end = EXTRACT_TO("\"", end);
+
+    if (end != null) {
+        date = EXTRACT_TO("T", end);
+        date = REMOVE_HTML_TAGS(date);
+        time = MOVE_TO("T", end);
+        String time2 = EXTRACT_TO("+", time);
+        if (time2 == null) {
+            time2 = EXTRACT_TO("Z", time);
+        }
+        time = REMOVE_HTML_TAGS(time2);
+    }
+
+    newDate = null;
+    if (date != null) {
+        newDate = FIX_DATE("yyyy-MM-dd", date);
+        if (newDate == null) {
+            LOG_ERROR(episode, "Failed to parse removal date: " + date);
+            newDate = date;
+        }
+    } else {
+        LOG_WARNING(episode, "Removal date not found");
+    }
+
+    if (time != null) {
+        newTime = FIX_TIME("HH:mm:ss", time);
+        if (newTime == null) {
+            LOG_ERROR(episode, "Failed to parse removal time: " + time);
+            newTime = time;
+        }
+
+    } else {
+        LOG_WARNING(episode, "Removal time not found");
+    }
+
+    if (FUTURE_DATE(newDate, newTime) &&
+            DATE_BEFORE(episode.getRemovalDate(), episode.getRemovalTime(), newDate, newTime)) {
+//                LOG_INFO(episode.getPodcastTitle() + " removal date " + newDate + " " + newTime + " is before " + episode.getRemovalDate() + " " + episode.getRemovalTime());
+        episode.setRemovalDate(newDate);
+        episode.setRemovalTime(newTime);
+    } else {
+//                LOG_INFO(episode.getPodcastTitle() + " removal date " + episode.getRemovalDate() + " " + episode.getRemovalTime() + " prevails over " + newDate + " " + newTime);
+    }
 }
+
 
 if (episode.getDuration() == null || episode.getDuration().isEmpty()) {
     LOG_WARNING(episode, "No episode duration found");
